@@ -6,7 +6,9 @@
 
 - name: Ensure heroic-games-launcher is installed
   ansible.builtin.package:
-    name: wine,heroic-games-launcher-bin
+    name:
+      - wine
+      - heroic-games-launcher-bin
     state: present
 
 - name: Ensure steam is installed

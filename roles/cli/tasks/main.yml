@@ -7,6 +7,12 @@
     owner: "{{ cli_user }}"
     group: "{{ cli_user }}"
 
+- name: Ensure CLI programs are installed
+  ansible.builtin.package:
+    name:
+      - bat
+    state: present
+
 - name: Find all files and directories in dotfiles/bash
   ansible.builtin.find:
     paths: "{{ dotfiles_path }}/bash"
