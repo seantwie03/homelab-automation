@@ -6,12 +6,13 @@
     owner: root
     group: wheel
     recurse: true
-    
+  changed_when: false
+
 - name: Template ansible-pull systemd service
   ansible.builtin.template:
     src: ansible-pull.service.j2
     dest: /etc/systemd/system/ansible-pull.service
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
 
@@ -19,7 +20,7 @@
   ansible.builtin.template:
     src: ansible-pull.timer.j2
     dest: /etc/systemd/system/ansible-pull.timer
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
 
@@ -27,7 +28,7 @@
   ansible.builtin.file:
     path: /var/log/ansible-pull
     state: directory
-    mode: '0755'
+    mode: "0755"
     owner: root
     group: root
 
@@ -44,7 +45,7 @@
           create 0644 root root
       }
     dest: /etc/logrotate.d/ansible-pull
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
 
@@ -59,7 +60,7 @@
   ansible.builtin.template:
     src: ansible-pull-manage.sh.j2
     dest: /usr/local/bin/ansible-pull-manage
-    mode: '0755'
+    mode: "0755"
     owner: root
     group: root
 

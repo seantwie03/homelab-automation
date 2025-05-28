@@ -1,0 +1,44 @@
+---
+- name: Ensure .config directory exists
+  ansible.builtin.file:
+    path: "/home/{{ cli_user }}/.config"
+    state: directory
+    mode: "0755"
+    owner: "{{ cli_user }}"
+    group: "{{ cli_user }}"
+
+- name: Find all files and directories in dotfiles/bash
+  ansible.builtin.find:
+    paths: "{{ dotfiles_path }}/bash"
+    file_type: any
+    hidden: true
+  register: bash_dotfiles
+
+- name: Symlink bash dotfiles to home directory
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "/home/{{ cli_user }}/{{ item.path | basename }}"
+    state: link
+    force: true
+    owner: "{{ cli_user }}"
+    group: "{{ cli_user }}"
+  loop: "{{ bash_dotfiles.files }}"
+  loop_control:
+    label: "Symlinking {{ item.path | basename }}"
+# - name: Symlink fish dotfiles directory
+#   ansible.builtin.file:
+#     src: "{{ dotfiles_path }}/fish"
+#     dest: "/home/{{ cli_user }}/.config/fish"
+#     state: link
+#     force: true
+#     owner: "{{ cli_user }}"
+#     group: "{{ cli_user }}"
+
+# - name: Symlink nvim dotfiles directory
+#   ansible.builtin.file:
+#     src: "{{ dotfiles_path }}/nvim"
+#     dest: "/home/{{ cli_user }}/.config/nvim"
+#     state: link
+#     force: true
+#     owner: "{{ cli_user }}"
+#     group: "{{ ansible_user_id }}"

@@ -1,0 +1,20 @@
+$include /etc/inputrc
+
+# Settings - https://www.gnu.org/software/bash/manual/html_node/Readline-Init-File-Syntax.html
+set editing-mode emacs
+set bell-style none
+set completion-ignore-case on
+set completion-map-case on
+set visible-stats on
+set colored-stats on
+set mark-symlinked-directories on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set blink-matching-paren on
+set colored-completion-prefix on
+set colored-stats on
+
+# Keybinds
+"\C-p":history-search-backward
+"\C-n":history-search-forward
+"\b":backward-kill-word # This is C-Backspace -- somehow
