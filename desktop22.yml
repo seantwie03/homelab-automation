@@ -49,3 +49,6 @@
           - server: odroidh3plus
             share: temp
     - role: gaming
+    - role: cli
+      vars:
+        cli_user: "{{ primary_user.name }}"
