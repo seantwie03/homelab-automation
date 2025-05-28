@@ -1,0 +1,3 @@
+- name: Additional install instructions
+  ansible.builtin.debug:
+    msg: Run `sudo tailscale up`

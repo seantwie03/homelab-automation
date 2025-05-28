@@ -1,0 +1,114 @@
+- name: Remove screen blanking
+  community.general.dconf:
+    key: /org/gnome/desktop/session/idle-delay
+    value: "0"
+    state: present
+
+- name: Disable hot corners
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/enable-hot-corners"
+    value: false
+
+- name: Show maximize and minimize buttons
+  community.general.dconf:
+    key: "/org/gnome/desktop/wm/preferences/button-layout"
+    value: "'appmenu:minimize,maximize,close'"
+
+- name: Disable alert sounds
+  community.general.dconf:
+    key: "/org/gnome/desktop/sound/event-sounds"
+    value: false
+
+- name: Lock screen and wallpaper settings
+  block:
+    - name: Ensure user specific backgrounds directory exists
+      ansible.builtin.file:
+        path: /home/{{ item }}/.local/share/backgrounds
+        state: directory
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0755"
+
+    - name: Ensure workstation-wallpaper file exists
+      ansible.builtin.copy:
+        src: cosmicdawn1080p.jpg
+        dest: /home/{{ item }}/.local/share/backgrounds/workstation-wallpaper.jpg
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0644"
+
+    - name: Ensure workstation-wallpaper-dark file exists
+      ansible.builtin.copy:
+        src: crucibleplanet1080p.jpg
+        dest: /home/{{ item }}/.local/share/backgrounds/workstation-wallpaper-dark.jpg
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0644"
+
+    - name: Ensure wallpaper is set
+      community.general.dconf:
+        key: "/org/gnome/desktop/background/picture-uri"
+        value: "'file:///home/{{ item }}/.local/share/backgrounds/workstation-wallpaper.jpg'"
+
+    - name: Ensure dark wallpaper is set
+      community.general.dconf:
+        key: "/org/gnome/desktop/background/picture-uri-dark"
+        value: "'file:///home/{{ item }}/.local/share/backgrounds/workstation-wallpaper-dark.jpg'"
+
+- name: Night Light settings
+  block:
+    - name: Ensure Night Light is enabled
+      community.general.dconf:
+        key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
+        value: true
+
+    - name: Disable automatic scheduling
+      community.general.dconf:
+        key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-automatic"
+        value: false
+
+    - name: Turn on Night Light at 8p.m.
+      community.general.dconf:
+        key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-from"
+        value: 20.0
+
+    - name: Turn off Night Light at 4a.m.
+      community.general.dconf:
+        key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-to"
+        value: 4.0
+
+- name: File Explorer Settings
+  block:
+    - name: List view in files
+      community.general.dconf:
+        key: /org/gnome/nautilus/preferences/default-folder-viewer
+        value: "'list-view'"
+        state: present
+
+    - name: Folders before files
+      community.general.dconf:
+        key: /org/gtk/gtk4/settings/file-chooser/sort-directories-first
+        value: true
+        state: present
+
+- name: Keyboard Shortcuts
+  block:
+    - name: Switch to workspace to the right
+      community.general.dconf:
+        key: "/org/gnome/desktop/wm/keybindings/switch-to-workspace-right"
+        value: ["<Control><Super>Right"]
+
+    - name: Switch to workspace to the left
+      community.general.dconf:
+        key: "/org/gnome/desktop/wm/keybindings/switch-to-workspace-left"
+        value: ["<Control><Super>Left"]
+
+    - name: Move window to left workspace
+      community.general.dconf:
+        key: "/org/gnome/desktop/wm/keybindings/move-to-workspace-left"
+        value: ["<Shift><Control><Super>Left"]
+
+    - name: Move window to right workspace
+      community.general.dconf:
+        key: "/org/gnome/desktop/wm/keybindings/move-to-workspace-right"
+        value: ["<Shift><Control><Super>Right"]

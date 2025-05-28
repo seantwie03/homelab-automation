@@ -1,0 +1,38 @@
+---
+- name: Ensure 1password repository is configured
+  block:
+    - name: Ensure 1Password repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://downloads.1password.com/linux/keys/1password.asc
+        state: present
+
+    - name: Ensure 1Password repository is enabled
+      ansible.builtin.yum_repository:
+        name: 1password
+        description: 1Password Stable Channel
+        baseurl: https://downloads.1password.com/linux/rpm/stable/$basearch/
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://downloads.1password.com/linux/keys/1password.asc
+
+- name: Ensure 1password-cli is installed
+  ansible.builtin.package:
+    name: 1password-cli
+    state: present
+
+- name: Get default target
+  ansible.builtin.stat:
+    path: /etc/systemd/system/default.target
+  register: default_target
+
+- name: Print default systemd target
+  ansible.builtin.debug:
+    var: default_target.stat.lnk_target
+    verbosity: 1
+
+- name: Ensure 1password GUI is installed on graphical systems
+  ansible.builtin.package:
+    name: 1password
+    state: present
+  when: "'graphical' in default_target.stat.lnk_target"

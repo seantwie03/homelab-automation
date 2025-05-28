@@ -1,0 +1,14 @@
+---
+- name: Ensure dconf dependencies are installed
+  ansible.builtin.package:
+    name: python3-psutil
+    state: present
+
+# dconf settings are per-user. Separating the dconf tasks
+# into a separate file allows specifying become_user once.
+- name: Configure gnome desktop environment
+  ansible.builtin.include_tasks:
+    file: ./dconf_settings.yml
+    apply:
+      become_user: "{{ item }}"
+  loop: "{{ dconf_users }}"

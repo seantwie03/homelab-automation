@@ -1,0 +1,25 @@
+---
+- name: Ensure cifs-utils is installed
+  ansible.builtin.package:
+    name: cifs-utils
+    state: present
+
+- name: Ensure mount points exists
+  ansible.builtin.file:
+    path: /srv/{{ item.share }}
+    state: directory
+    mode: '0755'
+  loop: "{{ samba_mounts }}"
+  loop_control:
+    label: /srv/{{ item.share }}
+
+- name: Ensure automount configured for samba shares
+  ansible.posix.mount:
+    path: /srv/{{ item.share }}
+    src: //{{ item.server }}/{{ item.share }}
+    fstype: cifs
+    boot: false
+    opts: x-systemd.device-timeout=10,x-systemd.automount,credentials=/root/.smbcreds,uid={{ user_id }},gid={{ group_id }},file_mode=0664,dir_mode=0775
+    state: present
+  loop: "{{ samba_mounts }}"
+  notify: Restart local-fs.target

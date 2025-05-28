@@ -1,0 +1,18 @@
+---
+- name: Create directory for {{ font }}
+  ansible.builtin.file:
+    path: /usr/local/share/fonts/{{ font }}
+    owner: root
+    group: root
+    mode: "0775"
+    state: directory
+
+- name: Download and extract {{ font }}
+  ansible.builtin.unarchive:
+    src: https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ font }}.tar.xz
+    dest: /usr/local/share/fonts/{{ font }}
+    remote_src: true
+    owner: root
+    group: root
+    mode: u=rwX,g=rwX,o=rX
+    creates: /usr/local/share/fonts/{{ font }}/README.md

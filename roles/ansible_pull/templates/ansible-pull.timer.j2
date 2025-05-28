@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Ansible Pull Daily
+Documentation=https://github.com/yourusername/homelab-ansible
+Requires=ansible-pull.service
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target
