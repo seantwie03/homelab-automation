@@ -1,0 +1,28 @@
+---
+- name: Ensure Nodesource repository is configured
+  block:
+    - name: Ensure Nodesource repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+        state: present
+
+    - name: Ensure Nodesource Node.js repository is enabled
+      ansible.builtin.yum_repository:
+        name: nodesource-nodejs
+        description: Node.js Packages for Linux RPM based distros
+        baseurl: https://rpm.nodesource.com/pub_{{ node_version }}/nodistro/nodejs/x86_64
+        enabled: true
+        gpgcheck: true
+        priority: 10
+        gpgkey: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+
+- name: Ensure Node.js is installed
+  ansible.builtin.package:
+    name: nodejs
+    state: present
+
+- name: Ensure pnmp is installed
+  community.general.npm:
+    name: pnpm
+    global: true
+    state: present

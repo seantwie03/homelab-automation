@@ -1,0 +1,22 @@
+[Unit]
+Description=Ansible Pull Workstation Configuration
+Documentation=https://github.com/yourusername/homelab-ansible
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/homelab-ansible
+ExecStart={{ ansible_pull_path }} \
+    --limit localhost \
+    --accept-host-key \
+    --directory /opt/homelab-ansible \
+    --url {{ homelab_ansible_repo_url }} \
+    {{ ansible_hostname }}.yml
+StandardOutput=append:/var/log/ansible-pull/ansible-pull.log
+StandardError=append:/var/log/ansible-pull/ansible-pull-error.log
+Environment=ANSIBLE_LOG_PATH=/var/log/ansible-pull/ansible-pull.log
+
+[Install]
+WantedBy=multi-user.target

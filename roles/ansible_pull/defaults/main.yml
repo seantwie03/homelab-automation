@@ -1,0 +1,3 @@
+---
+homelab_ansible_repo_url: https://github.com/seantwie03/homelab-ansible
+ansible_pull_path: /usr/local/bin/ansible-pull

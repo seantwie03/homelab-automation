@@ -1,0 +1,14 @@
+---
+# The tag version from https://github.com/ryanoasis/nerd-fonts/releases
+nerd_fonts_version: v3.4.0
+
+# The font(s) to download and install
+fonts:
+  - Inconsolata
+  - InconsolataGo
+  - Iosevka
+  - IosevkaTerm
+  - Monofur
+  - MPlus
+  - UbuntuMono
+  - ZedMono

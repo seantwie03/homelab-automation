@@ -1,0 +1,5 @@
+- name: Restart local-fs.target
+  ansible.builtin.systemd:
+    name: local-fs.target
+    state: restarted
+    daemon_reload: true

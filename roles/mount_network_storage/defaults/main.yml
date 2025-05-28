@@ -1,0 +1,8 @@
+---
+user_id: 1000
+group_id: 1000
+samba_mounts:
+  - server: servera
+    share: docs
+  - server: 192.168.0.1
+    share: pictures

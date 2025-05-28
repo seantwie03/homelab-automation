@@ -1,0 +1,70 @@
+---
+- name: Create ansible-pull systemd service
+  ansible.builtin.template:
+    src: ansible-pull.service.j2
+    dest: /etc/systemd/system/ansible-pull.service
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Create ansible-pull systemd timer
+  ansible.builtin.template:
+    src: ansible-pull.timer.j2
+    dest: /etc/systemd/system/ansible-pull.timer
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Create ansible-pull log directory
+  ansible.builtin.file:
+    path: /var/log/ansible-pull
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Setup log rotation for ansible-pull
+  ansible.builtin.copy:
+    content: |
+      /var/log/ansible-pull/*.log {
+          daily
+          rotate 7
+          compress
+          delaycompress
+          missingok
+          notifempty
+          create 0644 root root
+      }
+    dest: /etc/logrotate.d/ansible-pull
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Enable and start ansible-pull timer
+  ansible.builtin.systemd:
+    name: ansible-pull.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Create ansible-pull management script
+  ansible.builtin.template:
+    src: ansible-pull-manage.sh.j2
+    dest: /usr/local/bin/ansible-pull-manage
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Display timer status
+  ansible.builtin.debug:
+    msg: |
+      Ansible-pull timer has been configured and started.
+
+      Management commands:
+      - sudo ansible-pull-manage status    # Show timer and last run status
+      - sudo ansible-pull-manage run       # Run ansible-pull immediately
+      - sudo ansible-pull-manage logs      # Show recent logs
+      - sudo ansible-pull-manage enable    # Enable timer
+      - sudo ansible-pull-manage disable   # Disable timer
+
+      Timer will run daily at 09:00 AM with up to 30 minutes random delay.
