@@ -48,7 +48,7 @@ case "$1" in
         cd {{ playbook_path }}
         git add .
         git commit -m "$(date --iso-8601='minutes')"
-        git push git push git@github.com:seantwie03/homelab-ansible.git main
+        git push git@github.com:seantwie03/homelab-ansible.git main
         ;;
     *)
         echo "Ansible Pull Management Script"
