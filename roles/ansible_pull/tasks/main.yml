@@ -1,5 +1,13 @@
 ---
-- name: Create ansible-pull systemd service
+- name: Ensure wheel group can edit /opt/homelab-ansible
+  ansible.builtin.file:
+    path: /opt/homelab-ansible
+    mode: u=rwX,g=rwX,o=rX
+    owner: root
+    group: wheel
+    recurse: true
+    
+- name: Template ansible-pull systemd service
   ansible.builtin.template:
     src: ansible-pull.service.j2
     dest: /etc/systemd/system/ansible-pull.service
@@ -7,7 +15,7 @@
     owner: root
     group: root
 
-- name: Create ansible-pull systemd timer
+- name: Template ansible-pull systemd timer
   ansible.builtin.template:
     src: ansible-pull.timer.j2
     dest: /etc/systemd/system/ansible-pull.timer
@@ -15,7 +23,7 @@
     owner: root
     group: root
 
-- name: Create ansible-pull log directory
+- name: Template ansible-pull log directory
   ansible.builtin.file:
     path: /var/log/ansible-pull
     state: directory
@@ -47,7 +55,7 @@
     state: started
     daemon_reload: true
 
-- name: Create ansible-pull management script
+- name: Template ansible-pull management script
   ansible.builtin.template:
     src: ansible-pull-manage.sh.j2
     dest: /usr/local/bin/ansible-pull-manage

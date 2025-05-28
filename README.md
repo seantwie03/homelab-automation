@@ -3,11 +3,10 @@
 ```sh
 sudo dnf install python3-pip git
 sudo python3 -m pip install ansible
-ansible-pull
-ansible-pull \
+sudo ansible-pull \
     --limit localhost \
     --accept-host-key \
     --directory /opt/homelab-ansible \
-    --url {{ ansible_repo_url }} \
-    $(hostname --short)$.yml
+    --url https://github.com/seantwie03/homelab-ansible.git \
+    $(hostname --short).yml
 ```
