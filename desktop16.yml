@@ -49,3 +49,6 @@
             share: media
           - server: odroidh3plus
             share: temp
+    - role: cli
+      vars:
+        cli_user: "{{ primary_user.name }}"

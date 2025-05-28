@@ -8,7 +8,9 @@
 
     - name: Ensure decompression tools are installed
       ansible.builtin.package:
-        name: xz,unzip
+        name:
+          - xz
+          - unzip
         state: installed
 
 - name: Download and extract fonts

@@ -43,13 +43,12 @@ case "$1" in
         systemctl stop $TIMER_NAME
         echo "Ansible pull timer disabled and stopped"
         ;;
-    "edit")
+    "commit")
         echo "Repository location: /opt/homelab-ansible"
-        echo "Edit files and commit changes:"
-        echo "  cd /opt/homelab-ansible"
-        echo "  git add ."
-        echo "  git commit -m 'Update configuration'"
-        echo "  git push"
+        cd /opt/homelab-ansible
+        git add .
+        git commit -m "$(date --iso-8601='minutes')"
+        git push origin-ssh
         ;;
     *)
         echo "Ansible Pull Management Script"
@@ -61,7 +60,7 @@ case "$1" in
         echo "  logs     - Show recent ansible-pull logs"
         echo "  enable   - Enable the daily timer"
         echo "  disable  - Disable the daily timer"
-        echo "  edit     - Show information about editing configuration"
+        echo "  commit   - Commit all changes to homelab-ansible"
         echo ""
         echo "Current hostname: {{ ansible_hostname }}"
         echo "Playbook: {{ ansible_hostname }}.yml"
