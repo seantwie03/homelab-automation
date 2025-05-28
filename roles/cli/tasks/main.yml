@@ -31,6 +31,7 @@
   loop: "{{ bash_dotfiles.files }}"
   loop_control:
     label: "Symlinking {{ item.path | basename }}"
+  changed_when: false
 # - name: Symlink fish dotfiles directory
 #   ansible.builtin.file:
 #     src: "{{ dotfiles_path }}/fish"

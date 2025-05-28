@@ -1,1 +1,2 @@
-dotfiles_path: /opt/homelab-ansible/dotfiles
+playbook_path: /opt/homelab-ansible
+dotfiles_path: "{{ playbook_path }}/dotfiles"
