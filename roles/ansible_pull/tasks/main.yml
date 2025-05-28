@@ -1,7 +1,7 @@
 ---
-- name: Ensure wheel group can edit /opt/homelab-ansible
+- name: Ensure wheel group can edit {{ playbook_path }}
   ansible.builtin.file:
-    path: /opt/homelab-ansible
+    path: "{{ playbook_path }}"
     mode: u=rwX,g=rwX,o=rX
     owner: root
     group: wheel
@@ -63,17 +63,3 @@
     mode: "0755"
     owner: root
     group: root
-
-- name: Display timer status
-  ansible.builtin.debug:
-    msg: |
-      Ansible-pull timer has been configured and started.
-
-      Management commands:
-      - sudo ansible-pull-manage status    # Show timer and last run status
-      - sudo ansible-pull-manage run       # Run ansible-pull immediately
-      - sudo ansible-pull-manage logs      # Show recent logs
-      - sudo ansible-pull-manage enable    # Enable timer
-      - sudo ansible-pull-manage disable   # Disable timer
-
-      Timer will run daily at 09:00 AM with up to 30 minutes random delay.

@@ -44,11 +44,11 @@ case "$1" in
         echo "Ansible pull timer disabled and stopped"
         ;;
     "commit")
-        echo "Repository location: /opt/homelab-ansible"
-        cd /opt/homelab-ansible
+        echo "Repository location: {{ playbook_path }}"
+        cd {{ playbook_path }}
         git add .
         git commit -m "$(date --iso-8601='minutes')"
-        git push origin-ssh
+        git push git push git@github.com:seantwie03/homelab-ansible.git main
         ;;
     *)
         echo "Ansible Pull Management Script"

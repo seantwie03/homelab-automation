@@ -7,11 +7,11 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=root
-WorkingDirectory=/opt/homelab-ansible
+WorkingDirectory={{ playbook_path }}
 ExecStart={{ ansible_pull_path }} \
     --limit localhost \
     --accept-host-key \
-    --directory /opt/homelab-ansible \
+    --directory {{ playbook_path }} \
     --url {{ homelab_ansible_repo_url }} \
     {{ ansible_hostname }}.yml
 StandardOutput=append:/var/log/ansible-pull/ansible-pull.log
