@@ -23,15 +23,15 @@ case "$1" in
         echo "Run completed. Check logs with: $0 logs"
         ;;
     "logs")
-        echo "=== Recent Ansible Pull Logs ==="
-        echo "Standard output:"
-        tail -50 $LOG_DIR/ansible-pull.log 2>/dev/null || echo "No standard logs found"
-        echo ""
-        echo "Error output:"
-        tail -20 $LOG_DIR/ansible-pull-error.log 2>/dev/null || echo "No error logs found"
-        echo ""
-        echo "Systemd journal:"
-        journalctl -u $SERVICE_NAME --no-pager -n 20
+        #echo "=== Recent Ansible Pull Logs ==="
+        #echo "Standard output:"
+        #tail -50 $LOG_DIR/ansible-pull.log 2>/dev/null || echo "No standard logs found"
+        #echo ""
+        #echo "Error output:"
+        #tail -20 $LOG_DIR/ansible-pull-error.log 2>/dev/null || echo "No error logs found"
+        #echo ""
+        #echo "Systemd journal:"
+        journalctl -eu $SERVICE_NAME
         ;;
     "enable")
         systemctl enable $TIMER_NAME

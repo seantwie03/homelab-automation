@@ -36,18 +36,34 @@
   ansible.builtin.copy:
     content: |
       /var/log/ansible-pull/*.log {
-          daily
-          rotate 7
-          compress
-          delaycompress
+          rotate 30
+          maxage 30
           missingok
           notifempty
-          create 0644 root root
+          nocompress
+          nocreate
       }
     dest: /etc/logrotate.d/ansible-pull
     mode: "0644"
     owner: root
     group: root
+
+# - name: Setup log rotation for ansible-pull
+#   ansible.builtin.copy:
+#     content: |
+#       /var/log/ansible-pull/*.log {
+#           daily
+#           rotate 7
+#           compress
+#           delaycompress
+#           missingok
+#           notifempty
+#           create 0644 root root
+#       }
+#     dest: /etc/logrotate.d/ansible-pull
+#     mode: "0644"
+#     owner: root
+#     group: root
 
 - name: Enable and start ansible-pull timer
   ansible.builtin.systemd:
