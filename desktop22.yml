@@ -52,3 +52,4 @@
     - role: cli
       vars:
         cli_user: "{{ primary_user.name }}"
+    - role: cli
