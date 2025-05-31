@@ -1,0 +1,8 @@
+---
+- name: Ensure scanning software is installed
+  ansible.builtin.package:
+    name: simple-scan
+
+- name: Ensure mouse configuration software is installed
+  ansible.builtin.package:
+    name: piper
