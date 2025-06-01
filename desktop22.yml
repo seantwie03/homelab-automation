@@ -35,6 +35,7 @@
         kitty_user: "{{ primary_user.name }}"
     - role: vscode
     - role: nodejs
+    - role: python
     - role: mount_network_storage
       vars:
         user_id: "{{ primary_user.uid }}"
@@ -52,4 +53,4 @@
     - role: cli
       vars:
         cli_user: "{{ primary_user.name }}"
-    - role: cli
+    - role: gui
