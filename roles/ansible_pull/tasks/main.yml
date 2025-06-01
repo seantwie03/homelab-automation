@@ -55,10 +55,20 @@
     state: started
     daemon_reload: true
 
-- name: Template ansible-pull management script
+- name: Remove ansible-pull management script
+  ansible.builtin.file:
+    path: /usr/local/bin/ansible-pull-manage.sh
+    state: absent
+
+- name: Remove /opt/homelab-ansible
+  ansible.builtin.file:
+    path: /opt/homelab-ansible
+    state: absent
+
+- name: Template homelab management script (h)
   ansible.builtin.template:
-    src: ansible-pull-manage.sh.j2
-    dest: /usr/local/bin/ansible-pull-manage
+    src: h.sh.j2
+    dest: /usr/local/bin/h
     mode: "0755"
     owner: root
     group: root
