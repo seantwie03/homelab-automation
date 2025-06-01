@@ -25,7 +25,7 @@ show_usage() {
 
 show_automation_usage() {
     echo "Usage: h a <subcommand> [arguments]"
-    echo "If no subcommand is specified, defaults to showing systemctl status ${AUTOMATION_SERVICE_NAME}.service
+    echo "If no subcommand is specified, defaults to showing systemctl status ${AUTOMATION_SERVICE_NAME}.service"
     echo ""
     echo "Homelab Automation Subcommands:"
     echo "  e, edit                 - Opens EDITOR in the Homelab Autotmation directory ({{ playbook_path }})"
@@ -35,7 +35,7 @@ show_automation_usage() {
     echo "  t, test [playbook]      - Runs ansible-pull on a playbook with --force to ignore dirty working directory"
     echo "                            If no playbook specified, defaults to {hostname --short}.yml'"
     echo "  j, job [action]         - Enables or disables ${AUTOMATION_SERVICE_NAME}.timer (requires sudo)"
-    echo "                            Action should be either 'enable' or 'disable'
+    echo "                            Action should be either 'enable' or 'disable'"
     echo "                            If no action is specified, defaults to showing systemctl status"
     echo ""
     echo "Examples:"
@@ -82,7 +82,7 @@ case "$1" in
                 cd "{{ playbook_path }}" || exit
                 git add .
                 git commit -m "$(date --iso-8601='minutes')"
-                git push $AUTOMATION_GIT_REMOTE main
+                git push "$AUTOMATION_GIT_REMOTE" main
                 ;;
             l|logs)
                 journalctl -eu ${AUTOMATION_SERVICE_NAME}.service
@@ -151,11 +151,11 @@ case "$1" in
             i|inbox)
                 echo "Opening inbox file '${DOCS_DIR}/inbox.md' in $EDITOR..."
                 if [ "$EDITOR" = 'vim' ] || [ "$EDITOR" = 'nvim' ]; then
-                    "$EDITOR" ${DOCS_DIR}/inbox.md '+cd %:p:h'
-                if [ "$EDITOR" = 'code' ] || [ "$EDITOR" = 'code-oss' ] || [ "$EDITOR" = 'codium' ]; then
-                    code -n ${DOCS_DIR} ${DOCS_DIR}/inbox.md
+                    "$EDITOR" "${DOCS_DIR}"/inbox.md '+cd %:p:h'
+                elif [ "$EDITOR" = 'code' ] || [ "$EDITOR" = 'code-oss' ] || [ "$EDITOR" = 'codium' ]; then
+                    code -n "${DOCS_DIR}" "${DOCS_DIR}"/inbox.md
                 else
-                    "$EDITOR" ${DOCS_DIR}/inbox.md
+                    "$EDITOR" "${DOCS_DIR}"/inbox.md
                 fi
                 ;;
             h|-h|help|--help)

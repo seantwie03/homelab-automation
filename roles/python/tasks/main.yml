@@ -1,0 +1,10 @@
+---
+- name: Ensure python linter is installed
+  ansible.builtin.package:
+    name: ruff
+    state: present
+
+- name: Ensure python package manager is installed
+  ansible.builtin.package:
+    name: uv
+    state: present
