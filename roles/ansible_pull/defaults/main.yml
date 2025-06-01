@@ -1,3 +1,5 @@
 ---
-homelab_ansible_repo_url: https://github.com/seantwie03/homelab-ansible
 ansible_pull_path: /usr/local/bin/ansible-pull
+homelab_ansible_repo_url: https://github.com/seantwie03/homelab-automation
+homelab_ansible_repo_ssh: git@github.com:seantwie03/homelab-automation.git
+homelab_docs_dir: /srv/docs/areas/homelab

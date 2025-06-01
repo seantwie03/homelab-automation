@@ -6,7 +6,7 @@ sudo python3 -m pip install ansible
 sudo ansible-pull \
     --limit localhost \
     --accept-host-key \
-    --directory /opt/homelab-ansible \
-    --url https://github.com/seantwie03/homelab-ansible.git \
+    --directory /opt/homelab-automation \
+    --url https://github.com/seantwie03/homelab-automation.git \
     $(hostname --short).yml
 ```

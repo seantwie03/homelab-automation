@@ -1,0 +1,178 @@
+#!/bin/bash
+
+# h (Homelab) - A script for Homelab Automation and Documentation management.
+
+AUTOMATION_DIR="{{ playbook_path }}"
+AUTOMATION_SERVICE_NAME="ansible-pull"
+AUTOMATION_GIT_REMOTE="{{ homelab_ansible_repo_ssh }}"
+DOCS_DIR="{{ homelab_docs_dir }}"
+
+show_usage() {
+    echo "Usage: h <command> [subcommand] [arguments]"
+    echo ""
+    echo "Homelab Management Script"
+    echo ""
+    echo "Commands:"
+    echo "  a, automation    - Homelab Automation tasks"
+    echo "  d, documentation - Homelab Documentation tasks"
+    echo ""
+    echo "For more details on a command, use: h <command> --help"
+    echo ""
+    echo "Examples:"
+    echo "  h a edit"
+    echo "  h d inbox"
+}
+
+show_automation_usage() {
+    echo "Usage: h a <subcommand> [arguments]"
+    echo "If no subcommand is specified, defaults to showing systemctl status ${AUTOMATION_SERVICE_NAME}.service
+    echo ""
+    echo "Homelab Automation Subcommands:"
+    echo "  e, edit                 - Opens EDITOR in the Homelab Autotmation directory ({{ playbook_path }})"
+    echo "  c, commit               - Commits changes in the Automation directory ({{ playbook_path }})"
+    echo "  l, logs                 - View journald logs for ${AUTOMATION_SERVICE_NAME}.service"
+    echo "  r, run                  - Runs ${AUTOMATION_SERVICE_NAME}.service (requires sudo)"
+    echo "  t, test [playbook]      - Runs ansible-pull on a playbook with --force to ignore dirty working directory"
+    echo "                            If no playbook specified, defaults to {hostname --short}.yml'"
+    echo "  j, job [action]         - Enables or disables ${AUTOMATION_SERVICE_NAME}.timer (requires sudo)"
+    echo "                            Action should be either 'enable' or 'disable'
+    echo "                            If no action is specified, defaults to showing systemctl status"
+    echo ""
+    echo "Examples:"
+    echo "  h a e"
+    echo "  h a edit"
+    echo "  h a commit"
+    echo "  h a logs"
+    echo "  h a run"
+    echo "  h a test my_new_role.yml"
+}
+
+show_documentation_usage() {
+    echo "Usage: h d <subcommand>"
+    echo ""
+    echo "Homelab Documentation Subcommands:"
+    echo "  e, edit           - Opens EDITOR in the Homelab Documentation directory ($DOCS_DIR)"
+    echo "  i, inbox          - Opens the 'inbox' file in EDITOR at the Homelab Documentation directory ($DOCS_DIR)"
+    echo ""
+    echo "Examples:"
+    echo "  h d e"
+    echo "  h d edit"
+    echo "  h d inbox"
+}
+
+if [ "$#" -eq 0 ]; then
+    show_usage
+    exit 0
+fi
+
+case "$1" in
+    a|automation)
+        if [ "$#" -lt 2 ]; then # If only 'h a' was provided
+            systemctl status ${AUTOMATION_SERVICE_NAME}.service
+            exit 0
+        fi
+
+        case "$2" in
+            e|edit)
+                echo "Opening ${AUTOMATION_DIR} in $EDITOR..."
+                "$EDITOR" "${AUTOMATION_DIR}"
+                ;;
+            c|commit)
+                echo "Commiting all changes in: {{ playbook_path }}"
+                cd "{{ playbook_path }}" || exit
+                git add .
+                git commit -m "$(date --iso-8601='minutes')"
+                git push $AUTOMATION_GIT_REMOTE main
+                ;;
+            l|logs)
+                journalctl -eu ${AUTOMATION_SERVICE_NAME}.service
+                ;;
+            r|run)
+                echo "Running ${AUTOMATION_SERVICE_NAME}.service immediately..."
+                sudo systemctl start ${AUTOMATION_SERVICE_NAME}.service
+                echo "Run completed. Check logs with: h a logs"
+                ;;
+            t|test)
+                PLAYBOOK_NAME="${3:-$(hostname --short).yml}"
+                echo "Running Ansible playbook '${PLAYBOOK_NAME}'..."
+                sudo "{{ ansible_pull_path }}" --limit localhost \
+                    --accept-host-key \
+                    --directory "{{ playbook_path }}" \
+                    --url "{{ homelab_ansible_repo_url }}" \
+                    --force "$PLAYBOOK_NAME"
+                ;;
+            j|job)
+                if [ -z "$3" ]; then
+                    JOB_STATUS="status"
+                else
+                    JOB_STATUS="${3,,}"
+                fi
+                case "${JOB_STATUS}" in
+                    enable)
+                        sudo systemctl enable "${AUTOMATION_SERVICE_NAME}".timer
+                        echo "Enabled ${AUTOMATION_SERVICE_NAME}.timer use 'run' subcommand to execute immediately."
+                        ;;
+                    disable)
+                        sudo systemctl disable "${AUTOMATION_SERVICE_NAME}".timer
+                        sudo systemctl stop "${AUTOMATION_SERVICE_NAME}".timer
+                        echo "Disabled and stopped ${AUTOMATION_SERVICE_NAME}.timer"
+                        ;;
+                    status)
+                        systemctl status "${AUTOMATION_SERVICE_NAME}".timer
+                        ;;
+                    *)
+                        echo "Error: Invalid argument to job subcommand: '$JOB_STATUS'. Use 'enable' or 'disable'." >&2
+                        show_automation_usage
+                        exit 1
+                        ;;
+                esac
+                ;;
+            h|-h|help|--help)
+                show_automation_usage
+                ;;
+            *)
+                echo "Error: Invalid automation subcommand '$2'." >&2
+                show_automation_usage
+                exit 1
+                ;;
+        esac
+        ;;
+    d|documentation)
+        if [ "$#" -lt 2 ] || [ "$2" == "--help" ] || [ "$2" == "-h" ]; then
+            show_documentation_usage
+            exit 0
+        fi
+
+        case "$2" in
+            e|edit)
+                echo "Opening ${DOCS_DIR} in $EDITOR..."
+                "$EDITOR" "${DOCS_DIR}"
+                ;;
+            i|inbox)
+                echo "Opening inbox file '${DOCS_DIR}/inbox.md' in $EDITOR..."
+                if [ "$EDITOR" = 'vim' ] || [ "$EDITOR" = 'nvim' ]; then
+                    "$EDITOR" ${DOCS_DIR}/inbox.md '+cd %:p:h'
+                if [ "$EDITOR" = 'code' ] || [ "$EDITOR" = 'code-oss' ] || [ "$EDITOR" = 'codium' ]; then
+                    code -n ${DOCS_DIR} ${DOCS_DIR}/inbox.md
+                else
+                    "$EDITOR" ${DOCS_DIR}/inbox.md
+                fi
+                ;;
+            h|-h|help|--help)
+                show_documentation_usage
+                ;;
+            *)
+                echo "Error: Invalid documentation subcommand '$2'." >&2
+                show_documentation_usage
+                exit 1
+                ;;
+        esac
+        ;;
+    *)
+        echo "Error: Invalid command '$1'." >&2
+        show_usage
+        exit 1
+        ;;
+esac
+
+exit 0
