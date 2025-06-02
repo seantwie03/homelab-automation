@@ -68,7 +68,7 @@ fi
 case "$1" in
     a|automation)
         if [ "$#" -lt 2 ]; then # If only 'h a' was provided
-            systemctl status ${AUTOMATION_SERVICE_NAME}.service
+            systemctl status ${AUTOMATION_SERVICE_NAME}.service --no-pager -l
             exit 0
         fi
 
