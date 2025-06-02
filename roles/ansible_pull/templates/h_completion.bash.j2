@@ -1,0 +1,80 @@
+_h() {
+    local cur prev words cword
+    # COMPREPLY is the array of possible completions.
+    # COMP_WORDS is an array containing the individual words in the current command line.
+    # COMP_CWORD is the index of the current word in the COMP_WORDS array.
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    local AUTOMATION_DIR="{{ playbook_path }}"
+
+    # Main commands - removed single-letter aliases
+    local main_commands="automation documentation help"
+
+    # Automation subcommands - removed single-letter aliases
+    local automation_subcommands="edit commit logs run test job help"
+
+    # Documentation subcommands - removed single-letter aliases
+    local documentation_subcommands="edit inbox help"
+
+    case ${COMP_CWORD} in
+        1)
+            # Completing the first argument (main command)
+            COMPREPLY=( $(compgen -W "${main_commands}" -- "${cur}") )
+            ;;
+        2)
+            # Completing the second argument (subcommand)
+            case "${prev}" in
+                a|automation) # Still check for 'a' as an input, but only suggest full words
+                    COMPREPLY=( $(compgen -W "${automation_subcommands}" -- "${cur}") )
+                    ;;
+                d|documentation) # Still check for 'd' as an input, but only suggest full words
+                    COMPREPLY=( $(compgen -W "${documentation_subcommands}" -- "${cur}") )
+                    ;;
+                *)
+                    # No completion for other main commands or if prev is not a recognized command
+                    ;;
+            esac
+            ;;
+        3)
+            # Completing the third argument (arguments to subcommands)
+            case "${COMP_WORDS[1]}" in # Check the main command
+                a|automation)
+                    case "${prev}" in # Check the subcommand
+                        t|test)
+                            # Suggest .yml and .yaml files in the automation directory
+                            if [ -d "${AUTOMATION_DIR}" ]; then
+                                local yaml_files=()
+                                # Find all .yml and .yaml files in the automation directory
+                                while IFS= read -r -d '' file; do
+                                    yaml_files+=("$(basename "$file")")
+                                done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) -print0 2>/dev/null)
+                                
+                                # Generate completions from the found files
+                                {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
+                                    COMPREPLY=( $(compgen -W "${yaml_files[*]}" -- "${cur}") )
+                                fi
+                            fi
+                            ;;
+                        j|job)
+                            # Suggest 'enable' or 'disable' for 'job' subcommand
+                            local job_actions="enable disable"
+                            COMPREPLY=( $(compgen -W "${job_actions}" -- "${cur}") )
+                            ;;
+                    esac
+                    ;;
+                *)
+                    # No completion for other commands or subcommands at this level
+                    ;;
+            esac
+            ;;
+        *)
+            # No further completion beyond the third argument for now
+            ;;
+    esac
+
+    return 0
+}
+
+# Register the completion function for the 'h' command
+complete -F _h h

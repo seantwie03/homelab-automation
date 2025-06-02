@@ -72,3 +72,11 @@
     mode: "0755"
     owner: root
     group: root
+
+- name: Template homelab management script (h) bash completion
+  ansible.builtin.template:
+    src: h_completion.bash.j2
+    dest: /etc/bash_completion.d/h_completion.bash
+    mode: "0644"
+    owner: root
+    group: root
