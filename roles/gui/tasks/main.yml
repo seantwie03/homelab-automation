@@ -6,3 +6,7 @@
 - name: Ensure mouse configuration software is installed
   ansible.builtin.package:
     name: piper
+
+- name: Ensure chrome is installed
+  ansible.builtin.package:
+    name: google-chrome-stable
