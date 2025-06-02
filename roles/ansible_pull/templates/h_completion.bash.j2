@@ -45,10 +45,10 @@ _h() {
                             # Suggest .yml and .yaml files in the automation directory
                             if [ -d "${AUTOMATION_DIR}" ]; then
                                 local yaml_files=()
-                                # Find all .yml and .yaml files in the automation directory
+                                # Find all .yml and .yaml files in the automation directory (excluding hidden files)
                                 while IFS= read -r -d '' file; do
                                     yaml_files+=("$(basename "$file")")
-                                done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) -print0 2>/dev/null)
+                                done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
                                 
                                 # Generate completions from the found files
                                 {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
