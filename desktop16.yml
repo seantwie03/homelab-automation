@@ -37,6 +37,7 @@
     - role: vscode
     - role: nodejs
     - role: python
+    - role: devops
     - role: mount_network_storage
       vars:
         user_id: "{{ primary_user.uid }}"

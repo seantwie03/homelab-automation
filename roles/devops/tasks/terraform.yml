@@ -1,0 +1,21 @@
+- name: Ensure Hasicorp repository is configured
+  block:
+    - name: Ensure Hasicorp repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://rpm.releases.hashicorp.com/gpg
+        state: present
+
+    - name: Ensure Hasicorp repository is enabled
+      ansible.builtin.yum_repository:
+        name: hashicorp
+        description: Hashicorp Stable - $basearch
+        baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://rpm.releases.hashicorp.com/gpg
+
+- name: Ensure Terraform is installed
+  ansible.builtin.package:
+    name: terraform
+    state: present
