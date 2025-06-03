@@ -1,0 +1,4 @@
+---
+- name: Ensure Terraform is installed
+  ansible.builtin.include_tasks:
+    file: terraform.yml
