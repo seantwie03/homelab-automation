@@ -92,6 +92,10 @@ if is_wsl ; then
   export WH
 fi
 
-
+####################################### Completion #######################################
+# Load AWS CLI completion if available
+if command -v aws &> /dev/null && command -v aws_completer &> /dev/null; then
+  complete -C '/usr/local/bin/aws_completer' aws
+fi
 
 
