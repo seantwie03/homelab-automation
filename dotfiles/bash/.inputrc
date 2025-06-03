@@ -6,13 +6,12 @@ set bell-style none
 set completion-ignore-case on
 set completion-map-case on
 set visible-stats on
-set colored-stats on
+#set colored-stats on # Turn this off until I configure LS_COLORS correctly
 set mark-symlinked-directories on
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
 set blink-matching-paren on
 set colored-completion-prefix on
-set colored-stats on
 
 # Keybinds
 "\C-p":history-search-backward
