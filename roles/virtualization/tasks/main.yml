@@ -1,7 +1,7 @@
 ---
 - name: Ensure @virtualization group is installed
   ansible.builtin.package:
-    name: '@virtualization'
+    name: "@virtualization"
     state: present
 
 - name: Ensure libvirt_users are in the libvirt group
@@ -17,4 +17,11 @@
     state: directory
     owner: root
     group: wheel
-    mode: '0775'
+    mode: "0775"
+
+- name: Ensure community.libvirt prerequisites are installed
+  ansible.builtin.package:
+    name:
+      - python3-libvirt
+      - python3-lxml
+    state: present

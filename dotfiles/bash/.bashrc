@@ -98,4 +98,6 @@ if command -v aws &> /dev/null && command -v aws_completer &> /dev/null; then
   complete -C '/usr/local/bin/aws_completer' aws
 fi
 
-
+if command -v terraform &> /dev/null; then
+  complete -C /usr/bin/terraform terraform
+fi
