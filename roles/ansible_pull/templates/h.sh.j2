@@ -74,8 +74,16 @@ case "$1" in
 
         case "$2" in
             e|edit)
-                echo "Opening ${AUTOMATION_DIR} in $EDITOR..."
-                "$EDITOR" "${AUTOMATION_DIR}"
+		# The ##*/ bash parameter expansion strips everything up to and including the last slash.
+		# This ensures the conditional work work whether or not the EDITOR variable includes
+		# the full path or just the executable name.
+                if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
+                    "$EDITOR" "${AUTOMATION_DIR}" '+cd %:p:h'
+                elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
+                    code -n "${AUTOMATION_DIR}"
+                else
+                    "$EDITOR" "${AUTOMATION_DIR}"
+		fi
                 ;;
             c|commit)
                 echo "Commiting all changes in: {{ playbook_path }}"
@@ -85,7 +93,7 @@ case "$1" in
                 git push "$AUTOMATION_GIT_REMOTE" main
                 ;;
             l|logs)
-                journalctl -eu ${AUTOMATION_SERVICE_NAME}.service
+                journalctl -u ${AUTOMATION_SERVICE_NAME}.service
                 ;;
             r|run)
                 echo "Running ${AUTOMATION_SERVICE_NAME}.service immediately..."
@@ -145,14 +153,18 @@ case "$1" in
 
         case "$2" in
             e|edit)
-                echo "Opening ${DOCS_DIR} in $EDITOR..."
-                "$EDITOR" "${DOCS_DIR}"
+                if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
+                    "$EDITOR" "${DOCS_DIR}" '+cd %:p:h'
+                elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
+                    code -n "${DOCS_DIR}"
+                else
+                    "$EDITOR" "${DOCS_DIR}"
+                fi
                 ;;
             i|inbox)
-                echo "Opening inbox file '${DOCS_DIR}/inbox.md' in $EDITOR..."
-                if [ "$EDITOR" = 'vim' ] || [ "$EDITOR" = 'nvim' ]; then
+                if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
                     "$EDITOR" "${DOCS_DIR}"/inbox.md '+cd %:p:h'
-                elif [ "$EDITOR" = 'code' ] || [ "$EDITOR" = 'code-oss' ] || [ "$EDITOR" = 'codium' ]; then
+                elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
                     code -n "${DOCS_DIR}" "${DOCS_DIR}"/inbox.md
                 else
                     "$EDITOR" "${DOCS_DIR}"/inbox.md
