@@ -12,7 +12,7 @@ _h() {
     local main_commands="automation documentation help"
 
     # Automation subcommands - removed single-letter aliases
-    local automation_subcommands="edit commit logs run test job help"
+    local automation_subcommands="edit commit git logs run test job help"
 
     # Documentation subcommands - removed single-letter aliases
     local documentation_subcommands="edit inbox help"
@@ -50,7 +50,6 @@ _h() {
                                     yaml_files+=("$(basename "$file")")
                                 done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
                                 
-                                # Generate completions from the found files
                                 {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
                                     COMPREPLY=( $(compgen -W "${yaml_files[*]}" -- "${cur}") )
                                 fi
@@ -60,6 +59,11 @@ _h() {
                             # Suggest 'enable' or 'disable' for 'job' subcommand
                             local job_actions="enable disable"
                             COMPREPLY=( $(compgen -W "${job_actions}" -- "${cur}") )
+                            ;;
+                        g|git)
+                            # Suggest common git subcommands for completion
+                            local git_subcommands="add commit push pull status log diff branch checkout reset fetch merge rebase tag remote stash show config"
+                            COMPREPLY=( $(compgen -W "${git_subcommands}" -- "${cur}") )
                             ;;
                     esac
                     ;;
