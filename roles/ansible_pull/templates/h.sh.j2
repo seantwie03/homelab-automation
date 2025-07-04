@@ -28,8 +28,11 @@ show_automation_usage() {
     echo "If no subcommand is specified, defaults to showing systemctl status ${AUTOMATION_SERVICE_NAME}.service"
     echo ""
     echo "Homelab Automation Subcommands:"
-    echo "  e, edit                 - Opens EDITOR in the Homelab Autotmation directory ({{ playbook_path }})"
-    echo "  c, commit               - Commits changes in the Automation directory ({{ playbook_path }})"
+    echo "  e, edit                 - Opens EDITOR in the Homelab Autotmation directory ($AUTOMATION_DIR)"
+    echo "  c, commit               - Commits changes in the Automation directory ($AUTOMATION_DIR)"
+    echo "  g, git [args]           - Run arbitrary git commands in the Automation directory ($AUTOMATION_DIR)"
+    echo "                            Any arguments after g[it] will be passed directly to git."
+    echo "                            If no arguments are provided, defaults to showing git status"
     echo "  l, logs                 - View journald logs for ${AUTOMATION_SERVICE_NAME}.service"
     echo "  r, run                  - Runs ${AUTOMATION_SERVICE_NAME}.service (requires sudo)"
     echo "  t, test [playbook]      - Runs ansible-pull on a playbook with --force to ignore dirty working directory"
@@ -45,6 +48,7 @@ show_automation_usage() {
     echo "  h a logs"
     echo "  h a run"
     echo "  h a test my_new_role.yml"
+    echo "  h a g diff"
 }
 
 show_documentation_usage() {
@@ -86,8 +90,8 @@ case "$1" in
 		fi
                 ;;
             c|commit)
-                echo "Commiting all changes in: {{ playbook_path }}"
-                cd "{{ playbook_path }}" || exit
+                echo "Commiting all changes in: $AUTOMATION_DIR"
+                cd "$AUTOMATION_DIR" || exit
                 git add .
                 git commit -m "$(date --iso-8601='minutes')"
                 git push "$AUTOMATION_GIT_REMOTE" main
@@ -105,7 +109,7 @@ case "$1" in
                 echo "Running Ansible playbook '${PLAYBOOK_NAME}'..."
                 sudo "{{ ansible_pull_path }}" --limit localhost \
                     --accept-host-key \
-                    --directory "{{ playbook_path }}" \
+                    --directory "$AUTOMATION_DIR" \
                     --url "{{ homelab_ansible_repo_url }}" \
                     --force "$PLAYBOOK_NAME"
                 ;;
@@ -134,6 +138,17 @@ case "$1" in
                         exit 1
                         ;;
                 esac
+                ;;
+            g|git)
+                if [ "$#" -lt 3 ]; then
+                    echo "No git arguments provided. Showing git status in: $AUTOMATION_DIR"
+                    cd "$AUTOMATION_DIR" || exit
+                    git status
+                else
+                    echo "Running git ${*:3} in: $AUTOMATION_DIR"
+                    cd "$AUTOMATION_DIR" || exit
+                    git "${@:3}"
+                fi
                 ;;
             h|-h|help|--help)
                 show_automation_usage
