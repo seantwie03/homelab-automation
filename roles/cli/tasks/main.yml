@@ -7,11 +7,31 @@
     owner: "{{ cli_user }}"
     group: "{{ cli_user }}"
 
+- name: Ensure /home/{{ cli_user }}/bin directory exists
+  ansible.builtin.file:
+    path: "/home/{{ cli_user }}/bin"
+    state: directory
+    mode: "0755"
+    owner: "{{ cli_user }}"
+    group: "{{ cli_user }}"
+
 - name: Ensure CLI programs are installed
   ansible.builtin.package:
     name:
       - bat
+      - cargo
     state: present
+
+- name: Ensure presenterm is installed
+  community.general.cargo:
+    name: presenterm
+    state: absent
+
+- name: Ensure presenterm is installed
+  community.general.cargo:
+    name: presenterm
+    state: present
+    path: "/home/{{ cli_user }}" # cargo automatically appends /bin
 
 - name: Find all files and directories in dotfiles/bash
   ansible.builtin.find:
