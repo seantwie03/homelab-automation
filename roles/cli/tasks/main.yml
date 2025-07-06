@@ -25,11 +25,6 @@
 - name: Ensure presenterm is installed
   community.general.cargo:
     name: presenterm
-    state: absent
-
-- name: Ensure presenterm is installed
-  community.general.cargo:
-    name: presenterm
     state: present
     path: "/home/{{ cli_user }}" # cargo automatically appends /bin
 
