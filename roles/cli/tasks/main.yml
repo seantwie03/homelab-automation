@@ -11,7 +11,7 @@
   ansible.builtin.file:
     path: "/home/{{ cli_user }}/bin"
     state: directory
-    mode: "0755"
+    mode: "0750"
     owner: "{{ cli_user }}"
     group: "{{ cli_user }}"
 
@@ -19,14 +19,40 @@
   ansible.builtin.package:
     name:
       - bat
-      - cargo
     state: present
 
-- name: Ensure presenterm is installed
-  community.general.cargo:
-    name: presenterm
-    state: present
-    path: "/home/{{ cli_user }}" # cargo automatically appends /bin
+- name: Install presenterm
+  block:
+    - name: Ensure cargo is installed
+      ansible.builtin.package:
+        name: cargo
+        state: present
+
+    - name: Ensure mermaid-cli is installed
+      community.general.npm:
+        name: "@mermaid-js/mermaid-cli"
+        state: present
+        global: true
+
+    - name: Ensure puppeteer is installed
+      community.general.npm:
+        name: puppeteer
+        state: present
+        global: true
+
+    - name: Ensure presenterm is installed
+      community.general.cargo:
+        name: presenterm
+        state: present
+        path: "/home/{{ cli_user }}" # cargo automatically appends /bin
+
+    - name: Fix permissions for /home/{{ cli_user }}/bin
+      ansible.builtin.file:
+        path: "/home/{{ cli_user }}/bin"
+        mode: u=rwx,g=rx,o=
+        owner: "{{ cli_user }}"
+        group: "{{ cli_user }}"
+        recurse: true
 
 - name: Find all files and directories in dotfiles/bash
   ansible.builtin.find:
