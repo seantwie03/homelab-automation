@@ -22,3 +22,32 @@
     # name: https://zoom.us/client/latest/zoom_x86_64.rpm
     name: https://zoom.us/client/6.5.3.2773/zoom_x86_64.rpm
     state: present
+
+- name: Ensure gromit-mpx is installed # Software for drawing on the screen during presetations
+  ansible.builtin.package:
+    name: gromit-mpx
+    state: present
+
+- name: Ensure autostart directory exists
+  ansible.builtin.file:
+    path: /home/{{ gui_user }}/.config/autostart
+    state: directory
+    owner: "{{ gui_user }}"
+    group: "{{ gui_user }}"
+    mode: "0755"
+
+- name: Ensure gromit-mpx autostarts
+  ansible.builtin.copy:
+    src: gromit-mpx.desktop
+    dest: /home/{{ gui_user }}/.config/autostart/gromit-mpx.desktop
+    owner: "{{ gui_user }}"
+    group: "{{ gui_user }}"
+    mode: "0644"
+
+- name: Ensure gromit-mpx configuration file exists
+  ansible.builtin.copy:
+    src: gromit-mpx.cfg
+    dest: /home/{{ gui_user }}/.config/gromit-mpx.cfg
+    owner: "{{ gui_user }}"
+    group: "{{ gui_user }}"
+    mode: "0644"
