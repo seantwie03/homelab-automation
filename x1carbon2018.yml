@@ -1,5 +1,5 @@
 ---
-- name: Configure desktop16 as a workstation
+- name: Configure x1carbon2018 as a workstation
   hosts: localhost
   connection: local
   become: true
