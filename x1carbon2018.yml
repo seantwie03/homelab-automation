@@ -22,6 +22,8 @@
           - UbuntuMono
           - ZedMono
     - role: onepassword
+      vars:
+        gui_user: "{{ primary_user.name }}"
     - role: virtualization
       vars:
         libvirt_users:

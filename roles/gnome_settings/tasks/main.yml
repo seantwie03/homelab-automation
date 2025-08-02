@@ -4,6 +4,18 @@
     name: python3-psutil
     state: present
 
+- name: Install Gnome Extensions app
+  ansible.builtin.package:
+    name: gnome-extensions-app
+    state: present
+
+- name: Install App Indicators
+  ansible.builtin.package:
+    name: 
+      - gnome-shell-extension-appindicator
+      - libappindicator
+    state: present
+
 # dconf settings are per-user. Separating the dconf tasks
 # into a separate file allows specifying become_user once.
 - name: Configure gnome desktop environment
@@ -12,3 +24,4 @@
     apply:
       become_user: "{{ item }}"
   loop: "{{ dconf_users }}"
+

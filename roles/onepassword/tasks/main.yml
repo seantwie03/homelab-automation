@@ -36,3 +36,13 @@
     name: 1password
     state: present
   when: "'graphical' in default_target.stat.lnk_target"
+
+- name: Ensure 1password GUI autostarts on graphical systems
+  ansible.builtin.copy:
+    remote_src: true
+    src: /usr/share/applications/1password.desktop
+    dest: /home/{{ gui_user }}/.config/autostart/1password.desktop
+    owner: "{{ gui_user }}"
+    group: "{{ gui_user }}"
+    mode: "0644"
+  when: "'graphical' in default_target.stat.lnk_target"

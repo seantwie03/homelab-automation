@@ -29,8 +29,10 @@
     dest: "/home/{{ cli_user }}/.config/git"
     state: link
     force: true
+    follow: false
     owner: "{{ cli_user }}"
     group: "{{ cli_user }}"
+  changed_when: false
 
 # Special handling for bash dotfiles because they go 
 # into the home directory instead of ~/.config
@@ -48,6 +50,7 @@
         dest: "/home/{{ cli_user }}/{{ item.path | basename }}"
         state: link
         force: true
+        follow: false
         owner: "{{ cli_user }}"
         group: "{{ cli_user }}"
       loop: "{{ bash_dotfiles.files }}"

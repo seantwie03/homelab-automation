@@ -1,8 +1,16 @@
+- name: Enable extensions
+  community.general.dconf:
+    key: /org/gnome/desktop/session/idle-delay
+    value: ['appindicatorsupport@rgcjonas.gmail.com']
+    state: present
+  changed_when: false
+
 - name: Remove screen blanking
   community.general.dconf:
     key: /org/gnome/desktop/session/idle-delay
-    value: "0"
+    value: uint32 0
     state: present
+  changed_when: false
 
 - name: Disable hot corners
   community.general.dconf:
@@ -112,3 +120,4 @@
       community.general.dconf:
         key: "/org/gnome/desktop/wm/keybindings/move-to-workspace-right"
         value: ["<Shift><Control><Super>Right"]
+
