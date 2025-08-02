@@ -1,0 +1,5 @@
+[safe]
+	directory = /opt/homelab-automation
+[user]
+	email = sean.twie03@mail.com
+	name = Sean Twie03
