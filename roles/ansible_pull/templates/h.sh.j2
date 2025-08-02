@@ -82,7 +82,8 @@ case "$1" in
 		# This ensures the conditional work work whether or not the EDITOR variable includes
 		# the full path or just the executable name.
                 if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
-                    "$EDITOR" "${AUTOMATION_DIR}" '+cd %:p:h'
+                    echo "NEOVIM"
+                    "$EDITOR" "${AUTOMATION_DIR}" "+cd ${AUTOMATION_DIR}"
                 elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
                     code -n "${AUTOMATION_DIR}"
                 else
@@ -169,7 +170,7 @@ case "$1" in
         case "$2" in
             e|edit)
                 if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
-                    "$EDITOR" "${DOCS_DIR}" '+cd %:p:h'
+                    "$EDITOR" "${DOCS_DIR}" "+cd ${DOCS_DIR}"
                 elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
                     code -n "${DOCS_DIR}"
                 else
@@ -178,7 +179,7 @@ case "$1" in
                 ;;
             i|inbox)
                 if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
-                    "$EDITOR" "${DOCS_DIR}"/inbox.md '+cd %:p:h'
+                    "$EDITOR" "${DOCS_DIR}"/inbox.md "+cd ${DOCS_DIR}"
                 elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
                     code -n "${DOCS_DIR}" "${DOCS_DIR}"/inbox.md
                 else
