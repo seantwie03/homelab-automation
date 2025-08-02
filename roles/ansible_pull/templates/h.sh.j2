@@ -4,7 +4,7 @@
 
 AUTOMATION_DIR="{{ playbook_path }}"
 AUTOMATION_SERVICE_NAME="ansible-pull"
-AUTOMATION_GIT_REMOTE="{{ homelab_ansible_repo_ssh }}"
+AUTOMATION_GIT_REMOTE="{{ homelab_ansible_repo_git }}"
 DOCS_DIR="{{ homelab_docs_dir }}"
 
 show_usage() {
@@ -110,7 +110,7 @@ case "$1" in
                 sudo "{{ ansible_pull_path }}" --limit localhost \
                     --accept-host-key \
                     --directory "$AUTOMATION_DIR" \
-                    --url "{{ homelab_ansible_repo_url }}" \
+                    --url "{{ homelab_ansible_repo_git }}" \
                     --force "$PLAYBOOK_NAME"
                 ;;
             j|job)

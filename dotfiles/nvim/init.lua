@@ -1,0 +1,7 @@
+require('config.globals')
+require('config.lazy')
+require('config.options')
+require('config.keymap')
+require('config.autocmd')
+require('config.lsp')
+require('config.ui')

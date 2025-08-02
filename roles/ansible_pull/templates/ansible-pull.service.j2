@@ -12,7 +12,7 @@ ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
     --limit localhost \
     --accept-host-key \
     --directory {{ playbook_path }} \
-    --url {{ homelab_ansible_repo_url }} \
+    --url {{ homelab_ansible_repo_git }} \
     --verbose \
     {{ ansible_hostname }}.yml \
     2>&1 | tee /var/log/ansible-pull/ansible-pull-$(date --iso-8601='minutes').log"

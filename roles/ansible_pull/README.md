@@ -21,7 +21,7 @@ Role Variables
 
 `homelab_ansible_repo_url`: URL to remote repository.
 
-`homelab_ansible_repo_ssh`: SSH URL to remote repository.
+`homelab_ansible_repo_git`: SSH URL to remote repository.
 
 `homelab_docs_dir`: Path to documentation used in `h` script for `documentation` subcommands
 
@@ -55,7 +55,7 @@ Example Playbook
       vars:
         ansible_pull_path: /usr/local/bin/ansible-pull
         homelab_ansible_repo_url: https://github.com/your_username/your_reponame
-        homelab_ansible_repo_ssh: git@github.com:your_username/your_reponame.git
+        homelab_ansible_repo_git: git@github.com:your_username/your_reponame.git
         homelab_docs_dir: /srv/docs/areas/homelab
 ```
 
