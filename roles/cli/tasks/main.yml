@@ -19,6 +19,7 @@
   ansible.builtin.package:
     name:
       - bat
+      - neovim
     state: present
 
 - name: Install presenterm
