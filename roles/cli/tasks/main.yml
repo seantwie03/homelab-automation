@@ -18,9 +18,42 @@
 - name: Ensure CLI programs are installed
   ansible.builtin.package:
     name:
+      - git
       - bat
       - neovim
     state: present
+
+- name: Symlink git dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/git"
+    dest: "/home/{{ cli_user }}/.config/git"
+    state: link
+    force: true
+    owner: "{{ cli_user }}"
+    group: "{{ cli_user }}"
+
+# Special handling for bash dotfiles because they go 
+# into the home directory instead of ~/.config
+- name: Install bash dotfiles
+  block:
+    - name: Find all files in dotfiles/bash
+      ansible.builtin.find:
+        paths: "{{ dotfiles_path }}/bash"
+        hidden: true
+      register: bash_dotfiles
+
+    - name: Symlink bash dotfiles to home directory
+      ansible.builtin.file:
+        src: "{{ item.path }}"
+        dest: "/home/{{ cli_user }}/{{ item.path | basename }}"
+        state: link
+        force: true
+        owner: "{{ cli_user }}"
+        group: "{{ cli_user }}"
+      loop: "{{ bash_dotfiles.files }}"
+      loop_control:
+        label: "Symlinking {{ item.path | basename }}"
+      changed_when: false
 
 - name: Install presenterm
   block:
@@ -55,25 +88,6 @@
         group: "{{ cli_user }}"
         recurse: true
 
-- name: Find all files and directories in dotfiles/bash
-  ansible.builtin.find:
-    paths: "{{ dotfiles_path }}/bash"
-    file_type: any
-    hidden: true
-  register: bash_dotfiles
-
-- name: Symlink bash dotfiles to home directory
-  ansible.builtin.file:
-    src: "{{ item.path }}"
-    dest: "/home/{{ cli_user }}/{{ item.path | basename }}"
-    state: link
-    force: true
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
-  loop: "{{ bash_dotfiles.files }}"
-  loop_control:
-    label: "Symlinking {{ item.path | basename }}"
-  changed_when: false
 # - name: Symlink fish dotfiles directory
 #   ansible.builtin.file:
 #     src: "{{ dotfiles_path }}/fish"
