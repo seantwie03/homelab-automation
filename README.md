@@ -28,4 +28,12 @@ sudo ansible-pull \
 
 Notice that the command above installs Ansible via `pip` instead of `dnf`. This is because the ansible package in the Fedora repositories does no include `ansible-pull`. Also, the command above runs `pip` with `sudo`. This is not recommended but I am doing it in this case because the `ansible-pull` role installs a persistent systemd-timer that runs as root. For this to work the `ansible-pull` command must be available to the root user.
 
-This repo was likely cloned without any authentication because running this playbook is what sets up the password manager. You'll likely want to switch to an authenticated remote.
+This repo was likely cloned without any authentication because running this playbook is what sets up the password manager. You'll likely want to switch to an authenticated remote. These commands should do it:
+
+```sh
+cd /opt/homelab-automation
+git remote remove origin
+git remote add origin git@github.com:seantwie03/homelab-automation.git
+git push --set-upstream origin main
+```
+
