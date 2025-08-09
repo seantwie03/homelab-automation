@@ -110,3 +110,7 @@ gsave() {
     git commit -m "$(date --iso-8601='minutes')"
     git push
 }
+
+gload() {
+    git pull
+}
