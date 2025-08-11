@@ -17,7 +17,7 @@ To get started, install the required packages and run `ansible-pull` as follows:
 **Note:** The command below (along with many other things in this repository) has only been tested on Fedora and/or a recent version of an Enterprise Linux distribution (RHEL9+).
 
 ```sh
-sudo dnf install python3-libdnf5 python3-pip git wget
+sudo dnf install python3-libdnf5 python3-pip git wget hostname
 sudo python3 -m pip install ansible ansible-lint
 sudo ansible-pull \
     --limit localhost \

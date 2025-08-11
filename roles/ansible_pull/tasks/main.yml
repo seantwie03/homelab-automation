@@ -32,6 +32,11 @@
     owner: root
     group: root
 
+- name: Ensure logrotate is installed
+  ansible.builtin.package:
+    name: logrotate
+    state: present
+
 - name: Setup log rotation for ansible-pull
   ansible.builtin.copy:
     content: |
