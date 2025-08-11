@@ -3,3 +3,14 @@ function is_wsl {
   grep -qi 'microsoft' /proc/version
   return $?
 }
+
+gsave() {
+    git add -A
+    git commit -m "$(date --iso-8601='minutes')"
+    git push
+}
+
+gload() {
+    git pull
+}
+
