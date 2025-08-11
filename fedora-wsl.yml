@@ -1,0 +1,38 @@
+- name: Configure wsl-fedora as a workstation
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    primary_user:
+      name: sean
+      uid: 1000
+      gid: 1000
+
+  roles:
+    - role: ansible_pull
+    - role: virtualization
+      vars:
+        libvirt_users:
+          - "{{ primary_user.name }}"
+    # - role: kitty
+    #   vars:
+    #     kitty_user: "{{ primary_user.name }}"
+    - role: nodejs
+    - role: python
+    - role: mount_network_storage
+      vars:
+        user_id: "{{ primary_user.uid }}"
+        group_id: "{{ primary_user.gid }}"
+        samba_mounts:
+          - server: odroidh3plus
+            share: docs
+          - server: odroidh3plus
+            share: source
+          - server: odroidh3plus
+            share: media
+          - server: odroidh3plus
+            share: temp
+    - role: cli
+      vars:
+        cli_user: "{{ primary_user.name }}"
