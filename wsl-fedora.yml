@@ -5,7 +5,7 @@
 
   vars:
     primary_user:
-      name: sean
+      name: seant
       uid: 1000
       gid: 1000
 

@@ -40,11 +40,16 @@ shopt -s globstar
 shopt -s nocaseglob
 
 ######################################## SSH Agent ########################################
-if [ ! -S ~/.ssh/ssh_auth_sock ]; then
-  eval "$(ssh-agent)"
-  ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+if [[ is_wsl ]]; then
+    alias ssh="ssh.exe"
+    alias ssh-add="ssh-add.exe"
+else
+    if [ ! -S ~/.ssh/ssh_auth_sock ]; then
+      eval "$(ssh-agent)"
+      ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+    fi
+    export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
 fi
-export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
 
 ######################################## History ########################################
 HISTSIZE=
@@ -93,16 +98,6 @@ if command -v terraform &> /dev/null; then
   complete -C /usr/bin/terraform terraform
 fi
 
-######################################## Variables ########################################
-# Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
-if is_wsl ; then
-  # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
-  # that by adding a sed substitution to remove the \r
-  WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
-  export WH
-fi
-
-
 ####################################### Functions #######################################
 gsave() {
     git add -A
@@ -113,6 +108,24 @@ gsave() {
 gload() {
     git pull
 }
+
+is_wsl() {
+    if [[ -f /etc/wsl.conf ]] ; then 
+        return 0
+    else
+        return 1 
+    fi
+}
+
+######################################## Variables ########################################
+# Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
+if is_wsl ; then
+  # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
+  # that by adding a sed substitution to remove the \r
+  WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
+  export WH
+fi
+
 
 
 ######################################## Aliases ########################################
