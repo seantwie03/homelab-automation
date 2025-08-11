@@ -83,15 +83,6 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 # This is a great breakdown for how to set the colors: https://chrisyeh96.github.io/2020/03/28/terminal-colors.html
 PS1='\[\033[0;34m\]\u\[\033[1;30m\]@\[\033[0;34m\]\h\[\033[1;30m\]:\[\033[0;36m\]\w\[\033[1;30m\]$ \[\033[0;30m\]'
 
-######################################## Variables ########################################
-# Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
-if is_wsl ; then
-  # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
-  # that by adding a sed substitution to remove the \r
-  WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
-  export WH
-fi
-
 ####################################### Completion #######################################
 # Load AWS CLI completion if available
 if command -v aws &> /dev/null && command -v aws_completer &> /dev/null; then
@@ -102,7 +93,15 @@ if command -v terraform &> /dev/null; then
   complete -C /usr/bin/terraform terraform
 fi
 
-alias vim=nvim
+######################################## Variables ########################################
+# Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
+if is_wsl ; then
+  # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
+  # that by adding a sed substitution to remove the \r
+  WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
+  export WH
+fi
+
 
 ####################################### Functions #######################################
 gsave() {
@@ -114,3 +113,10 @@ gsave() {
 gload() {
     git pull
 }
+
+
+######################################## Aliases ########################################
+alias vim=nvim
+
+#[[ "$TERM" == "xterm-kitty" ]] && alias ssh="TERM=xterm-256color ssh"
+
