@@ -98,25 +98,6 @@ if command -v terraform &> /dev/null; then
   complete -C /usr/bin/terraform terraform
 fi
 
-####################################### Functions #######################################
-gsave() {
-    git add -A
-    git commit -m "$(date --iso-8601='minutes')"
-    git push
-}
-
-gload() {
-    git pull
-}
-
-is_wsl() {
-    if [[ -f /etc/wsl.conf ]] ; then 
-        return 0
-    else
-        return 1 
-    fi
-}
-
 ######################################## Variables ########################################
 # Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
 if is_wsl ; then
@@ -125,11 +106,4 @@ if is_wsl ; then
   WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
   export WH
 fi
-
-
-
-######################################## Aliases ########################################
-alias vim=nvim
-
-#[[ "$TERM" == "xterm-kitty" ]] && alias ssh="TERM=xterm-256color ssh"
 
