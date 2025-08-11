@@ -23,17 +23,6 @@
       - neovim
     state: present
 
-- name: Symlink git dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/git"
-    dest: "/home/{{ cli_user }}/.config/git"
-    state: link
-    force: true
-    follow: false
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
-  changed_when: false
-
 - name: Symlink nvim dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/nvim"
@@ -111,11 +100,3 @@
 #     owner: "{{ cli_user }}"
 #     group: "{{ cli_user }}"
 
-# - name: Symlink nvim dotfiles directory
-#   ansible.builtin.file:
-#     src: "{{ dotfiles_path }}/nvim"
-#     dest: "/home/{{ cli_user }}/.config/nvim"
-#     state: link
-#     force: true
-#     owner: "{{ cli_user }}"
-#     group: "{{ ansible_user_id }}"
