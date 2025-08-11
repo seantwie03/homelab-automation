@@ -4,7 +4,7 @@
     name: kitty
     state: present
 
-- name: Symlink git dotfiles directory
+- name: Symlink kitty dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/kitty"
     dest: "/home/{{ kitty_user }}/.config/kitty"
@@ -15,28 +15,3 @@
     group: "{{ kitty_user }}"
   changed_when: false
 
-#- name: Ensure kitty config directory exists
-#  ansible.builtin.file:
-#    path: /home/{{ kitty_user }}/.config/kitty
-#    state: directory
-#    owner: "{{ kitty_user }}"
-#    group: "{{ kitty_user }}"
-#    mode: '0755'
-#
-#- name: Ensure the kitty.conf file is present
-#  ansible.builtin.copy:
-#    src: kitty.conf
-#    dest: /home/{{ kitty_user }}/.config/kitty/kitty.conf
-#    owner: "{{ kitty_user }}"
-#    group: "{{ kitty_user }}"
-#    mode: '0644'
-#
-#- name: Ensure the theme files are present
-#  ansible.builtin.copy:
-#    src: "{{ item }}"
-#    dest: /home/{{ kitty_user }}/.config/kitty/
-#    owner: "{{ kitty_user }}"
-#    group: "{{ kitty_user }}"
-#    mode: '0644'
-#  with_fileglob:
-#    - "*-theme*.conf"
