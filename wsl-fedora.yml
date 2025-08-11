@@ -15,9 +15,9 @@
       vars:
         libvirt_users:
           - "{{ primary_user.name }}"
-    # - role: kitty
-    #   vars:
-    #     kitty_user: "{{ primary_user.name }}"
+    - role: kitty
+      vars:
+        kitty_user: "{{ primary_user.name }}"
     - role: nodejs
     - role: python
     - role: mount_network_storage
