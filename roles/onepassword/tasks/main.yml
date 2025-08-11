@@ -37,6 +37,14 @@
     state: present
   when: "'graphical' in default_target.stat.lnk_target"
 
+- name: Ensure autostart directory exists
+  ansible.builtin.file:
+    path: /home/{{ gui_user }}/.config/autostart
+    state: directory
+    owner: "{{ gui_user }}"
+    group: "{{ gui_user }}"
+    mode: "0755"
+
 - name: Ensure 1password GUI autostarts on graphical systems
   ansible.builtin.copy:
     remote_src: true
