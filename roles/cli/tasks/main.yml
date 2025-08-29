@@ -91,6 +91,11 @@
         group: "{{ cli_user }}"
         recurse: true
 
+- name: Install asciinema
+  ansible.builtin.package:
+    name: asciinema
+    state: present
+
 # - name: Symlink fish dotfiles directory
 #   ansible.builtin.file:
 #     src: "{{ dotfiles_path }}/fish"

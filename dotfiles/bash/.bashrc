@@ -40,7 +40,7 @@ shopt -s globstar
 shopt -s nocaseglob
 
 ######################################## SSH Agent ########################################
-if [[ is_wsl ]]; then
+if is_wsl; then
     alias ssh="ssh.exe"
     alias ssh-add="ssh-add.exe"
 else
