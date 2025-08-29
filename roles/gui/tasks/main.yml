@@ -19,8 +19,12 @@
 
 - name: Ensure zoom is installed
   ansible.builtin.package:
-    # name: https://zoom.us/client/latest/zoom_x86_64.rpm
-    name: https://zoom.us/client/6.5.3.2773/zoom_x86_64.rpm
+    # Find the latest version
+    #     cd ~/Downloads
+    #     rm zoom_x86_64.rpm 2>/dev/null
+    #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
+    #     rpm -qp ./zoom_x86_64.rpm
+    name: https://zoom.us/client/6.5.11.4015/zoom_x86_64.rpm
     state: present
 
 - name: Ensure gromit-mpx is installed # Software for drawing on the screen during presetations
