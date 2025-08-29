@@ -14,3 +14,7 @@ gload() {
     git pull
 }
 
+gstat() {
+    git status
+}
+
