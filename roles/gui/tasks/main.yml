@@ -55,3 +55,16 @@
     owner: "{{ gui_user }}"
     group: "{{ gui_user }}"
     mode: "0644"
+
+- name: Install ghostty
+  block:
+    - name: Enable scottames/ghostty copr
+      community.general.copr:
+        name: scottames/ghostty
+        state: enabled
+
+    - name: Ensure ghostty is installed
+      ansible.builtin.package:
+        name: ghostty
+        state: present
+
