@@ -20,6 +20,10 @@ cursor-style-blink = false
 # Keybinds
 keybind = ctrl+alt+t=new_split:auto
 keybind = ctrl+alt+z=toggle_split_zoom
+keybind = ctrl+alt+h=goto_split:left
+keybind = ctrl+alt+j=goto_split:down
+keybind = ctrl+alt+k=goto_split:up
+keybind = ctrl+alt+l=goto_split:right
 
 # Presentations
 #config-file = presentation_config
