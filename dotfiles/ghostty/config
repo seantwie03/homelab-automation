@@ -1,0 +1,25 @@
+# Window
+maximize = true
+
+# Font
+font-family = "Iosevka Nerd Font"
+font-size = 16
+
+# Colors
+theme=light:GitHub-Light-High-Contrast,dark:GitHub-Dark-High-Contrast
+minimum-contrast = 1.9
+
+# Cursor
+adjust-cursor-height = 5%
+adjust-cursor-thickness = 70%
+cursor-text = #000000
+cursor-color = #8593ed
+# Only applied when shell-integration is off (i.e. when SSH)
+cursor-style-blink = false
+
+# Keybinds
+keybind = ctrl+alt+t=new_split:auto
+keybind = ctrl+alt+z=toggle_split_zoom
+
+# Presentations
+#config-file = presentation_config
