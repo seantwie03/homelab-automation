@@ -1,7 +1,7 @@
 # Presentations
-window-padding-x = 75
-window-padding-y = 75
+window-padding-x = 150
+window-padding-y = 0,20
 font-size = 26
-window-padding-balance = true
+#window-padding-balance = false
 window-padding-color = extend
 

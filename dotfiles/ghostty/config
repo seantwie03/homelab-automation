@@ -1,5 +1,4 @@
 # Misc
-copy-on-select = clipboard
 font-feature = -calt, -liga, -dlig
 unfocused-split-opacity = 0.7
 
