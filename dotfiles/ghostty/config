@@ -1,3 +1,8 @@
+# Misc
+copy-on-select = true
+font-feature = -calt, -liga, -dlig
+unfocused-split-opacity = 0.7
+
 # Window
 maximize = true
 
