@@ -19,3 +19,8 @@
   ansible.builtin.package:
     name: terraform
     state: present
+
+- name: Ensure Vagrant is installed
+  ansible.builtin.package:
+    name: vagrant
+    state: present

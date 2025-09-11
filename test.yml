@@ -1,0 +1,13 @@
+- name: Test a role
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    primary_user:
+      name: sean
+      uid: 1000
+      gid: 1000
+
+  roles:
+    - role: virtualbox
