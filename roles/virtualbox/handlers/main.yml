@@ -1,0 +1,13 @@
+---
+- name: Run akmods
+  ansible.builtin.command:
+    cmd: akmods
+
+- name: Restart vboxdrv
+  ansible.builtin.service:
+    name: xboxdrv
+    state: restarted
+
+- name: Install extension pack
+  ansible.builtin.debug:
+    mgs: "Install VirtualBox Extension Pack: https://rpmfusion.org/Howto/VirtualBox#Install_VirtualBox_Extension_Pack"
