@@ -22,3 +22,12 @@ vim.api.nvim_create_autocmd({ "CmdlineLeave" }, {
     pattern = "/,\\?",
     command = "set nohlsearch",
 })
+
+-- Return cursor to its last position when opening a file
+local neovimrc_last_cursor_position = vim.api.nvim_create_augroup("NeovimrcLastCursorPosition", { clear = true })
+vim.api.nvim_create_autocmd({"BufWinEnter"}, {
+  group = neovimrc_last_cursor_position,
+  desc = "Return cursor to its last position when opening a file",
+  pattern = "*",
+  command = "silent! normal! g`\"zv",
+})
