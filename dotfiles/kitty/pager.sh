@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copied from: https://github.com/kovidgoyal/kitty/issues/719#issuecomment-952039731
 set -eu
 
 if [ "$#" -eq 3 ]; then
