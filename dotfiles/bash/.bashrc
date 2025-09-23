@@ -108,3 +108,5 @@ if is_wsl ; then
   export WH
 fi
 
+# Use libvirt with Vagrant
+export VAGRANT_DEFAULT_PROVIDER='libvirt'
