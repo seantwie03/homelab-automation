@@ -6,4 +6,4 @@ if command -v bat >/dev/null 2>&1 ; then
 fi
 
 alias vim="nvim"
-alias gemini='npx --yes https://github.com/google-gemini/gemini-cli'
+#alias gemini='npx --yes https://github.com/google-gemini/gemini-cli'
