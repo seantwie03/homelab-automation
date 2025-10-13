@@ -82,11 +82,26 @@
         state: present
         global: true
 
-    - name: Ensure puppeteer is installed
+    - name: Ensure puppeteer is installed (mermaid-cli dependency)
       community.general.npm:
         name: puppeteer
         state: present
         global: true
+
+    - name: Ensure d2 is installed
+      ansible.builtin.unarchive:
+        src: https://github.com/terrastruct/d2/releases/download/v0.7.1/d2-v0.7.1-linux-amd64.tar.gz
+        dest: /var/tmp/
+        remote_src: true
+        creates: /var/tmp/d2-v0.7.1/bin/d2
+
+    - name: Ensure d2 exists in /home/{{ cli_user }}/bin/
+      ansible.builtin.copy:
+        src: /var/tmp/d2-v0.7.1/bin/d2
+        dest: "/home/{{ cli_user }}/bin/d2"
+        mode: "0770"
+        owner: "{{ cli_user }}"
+        group: "{{ cli_user }}"
 
     - name: Ensure presenterm is installed
       community.general.cargo:
