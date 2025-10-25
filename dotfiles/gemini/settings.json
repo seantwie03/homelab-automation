@@ -1,0 +1,8 @@
+{
+    tools: {
+        shell: {
+            enableInteractiveShell: true
+            showColor: false
+        }
+    }
+}
