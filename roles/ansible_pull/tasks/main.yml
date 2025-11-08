@@ -1,18 +1,17 @@
 ---
-- name: Ensure wheel group can edit {{ playbook_path }}
+- name: wheel group can edit {{ playbook_path }}
   ansible.builtin.file:
     path: "{{ playbook_path }}"
     mode: u=rwX,g=rwX,o=rX
     owner: root
     group: wheel
     recurse: true
-  changed_when: false
 
 - name: Template ansible-pull systemd service
   ansible.builtin.template:
     src: ansible-pull.service.j2
     dest: /etc/systemd/system/ansible-pull.service
-    mode: "0644"
+    mode: 0644
     owner: root
     group: root
 
@@ -20,24 +19,25 @@
   ansible.builtin.template:
     src: ansible-pull.timer.j2
     dest: /etc/systemd/system/ansible-pull.timer
-    mode: "0644"
+    mode: 0644
     owner: root
     group: root
+  notify: restart ansible-pull timer
 
-- name: Template ansible-pull log directory
+- name: ansible-pull log directory exists
   ansible.builtin.file:
     path: /var/log/ansible-pull
     state: directory
-    mode: "0755"
+    mode: 0770
     owner: root
-    group: root
+    group: wheel
 
-- name: Ensure logrotate is installed
+- name: logrotate is installed
   ansible.builtin.package:
     name: logrotate
     state: present
 
-- name: Setup log rotation for ansible-pull
+- name: Configure log rotation for ansible-pull
   ansible.builtin.copy:
     content: |
       /var/log/ansible-pull/*.log {
@@ -49,12 +49,12 @@
           nocreate
       }
     dest: /etc/logrotate.d/ansible-pull
-    mode: "0644"
+    mode: 0640
     owner: root
-    group: root
+    group: wheel
 
 - name: Enable and start ansible-pull timer
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: ansible-pull.timer
     enabled: true
     state: started
@@ -64,14 +64,15 @@
   ansible.builtin.template:
     src: h.sh.j2
     dest: /usr/local/bin/h
-    mode: "0755"
+    mode: 0750
     owner: root
-    group: root
+    group: wheel
 
 - name: Template homelab management script (h) bash completion
   ansible.builtin.template:
     src: h_completion.bash.j2
     dest: /etc/bash_completion.d/h_completion.bash
-    mode: "0644"
+    mode: 0640
     owner: root
-    group: root
+    group: wheel
+

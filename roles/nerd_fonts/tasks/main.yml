@@ -14,7 +14,7 @@
         state: installed
 
 - name: Download and extract fonts
-  ansible.builtin.include_tasks: ./download_extract_fonts.yml
+  ansible.builtin.include_tasks: download_extract_fonts.yml
   loop: "{{ fonts }}"
   loop_control:
     loop_var: font

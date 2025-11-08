@@ -1,12 +1,12 @@
 ---
-- name: Ensure 1password repository is configured
+- name: 1password repository is configured
   block:
-    - name: Ensure 1Password repository key is installed
+    - name: 1Password repository key is installed
       ansible.builtin.rpm_key:
         key: https://downloads.1password.com/linux/keys/1password.asc
         state: present
 
-    - name: Ensure 1Password repository is enabled
+    - name: 1Password repository is enabled
       ansible.builtin.yum_repository:
         name: 1password
         description: 1Password Stable Channel
@@ -16,12 +16,12 @@
         repo_gpgcheck: true
         gpgkey: https://downloads.1password.com/linux/keys/1password.asc
 
-- name: Ensure 1password-cli is installed
+- name: 1Password CLI is installed
   ansible.builtin.package:
     name: 1password-cli
     state: present
 
-- name: Get default target
+- name: Register default systemd target
   ansible.builtin.stat:
     path: /etc/systemd/system/default.target
   register: default_target
@@ -31,26 +31,6 @@
     var: default_target.stat.lnk_target
     verbosity: 1
 
-- name: Ensure 1password GUI is installed on graphical systems
-  ansible.builtin.package:
-    name: 1password
-    state: present
-  when: "'graphical' in default_target.stat.lnk_target"
-
-- name: Ensure autostart directory exists
-  ansible.builtin.file:
-    path: /home/{{ gui_user }}/.config/autostart
-    state: directory
-    owner: "{{ gui_user }}"
-    group: "{{ gui_user }}"
-    mode: "0755"
-
-- name: Ensure 1password GUI autostarts on graphical systems
-  ansible.builtin.copy:
-    remote_src: true
-    src: /usr/share/applications/1password.desktop
-    dest: /home/{{ gui_user }}/.config/autostart/1password.desktop
-    owner: "{{ gui_user }}"
-    group: "{{ gui_user }}"
-    mode: "0644"
+- name: 1Password GUI is installed
+  ansible.builtin.include_tasks: gui.yml
   when: "'graphical' in default_target.stat.lnk_target"

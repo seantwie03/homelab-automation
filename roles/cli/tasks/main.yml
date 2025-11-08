@@ -1,60 +1,39 @@
 ---
 - name: Ensure .config directory exists
   ansible.builtin.file:
-    path: "/home/{{ cli_user }}/.config"
+    path: /home/{{ user }}/.config
     state: directory
-    mode: "0755"
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
+    mode: 0755
+    owner: "{{ user }}"
+    group: "{{ user }}"
 
-- name: Ensure /home/{{ cli_user }}/bin directory exists
+- name: Ensure /home/{{ user }}/bin directory exists
   ansible.builtin.file:
-    path: "/home/{{ cli_user }}/bin"
+    path: /home/{{ user }}/bin
     state: directory
-    mode: "0750"
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
+    mode: 0750
+    owner: "{{ user }}"
+    group: "{{ user }}"
 
 - name: Ensure CLI programs are installed
   ansible.builtin.package:
     name:
       - git
       - bat
-      - neovim
+      - asciinema
     state: present
 
-- name: Symlink nvim dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/nvim"
-    dest: "/home/{{ cli_user }}/.config/nvim"
-    state: link
-    force: true
-    follow: false
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
-  changed_when: false
+- name: Ensure neovim is installed and configured
+  ansible.builtin.include_tasks: neovim.yml
 
 - name: Symlink ghostty dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/ghostty"
-    dest: "/home/{{ cli_user }}/.config/ghostty"
+    dest: /home/{{ user }}/.config/ghostty
     state: link
-    force: true
     follow: false
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
-  changed_when: false
-
-- name: Symlink presenterm dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/presenterm"
-    dest: "/home/{{ cli_user }}/.config/presenterm"
-    state: link
-    force: true
-    follow: false
-    owner: "{{ cli_user }}"
-    group: "{{ cli_user }}"
-  changed_when: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
 
 # Special handling for bash dotfiles because they go 
 # into the home directory instead of ~/.config
@@ -69,77 +48,15 @@
     - name: Symlink bash dotfiles to home directory
       ansible.builtin.file:
         src: "{{ item.path }}"
-        dest: "/home/{{ cli_user }}/{{ item.path | basename }}"
+        dest: "/home/{{ user }}/{{ item.path | basename }}"
         state: link
-        force: true
         follow: false
-        owner: "{{ cli_user }}"
-        group: "{{ cli_user }}"
+        owner: "{{ user }}"
+        group: "{{ user }}"
       loop: "{{ bash_dotfiles.files }}"
       loop_control:
         label: "Symlinking {{ item.path | basename }}"
-      changed_when: false
 
-- name: Install presenterm
-  block:
-    - name: Ensure cargo is installed
-      ansible.builtin.package:
-        name: cargo
-        state: present
-
-    - name: Ensure mermaid-cli is installed
-      community.general.npm:
-        name: "@mermaid-js/mermaid-cli"
-        state: present
-        global: true
-
-    - name: Ensure puppeteer is installed (mermaid-cli dependency)
-      community.general.npm:
-        name: puppeteer
-        state: present
-        global: true
-
-    - name: Ensure d2 is installed
-      ansible.builtin.unarchive:
-        src: https://github.com/terrastruct/d2/releases/download/v0.7.1/d2-v0.7.1-linux-amd64.tar.gz
-        dest: /var/tmp/
-        remote_src: true
-        creates: /var/tmp/d2-v0.7.1/bin/d2
-
-    - name: Ensure d2 exists in /home/{{ cli_user }}/bin/
-      ansible.builtin.copy:
-        src: /var/tmp/d2-v0.7.1/bin/d2
-        dest: "/home/{{ cli_user }}/bin/d2"
-        mode: "0770"
-        owner: "{{ cli_user }}"
-        group: "{{ cli_user }}"
-
-    - name: Ensure presenterm is installed
-      community.general.cargo:
-        name: presenterm
-        state: present
-        path: "/home/{{ cli_user }}" # cargo automatically appends /bin
-
-    - name: Fix permissions for /home/{{ cli_user }}/bin
-      ansible.builtin.file:
-        path: "/home/{{ cli_user }}/bin"
-        mode: u=rwx,g=rx,o=
-        owner: "{{ cli_user }}"
-        group: "{{ cli_user }}"
-        recurse: true
-      changed_when: false
-
-- name: Install asciinema
-  ansible.builtin.package:
-    name: asciinema
-    state: present
-
-# - name: Symlink fish dotfiles directory
-#   ansible.builtin.file:
-#     src: "{{ dotfiles_path }}/fish"
-#     dest: "/home/{{ cli_user }}/.config/fish"
-#     state: link
-#     force: true
-#     owner: "{{ cli_user }}"
-#     group: "{{ cli_user }}"
+- name: Ensure presenterm is installed and configured
+  ansible.builtin.include_tasks: presenterm.yml
 

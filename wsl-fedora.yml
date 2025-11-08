@@ -11,7 +11,7 @@
 
   roles:
     - role: ansible_pull
-    - role: virtualization
+    - role: libvirt
       vars:
         libvirt_users:
           - "{{ primary_user.name }}"

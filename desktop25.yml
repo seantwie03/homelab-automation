@@ -4,10 +4,9 @@
   become: true
 
   vars:
-    primary_user:
-      name: sean
-      uid: 1000
-      gid: 1000
+    user: sean
+    uid: 1000
+    gid: 1000
 
   roles:
     - role: ansible_pull
@@ -21,28 +20,23 @@
           - UbuntuMono
           - ZedMono
     - role: onepassword
-      vars:
-        gui_user: "{{ primary_user.name }}"
-    - role: virtualization
-      vars:
-        libvirt_users:
-          - "{{ primary_user.name }}"
+    - role: libvirt
     - role: gnome_settings
       vars:
         dconf_users:
-          - "{{ primary_user.name }}"
+          - "{{ user }}"
     - role: tailscale
     - role: kitty
       vars:
-        kitty_user: "{{ primary_user.name }}"
+        kitty_user: "{{ user }}"
     - role: vscode
     - role: nodejs
     - role: python
     - role: devops
     - role: mount_network_storage
       vars:
-        user_id: "{{ primary_user.uid }}"
-        group_id: "{{ primary_user.gid }}"
+        user_id: "{{ uid }}"
+        group_id: "{{ gid }}"
         samba_mounts:
           - server: odroidh3plus
             share: docs
@@ -53,8 +47,6 @@
           - server: odroidh3plus
             share: temp
     - role: cli
-      vars:
-        cli_user: "{{ primary_user.name }}"
     - role: gui
       vars:
-        gui_user: "{{ primary_user.name }}"
+        gui_user: "{{ user }}"
