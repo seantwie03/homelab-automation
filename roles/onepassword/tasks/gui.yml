@@ -1,0 +1,24 @@
+---
+- name: 1Password GUI is installed
+  ansible.builtin.package:
+    name: 1password
+    state: present
+
+- name: 1Password GUI autostarts
+  block:
+    - name: Autostart directory exists
+      ansible.builtin.file:
+        path: /home/{{ user }}/.config/autostart
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+
+    - name: 1Password GUI autostarts
+      ansible.builtin.copy:
+        remote_src: true
+        src: /usr/share/applications/1password.desktop
+        dest: /home/{{ user }}/.config/autostart/1password.desktop
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644

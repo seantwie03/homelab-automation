@@ -1,0 +1,24 @@
+---
+- name: virtualization package group is installed
+  ansible.builtin.package:
+    name: "@virtualization"
+    state: present
+
+- name: User {{ user }} is in the libvirt group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: libvirt
+    append: true
+
+- name: Prerequisites installed for community.libvirt module
+  ansible.builtin.package:
+    name:
+      - python3-libvirt
+      - python3-lxml
+    state: present
+
+- name: Ensure storage pools are configured
+  ansible.builtin.include_tasks: storage_pools.yml
+  when:
+    - lookup('community.general.collection_version', 'community.libvirt') is not none
+    - lookup('community.general.collection_version', 'community.libvirt') is version('1.4.0', '>=')

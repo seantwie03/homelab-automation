@@ -24,7 +24,7 @@
     - role: onepassword
       vars:
         gui_user: "{{ primary_user.name }}"
-    - role: virtualization
+    - role: libvirt
       vars:
         libvirt_users:
           - "{{ primary_user.name }}"

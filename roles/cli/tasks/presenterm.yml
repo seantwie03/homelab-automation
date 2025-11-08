@@ -1,0 +1,55 @@
+---
+- name: Ensure cargo is installed
+  ansible.builtin.package:
+    name: cargo
+    state: present
+
+- name: Ensure mermaid-cli is installed
+  community.general.npm:
+    name: "@mermaid-js/mermaid-cli"
+    state: present
+    global: true
+
+- name: Ensure puppeteer is installed (mermaid-cli dependency)
+  community.general.npm:
+    name: puppeteer
+    state: present
+    global: true
+
+- name: Ensure d2 is installed
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: https://github.com/terrastruct/d2/releases/download/v0.7.1/d2-v0.7.1-linux-amd64.tar.gz
+    dest: /var/tmp/
+    creates: /var/tmp/d2-v0.7.1/bin/d2
+
+- name: Ensure d2 exists in /home/{{ user }}/bin/
+  ansible.builtin.copy:
+    src: /var/tmp/d2-v0.7.1/bin/d2
+    dest: /home/{{ user }}/bin/d2
+    mode: 0550
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Ensure presenterm is installed
+  community.general.cargo:
+    name: presenterm
+    state: present
+    path: "/home/{{ user }}" # cargo automatically appends /bin
+
+- name: Ensure presenterm is executable
+  ansible.builtin.file:
+    path: /home/{{ user }}/bin/presenterm
+    mode: 0550
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Symlink presenterm dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/presenterm"
+    dest: /home/{{ user }}/.config/presenterm
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+

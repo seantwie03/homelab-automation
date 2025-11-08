@@ -1,21 +1,12 @@
-Role Name - ansible_pull
-=========
+# Ansible Pull Job
 
-Configure job to recurrently run `ansible-pull`. Also installs Homelab Management (`h`) script
+Configure Systemd Timer to recurrently run `ansible-pull`. Also installs Homelab Management (`h`) script
 
-Requirements
-------------
+This role configures a recurring job. The job runs `ansible-pull` to clone the playbook to `/opt/homelab-automation`.
 
-DNF, Become
+The Systemd Service name is `ansible-pull`. It is hardcoded in several places.
 
-This role configures a recurring job. The job runs `ansible-pull` to clone the playbook to /opt/homelab-automation. The idea is at the end of the provisioning process the following command would be ran to bootstrap the workstation.
-
-`ansible-pull --limit localhost --accept-host-key --directory /opt/homelab-automation --url https://github.com/seantwie03/homelab-automation $(hostname --short).yml`
-
-The systemd service name is `ansible-pull` it is hardcoded in several places.
-
-Role Variables
---------------
+## Role Variables
 
 `ansible_pull_path`: The path to the `ansible-pull` executable. Will be different depending on installation method.
 
@@ -27,8 +18,7 @@ Role Variables
 
 `playbook_path`: Do not change this. Default is: `/opt/homelab-automation`
 
-Dependencies
-------------
+## Dependencies
 
 `ansible-pull` must be installed on the managed host
 
@@ -38,11 +28,12 @@ Follow the steps below to install ansible-pull globally.
 
 ```sh
 sudo dnf install python3-pip
-sudo python3 -m pip install ansible ansible-lint
+sudo python3 -m pip install ansible
 ```
 
-Example Playbook
-----------------
+Notice that the command above installs Ansible via `pip` instead of `dnf`. This is because the ansible package in the Fedora repositories does not include `ansible-pull`. Also, the command above runs `pip` with `sudo`. This is generally not recommended, but `ansible-pull` must be installed system-wide in order for the recurring job to succeed when ran as the *root* user.
+
+## Example Playbook
 
 ```yml
 ---
@@ -58,9 +49,4 @@ Example Playbook
         homelab_ansible_repo_git: git@github.com:your_username/your_reponame.git
         homelab_docs_dir: /srv/docs/areas/homelab
 ```
-
-License
--------
-
-MIT
 
