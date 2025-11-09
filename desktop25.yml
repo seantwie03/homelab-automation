@@ -10,16 +10,16 @@
 
   roles:
     - role: ansible_pull
+    - role: cli
+    - role: libvirt
     - role: nerd_fonts
     - role: onepassword
-    - role: libvirt
-    - role: gnome_settings
     - role: tailscale
-    - role: kitty
-    - role: vscode
+    - role: network_storage
+    - role: devops
     - role: nodejs
     - role: python
-    - role: devops
-    - role: mount_network_storage
-    - role: cli
+    - role: gnome_settings
+    - role: kitty
+    - role: vscode
     - role: gui
