@@ -1,4 +1,4 @@
-# Mount Network Storage
+# Network Storage
 
 Mount network storage.
 

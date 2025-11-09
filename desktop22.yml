@@ -4,54 +4,18 @@
   become: true
 
   vars:
-    primary_user:
-      name: sean
-      uid: 1000
-      gid: 1000
+    user: sean
+    uid: 1000
+    gid: 1000
 
   roles:
     - role: ansible_pull
-    - role: nerd_fonts
-      vars:
-        fonts:
-          - Iosevka
-          - IosevkaTerm
-          - Monofur
-          - MPlus
-          - UbuntuMono
-          - ZedMono
-    - role: onepassword
-      vars:
-        gui_user: "{{ primary_user.name }}"
-    - role: libvirt
-      vars:
-        libvirt_users:
-          - "{{ primary_user.name }}"
-    - role: tailscale
-    - role: kitty
-      vars:
-        kitty_user: "{{ primary_user.name }}"
-    - role: vscode
-    - role: nodejs
-    - role: python
-    - role: devops
-    - role: mount_network_storage
-      vars:
-        user_id: "{{ primary_user.uid }}"
-        group_id: "{{ primary_user.gid }}"
-        samba_mounts:
-          - server: odroidh3plus
-            share: docs
-          - server: odroidh3plus
-            share: source
-          - server: odroidh3plus
-            share: media
-          - server: odroidh3plus
-            share: temp
-    - role: gaming
     - role: cli
-      vars:
-        cli_user: "{{ primary_user.name }}"
-    - role: gui
-      vars:
-        gui_user: "{{ primary_user.name }}"
+    - role: libvirt
+    - role: nerd_fonts
+    - role: onepassword
+    - role: tailscale
+    - role: network_storage
+    - role: devops
+    - role: nodejs
+    - role: kitty
