@@ -1,4 +1,4 @@
-- name: Restart local-fs.target
+- name: restart local-fs.target
   ansible.builtin.systemd:
     name: local-fs.target
     state: restarted

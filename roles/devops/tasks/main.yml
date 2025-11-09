@@ -1,8 +1,8 @@
 ---
-- name: Ensure Terraform is installed
+- name: install terraform
   ansible.builtin.include_tasks:
     file: terraform.yml
 
-- name: Ensure awscli is installed
+- name: install awscli
   ansible.builtin.include_tasks:
     file: awscli.yml

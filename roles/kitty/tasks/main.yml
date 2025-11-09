@@ -1,17 +1,15 @@
 ---
-- name: Ensure kitty is installed
+- name: kitty is installed
   ansible.builtin.package:
     name: kitty
     state: present
 
-- name: Symlink kitty dotfiles directory
+- name: symlink kitty dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/kitty"
-    dest: "/home/{{ kitty_user }}/.config/kitty"
+    dest: /home/{{ user }}/.config/kitty
     state: link
-    force: true
     follow: false
-    owner: "{{ kitty_user }}"
-    group: "{{ kitty_user }}"
-  changed_when: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
 

@@ -58,3 +58,4 @@
   community.libvirt.virt_pool:
     name: isos
     autostart: true
+
