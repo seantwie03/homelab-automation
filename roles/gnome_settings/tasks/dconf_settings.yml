@@ -1,3 +1,4 @@
+---
 - name: enable extensions
   community.general.dconf:
     key: /org/gnome/desktop/session/idle-delay
@@ -35,7 +36,7 @@
         state: directory
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: "0755"
+        mode: 0755
 
     - name: workstation-wallpaper file exists
       ansible.builtin.copy:
@@ -43,7 +44,7 @@
         dest: /home/{{ user }}/.local/share/backgrounds/workstation-wallpaper.jpg
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: "0644"
+        mode: 0644
 
     - name: workstation-wallpaper-dark file exists
       ansible.builtin.copy:
@@ -51,7 +52,7 @@
         dest: /home/{{ user }}/.local/share/backgrounds/workstation-wallpaper-dark.jpg
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: "0644"
+        mode: 0644
 
     - name: wallpaper is set
       community.general.dconf:
@@ -75,17 +76,17 @@
         key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-automatic"
         value: false
 
-    - name: turn on Night Light at 8p.m.
+    - name: turn on night light at 8p.m.
       community.general.dconf:
         key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-from"
         value: 20.0
 
-    - name: turn off Night Light at 4a.m.
+    - name: turn off night light at 4a.m.
       community.general.dconf:
         key: "/org/gnome/settings-daemon/plugins/color/night-light-schedule-to"
         value: 4.0
 
-- name: file explorer (Nautalis / Files) settings
+- name: file explorer (Nautilus / Files) settings
   block:
     - name: list view in files
       community.general.dconf:
