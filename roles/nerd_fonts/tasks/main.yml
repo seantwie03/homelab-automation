@@ -1,19 +1,19 @@
 ---
-- name: Ensure prerequisites
+- name: install prerequisites
   block:
-    - name: Ensure fontconfigs is installed
+    - name: fontconfigs is installed
       ansible.builtin.package:
         name: fontconfig
         state: installed
 
-    - name: Ensure decompression tools are installed
+    - name: decompression tools are installed
       ansible.builtin.package:
         name:
           - xz
           - unzip
         state: installed
 
-- name: Download and extract fonts
+- name: download and extract fonts
   ansible.builtin.include_tasks: download_extract_fonts.yml
   loop: "{{ fonts }}"
   loop_control:

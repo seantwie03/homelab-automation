@@ -1,13 +1,13 @@
 ---
-- name: Ensure CLI programs are installed
+- name: neovim is installed
   ansible.builtin.package:
     name: neovim
     state: present
 
-- name: Symlink nvim dotfiles directory
+- name: symlink nvim dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/nvim"
-    dest: "/home/{{ user }}/.config/nvim"
+    dest: /home/{{ user }}/.config/nvim
     state: link
     follow: false
     owner: "{{ user }}"

@@ -1,12 +1,12 @@
 ---
-- name: Ensure the tailscale repository is configured
+- name: configure tailscale repository
   block:
-    - name: Ensure tailscale repository key is installed
+    - name: tailscale repository key is installed
       ansible.builtin.rpm_key:
         key: https://pkgs.tailscale.com/stable/fedora/repo.gpg
         state: present
 
-    - name: Ensure tailscale repository is enabled
+    - name: tailscale repository is enabled
       ansible.builtin.yum_repository:
         name: tailscale-stable
         description: Tailscale stable
@@ -16,13 +16,13 @@
         repo_gpgcheck: true
         gpgkey: https://pkgs.tailscale.com/stable/fedora/repo.gpg
 
-- name: Ensure tailscale is installed
+- name: tailscale is installed
   ansible.builtin.package:
     name: tailscale
     state: present
-  notify: Additional install instructions
+  notify: tailscale install instructions
 
-- name: Ensure tailscald is started and enabled
+- name: tailscald is started and enabled
   ansible.builtin.service:
     name: tailscaled.service
     state: started

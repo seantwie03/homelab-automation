@@ -7,7 +7,7 @@
     group: wheel
     recurse: true
 
-- name: Template ansible-pull systemd service
+- name: template ansible-pull systemd service
   ansible.builtin.template:
     src: ansible-pull.service.j2
     dest: /etc/systemd/system/ansible-pull.service
@@ -15,7 +15,7 @@
     owner: root
     group: root
 
-- name: Template ansible-pull systemd timer
+- name: template ansible-pull systemd timer
   ansible.builtin.template:
     src: ansible-pull.timer.j2
     dest: /etc/systemd/system/ansible-pull.timer
@@ -37,7 +37,7 @@
     name: logrotate
     state: present
 
-- name: Configure log rotation for ansible-pull
+- name: configure log rotation for ansible-pull
   ansible.builtin.copy:
     content: |
       /var/log/ansible-pull/*.log {
@@ -53,14 +53,14 @@
     owner: root
     group: wheel
 
-- name: Enable and start ansible-pull timer
+- name: enable and start ansible-pull timer
   ansible.builtin.systemd_service:
     name: ansible-pull.timer
     enabled: true
     state: started
     daemon_reload: true
 
-- name: Template homelab management script (h)
+- name: template homelab management script (h)
   ansible.builtin.template:
     src: h.sh.j2
     dest: /usr/local/bin/h
@@ -68,7 +68,7 @@
     owner: root
     group: wheel
 
-- name: Template homelab management script (h) bash completion
+- name: template homelab management script (h) bash completion
   ansible.builtin.template:
     src: h_completion.bash.j2
     dest: /etc/bash_completion.d/h_completion.bash

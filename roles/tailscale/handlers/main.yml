@@ -1,3 +1,3 @@
-- name: Additional install instructions
+- name: tailscale install instructions
   ansible.builtin.debug:
-    msg: Run `sudo tailscale up`
+    msg: Run `sudo tailscale up` and follow prompts

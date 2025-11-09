@@ -1,43 +1,6 @@
-Role Name
-=========
+# Gnome
 
-Settings for Gnome Desktop Environment.
+Apply settings to the Gnome Desktop Environment for the user specified in `user` variable.
 
-Requirements
-------------
-
-DNF, Become
-
-`community.general.dconf` module
-
-
-Role Variables
---------------
-
-`dconf_users`: A list of users to apply dconf settings to.
-
-Dependencies
-------------
-
-None
-
-Example Playbook
-----------------
-
-```yml
----
-- name: Configure Gnome
-  hosts: desktop
-  become: true
-  roles:
-    - role: gnome_settings
-      vars:
-        dconf_users:
-          - linda
-```
-
-License
--------
-
-MIT
+Requires the `community.general` collection version `10.6.0+`.
 
