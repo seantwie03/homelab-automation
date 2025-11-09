@@ -1,70 +1,63 @@
 ---
-- name: Ensure scanning software is installed
+- name: document scanning software is installed
   ansible.builtin.package:
     name: simple-scan
 
-- name: Ensure mouse configuration software is installed
+- name: mouse configuration software is installed
   ansible.builtin.package:
     name: piper
 
-- name: Ensure chrome is installed
+- name: google chrome is installed
   ansible.builtin.package:
     name: google-chrome-stable
 
-- name: Ensure zoom-us repository key is installed
-  ansible.builtin.rpm_key:
-    key: https://zoom.us/linux/download/pubkey?version=6-3-10
-    fingerprint: AE44 6BAB 33EA 9862 AA29 FC3D DDE0 E622 2047 091F
-    state: present
-
-- name: Ensure zoom is installed
-  ansible.builtin.package:
-    # Find the latest version
-    #     cd ~/Downloads
-    #     rm zoom_x86_64.rpm 2>/dev/null
-    #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
-    #     rpm -qp ./zoom_x86_64.rpm
-    name: https://zoom.us/client/6.5.11.4015/zoom_x86_64.rpm
-    state: present
-
-- name: Ensure gromit-mpx is installed # Software for drawing on the screen during presetations
-  ansible.builtin.package:
-    name: gromit-mpx
-    state: present
-
-- name: Ensure autostart directory exists
-  ansible.builtin.file:
-    path: /home/{{ gui_user }}/.config/autostart
-    state: directory
-    owner: "{{ gui_user }}"
-    group: "{{ gui_user }}"
-    mode: "0755"
-
-- name: Ensure gromit-mpx autostarts
-  ansible.builtin.copy:
-    src: gromit-mpx.desktop
-    dest: /home/{{ gui_user }}/.config/autostart/gromit-mpx.desktop
-    owner: "{{ gui_user }}"
-    group: "{{ gui_user }}"
-    mode: "0644"
-
-- name: Ensure gromit-mpx configuration file exists
-  ansible.builtin.copy:
-    src: gromit-mpx.cfg
-    dest: /home/{{ gui_user }}/.config/gromit-mpx.cfg
-    owner: "{{ gui_user }}"
-    group: "{{ gui_user }}"
-    mode: "0644"
-
-- name: Install ghostty
+- name: install zoom
   block:
-    - name: Enable scottames/ghostty copr
-      community.general.copr:
-        name: scottames/ghostty
-        state: enabled
-
-    - name: Ensure ghostty is installed
-      ansible.builtin.package:
-        name: ghostty
+    - name: zoom-us repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://zoom.us/linux/download/pubkey?version=6-3-10
+        fingerprint: AE44 6BAB 33EA 9862 AA29 FC3D DDE0 E622 2047 091F
         state: present
+
+    - name: Ensure zoom is installed
+      ansible.builtin.package:
+        # Find the latest version
+        #     cd ~/Downloads
+        #     rm zoom_x86_64.rpm 2>/dev/null
+        #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
+        #     rpm -qp ./zoom_x86_64.rpm
+        name: https://zoom.us/client/6.5.11.4015/zoom_x86_64.rpm
+        state: present
+
+- name: install gromit-mpx (software for drawing on the screen during presentations)
+  block:
+    - name: gromit-mpx is installed
+      ansible.builtin.package:
+        name: gromit-mpx
+        state: present
+
+    - name: autostart directory exists
+      ansible.builtin.file:
+        path: /home/{{ user }}/.config/autostart
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+
+    - name: Ensure gromit-mpx autostarts
+      ansible.builtin.copy:
+        src: gromit-mpx.desktop
+        dest: /home/{{ user }}/.config/autostart/gromit-mpx.desktop
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+
+    - name: symlink gromit-mpx dotfiles directory
+      ansible.builtin.file:
+        src: "{{ dotfiles_path }}/gromit-mpx"
+        dest: /home/{{ user }}/.config/gromit-mpx
+        state: link
+        follow: false
+        owner: "{{ user }}"
+        group: "{{ user }}"
 

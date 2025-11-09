@@ -1,1 +1,4 @@
-`cli_user`: A user to add cli configurations to.
+# CLI
+
+Install and configure CLI environment for user specified in `user` variable.
+
