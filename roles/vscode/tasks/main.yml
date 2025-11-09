@@ -1,12 +1,12 @@
 ---
-- name: Ensure 1password repository is configured
+- name: configure vscode repository
   block:
-    - name: Ensure VSCode repository key is installed
+    - name: vscode repository key is installed
       ansible.builtin.rpm_key:
         key: https://packages.microsoft.com/keys/microsoft.asc
         state: present
 
-    - name: Ensure VSCode repository is enabled
+    - name: vscode repository is enabled
       ansible.builtin.yum_repository:
         name: vscode
         description: Visual Studio Code
@@ -16,14 +16,12 @@
         repo_gpgcheck: true
         gpgkey: https://packages.microsoft.com/keys/microsoft.asc
 
-- name: Ensure VSCode is installed
+- name: vscode is installed
   ansible.builtin.package:
     name: code
     state: present
 
-# Remove vscode-insiders because it prevents linux from sleeping (2025-05-25)
-# Seems to only happen when a folder is open
-- name: Ensure VSCode Insiders is not installed
+- name: vscode-insiders is installed
   ansible.builtin.package:
     name: code-insiders
-    state: absent
+    state: present

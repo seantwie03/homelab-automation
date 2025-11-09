@@ -57,6 +57,6 @@
       loop_control:
         label: "Symlinking {{ item.path | basename }}"
 
-- name: ensure presenterm is installed and configured
+- name: install and configure presenterm
   ansible.builtin.include_tasks: presenterm.yml
 

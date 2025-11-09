@@ -82,7 +82,6 @@ case "$1" in
 		# This ensures the conditional work work whether or not the EDITOR variable includes
 		# the full path or just the executable name.
                 if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
-                    echo "NEOVIM"
                     "$EDITOR" "${AUTOMATION_DIR}" "+cd ${AUTOMATION_DIR}"
                 elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
                     code -n "${AUTOMATION_DIR}"
@@ -112,7 +111,10 @@ case "$1" in
                     --accept-host-key \
                     --directory "$AUTOMATION_DIR" \
                     --url "{{ homelab_ansible_repo_git }}" \
-                    --force "$PLAYBOOK_NAME"
+                    -v \
+                    --diff \
+                    --force \
+                    "$PLAYBOOK_NAME"
                 ;;
             j|job)
                 if [ -z "$3" ]; then

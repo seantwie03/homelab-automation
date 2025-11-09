@@ -1,8 +1,13 @@
 ---
-user_id: 1000
-group_id: 1000
+uid: 1000
+gid: 1000
 samba_mounts:
-  - server: servera
+  - server: odroidh3plus
     share: docs
-  - server: 192.168.0.1
-    share: pictures
+  - server: odroidh3plus
+    share: source
+  - server: odroidh3plus
+    share: media
+  - server: odroidh3plus
+    share: temp
+

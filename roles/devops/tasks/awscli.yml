@@ -1,11 +1,11 @@
-- name: Ensure awscli v2 is downloaded
+- name: awscli v2 is downloaded
   ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: /var/tmp/
     remote_src: true
     creates: /var/tmp/aws/install
 
-- name: Install awscli v2 if not already installed
+- name: awscli v2 is installed
   ansible.builtin.command:
     cmd: /var/tmp/aws/install --update
     creates: /usr/local/bin/aws

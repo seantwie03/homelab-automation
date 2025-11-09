@@ -1,43 +1,11 @@
-Role Name
+# Kitty Terminal
 =========
 
-Install and configure kitty terminal.
+Install the kitty terminal.
 
-Requirements
-------------
+The font in the `kitty.conf` file must be installed. This is usually done with the `nerd_fonts` module.
 
-DNF, Become, Font specified in kitty.conf
+## Role Variables
 
-
-Role Variables
---------------
-
-`kitty_user`: A user to add kitty configuration to.
-
-Dependencies
-------------
-
-The font in the kitty.conf must be installed. This is usually done with the `nerd_fonts` module.
-
-Example Playbook
-----------------
-
-```yml
----
-- name: Install and Configure kitty terminal
-  hosts: desktop
-  become: true
-  roles:
-    - role: kitty
-      vars:
-        kitty_user: linda
-    - role: kitty
-      vars:
-        kitty_user: lucy
-```
-
-License
--------
-
-MIT
+`user`: A user to add kitty configuration to.
 
