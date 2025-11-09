@@ -22,9 +22,6 @@
     - role: onepassword
     - role: libvirt
     - role: gnome_settings
-      vars:
-        dconf_users:
-          - "{{ user }}"
     - role: tailscale
     - role: kitty
       vars:

@@ -29,7 +29,7 @@
 
 - name: Lock screen and wallpaper settings
   block:
-    - name: Ensure user specific backgrounds directory exists
+    - name: User specific backgrounds directory exists
       ansible.builtin.file:
         path: /home/{{ item }}/.local/share/backgrounds
         state: directory
@@ -37,7 +37,7 @@
         group: "{{ item }}"
         mode: "0755"
 
-    - name: Ensure workstation-wallpaper file exists
+    - name: workstation-wallpaper file exists
       ansible.builtin.copy:
         src: cosmicdawn1080p.jpg
         dest: /home/{{ item }}/.local/share/backgrounds/workstation-wallpaper.jpg
@@ -45,7 +45,7 @@
         group: "{{ item }}"
         mode: "0644"
 
-    - name: Ensure workstation-wallpaper-dark file exists
+    - name: workstation-wallpaper-dark file exists
       ansible.builtin.copy:
         src: crucibleplanet1080p.jpg
         dest: /home/{{ item }}/.local/share/backgrounds/workstation-wallpaper-dark.jpg
@@ -53,19 +53,19 @@
         group: "{{ item }}"
         mode: "0644"
 
-    - name: Ensure wallpaper is set
+    - name: Wallpaper is set
       community.general.dconf:
         key: "/org/gnome/desktop/background/picture-uri"
         value: "'file:///home/{{ item }}/.local/share/backgrounds/workstation-wallpaper.jpg'"
 
-    - name: Ensure dark wallpaper is set
+    - name: Dark wallpaper is set
       community.general.dconf:
         key: "/org/gnome/desktop/background/picture-uri-dark"
         value: "'file:///home/{{ item }}/.local/share/backgrounds/workstation-wallpaper-dark.jpg'"
 
 - name: Night Light settings
   block:
-    - name: Ensure Night Light is enabled
+    - name: Night Light is enabled
       community.general.dconf:
         key: "/org/gnome/settings-daemon/plugins/color/night-light-enabled"
         value: true

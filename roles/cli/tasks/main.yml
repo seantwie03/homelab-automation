@@ -1,5 +1,5 @@
 ---
-- name: Ensure .config directory exists
+- name: /home/{{ user }}/.config directory exists
   ansible.builtin.file:
     path: /home/{{ user }}/.config
     state: directory
@@ -7,7 +7,7 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-- name: Ensure /home/{{ user }}/bin directory exists
+- name: /home/{{ user }}/bin directory exists
   ansible.builtin.file:
     path: /home/{{ user }}/bin
     state: directory
@@ -15,7 +15,7 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-- name: Ensure CLI programs are installed
+- name: CLI programs are installed
   ansible.builtin.package:
     name:
       - git
@@ -23,10 +23,10 @@
       - asciinema
     state: present
 
-- name: Ensure neovim is installed and configured
+- name: neovim is installed and configured
   ansible.builtin.include_tasks: neovim.yml
 
-- name: Symlink ghostty dotfiles directory
+- name: symlink ghostty dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/ghostty"
     dest: /home/{{ user }}/.config/ghostty
@@ -37,15 +37,15 @@
 
 # Special handling for bash dotfiles because they go 
 # into the home directory instead of ~/.config
-- name: Install bash dotfiles
+- name: install bash dotfiles
   block:
-    - name: Find all files in dotfiles/bash
+    - name: find all files in dotfiles/bash
       ansible.builtin.find:
         paths: "{{ dotfiles_path }}/bash"
         hidden: true
       register: bash_dotfiles
 
-    - name: Symlink bash dotfiles to home directory
+    - name: symlink bash dotfiles to home directory
       ansible.builtin.file:
         src: "{{ item.path }}"
         dest: "/home/{{ user }}/{{ item.path | basename }}"
@@ -57,6 +57,6 @@
       loop_control:
         label: "Symlinking {{ item.path | basename }}"
 
-- name: Ensure presenterm is installed and configured
+- name: ensure presenterm is installed and configured
   ansible.builtin.include_tasks: presenterm.yml
 
