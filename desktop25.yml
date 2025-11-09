@@ -11,14 +11,6 @@
   roles:
     - role: ansible_pull
     - role: nerd_fonts
-      vars:
-        fonts:
-          - Iosevka
-          - IosevkaTerm
-          - Monofur
-          - MPlus
-          - UbuntuMono
-          - ZedMono
     - role: onepassword
     - role: libvirt
     - role: gnome_settings
@@ -31,5 +23,3 @@
     - role: mount_network_storage
     - role: cli
     - role: gui
-      vars:
-        gui_user: "{{ user }}"

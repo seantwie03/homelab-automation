@@ -1,17 +1,17 @@
 ---
-- name: Enable heroic-games-launcher copr
+- name: enable heroic-games-launcher copr
   community.general.copr:
     name: atim/heroic-games-launcher
     state: enabled
 
-- name: Ensure heroic-games-launcher is installed
+- name: heroic-games-launcher is installed
   ansible.builtin.package:
     name:
       - wine
       - heroic-games-launcher-bin
     state: present
 
-- name: Ensure steam is installed
+- name: steam is installed
   ansible.builtin.package:
     name: steam
     state: present

@@ -6,6 +6,7 @@
     owner: root
     group: wheel
     recurse: true
+  changed_when: false
 
 - name: template ansible-pull systemd service
   ansible.builtin.template:
