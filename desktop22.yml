@@ -10,8 +10,8 @@
 
   roles:
     - role: ansible_pull
+    - role: rpm_fusion
     - role: cli
-    - role: libvirt
     - role: nerd_fonts
     - role: onepassword
     - role: tailscale
@@ -19,3 +19,6 @@
     - role: devops
     - role: nodejs
     - role: kitty
+    - role: niri
+    - role: gui
+

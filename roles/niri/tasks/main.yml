@@ -1,0 +1,5 @@
+---
+- name: pavucontrol is installed
+  ansible.builtin.package:
+    name: pavucontrol
+    state: present

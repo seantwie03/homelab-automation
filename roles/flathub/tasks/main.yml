@@ -1,0 +1,17 @@
+---
+- name: flatpak is installed
+  ansible.builtin.package:
+    name: flatpak
+    state: present
+
+- name: Add flathub repository
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+- name: flatseal is installed
+  community.general.flatpak:
+    name: com.github.tchx84.Flatseal
+    state: present
+
