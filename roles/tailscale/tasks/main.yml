@@ -4,6 +4,7 @@
     - name: tailscale repository key is installed
       ansible.builtin.rpm_key:
         key: https://pkgs.tailscale.com/stable/fedora/repo.gpg
+        fingerprint: 2596a99eaab33821893c0a79458ca832957f5868
         state: present
 
     - name: tailscale repository is enabled

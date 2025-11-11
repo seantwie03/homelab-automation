@@ -21,5 +21,6 @@
     - role: kitty
     - role: niri
     - role: gui
+    - role: vscode
     - role: gaming
 

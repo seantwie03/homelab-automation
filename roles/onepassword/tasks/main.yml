@@ -4,6 +4,7 @@
     - name: 1password repository key is installed
       ansible.builtin.rpm_key:
         key: https://downloads.1password.com/linux/keys/1password.asc
+        fingerprint: 3fef9748469adbe15da7ca80ac2d62742012ea22
         state: present
 
     - name: 1password repository is enabled
