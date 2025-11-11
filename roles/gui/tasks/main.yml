@@ -11,17 +11,26 @@
   community.general.flatpak:
     name: org.mozilla.firefox
 
-#- name: install chrome
-#  block:
-#    - name: google-chrome repository key is installed
-#      ansible.builtin.rpm_key:
-#        key: https://zoom.us/linux/download/pubkey?version=6-3-10
-#        fingerprint: AE44 6BAB 33EA 9862 AA29 FC3D DDE0 E622 2047 091F
-#        state: present
-#
-#    - name: google chrome is installed
-#      ansible.builtin.package:
-#        name: google-chrome-stable
+- name: install chrome
+  block:
+    - name: google repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://dl.google.com/linux/linux_signing_key.pub
+        state: present
+
+    - name: google-chrome repository is enabled
+      ansible.builtin.yum_repository:
+        name: google-chrome
+        description: Google Chrome
+        baseurl: https://dl.google.com/linux/chrome/rpm/stable/x86_64
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+
+    - name: google chrome is installed
+      ansible.builtin.package:
+        name: google-chrome-stable
 
 - name: install zoom
   block:
