@@ -4,6 +4,7 @@
     - name: vscode repository key is installed
       ansible.builtin.rpm_key:
         key: https://packages.microsoft.com/keys/microsoft.asc
+        fingerprint: bc528686b50d79e339d3721ceb3e94adbe1229cf
         state: present
 
     - name: vscode repository is enabled

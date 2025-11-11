@@ -4,6 +4,7 @@
     - name: nodesource repository key is installed
       ansible.builtin.rpm_key:
         key: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+        fingerprint: 242b813831af09562b6c46f76b88da4e3af28a14
         state: present
 
     - name: nodesource-node.js repository is enabled
