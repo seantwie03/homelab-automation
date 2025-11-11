@@ -1,4 +1,9 @@
 ---
+- name: python3-dnf is installed
+  ansible.builtin.package:
+    name: python3-dnf
+    state: present
+
 - name: enable heroic-games-launcher copr
   community.general.copr:
     name: atim/heroic-games-launcher
