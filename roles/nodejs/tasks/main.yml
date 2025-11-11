@@ -26,3 +26,4 @@
     name: pnpm
     global: true
     state: present
+
