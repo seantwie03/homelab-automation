@@ -18,7 +18,6 @@
     - role: network_storage
     - role: devops
     - role: nodejs
-    - role: kitty
     - role: niri
     - role: gui
     - role: gaming
