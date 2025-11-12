@@ -1,4 +1,16 @@
 ---
+# Some GUI programs are configured to autostart using ~/.config/autostart
+- name: autostart directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/autostart
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: flatpak is installed and flathub is configured
+  ansible.builtin.include_tasks: flathub.yml
+
 - name: document scanning software is installed
   ansible.builtin.package:
     name: simple-scan
@@ -11,75 +23,16 @@
   community.general.flatpak:
     name: org.mozilla.firefox
 
-- name: install chrome
-  block:
-    - name: google repository key is installed
-      ansible.builtin.rpm_key:
-        key: https://dl.google.com/linux/linux_signing_key.pub
-        fingerprint: eb4c1bfd4f042f6dddccec917721f63bd38b4796
-        state: present
+- name: google-chrome is installed
+  ansible.builtin.include_tasks: google_chrome.yml
 
-    - name: google-chrome repository is enabled
-      ansible.builtin.yum_repository:
-        name: google-chrome
-        description: Google Chrome
-        baseurl: https://dl.google.com/linux/chrome/rpm/stable/x86_64
-        enabled: true
-        gpgcheck: true
-        repo_gpgcheck: true
-        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+- name: zoom is installed
+  ansible.builtin.include_tasks: zoom.yml
 
-    - name: google chrome is installed
-      ansible.builtin.package:
-        name: google-chrome-stable
+- name: gromit-mpx is installed and configured
+  ansible.builtin.include_tasks: gromit_mpx.yml
 
-- name: install zoom
-  block:
-    - name: zoom-us repository key is installed
-      ansible.builtin.rpm_key:
-        key: https://zoom.us/linux/download/pubkey?version=6-3-10
-        fingerprint: AE44 6BAB 33EA 9862 AA29 FC3D DDE0 E622 2047 091F
-        state: present
+- name: vscode and vscode-insiders are installed
+  ansible.builtin.include_tasks: vscode.yml
 
-    - name: Ensure zoom is installed
-      ansible.builtin.package:
-        # Find the latest version
-        #     cd ~/Downloads
-        #     rm zoom_x86_64.rpm 2>/dev/null
-        #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
-        #     rpm -qp ./zoom_x86_64.rpm
-        name: https://zoom.us/client/6.5.11.4015/zoom_x86_64.rpm
-        state: present
-
-- name: install gromit-mpx (software for drawing on the screen during presentations)
-  block:
-    - name: gromit-mpx is installed
-      ansible.builtin.package:
-        name: gromit-mpx
-        state: present
-
-    - name: autostart directory exists
-      ansible.builtin.file:
-        path: /home/{{ user }}/.config/autostart
-        state: directory
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        mode: 0755
-
-    - name: Ensure gromit-mpx autostarts
-      ansible.builtin.copy:
-        src: gromit-mpx.desktop
-        dest: /home/{{ user }}/.config/autostart/gromit-mpx.desktop
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        mode: 0644
-
-    - name: symlink gromit-mpx dotfiles directory
-      ansible.builtin.file:
-        src: "{{ dotfiles_path }}/gromit-mpx"
-        dest: /home/{{ user }}/.config/gromit-mpx
-        state: link
-        follow: false
-        owner: "{{ user }}"
-        group: "{{ user }}"
 
