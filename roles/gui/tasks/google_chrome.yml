@@ -1,0 +1,22 @@
+- name: configure google-chrome repository
+  block:
+    - name: google repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://dl.google.com/linux/linux_signing_key.pub
+        fingerprint: eb4c1bfd4f042f6dddccec917721f63bd38b4796
+        state: present
+
+    - name: google-chrome repository is enabled
+      ansible.builtin.yum_repository:
+        name: google-chrome
+        description: Google Chrome
+        baseurl: https://dl.google.com/linux/chrome/rpm/stable/x86_64
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+
+- name: google chrome is installed
+  ansible.builtin.package:
+    name: google-chrome-stable
+

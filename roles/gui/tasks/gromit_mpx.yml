@@ -1,0 +1,22 @@
+- name: gromit-mpx is installed
+  ansible.builtin.package:
+    name: gromit-mpx
+    state: present
+
+- name: autostart gromit-mpx
+  ansible.builtin.copy:
+    src: gromit-mpx.desktop
+    dest: /home/{{ user }}/.config/autostart/gromit-mpx.desktop
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+- name: symlink gromit-mpx dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/gromit-mpx"
+    dest: /home/{{ user }}/.config/gromit-mpx
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
