@@ -1,3 +1,4 @@
+---
 - name: gromit-mpx is installed
   ansible.builtin.package:
     name: gromit-mpx

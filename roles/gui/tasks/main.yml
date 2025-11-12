@@ -11,20 +11,15 @@
 - name: flatpak is installed and flathub is configured
   ansible.builtin.include_tasks: flathub.yml
 
-- name: document scanning software is installed
-  ansible.builtin.package:
-    name: simple-scan
-
-- name: mouse configuration software is installed
-  ansible.builtin.package:
-    name: piper
-
 - name: firefox flatpak is installed
   community.general.flatpak:
     name: org.mozilla.firefox
 
 - name: google-chrome is installed
   ansible.builtin.include_tasks: google_chrome.yml
+
+- name: kitty is installed and configured
+  ansible.builtin.include_tasks: kitty.yml
 
 - name: zoom is installed
   ansible.builtin.include_tasks: zoom.yml
@@ -35,4 +30,11 @@
 - name: vscode and vscode-insiders are installed
   ansible.builtin.include_tasks: vscode.yml
 
+- name: document scanning software is installed
+  ansible.builtin.package:
+    name: simple-scan
+
+- name: mouse configuration software is installed
+  ansible.builtin.package:
+    name: piper
 

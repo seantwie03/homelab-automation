@@ -20,6 +20,4 @@
     - role: nodejs
     - role: python
     - role: gnome_settings
-    - role: kitty
-    - role: vscode
     - role: gui

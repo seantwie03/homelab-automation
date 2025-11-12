@@ -1,3 +1,4 @@
+---
 - name: configure google-chrome repository
   block:
     - name: google repository key is installed
