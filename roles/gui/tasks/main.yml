@@ -30,6 +30,9 @@
 - name: vscode and vscode-insiders are installed
   ansible.builtin.include_tasks: vscode.yml
 
+- name: print packages are installed
+  ansible.builtin.include_tasks: printer.yml
+
 - name: document scanning software is installed
   ansible.builtin.package:
     name: simple-scan
