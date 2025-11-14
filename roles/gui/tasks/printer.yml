@@ -1,0 +1,28 @@
+---
+- name: cups is installed
+  ansible.builtin.package:
+    name: cups
+    state: present
+
+- name: cups service is enabled and started
+  ansible.builtin.service:
+    name: cups
+    state: started
+    enabled: true
+
+- name: avahi is installed
+  ansible.builtin.package:
+    name: avahi
+    state: present
+
+- name: avahi-daemon service is enabled and started
+  ansible.builtin.service:
+    name: avahi-daemon
+    state: started
+    enabled: true
+
+- name: system-config-printer is installed
+  ansible.builtin.package:
+    name: system-config-printer
+    state: present
+
