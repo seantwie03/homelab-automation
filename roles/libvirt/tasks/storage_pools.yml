@@ -7,27 +7,27 @@
     group: wheel
     mode: 0775
 
-- name: images storage pool is defined
-  community.libvirt.virt_pool:
-    command: define
-    name: images
-    xml: |
-      <pool type='dir'>
-        <name>images</name>
-        <target>
-          <path>/var/lib/libvirt/images</path>
-        </target>
-      </pool>
-
-- name: images storage pool is active
-  community.libvirt.virt_pool:
-    name: images
-    state: active
-
-- name: images storage pool will autostart
-  community.libvirt.virt_pool:
-    name: images
-    autostart: true
+#- name: images storage pool is defined
+#  community.libvirt.virt_pool:
+#    command: define
+#    name: images
+#    xml: |
+#      <pool type='dir'>
+#        <name>images</name>
+#        <target>
+#          <path>/var/lib/libvirt/images</path>
+#        </target>
+#      </pool>
+#
+#- name: images storage pool is active
+#  community.libvirt.virt_pool:
+#    name: images
+#    state: active
+#
+#- name: images storage pool will autostart
+#  community.libvirt.virt_pool:
+#    name: images
+#    autostart: true
 
 - name: isos directory exists
   ansible.builtin.file:

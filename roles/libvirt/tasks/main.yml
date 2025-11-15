@@ -22,3 +22,10 @@
   when:
     - lookup('community.general.collection_version', 'community.libvirt') is not none
     - lookup('community.general.collection_version', 'community.libvirt') is version('1.4.0', '>=')
+
+- name: start and enable libvirtd
+  ansible.builtin.service:
+    name: libvirtd
+    state: started
+    enabled: true
+
