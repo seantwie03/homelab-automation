@@ -1,4 +1,4 @@
-- name: Configure desktop22 as a workstation
+- name: Configure odroidh3plus as a server
   hosts: localhost
   connection: local
   become: true
@@ -10,16 +10,8 @@
 
   roles:
     - role: ansible_pull
-    - role: rpm_fusion
     - role: cli
+    - role: libvirt
     - role: nerd_fonts
     - role: onepassword
     - role: tailscale
-    - role: network_storage
-    - role: libvirt
-    - role: devops
-    - role: nodejs
-    - role: niri
-    - role: gui
-    - role: gaming
-
