@@ -1,0 +1,22 @@
+---
+- name: ensure git is installed
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: create adobe fonts directory
+  ansible.builtin.file:
+    path: /usr/share/fonts/adobe-fonts
+    state: directory
+    mode: '0755'
+
+- name: clone adobe fonts repositories
+  ansible.builtin.git:
+    repo: "https://github.com/adobe-fonts/{{ item }}.git"
+    dest: "/usr/share/fonts/adobe-fonts/{{ item }}"
+    depth: 1
+  loop:
+    - source-sans
+    - source-serif
+    - source-code-pro
+  notify: rebuild font cache
