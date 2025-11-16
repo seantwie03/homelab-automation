@@ -1,0 +1,14 @@
+---
+- name: create google fonts directory
+  ansible.builtin.file:
+    path: /usr/share/fonts/google
+    state: directory
+    mode: '0755'
+
+- name: download and unarchive google fonts
+  ansible.builtin.unarchive:
+    src: https://github.com/google/fonts/archive/main.zip
+    dest: /usr/share/fonts/google
+    remote_src: yes
+    creates: /usr/share/fonts/google/fonts-main
+  notify: rebuild font cache

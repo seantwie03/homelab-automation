@@ -17,3 +17,6 @@
   loop: "{{ fonts }}"
   loop_control:
     loop_var: font
+
+- name: install google fonts
+  ansible.builtin.include_tasks: google_fonts.yml
