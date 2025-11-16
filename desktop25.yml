@@ -9,10 +9,11 @@
     gid: 1000
 
   roles:
+    - role: core
     - role: ansible_pull
     - role: cli
     - role: libvirt
-    - role: nerd_fonts
+    - role: fonts
     - role: onepassword
     - role: tailscale
     - role: network_storage
