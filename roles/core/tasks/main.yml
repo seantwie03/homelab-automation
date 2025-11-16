@@ -1,0 +1,22 @@
+---
+- name: downloader tools are installed
+  ansible.builtin.package:
+    name:
+      - curl
+      - wget
+    state: present
+
+- name: compression tools are installed
+  ansible.builtin.package:
+    name:
+      - xz
+      - zip
+      - unzip
+      - tar
+    state: present
+
+- name: community.general prerequisites are installed
+  ansible.builtin.package:
+    name: python3-dnf
+    state: present
+

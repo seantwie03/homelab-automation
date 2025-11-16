@@ -1,0 +1,6 @@
+---
+- name: bluez is installed
+  ansible.builtin.package:
+    name: bluez
+    state: present
+

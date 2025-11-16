@@ -21,6 +21,9 @@
 - name: kitty is installed and configured
   ansible.builtin.include_tasks: kitty.yml
 
+- name: bluetooth is installed
+  ansible.builtin.include_tasks: bluetooth.yml
+
 - name: zoom is installed
   ansible.builtin.include_tasks: zoom.yml
 
