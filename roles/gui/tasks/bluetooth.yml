@@ -4,3 +4,15 @@
     name: bluez
     state: present
 
+- name: bluetui prerequisites are installed
+  ansible.builtin.package:
+    name:
+      - dbus-devel 
+      - pkgconf-pkg-config
+    state: present
+
+- name: bluetui is installed
+  community.general.cargo:
+    name: bluetui
+    state: present
+    path: "/home/{{ user }}" # cargo automatically appends /bin

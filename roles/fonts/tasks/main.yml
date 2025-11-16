@@ -7,6 +7,12 @@
       - fontconfig
     state: present
 
+- name: install noto color emoji font
+  ansible.builtin.package:
+    name: google-noto-color-emoji-fonts
+    state: present
+  notify: rebuild font cache
+
 - name: install microsoft fonts
   ansible.builtin.command:
     cmd: "rpm --nodigest -i {{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
@@ -20,3 +26,6 @@
 
 - name: install google fonts
   ansible.builtin.include_tasks: google_fonts.yml
+
+- name: install adobe fonts
+  ansible.builtin.include_tasks: adobe_fonts.yml
