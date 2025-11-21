@@ -10,18 +10,21 @@
     groups: libvirt
     append: true
 
-- name: prerequisites installed for community.libvirt collection
-  ansible.builtin.package:
-    name:
-      - python3-libvirt
-      - python3-lxml
-    state: present
+- name: images directory exists
+  ansible.builtin.file:
+    path: /var/lib/libvirt/images
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0775
 
-- name: storage pools are configured
-  ansible.builtin.include_tasks: storage_pools.yml
-  when:
-    - lookup('community.general.collection_version', 'community.libvirt') is not none
-    - lookup('community.general.collection_version', 'community.libvirt') is version('1.4.0', '>=')
+- name: isos directory exists
+  ansible.builtin.file:
+    path: /var/lib/libvirt/images/isos
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0775
 
 - name: start and enable libvirtd
   ansible.builtin.service:
