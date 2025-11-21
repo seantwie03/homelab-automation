@@ -5,6 +5,3 @@ collections:
 
   - name: community.general
     version: 10.6.0
-
-  - name: community.libvirt
-    version: 2.0.0
