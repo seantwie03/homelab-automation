@@ -7,3 +7,18 @@
     - run akmods
     - restart vboxdrv
     - install extension pack
+
+- name: /etc/vbox directory exists
+  ansible.builtin.file:
+    path: /etc/vbox
+    owner: root
+    group: wheel
+    mode: 0775
+
+- name: networks.conf exists
+  ansible.builtin.copy:
+    src: networks.conf
+    dest: /etc/vbox/networks.conf
+    owner: root
+    group: wheel
+    mode: 0664
