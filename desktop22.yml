@@ -18,6 +18,7 @@
     - role: tailscale
     - role: network_storage
     - role: libvirt
+    - role: virtualbox
     - role: devops
     - role: nodejs
     - role: niri
