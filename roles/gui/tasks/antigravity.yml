@@ -1,0 +1,14 @@
+---
+- name: add antigravity repo
+  ansible.builtin.copy:
+    src: antigravity.repo
+    dest: /etc/yum.repos.d/antigravity.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: antigravity is installed
+  ansible.builtin.dnf:
+    name: antigravity
+    state: latest
+    update_cache: true
