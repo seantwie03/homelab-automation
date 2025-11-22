@@ -33,6 +33,9 @@
 - name: vscode and vscode-insiders are installed
   ansible.builtin.include_tasks: vscode.yml
 
+- name: install google antigravity
+  ansible.builtin.include_tasks: antigravity.yml
+
 - name: print packages are installed
   ansible.builtin.include_tasks: printer.yml
 
