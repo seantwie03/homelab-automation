@@ -1,24 +1,29 @@
 ---
+- name: configure virtualbox repository
+  block:
+    - name: virtualbox repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+        fingerprint: B9F8 D658 297A F3EF C18D  5CDF A2F6 83C5 2980 AECF
+        state: present
+
+    - name: virtualbox repository is enabled
+      ansible.builtin.yum_repository:
+        name: virtualbox
+        description: Fedora $releasever - $basearch - VirtualBox
+        baseurl: http://download.virtualbox.org/virtualbox/rpm/fedora/$releasever/$basearch
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+
 - name: virtualbox is installed
   ansible.builtin.package:
-    name: VirtualBox
+    name: VirtualBox-7.2
     state: present
-  notify: 
-    - run akmods
-    - restart vboxdrv
-    - install extension pack
 
-- name: /etc/vbox directory exists
-  ansible.builtin.file:
-    path: /etc/vbox
-    owner: root
-    group: wheel
-    mode: 0775
-
-- name: networks.conf exists
-  ansible.builtin.copy:
-    src: networks.conf
-    dest: /etc/vbox/networks.conf
-    owner: root
-    group: wheel
-    mode: 0664
+- name: user {{ user }} is in vboxusers group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: vboxusers
+    append: true
