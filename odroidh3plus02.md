@@ -10,9 +10,9 @@ The primary goal of this server is to provide reliable, centralized file storage
 
 Key Technologies:
 
-* btrfs
-* btrbk - Snapshot/rollback of user data
-* restic - Encrypted offsite backups
+-   btrfs
+-   btrbk - Snapshot/rollback of user data
+-   restic - Encrypted offsite backups
 
 ### Hardware
 
