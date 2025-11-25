@@ -1,4 +1,10 @@
 ---
+- name: install prerequisites
+  ansible.builtin.package:
+    name:
+      - "@c-development"
+      - "@development-tools"
+
 - name: configure virtualbox repository
   block:
     - name: virtualbox repository key is installed

@@ -13,7 +13,6 @@
     - role: ansible_pull
     - role: cli
     - role: libvirt
-    - role: virtualbox
     - role: fonts
     - role: onepassword
     - role: tailscale
