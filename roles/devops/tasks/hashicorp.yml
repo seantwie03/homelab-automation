@@ -25,3 +25,10 @@
   ansible.builtin.package:
     name: vagrant
     state: present
+  notify: install vagrant-libvirt plugin
+
+- name: vagrant-libvirt is installed
+  ansible.builtin.package:
+    name: vagrant-libvirt
+    state: present
+  notify: install vagrant-libvirt plugin
