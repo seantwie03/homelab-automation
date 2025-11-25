@@ -1,0 +1,4 @@
+- name: install vagrant-libvirt plugin
+  ansible.builtin.command:
+    cmd: vagrant plugin install vagrant-libvirt
+

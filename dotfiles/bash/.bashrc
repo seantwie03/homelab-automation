@@ -87,7 +87,6 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 # Add Color to Prompt
 # This is a great breakdown for how to set the colors: https://chrisyeh96.github.io/2020/03/28/terminal-colors.html
 #PS1='\[\033[0;34m\]\u\[\033[1;30m\]@\[\033[0;34m\]\h\[\033[1;30m\]:\[\033[0;36m\]\w\[\033[1;30m\]$ \[\033[0;30m\]'
-#PS1='\[\033[0;34m\]\u\[\033[1;30m\]@\[\033[0;34m\]\h\[\033[1;30m\]:\[\033[0;36m\]\w\[\033[1;30m\]$ \[\033[0;30m\]'
 PS1='\[\033[0;34m\]\u\[\033[1;30m\]@\[\033[0;34m\]\h\[\033[1;30m\]:\[\033[0;36m\]\w\[\033[0;30m\]$ '
 
 ####################################### Completion #######################################
@@ -108,4 +107,7 @@ if is_wsl ; then
   WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
   export WH
 fi
+
+# Use libvirt with Vagrant
+export VAGRANT_DEFAULT_PROVIDER='libvirt'
 

@@ -1,7 +1,7 @@
 ---
-- name: install terraform
+- name: install hashicorp tools
   ansible.builtin.include_tasks:
-    file: terraform.yml
+    file: hashicorp.yml
 
 - name: install awscli
   ansible.builtin.include_tasks:
