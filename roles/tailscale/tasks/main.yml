@@ -16,6 +16,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://pkgs.tailscale.com/stable/fedora/repo.gpg
+        skip_if_unavailable: true
 
 - name: tailscale is installed
   ansible.builtin.package:

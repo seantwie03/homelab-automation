@@ -22,6 +22,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+        skip_if_unavailable: true
 
 - name: virtualbox is installed
   ansible.builtin.package:

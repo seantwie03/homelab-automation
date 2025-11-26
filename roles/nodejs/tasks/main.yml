@@ -16,6 +16,7 @@
         gpgcheck: true
         priority: 10
         gpgkey: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+        skip_if_unavailable: true
 
 - name: nodejs is installed
   ansible.builtin.package:
