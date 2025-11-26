@@ -32,3 +32,17 @@
     state: started
     enabled: true
 
+- name: virtio-win repository is enabled
+  ansible.builtin.yum_repository:
+    name: virtio-win-latest
+    description: VirtIO Drivers for Windows
+    baseurl: https://fedorapeople.org/groups/virt/virtio-win/repo/latest
+    enabled: true
+    gpgcheck: false
+    repo_gpgcheck: false
+    skip_if_unavailable: true
+
+- name: install virtio-win (will be saved to /usr/share/virtio-win/)
+  ansible.builtin.package:
+    name: virtio-win
+    state: present

@@ -16,6 +16,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        skip_if_unavailable: true
 
 - name: vscode is installed
   ansible.builtin.package:

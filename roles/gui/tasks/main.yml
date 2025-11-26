@@ -42,12 +42,12 @@
 - name: document scanning software is installed
   ansible.builtin.package:
     name: simple-scan
-    state: presetn
+    state: present
 
 - name: mouse configuration software is installed
   ansible.builtin.package:
     name: piper
-    state: presetn
+    state: present
 
 - name: install bittorrent client
   ansible.builtin.package:

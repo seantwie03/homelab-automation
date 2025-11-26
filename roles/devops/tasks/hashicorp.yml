@@ -15,6 +15,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://rpm.releases.hashicorp.com/gpg
+        skip_if_unavailable: true
 
 - name: terraform is installed
   ansible.builtin.package:

@@ -16,6 +16,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://downloads.1password.com/linux/keys/1password.asc
+        skip_if_unavailable: true
 
 - name: 1password CLI is installed
   ansible.builtin.package:
