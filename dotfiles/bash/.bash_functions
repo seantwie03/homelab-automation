@@ -18,6 +18,19 @@ gstat() {
     git status
 }
 
+# kitty-demo-cmd-file-updater
+kdcfu() {
+    local target_path="$1"
+
+    # Check if the path does NOT start with a /
+    if [[ "$target_path" != /* ]]; then
+        target_path="$(pwd)/$target_path"
+    fi
+
+    # Use | as delimiter and double quotes for variable expansion
+    sed -i "s|CMD_FILE=.*$|CMD_FILE='$target_path'|" ~/s/cli_demos/kitty-demo.sh
+}
+
 # Print characters in the entire asciinema recording area (120x32)
 recording_area() {
 echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
