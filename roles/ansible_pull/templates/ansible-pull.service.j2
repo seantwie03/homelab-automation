@@ -8,6 +8,7 @@ Wants=network-online.target
 Type=oneshot
 User=root
 WorkingDirectory={{ playbook_path }}
+Environment="PYTHONUNBUFFERED=True"
 ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
     --limit localhost \
     --accept-host-key \
@@ -15,7 +16,7 @@ ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
     --url {{ homelab_ansible_repo_git }} \
     --diff \
     --verbose \
-    {{ ansible_hostname }}.yml \
+    {{ ansible_facts['hostname'] }}.yml \
     2>&1 | tee /var/log/ansible-pull/ansible-pull-$(date --iso-8601='minutes').log"
 
 [Install]
