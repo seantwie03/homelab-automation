@@ -107,7 +107,7 @@ case "$1" in
             t|test)
                 PLAYBOOK_NAME="${3:-$(hostname --short).yml}"
                 echo "Running Ansible playbook '${PLAYBOOK_NAME}'..."
-                sudo "{{ ansible_pull_path }}" --limit localhost \
+                sudo PYTHONUNBUFFERED=True "{{ ansible_pull_path }}" --limit localhost \
                     --accept-host-key \
                     --directory "$AUTOMATION_DIR" \
                     --url "{{ homelab_ansible_repo_git }}" \

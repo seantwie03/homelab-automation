@@ -9,6 +9,7 @@
     gid: 1000
 
   roles:
+    - role: core
     - role: ansible_pull
     - role: cli
     - role: libvirt
