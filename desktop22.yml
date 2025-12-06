@@ -11,6 +11,7 @@
   roles:
     - role: core
     - role: ansible_pull
+    - role: btrfs
     - role: rpm_fusion
     - role: cli
     - role: fonts
