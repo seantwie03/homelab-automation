@@ -1,0 +1,16 @@
+- name: Configure odroidh3plus as a server
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    user: sean
+    uid: 1000
+    gid: 1000
+
+  roles:
+    - role: ansible_pull
+    - role: cli
+    - role: fonts
+    - role: onepassword
+    - role: tailscale
