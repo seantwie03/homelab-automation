@@ -8,7 +8,7 @@ Wants=network-online.target
 Type=oneshot
 User=root
 EnvironmentFile=-/run/ansible-pull.env
-ExecStartPre=-/bin/bash -c "echo PRE_NUM=$(snapper create --type pre --print-number --description 'Before ansible-pull') > /run/ansible-pull.env"
+ExecStartPre=-/bin/bash -c "echo PRE_NUM=$(snapper create --type pre --print-number --description 'Before ansible-pull' --cleanup-algorithm number) > /run/ansible-pull.env"
 WorkingDirectory={{ playbook_path }}
 Environment="PYTHONUNBUFFERED=True"
 ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
@@ -20,7 +20,7 @@ ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
     --verbose \
     {{ ansible_facts['hostname'] }}.yml \
     2>&1 | tee /var/log/ansible-pull/ansible-pull-$(date --iso-8601='minutes').log"
-ExecStartPost=-/bin/bash -c "snapper create --type post --pre-number $PRE_NUM --description 'After ansible-pull' && rm -f /run/ansible-pull.env"
+ExecStartPost=-/bin/bash -c "snapper create --type post --pre-number $PRE_NUM --description 'After ansible-pull' --cleanup-algorithm number && rm -f /run/ansible-pull.env"
 
 [Install]
 WantedBy=multi-user.target
