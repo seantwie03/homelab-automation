@@ -6,11 +6,12 @@ This document outlines the storage architecture and backup strategy for the ODro
 
 The primary goal of this server is to provide reliable, centralized file storage and a robust backup destination for workstations and critical data.
 
-**Operating System**: Almalinux 10.1+
+**Operating System**: Fedora Minimal
 
 Key Technologies:
 
 -   btrfs
+-   snapper - Snapshot/rollback of root
 -   btrbk - Snapshot/rollback of user data
 -   restic - Encrypted offsite backups
 
@@ -18,12 +19,12 @@ Key Technologies:
 
 The [ODroid H3+](https://www.hardkernel.com/shop/odroid-h3-plus/) is a single-board computer with an x86-64 processor. It has an M.2 slot, two SATA ports, two 2.5GB ethernet ports, and can support up-to 64GB of DDR4. Typically you buy the board then put your own RAM and Storage.
 
-SBC:  ODroid H3+    [ODroid H3+](https://www.hardkernel.com/shop/odroid-h3-plus/)
-CPU:  Intel N6005   [Intel Pentium Silver N6005](https://www.intel.com/content/www/us/en/products/sku/212327/intel-pentium-silver-n6005-processor-4m-cache-up-to-3-30-ghz/specifications.html)
-RAM:  16GB (2x 8GB) [DDR4 SODIMM](https://www.amazon.com/dp/B08ZRSQX93?psc=1&ref=ppx_yo2ov_dt_b_product_details)
-M.2:  500GB NVMe    [WD_BLACK SN770](https://www.westerndigital.com/products/internal-drives/wd-black-sn770-nvme-ssd#WDS250G3X0E)
-HDD:  8TB (2x 4TB)  [WD Red Plus](https://www.westerndigital.com/products/internal-drives/wd-red-plus-sata-3-5-hdd#WD10EFRX)
-CASE: Type 1        [H3 Case Type 1](https://www.hardkernel.com/shop/odroid-h3-case-type-1/)
+-   SBC:  ODroid H3+    [ODroid H3+](https://www.hardkernel.com/shop/odroid-h3-plus/)
+-   CPU:  Intel N6005   [Intel Pentium Silver N6005](https://www.intel.com/content/www/us/en/products/sku/212327/intel-pentium-silver-n6005-processor-4m-cache-up-to-3-30-ghz/specifications.html)
+-   RAM:  16GB (2x 8GB) [DDR4 SODIMM](https://www.amazon.com/dp/B08ZRSQX93?psc=1&ref=ppx_yo2ov_dt_b_product_details)
+-   M.2:  500GB NVMe    [WD_BLACK SN770](https://www.westerndigital.com/products/internal-drives/wd-black-sn770-nvme-ssd#WDS250G3X0E)
+-   HDD:  8TB (2x 4TB)  [WD Red Plus](https://www.westerndigital.com/products/internal-drives/wd-red-plus-sata-3-5-hdd#WD10EFRX)
+-   CASE: Type 1        [H3 Case Type 1](https://www.hardkernel.com/shop/odroid-h3-case-type-1/)
 
 Purchased August 2023.
 
@@ -35,7 +36,7 @@ The storage is split between the NVMe SSD for performance-sensitive tasks and th
 
 The NVMe drive is primarily used for the operating system and its associated data.
 
--   **OS:** AlmaLinux 10.1+ with a BTRFS root filesystem.
+-   **OS:** Fedora Minimal with a BTRFS root filesystem setup similar to [this](https://sysguides.com/install-fedora-42-with-snapshot-and-rollback-support).
 -   **Application State:** May also host application state or caches.
 
 ### HDD BTRFS RAID1 (4TB Usable)
@@ -44,7 +45,7 @@ The two 4TB HDDs are configured as a single BTRFS volume with a RAID1 (mirrored)
 
 -   **Redundancy:** All data written to this volume exists on both drives. This protects against a single drive failure with no downtime. BTRFS also provides data scrubbing and self-healing to protect against bit rot.
 -   **Mount Point:** The volume is mounted at `/srv`.
--   **Usage:** This volume is the primary location for **all** user data, including Tier 1 (original) and Tier 2 (copy) data, as well as on-site backups and workstation backups.
+-   **Usage:** This volume is the primary location for **all** user data, including Tier 1 (original) and Tier 2 (copy) data.
 
 ## Data Tiers and Backup Strategy
 
@@ -57,13 +58,15 @@ To facilitate clear backup policies, data is organized within `/srv` as follows:
 ```
 /srv/
 ├── tier1/
-│   ├── docs/                  # Original documents, important paperwork
-│   ├── app_data/              # Application data from self-hosted services
-│   └── workstation_backups/   # Backups of workstation user data
+│   ├── docs/        # Original documents, paperwork
+│   └── app_data/    # Application data from self-hosted services
+│       └── gitlab/  # Gitlab data
 └── tier2/
-    ├── dvd_backups/      # Copies of DVDs
-    ├── photo_backups/    # Backups from Google Photos
-    └── audible_backups/  # Backups from Audible
+    ├── audiobooks/  # Copies of Audible audiobooks
+    ├── backups/     # Backups from other devices (workstations, phones)
+    ├── books/       # Copies of Ebooks
+    ├── media/       # Copies of DVDs / Blurays
+    └── photos/      # Copies of Google Photos
 ```
 
 ### Tier 1: Original Data (Backed Up Off-site)
@@ -101,6 +104,6 @@ restic backup /srv/tier1/ --tag=tier1
 The server acts as a central backup destination for BTRFS-based workstations.
 
 -   **Methodology:** Workstations use `btrbk` to send incremental BTRFS snapshots to the server over SSH. This is highly efficient, only transferring changed data.
--   **Storage Location:** Backups are received by the server and stored in `/srv/workstation_backups/`.
+-   **Storage Location:** Backups are received by the server and stored in `/srv/backups/{hostname}`.
 -   **Workstation Configuration:** On the workstations, `btrbk` is used to manage snapshots and backups of the `/home` subvolume.
 
