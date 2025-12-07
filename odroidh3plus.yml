@@ -9,12 +9,12 @@
     gid: 1000
     btrbk_volumes:
       - volume: /
-        snapshot_dir: /btrbk_snapshots
+        snapshot_dir: /.btrbk_snapshots
         snapshot_preserve: 24h 7d 4w
         subvolumes:
           - home
       - volume: /srv
-        snapshot_dir: /srv/btrbk_snapshots
+        snapshot_dir: /srv/.btrbk_snapshots
         snapshot_preserve: 24h 7d 4w 6m
         subvolumes:
           - .

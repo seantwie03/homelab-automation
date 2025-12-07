@@ -4,13 +4,10 @@
     name: btrbk
     state: present
 
-- name: btrbk snapshot directories exist
-  ansible.builtin.file:
-    path: "{{ item.snapshot_dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
+- name: btrbk snapshot directories are subvolumes
+  ansible.builtin.command:
+    cmd: btrfs subvolume create {{ item.snapshot_dir }}
+    creates: "{{ item.snapshot_dir }}"
   loop: "{{ btrbk_volumes }}"
   loop_control:
     label: "{{ item.snapshot_dir }}"

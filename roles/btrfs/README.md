@@ -63,8 +63,8 @@ This structure allows for different snapshot policies and storage locations for 
 *   **Target Subvolumes:** By default, the role is configured to take snapshots of the `/home` subvolume on the root (`/`) filesystem.
 
 *   **Snapshot Storage:** Snapshot storage directories are defined on a per-volume basis to ensure snapshots are stored on the same filesystem as their source.
-    *   The default snapshot directory for the root filesystem is `/btrbk_snapshots`.
-    *   **Important:** This location is a plain directory. The snapshots *within* it are BTRFS subvolumes. This prevents snapshots of snapshots when using other tools like `snapper`.
+    *   The default snapshot directory for the root filesystem is `./.btrbk_snapshots`.
+    *   **Important:** These snapshot directories (e.g., `/.btrbk_snapshots`, `/srv/.btrbk_snapshots`) are created as **BTRFS subvolumes themselves**. This prevents their contents from being redundantly included when other tools snapshot their parent filesystem.
 
 *   **Retention Policy:** The role implements a Grandfather-Father-Son (GFS) retention scheme, which is also defined on a per-volume basis. The default policy is `24h 7d 4w`:
     *   Keeps hourly snapshots for the last **24 hours**.
@@ -82,12 +82,12 @@ To configure snapshots for both the root filesystem and a separate `/srv` data f
 # In your playbook's vars section:
 btrbk_volumes:
   - volume: /
-    snapshot_dir: /btrbk_snapshots
+    snapshot_dir: /.btrbk_snapshots
     snapshot_preserve: 24h 7d 4w
     subvolumes:
       - home
   - volume: /srv
-    snapshot_dir: /srv/btrbk_snapshots
+    snapshot_dir: /srv/.btrbk_snapshots
     snapshot_preserve: 7d 8w 12m
     subvolumes:
       - .  # The dot refers to the volume mounted at /srv itself
@@ -122,7 +122,7 @@ btrbk_volumes:
 5.  **List Snapshot Subvolumes Directly:**
     To see the raw BTRFS subvolumes that have been created, you must check each configured snapshot directory:
     ```bash
-    sudo btrfs subvolume list /btrbk_snapshots
-    sudo btrfs subvolume list /srv/btrbk_snapshots
+    sudo btrfs subvolume list /.btrbk_snapshots
+    sudo btrfs subvolume list /srv/.btrbk_snapshots
     ```
 
