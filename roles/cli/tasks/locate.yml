@@ -8,7 +8,7 @@
   ansible.builtin.lineinfile:
     path: /etc/updatedb.conf
     regexp: '^PRUNENAMES ='
-    line: 'PRUNENAMES = ".snapshots btrbk_snapshots"'
+    line: 'PRUNENAMES = ".snapshots .btrbk_snapshots"'
     create: true
     state: present
 
