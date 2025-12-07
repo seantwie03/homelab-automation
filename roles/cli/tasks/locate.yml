@@ -1,0 +1,20 @@
+---
+- name: install plocate for a faster locate command
+  ansible.builtin.package:
+    name: plocate
+    state: present
+
+- name: PRUNENAMES excludes all snapshot directories
+  ansible.builtin.lineinfile:
+    path: /etc/updatedb.conf
+    regexp: '^PRUNENAMES ='
+    line: 'PRUNENAMES = ".snapshots btrbk_snapshots"'
+    create: true
+    state: present
+
+- name: plocate-updatedb.timer is enabled and started
+  ansible.builtin.service:
+    name: plocate-updatedb.timer
+    enabled: true
+    state: started
+

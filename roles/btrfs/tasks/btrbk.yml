@@ -1,0 +1,52 @@
+---
+- name: btrbk is installed
+  ansible.builtin.package:
+    name: btrbk
+    state: present
+
+- name: btrbk snapshot directories exist
+  ansible.builtin.file:
+    path: "{{ item.snapshot_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop: "{{ btrbk_volumes }}"
+  loop_control:
+    label: "{{ item.snapshot_dir }}"
+
+- name: btrbk configuration file exists
+  ansible.builtin.template:
+    src: btrbk.conf.j2
+    dest: /etc/btrbk/btrbk.conf
+    owner: root
+    group: root
+    mode: 0644
+    validate: btrbk -c %s config print
+
+- name: Ensure btrbk timer is enabled and started
+  ansible.builtin.systemd:
+    name: btrbk.timer
+    enabled: true
+    state: started
+
+- name: btrbk.timer override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/btrbk.timer.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: btrbk.timer runs hourly
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/btrbk.timer.d/override.conf
+    content: |
+      [Timer]
+      OnCalendar=
+      OnCalendar=hourly
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart btrbk.timer
+

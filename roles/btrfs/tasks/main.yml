@@ -1,43 +1,7 @@
 ---
-- name: set BTRFS_SCRUB_MOUNTPOINTS to auto
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/btrfsmaintenance
-    regexp: '^BTRFS_SCRUB_MOUNTPOINTS='
-    line: 'BTRFS_SCRUB_MOUNTPOINTS="auto"'
+- name: setup btrfs maitenance
+  ansible.builtin.include_tasks: btrfs-maintenance.yml
 
-- name: set BTRFS_BALANCE_MOUNTPOINTS to auto
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/btrfsmaintenance
-    regexp: '^BTRFS_BALANCE_MOUNTPOINTS='
-    line: 'BTRFS_BALANCE_MOUNTPOINTS="auto"'
-
-- name: set BTRFS_TRIM_MOUNTPOINTS to auto
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/btrfsmaintenance
-    regexp: '^BTRFS_TRIM_MOUNTPOINTS='
-    line: 'BTRFS_TRIM_MOUNTPOINTS="auto"'
-
-- name: btrfs-scrub.timer is enabled and started
-  ansible.builtin.service:
-    name: btrfs-scrub.timer
-    enabled: true
-    state: started
-
-- name: btrfs-balance.timer is enabled and started
-  ansible.builtin.service:
-    name: btrfs-balance.timer
-    enabled: true
-    state: started
-
-- name: btrfs-trim.timer is enabled and started
-  ansible.builtin.service:
-    name: btrfs-trim.timer
-    enabled: true
-    state: started
-
-- name: disable generic fstrim timer to avoid conflicts with btrfs-trim
-  ansible.builtin.service:
-    name: fstrim.timer
-    enabled: false
-    state: stopped
+- name: setup btrbk
+  ansible.builtin.include_tasks: btrbk.yml
 

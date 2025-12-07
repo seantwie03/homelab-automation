@@ -1,0 +1,5 @@
+- name: restart btrbk.timer
+  ansible.builtin.systemd:
+    name: btrbk.timer
+    daemon_reload: true
+    state: restarted
