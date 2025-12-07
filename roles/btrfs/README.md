@@ -82,7 +82,7 @@ To configure snapshots for both the root filesystem and a separate `/srv` data f
 # In your playbook's vars section:
 btrbk_volumes:
   - volume: /
-    snapshot_dir: /btrbk_snapshots/root
+    snapshot_dir: /btrbk_snapshots
     snapshot_preserve: 24h 7d 4w
     subvolumes:
       - home
@@ -122,7 +122,7 @@ btrbk_volumes:
 5.  **List Snapshot Subvolumes Directly:**
     To see the raw BTRFS subvolumes that have been created, you must check each configured snapshot directory:
     ```bash
-    sudo btrfs subvolume list /btrbk_snapshots/root
+    sudo btrfs subvolume list /btrbk_snapshots
     sudo btrfs subvolume list /srv/btrbk_snapshots
     ```
 

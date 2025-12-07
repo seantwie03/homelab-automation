@@ -1,6 +1,6 @@
 btrbk_volumes:
   - volume: /
-    snapshot_dir: /btrbk_snapshots/root
+    snapshot_dir: /btrbk_snapshots
     snapshot_preserve: 24h 7d 4w
     subvolumes:
       - home
