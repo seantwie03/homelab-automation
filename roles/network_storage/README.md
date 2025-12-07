@@ -1,6 +1,8 @@
 # Network Storage
 
-Mount network storage.
+This role mounts network SMB/CIFS shares on a client machine. It is designed to work with shares secured by user-level permissions.
+
+It ensures the local user and group configuration matches the server-side permissions for seamless access.
 
 A credentials file must be located in `/root/.smbcreds`. The file should have contents similar to the following:
 
@@ -8,20 +10,23 @@ A credentials file must be located in `/root/.smbcreds`. The file should have co
 username=usera
 password=userapassword
 ```
+This user should be a member of the `networkshare` group on the server.
 
 The `ansible.posix` collection must be available.
 
 
 ## Role Variables
 
-`uid`: The id of the user who will have write permissions to the shares
+`user`: The username of the local user who will own the files in the mounted shares. This should match the user defined in the playbook.
 
-`gid`: The id of the group who will have write permissions to the shares
+`uid`: The user ID of the local user.
 
-`samba_mounts`: A list of dictionaries containing the keys: `server` and `share`
+`samba_mounts`: A list of dictionaries containing the keys: `server` and `share`.
 
 - `server`: The hostname or ip address of the server.
 - `share`: The path of the share to mount.
+
+**Group Management Note:** This role automatically creates a `networkshare` group with a fixed GID (`5567`) and adds the `user` to it. The `gid` for the mount is handled by the `network_share_gid` variable from the role's defaults and does not need to be passed as a variable.
 
 ## Example Playbook
 
@@ -30,13 +35,17 @@ The `ansible.posix` collection must be available.
 - name: Mount network storage
   hosts: desktop
   become: true
+
+  vars:
+    user: sean
+    uid: 1000
+
   roles:
-    - role: mount_network_storage
+    - role: network_storage
       vars:
         samba_mounts:
           - server: odroidh3plus
-            share: data
-          - server: odroidh4
-            share: backups
+            share: tier1
+          - server: odroidh3plus
+            share: tier2
 ```
-
