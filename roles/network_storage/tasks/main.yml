@@ -1,4 +1,16 @@
 ---
+- name: network share group exists with the correct gid
+  ansible.builtin.group:
+    name: "{{ network_share_group }}"
+    gid: "{{ network_share_gid }}"
+    state: present
+
+- name: user is in the network share group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: "{{ network_share_group }}"
+    append: true
+
 - name: cifs-utils is installed
   ansible.builtin.package:
     name: cifs-utils
@@ -8,7 +20,7 @@
   ansible.builtin.file:
     path: /srv/{{ item.share }}
     state: directory
-    mode: 0755
+    mode: 0775
   loop: "{{ samba_mounts }}"
   loop_control:
     label: /srv/{{ item.share }}
@@ -19,7 +31,7 @@
     src: //{{ item.server }}/{{ item.share }}
     fstype: cifs
     boot: false
-    opts: x-systemd.device-timeout=10,x-systemd.automount,credentials=/root/.smbcreds,uid={{ uid }},gid={{ gid }},file_mode=0664,dir_mode=0775
+    opts: x-systemd.device-timeout=10,x-systemd.automount,credentials=/root/.smbcreds,uid={{ uid }},gid={{ network_share_gid }},file_mode=0660,dir_mode=0770
     state: present
   loop: "{{ samba_mounts }}"
   notify: restart local-fs.target
