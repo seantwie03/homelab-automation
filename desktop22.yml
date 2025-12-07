@@ -17,7 +17,7 @@
     - role: fonts
     - role: onepassword
     - role: tailscale
-    - role: network_storage
+#    - role: network_storage
     - role: libvirt
     - role: devops
     - role: nodejs
