@@ -38,3 +38,24 @@ git remote add origin git@github.com:seantwie03/homelab-automation.git
 git push --set-upstream origin main
 ```
 
+## YAML Code Formatting
+
+YAML files contain only `---` on the first line and an empty line at the end.
+
+Try to name tasks as if starting with the word Ensure for example: 'Ensure btrbk is installed'. When doing this nearly every tasks starts with 'Ensure ...' which means the word Ensure is essentially line noise so omit it. Task names are entirely lowercase unless the task name contains a ENVIRONMENT_VARIABLE or other case-sensitive name where.
+
+- Good: 'btrbk is installed'
+- Bad: 'Ensure btrbk is installed'
+- Good: 'btrbk.timer is enabled and started'
+- Bad: 'Ensure btrbk.timer is enabled and started'
+- Good: 'btrbk is configured'
+- Bad: 'Template btrbk configuration file'
+- Good: 'btrbk snapshot subvolume exists'
+- Bad: 'Create btrbk snapshot subvolume'
+
+When specifying file modes use octal notation without quotes.
+
+- Good: 0755
+- Bad: '0755'
+- Bad: 755
+

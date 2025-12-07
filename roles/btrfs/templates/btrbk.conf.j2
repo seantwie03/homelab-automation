@@ -1,0 +1,19 @@
+# /etc/btrbk/btrbk.conf
+# This file is managed by Ansible. DO NOT EDIT MANUALLY.
+
+# --- Global Options ---
+# See btrbk.conf(5) for all available options.
+
+timestamp_format      long-iso
+
+# --- Volume Groups ---
+{% for vol_group in btrbk_volumes %}
+
+# -- Volume group for filesystem mounted at: {{ vol_group.volume }}
+volume {{ vol_group.volume }}
+  snapshot_dir {{ vol_group.snapshot_dir }}
+  snapshot_preserve {{ vol_group.snapshot_preserve }}
+  {% for subvol_name in vol_group.subvolumes %}
+  subvolume {{ subvol_name }}
+  {% endfor %}
+{% endfor %}
