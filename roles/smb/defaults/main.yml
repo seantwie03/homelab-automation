@@ -1,0 +1,20 @@
+---
+user: sean
+smb_workgroup: 3246.win
+network_share_group: networkshare
+network_share_gid: 5567
+smb_shares:
+  - name: tier1
+    path: /srv/tier1
+    comment: Tier 1 Data
+    browseable: "yes"
+    read_only: "no"
+    veto_dirs:
+      - app_data
+  - name: tier2
+    path: /srv/tier2
+    comment: Tier 2 Data
+    browseable: "yes"
+    read_only: "no"
+    veto_dirs:
+      - backups

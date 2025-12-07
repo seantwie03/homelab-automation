@@ -1,0 +1,13 @@
+---
+- name: restart smb services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - smb
+    - nmb
+
+- name: apply selinux contexts
+  ansible.builtin.command:
+    cmd: "restorecon -Rv {{ item.path }}"
+  loop: "{{ smb_shares }}"

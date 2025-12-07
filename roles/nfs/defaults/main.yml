@@ -1,0 +1,18 @@
+---
+user: sean
+network_share_group: networkshare
+network_share_gid: 5567
+nfs_exports:
+  - path: /srv/tier1
+    clients:
+      - host: "192.168.0.0/16"
+        options: "rw,sync,no_subtree_check"
+      - host: "100.64.0.0/10"
+        options: "rw,sync,no_subtree_check"
+  - path: /srv/tier2
+    clients:
+      - host: "192.168.0.0/16"
+        options: "rw,sync,no_subtree_check"
+      - host: "100.64.0.0/10"
+        options: "rw,sync,no_subtree_check"
+

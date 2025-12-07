@@ -1,0 +1,49 @@
+---
+- name: nfs-utils is installed
+  ansible.builtin.package:
+    name: nfs-utils
+    state: present
+
+- name: network share group exists with the correct gid
+  ansible.builtin.group:
+    name: "{{ network_share_group }}"
+    gid: "{{ network_share_gid }}"
+    state: present
+
+- name: user is in the network share group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: "{{ network_share_group }}"
+    append: true
+
+- name: rpcbind service is enabled and started
+  ansible.builtin.service:
+    name: rpcbind
+    state: started
+    enabled: true
+
+- name: nfs-server service is enabled and started
+  ansible.builtin.service:
+    name: nfs-server
+    state: started
+    enabled: true
+
+- name: nfs exports are configured
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nfs-server
+
+- name: nfs and rpc-bind services are enabled in firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd

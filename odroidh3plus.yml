@@ -20,12 +20,14 @@
           - .
 
   roles:
-    - role: core
-    - role: ansible_pull
-    - role: btrfs
-    - role: cli
-    - role: libvirt
-    - role: fonts
-    - role: onepassword
-    - role: tailscale
+    #- role: core
+    #- role: ansible_pull
+    #- role: btrfs
+    #- role: cli
+    #- role: libvirt
+    #- role: fonts
+    #- role: onepassword
+    #- role: tailscale
+    #- role: smb
+    - role: nfs
 

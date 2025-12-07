@@ -59,3 +59,4 @@ When specifying file modes use octal notation without quotes.
 - Bad: '0755'
 - Bad: 755
 
+Prefer generic modules like `package` and `service` instead of specific modules like `dnf` and `systemd`.
