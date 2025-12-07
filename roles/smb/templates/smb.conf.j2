@@ -1,0 +1,27 @@
+[global]
+   server role = standalone server
+   workgroup = {{ smb_workgroup }}
+   server string = Samba Server %v
+   netbios name = {{ ansible_facts['hostname'] }}
+   security = user
+   map to guest = Never
+   dns proxy = no
+   logging = file
+   log file = /var/log/samba/log.%m
+   max log size = 100000
+
+{% for share in smb_shares %}
+[{{ share.name }}]
+   path = {{ share.path }}
+   comment = {{ share.comment | default('') }}
+   browseable = {{ share.browseable | default('no') }}
+   read only = {{ share.read_only | default('yes') }}
+   valid users = +{{ network_share_group }}
+   write list = +{{ network_share_group }}
+   force group = +{{ network_share_group }}
+   create mask = 0660
+   directory mask = 0770
+{% if share.veto_dirs is defined and share.veto_dirs is sequence %}
+   veto files = /{{ share.veto_dirs | join('/') }}/
+{% endif %}
+{% endfor %}

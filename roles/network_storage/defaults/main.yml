@@ -1,13 +1,4 @@
 ---
-uid: 1000
-gid: 1000
-samba_mounts:
-  - server: odroidh3plus
-    share: docs
-  - server: odroidh3plus
-    share: source
-  - server: odroidh3plus
-    share: media
-  - server: odroidh3plus
-    share: temp
-
+network_share_user: sean
+network_share_group: networkshare
+network_share_gid: 5567

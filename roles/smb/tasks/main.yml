@@ -1,0 +1,54 @@
+---
+- name: samba and samba-client are installed
+  ansible.builtin.package:
+    name:
+      - samba
+      - samba-client
+    state: present
+
+- name: network share group exists with the correct gid
+  ansible.builtin.group:
+    name: "{{ network_share_group }}"
+    gid: "{{ network_share_gid }}"
+    state: present
+
+- name: user is in the network share group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: "{{ network_share_group }}"
+    append: true
+
+- name: configure smb.conf
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+    validate: testparm -s %s
+  notify: restart smb services
+
+- name: smb and nmb services are enabled and started
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - smb
+    - nmb
+
+- name: samba service is enabled in firewalld
+  ansible.posix.firewalld:
+    service: samba
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: samba_share_t selinux context added for shared directories
+  community.general.sefcontext:
+    target: "{{ item.path }}(/.*)?"
+    setype: samba_share_t
+    state: present
+  loop: "{{ smb_shares }}"
+  notify: apply selinux contexts
+
