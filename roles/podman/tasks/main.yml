@@ -1,0 +1,12 @@
+---
+- name: podman package is installed
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: podman auto-update timer is enabled and started
+  ansible.builtin.systemd:
+    name: podman-auto-update.timer
+    state: started
+    enabled: true
+

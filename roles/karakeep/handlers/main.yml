@@ -1,0 +1,6 @@
+---
+- name: daemon-reload karakeep user
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: true
+  become_user: karakeep

@@ -29,5 +29,6 @@
     #- role: onepassword
     #- role: tailscale
     #- role: smb
-    - role: nfs
+    #- role: nfs
+    - role: karakeep
 
