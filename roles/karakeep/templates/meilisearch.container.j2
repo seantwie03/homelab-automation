@@ -1,0 +1,16 @@
+[Unit]
+Description=Karakeep Search Engine (MeiliSearch)
+After=network-online.target
+
+[Container]
+AutoUpdate=registry
+ContainerName=meilisearch
+Image=getmeili/meilisearch:v1.13.3
+Network=karakeep.network
+# Map data to your Tier 1 storage
+Volume={{ karakeep_data_dir }}/meilisearch_data:/meili_data:Z
+Environment=MEILI_NO_ANALYTICS=true
+Environment=MEILI_MASTER_KEY={{ karakeep_meili_master_key }}
+
+[Service]
+Restart=always
