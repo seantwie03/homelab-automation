@@ -1,0 +1,42 @@
+---
+- name: docker repository is added
+  block:
+    - name: docker repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://download.docker.com/linux/fedora/gpg
+        fingerprint: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
+        state: present
+
+    - name: docker repository is enabled
+      ansible.builtin.yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable
+        baseurl: https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://download.docker.com/linux/fedora/gpg
+        skip_if_unavailable: true
+
+- name: docker packages are installed
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: docker service is enabled and started
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: specified user is added to the docker group
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: docker
+    append: true
+

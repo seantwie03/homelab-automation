@@ -1,69 +1,39 @@
 ---
-- name: karakeep user exists with a home directory
-  ansible.builtin.user:
-    name: karakeep
-    create_home: true
-  register: karakeep_user
+- name: secrets file exists at /root/karakeep/.env
+  ansible.builtin.stat:
+    path: "{{ karakeep_secrets_file }}"
+  register: _secrets_file
 
-- name: lingering is enabled for karakeep user
-  ansible.builtin.command:
-    cmd: loginctl enable-linger {{ karakeep_user.name }}
-  when: karakeep_user.changed
+- name: fail if secrets file is missing
+  ansible.builtin.fail:
+    msg: >
+      The secrets file is missing at {{ karakeep_secrets_file }}.
+      Please create it manually with MEILI_MASTER_KEY, NEXTAUTH_SECRET, and OPENAI_API_KEY.
+  when: not _secrets_file.stat.exists
+
+- name: karakeep install directory exists
+  ansible.builtin.file:
+    path: "{{ karakeep_install_dir }}"
+    state: directory
+    mode: 0755
+
+- name: karakeep docker-compose file is templated
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ karakeep_install_dir }}/docker-compose.yml"
+    mode: 0640
 
 - name: karakeep data directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ karakeep_user.name }}"
-    group: "{{ karakeep_user.group }}"
     mode: 0755
   loop:
-    - "{{ karakeep_data_dir }}/karakeep_data"
-    - "{{ karakeep_data_dir }}/meilisearch_data"
+    - "{{ karakeep_data_root }}/karakeep_data"
+    - "{{ karakeep_data_root }}/meilisearch_data"
 
-- name: karakeep user config directory exists
-  ansible.builtin.file:
-    path: "{{ karakeep_user.home }}/.config"
-    state: directory
-    owner: "{{ karakeep_user.name }}"
-    group: "{{ karakeep_user.group }}"
-    mode: 0755
-
-- name: karakeep user containers directory exists
-  ansible.builtin.file:
-    path: "{{ karakeep_user.home }}/.config/containers"
-    state: directory
-    owner: "{{ karakeep_user.name }}"
-    group: "{{ karakeep_user.group }}"
-    mode: 0755
-
-- name: karakeep user config directory exists for quadlets
-  ansible.builtin.file:
-    path: "{{ karakeep_user.home }}/.config/containers/systemd"
-    state: directory
-    owner: "{{ karakeep_user.name }}"
-    group: "{{ karakeep_user.group }}"
-    mode: 0755
-
-- name: karakeep quadlet files are deployed for the user
-  ansible.builtin.template:
-    src: "{{ item }}.j2"
-    dest: "{{ karakeep_user.home }}/.config/containers/systemd/{{ item }}"
-    owner: "{{ karakeep_user.name }}"
-    group: "{{ karakeep_user.group }}"
-    mode: 0644
-  loop:
-    - karakeep.network
-    - meilisearch.container
-    - chrome.container
-    - karakeep.container
-  notify: daemon-reload karakeep user
-
-- name: karakeep main service is enabled and running for the user
-  ansible.builtin.systemd:
-    scope: user
-    name: karakeep.service
-    #state: started
-    #enabled: true
-  become_user: "{{ karakeep_user.name }}"
-
+- name: karakeep stack is running
+  community.docker.docker_compose_v2:
+    project_src: "{{ karakeep_install_dir }}"
+    state: present
+    pull: always

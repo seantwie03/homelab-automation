@@ -1,16 +1,12 @@
 ---
-# The base directory for Karakeep's persistent data.
-karakeep_data_dir: /srv/tier1/app_data/karakeep
+karakeep_data_root: /srv/tier1/app_data/karakeep
+karakeep_install_dir: /opt/karakeep
+karakeep_secrets_file: /root/karakeep/.env
 
-# The external port to expose the Karakeep web UI on.
 karakeep_port: 8910
+karakeep_fqdn: "{{ ansible_facts['fqdn'] }}"
+karakeep_url: "http://{{ ansible_facts['fqdn'] }}:{{ karakeep_port }}"
 
-# A long, random string for Meilisearch's master key.
-karakeep_meili_master_key: "CHANGEME_A_VERY_STRONG_KEY"
-
-# A long, random string for NextAuth.js.
-# You can generate one with: openssl rand -base64 32
-karakeep_nextauth_secret: "CHANGEME_A_VERY_STRONG_SECRET"
-
-# Optional: Your OpenAI API key for AI-powered features.
-karakeep_openai_key: "abcd"
+karakeep_version: release
+meilisearch_version: v1.13.3
+chrome_version: 124
