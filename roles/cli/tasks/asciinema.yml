@@ -1,0 +1,19 @@
+- name: asciinema is installed
+  ansible.builtin.package:
+    name: asciinema
+    state: present
+
+- name: symlink asciinema dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/asciinema"
+    dest: /home/{{ user }}/.config/asciinema
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+#- name: agg is installed (Asciinema Gif Generator)
+#  community.general.cargo:
+#    name: https://github.com/asciinema/agg
+#    state: present
+#    path: "/home/{{ user }}" # cargo automatically appends /bin
