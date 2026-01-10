@@ -9,8 +9,8 @@
 [ -f "$HOME"/.bash_aliases ] && source $HOME/.bash_aliases
 
 # User specific environment
-if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin: ]]; then
-  export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin: ]]; then
+  export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
 fi
 
 ######################################## Defaults ########################################

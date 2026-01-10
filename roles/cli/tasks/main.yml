@@ -20,20 +20,13 @@
     name:
       - git
       - bat
-      - asciinema
     state: present
 
 - name: neovim is installed and configured
   ansible.builtin.include_tasks: neovim.yml
 
-- name: symlink asciinema dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/asciinema"
-    dest: /home/{{ user }}/.config/asciinema
-    state: link
-    follow: false
-    owner: "{{ user }}"
-    group: "{{ user }}"
+- name: asciinema is installed and configured
+  ansible.builtin.include_tasks: asciinema.yml
 
 - name: symlink ghostty dotfiles directory
   ansible.builtin.file:
