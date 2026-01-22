@@ -9,6 +9,7 @@
 vim.lsp.enable('lua_ls')
 vim.lsp.enable('yamlls')
 vim.lsp.enable('ansiblels')
+vim.lsp.enable('harper_ls')
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
