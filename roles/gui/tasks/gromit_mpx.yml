@@ -21,3 +21,25 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+# Special handling for gromit-mpx dotfiles because they go 
+# into the ~/.config directory instead of ~/.config/gromit-mpx
+- name: install gromit-mpx dotfiles
+  block:
+    - name: find all files in dotfiles/gromit-mpx
+      ansible.builtin.find:
+        paths: "{{ dotfiles_path }}/gromit-mpx"
+        hidden: true
+      register: gromit_mpx_dotfiles
+
+    - name: symlink gromit-mpx dotfiles to home directory
+      ansible.builtin.file:
+        src: "{{ item.path }}"
+        dest: "/home/{{ user }}/.config/{{ item.path | basename }}"
+        state: link
+        follow: false
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      loop: "{{ gromit_mpx_dotfiles.files }}"
+      loop_control:
+        label: "Symlinking {{ item.path | basename }}"
+
