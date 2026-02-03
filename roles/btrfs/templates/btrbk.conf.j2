@@ -12,6 +12,7 @@ timestamp_format      long-iso
 # -- Volume group for filesystem mounted at: {{ vol_group.volume }}
 volume {{ vol_group.volume }}
   snapshot_dir {{ vol_group.snapshot_dir }}
+  snapshot_preserve_min latest
   snapshot_preserve {{ vol_group.snapshot_preserve }}
   {% for subvol_name in vol_group.subvolumes %}
   subvolume {{ subvol_name }}
