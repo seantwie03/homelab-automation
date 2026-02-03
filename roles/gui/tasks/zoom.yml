@@ -12,6 +12,7 @@
     #     rm zoom_x86_64.rpm 2>/dev/null
     #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
     #     rpm -qp ./zoom_x86_64.rpm
-    name: https://zoom.us/client/6.5.11.4015/zoom_x86_64.rpm
+    #     May need to remove -1 suffix
+    name: https://zoom.us/client/6.7.2.6498/zoom_x86_64.rpm
     state: present
 
