@@ -11,7 +11,7 @@
 - name: Create dynamic symlink for monitor-workspace.conf
   ansible.builtin.file:
     src: "/home/{{ user }}/.config/hypr/{{ ansible_facts['hostname'] }}.conf"
-    dest: "/home/{{ user }}/.config/hypr/monitor-workspace.conf"
+    dest: "/home/{{ user }}/.config/hypr/machine-specific.conf"
     state: link
     follow: false
     owner: "{{ user }}"
