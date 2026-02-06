@@ -8,7 +8,7 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-- name: Create dynamic symlink for monitor-workspace.conf
+- name: symlink for machine-specific.conf exists
   ansible.builtin.file:
     src: "/home/{{ user }}/.config/hypr/{{ ansible_facts['hostname'] }}.conf"
     dest: "/home/{{ user }}/.config/hypr/machine-specific.conf"
@@ -25,6 +25,16 @@
 - name: hyprland is installed
   ansible.builtin.package:
     name: hyprland
+    state: present
+
+- name: hyprpaper is installed
+  ansible.builtin.package:
+    name: hyprpaper
+    state: present
+
+- name: hypridle is installed
+  ansible.builtin.package:
+    name: hypridle
     state: present
 
 - name: pavucontrol is installed
