@@ -21,7 +21,7 @@
     - role: libvirt
     - role: devops
     - role: nodejs
-    - role: niri
+    - role: hyprland
     - role: gui
     - role: gaming
 

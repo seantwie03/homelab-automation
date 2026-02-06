@@ -11,15 +11,15 @@
   roles:
     - role: core
     - role: ansible_pull
-    - role: btrfs
-    - role: cli
     - role: libvirt
+    - role: btrfs
     - role: fonts
     - role: onepassword
     - role: tailscale
+    - role: nodejs
+    - role: python
+    - role: cli
     #- role: network_storage
     - role: devops
-    - role: nodejs
     - role: hyprland
-    - role: python
     - role: gui
