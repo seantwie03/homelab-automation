@@ -1,0 +1,22 @@
+---
+- name: enable solopasha/hyprland copr
+  community.general.copr:
+    name: solopasha/hyprland
+    state: enabled
+
+- name: hyprland is installed
+  ansible.builtin.package:
+    name: hyprland
+    state: present
+
+- name: pavucontrol is installed
+  ansible.builtin.package:
+    name: pavucontrol
+    state: present
+
+- name: wofi is installed and configured
+  ansible.builtin.include_tasks: wofi.yml
+
+- name: waybar is installed and configured
+  ansible.builtin.include_tasks: waybar.yml
+

@@ -26,3 +26,8 @@
     name: system-config-printer
     state: present
 
+- name: document scanning software is installed
+  ansible.builtin.package:
+    name: simple-scan
+    state: present
+
