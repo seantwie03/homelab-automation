@@ -17,9 +17,9 @@
     - role: fonts
     - role: onepassword
     - role: tailscale
-    - role: network_storage
+    #- role: network_storage
     - role: devops
     - role: nodejs
+    - role: hyprland
     - role: python
-    - role: gnome_settings
     - role: gui

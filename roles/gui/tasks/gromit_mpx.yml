@@ -22,7 +22,7 @@
     group: "{{ user }}"
 
 # Special handling for gromit-mpx dotfiles because they go 
-# into the ~/.config directory instead of ~/.config/gromit-mpx
+# into the ~/.config directory instead of ~/.config/gromit-mpx/
 - name: install gromit-mpx dotfiles
   block:
     - name: find all files in dotfiles/gromit-mpx

@@ -28,15 +28,6 @@
 - name: asciinema is installed and configured
   ansible.builtin.include_tasks: asciinema.yml
 
-- name: symlink ghostty dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/ghostty"
-    dest: /home/{{ user }}/.config/ghostty
-    state: link
-    follow: false
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
 # Special handling for bash dotfiles because they go 
 # into the home directory instead of ~/.config
 - name: install bash dotfiles

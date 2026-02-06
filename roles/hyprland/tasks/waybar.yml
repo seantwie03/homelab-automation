@@ -1,0 +1,15 @@
+---
+- name: waybar is installed
+  ansible.builtin.package:
+    name: waybar
+    state: present
+
+- name: symlink waybar dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/waybar"
+    dest: /home/{{ user }}/.config/waybar
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+

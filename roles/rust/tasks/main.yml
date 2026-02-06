@@ -1,0 +1,6 @@
+---
+- name: cargo (rust pgk manager) is installed
+  ansible.builtin.package:
+    name: cargo
+    state: present
+

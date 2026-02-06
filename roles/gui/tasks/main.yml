@@ -39,11 +39,6 @@
 - name: print packages are installed
   ansible.builtin.include_tasks: printer.yml
 
-- name: document scanning software is installed
-  ansible.builtin.package:
-    name: simple-scan
-    state: present
-
 - name: mouse configuration software is installed
   ansible.builtin.package:
     name: piper

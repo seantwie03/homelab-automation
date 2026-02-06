@@ -1,9 +1,4 @@
 ---
-- name: cargo (rust pgk manager) is installed
-  ansible.builtin.package:
-    name: cargo
-    state: present
-
 - name: mermaid-cli is installed
   community.general.npm:
     name: "@mermaid-js/mermaid-cli"
