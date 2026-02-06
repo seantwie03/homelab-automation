@@ -14,8 +14,6 @@
     dest: "/home/{{ user }}/.config/hypr/machine-specific.conf"
     state: link
     follow: false
-    owner: "{{ user }}"
-    group: "{{ user }}"
 
 - name: enable solopasha/hyprland copr
   community.general.copr:
@@ -48,3 +46,14 @@
 - name: waybar is installed and configured
   ansible.builtin.include_tasks: waybar.yml
 
+- name: autostart hyprland
+  blockinfile:
+    path: "/home/{{ user }}/.bash_profile"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart hyprland"
+    block: |
+      if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+          exec Hyprland
+      fi
