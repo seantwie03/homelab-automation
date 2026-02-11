@@ -53,8 +53,8 @@
 - name: install and configure locate
   ansible.builtin.include_tasks: locate.yml
 
-- name: install and configure presenterm
-  ansible.builtin.include_tasks: presenterm.yml
+#- name: install and configure presenterm
+#  ansible.builtin.include_tasks: presenterm.yml
 
 - name: gemini is installed
   community.general.npm:
