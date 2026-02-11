@@ -1,4 +1,4 @@
 ---
 dependencies:
-  - role: nodejs # To install gemini
-  - role: rust # To install presenterm
+  - role: nodejs # To install gemini and presenterm
+  #- role: rust # To install presenterm
