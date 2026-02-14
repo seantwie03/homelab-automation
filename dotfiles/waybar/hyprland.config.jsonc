@@ -7,10 +7,11 @@
     "spacing": 8, // Gaps between modules (4px)
     // Choose the order of the modules
     "modules-left": [
-        "niri/workspaces",
+        "hyprland/workspaces",
+        "hyprland/submap",
     ],
     "modules-center": [
-        "niri/window",
+        "hyprland/window"
     ],
     "modules-right": [
         "idle_inhibitor",
@@ -22,6 +23,14 @@
         "tray",
         "custom/power"
     ],
+    "hyprland/workspaces": {
+       "format": "{icon}",
+       "on-scroll-up": "hyprctl dispatch workspace e+2",
+       "on-scroll-down": "hyprctl dispatch workspace e-2"
+    },
+    "hyprland/window": {
+        "separate-outputs": true
+    },
     "keyboard-state": {
         "numlock": true,
         "capslock": true,

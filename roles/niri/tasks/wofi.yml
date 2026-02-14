@@ -1,0 +1,15 @@
+---
+- name: wofi is installed
+  ansible.builtin.package:
+    name: wofi
+    state: present
+
+- name: symlink wofi dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/wofi"
+    dest: /home/{{ user }}/.config/wofi
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+

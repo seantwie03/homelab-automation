@@ -8,7 +8,7 @@
 
 - name: rpm-fusion-free repository is enabled
   ansible.builtin.dnf:
-    name: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm"
+    name: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
     state: present
 
 - name: rpm-fusion-nonfree repo key is installed
@@ -16,9 +16,10 @@
     state: present
     key: https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020
     fingerprint: 79BD B88F 9BBF 7391 0FD4 095B 6A2A F961 9484 3C65
+  when: ansible_distribution == 'Fedora'
 
 - name: rpm-fusion-nonfree repository is enabled
   ansible.builtin.dnf:
-    name: "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_major_version }}.noarch.rpm"
+    name: "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
     state: present
 

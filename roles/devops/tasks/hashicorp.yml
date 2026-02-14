@@ -30,6 +30,8 @@
 
 - name: vagrant-libvirt is installed
   ansible.builtin.package:
-    name: vagrant-libvirt
+    name: 
+      - vagrant-libvirt
+      - libvirt-devel # required dependency of vagrant-libvirt plugin
     state: present
   notify: install vagrant-libvirt plugin
