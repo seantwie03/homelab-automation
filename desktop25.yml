@@ -15,11 +15,12 @@
     - role: btrfs
     - role: fonts
     - role: onepassword
+    - role: rpm_fusion
     - role: tailscale
     - role: nodejs
     - role: python
     - role: cli
     #- role: network_storage
     - role: devops
-    #- role: hyprland
+    - role: niri
     - role: gui
