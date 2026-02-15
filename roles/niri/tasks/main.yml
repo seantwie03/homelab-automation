@@ -78,6 +78,6 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart hyprland"
     block: |
       if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-          exec niri-session
+          exec niri-session -l
       fi
 

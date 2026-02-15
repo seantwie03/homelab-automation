@@ -1,0 +1,29 @@
+---
+- name: wayscriber repository is configured
+  block:
+    - name: wayscriber repository key is installed
+      ansible.builtin.rpm_key:
+        key: https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc
+        fingerprint: 4489BCBB3CB130533709175F027B1C752E38957A
+        state: present
+
+    - name: wayscriber repository is enabled
+      ansible.builtin.yum_repository:
+        name: wayscriber
+        description: Wayscriber Repo
+        baseurl: https://wayscriber.com/rpm
+        enabled: true
+        gpgcheck: true
+        repo_gpgcheck: true
+        gpgkey: https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc
+
+- name: wayscriber is installed
+  ansible.builtin.package:
+    name: wayscriber
+    state: present
+  notify: enable wayscriber service
+
+- name: wayscriber configurator is installed
+  ansible.builtin.package:
+    name: wayscriber-configurator
+    state: present

@@ -6,4 +6,4 @@ if command -v bat >/dev/null 2>&1 ; then
 fi
 
 alias vim='nvim'
-alias systemctlu='systemctl --user'
+

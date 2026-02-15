@@ -27,8 +27,11 @@
 - name: zoom is installed
   ansible.builtin.include_tasks: zoom.yml
 
-- name: gromit-mpx is installed and configured
+- name: gromit-mpx is uninstalled and removed
   ansible.builtin.include_tasks: gromit_mpx.yml
+
+- name: wayscriber is installed and configured
+  ansible.builtin.include_tasks: wayscriber.yml
 
 - name: vscode and vscode-insiders are installed
   ansible.builtin.include_tasks: vscode.yml
