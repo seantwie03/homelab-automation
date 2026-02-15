@@ -19,7 +19,6 @@
   ansible.builtin.package:
     name: niri
     state: present
-  notify: enable niri.service
 
 #- name: hyprpaper is installed
 #  ansible.builtin.package:
@@ -36,20 +35,49 @@
     name: pavucontrol
     state: present
 
-#- name: wofi is installed and configured
-#  ansible.builtin.include_tasks: wofi.yml
-
 - name: waybar is installed and configured
   ansible.builtin.include_tasks: waybar.yml
 
-- name: autostart niri
+#- name: wofi is installed and configured
+#  ansible.builtin.include_tasks: wofi.yml
+
+- name: wlr portal is configured for zoom screensharing
+  block:
+    - name: xdg-desktop-portal-wlr is installed
+      ansible.builtin.package:
+        name: xdg-desktop-portal-wlr
+        state: present
+      become: true
+      notify: restart xdg-desktop-portal
+
+    - name: parent directory for portals.conf exists
+      ansible.builtin.file:
+        path: "/home/{{ user }}/.config/xdg-desktop-portal"
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+
+    - name: portal priority is configured for wlr
+      ansible.builtin.copy:
+        dest: "/home/{{ user }}/.config/xdg-desktop-portal/portals.conf"
+        content: |
+          [preferred]
+          default=wlr;gtk;
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+      notify: restart xdg-desktop-portal
+
+- name: autostart hyprland
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart niri"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart hyprland"
     block: |
-      if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+      if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
           exec niri-session
       fi
+

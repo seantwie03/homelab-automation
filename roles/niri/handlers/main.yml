@@ -1,0 +1,8 @@
+---
+- name: restart xdg-desktop-portal
+  ansible.builtin.systemd:
+    name: xdg-desktop-portal.service
+    state: restarted
+    scope: user
+  become_user: "{{ user }}"
+
