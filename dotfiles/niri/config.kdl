@@ -495,6 +495,8 @@ binds {
 
     // Usually scrolling up and down with Shift in applications results in
     // horizontal scrolling; these binds replicate that.
+    // Mod+Shift+WheelScrollDown { focus-window-down; }
+    // Mod+Shift+WheelScrollUp   { focus-window-up; }
     Mod+Shift+WheelScrollDown      { focus-column-right; }
     Mod+Shift+WheelScrollUp        { focus-column-left; }
     Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
@@ -634,4 +636,13 @@ window-rule {
 window-rule {
     match app-id="zoom" title="as_toolbar"
     open-floating true
+}
+
+window-rule {
+    match app-id="zoom" title="zoom"
+    open-floating true
+}
+
+debug {
+    render-drm-device "/dev/dri/renderD128"
 }
