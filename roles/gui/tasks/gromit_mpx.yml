@@ -1,7 +1,5 @@
 ---
-# Special handling for gromit-mpx dotfiles because they go 
-# into the ~/.config directory instead of ~/.config/gromit-mpx/
-- name: install gromit-mpx dotfiles
+- name: remove gromit-mpx dotfiles
   block:
     - name: find all files in dotfiles/gromit-mpx
       ansible.builtin.find:
@@ -9,28 +7,20 @@
         hidden: true
       register: gromit_mpx_dotfiles
 
-    - name: symlink gromit-mpx dotfiles to home directory
+    - name: remove gromit-mpx dotfiles from home directory
       ansible.builtin.file:
-        src: "{{ item.path }}"
-        dest: "/home/{{ user }}/.config/{{ item.path | basename }}"
-        state: link
-        follow: false
-        owner: "{{ user }}"
-        group: "{{ user }}"
+        path: "/home/{{ user }}/.config/{{ item.path | basename }}"
+        state: absent
       loop: "{{ gromit_mpx_dotfiles.files }}"
       loop_control:
-        label: "Symlinking {{ item.path | basename }}"
+        label: "Removing {{ item.path | basename }}"
 
-- name: gromit-mpx is installed
+- name: gromit-mpx is uninstalled
   ansible.builtin.package:
     name: gromit-mpx
-    state: present
+    state: absent
 
-- name: autostart gromit-mpx
-  ansible.builtin.copy:
-    src: gromit-mpx.desktop
-    dest: /home/{{ user }}/.config/autostart/gromit-mpx.desktop
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0644
-
+- name: remove autostart for gromit-mpx
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/autostart/gromit-mpx.desktop
+    state: absent

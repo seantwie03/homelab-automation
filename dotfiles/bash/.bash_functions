@@ -66,3 +66,19 @@ echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 }
+
+# This started as alias systemctlu='systemctl --user' but evolved into this craziness to make tab complete work
+systemctlu() {
+    systemctl --user "$@"
+}
+if [[ -r /usr/share/bash-completion/completions/systemctl ]]; then
+    . /usr/share/bash-completion/completions/systemctl
+fi
+
+_systemctlu() {
+    # Prepend '--user' to the words being completed so _systemctl sees it
+    COMP_WORDS=(systemctl --user "${COMP_WORDS[@]:1}")
+    ((COMP_CWORD+=1))
+    _systemctl
+}
+complete -F _systemctlu systemctlu

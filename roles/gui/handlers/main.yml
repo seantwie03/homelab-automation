@@ -1,0 +1,8 @@
+---
+- name: enable wayscriber service
+  ansible.builtin.service:
+    name: wayscriber.service
+    enabled: true
+    state: started
+    scope: user
+  become_user: "{{ user }}"
