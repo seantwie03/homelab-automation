@@ -16,6 +16,7 @@
         gpgcheck: true
         repo_gpgcheck: true
         gpgkey: https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc
+        skip_if_unavailable: true
 
 - name: wayscriber is installed
   ansible.builtin.package:
