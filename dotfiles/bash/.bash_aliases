@@ -5,5 +5,5 @@ if command -v bat >/dev/null 2>&1 ; then
   alias cat='bat --paging=never --style=plain'
 fi
 
-alias vim="nvim"
-#alias gemini='npx --yes https://github.com/google-gemini/gemini-cli'
+alias vim='nvim'
+alias systemctlu='systemctl --user'
