@@ -26,10 +26,9 @@
     group: wheel
     mode: 0775
 
-- name: start and enable libvirtd
+- name: enable libvirtd
   ansible.builtin.service:
     name: libvirtd
-    state: started
     enabled: true
 
 - name: virtio-win repository is enabled

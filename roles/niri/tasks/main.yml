@@ -8,27 +8,15 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-#- name: symlink for machine-specific.conf exists
-#  ansible.builtin.file:
-#    src: "/home/{{ user }}/.config/hypr/{{ ansible_facts['hostname'] }}.conf"
-#    dest: "/home/{{ user }}/.config/hypr/machine-specific.conf"
-#    state: link
-#    follow: false
-
 - name: niri is installed
   ansible.builtin.package:
     name: niri
     state: present
 
-#- name: hyprpaper is installed
-#  ansible.builtin.package:
-#    name: hyprpaper
-#    state: present
-#
-#- name: hypridle is installed
-#  ansible.builtin.package:
-#    name: hypridle
-#    state: present
+- name: nautilus is installed
+  ansible.builtin.package:
+    name: nautilus
+    state: present
 
 - name: pavucontrol is installed
   ansible.builtin.package:
@@ -37,6 +25,38 @@
 
 - name: waybar is installed and configured
   ansible.builtin.include_tasks: waybar.yml
+
+# TODO:
+#   - swayidle
+#   - wallpaper
+#   - focus ring graient?
+#   - open presentation kitty window on main monitor maximized (workspace 2?)
+#   - decide wofi or fuzzel
+#     - emoji picker
+#   - wayscriber
+#     - screenshots workflow
+#     - how to zoom
+#     - presenter mode by default
+#   - Screenshare
+#     - Retry xdg-desktop-portal-gnome with https://github.com/niri-wm/niri/issues/2223 and nvidia
+#     - OBS for fun and profit
+#   - workflow
+#     - Kitty
+#       - Split vs two instances
+#         - Two instances allow tab switching on each instance
+#           - two instances: gemini/servera on different tabs | slides/pnpm dev on different tabs
+#             - Can mix/match
+#             - Easier to switch (Win+ instead of Ctrl+Alt+)
+#             - Able to have more than 2 "splits"
+#             - Con: Workflow not replicable on Traditional DEs
+#             - Con: New instances always open to ~
+#             - Leaning toward this one
+#           - vs
+#           - kitty split: (gemini | slides) on a tab / (pnpm | servera) on a tab
+#             - Con: Limited to two splits
+#             - Con: More rigiid (both splits grouped on a tab)
+#             - New splits open in same directory
+
 
 #- name: wofi is installed and configured
 #  ansible.builtin.include_tasks: wofi.yml
