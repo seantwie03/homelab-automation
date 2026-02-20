@@ -73,7 +73,9 @@
 # to a V4L2 loopback device. Zoom will see this as a camera source
 # which uses different mechanisms inside of zoom and should work
 # more reliably. If going this route, use pipewire-v4l2 instead
-# of the old DKMS module.
+# of the old DKMS module. 
+# I have [a plan to impelent this](roles/niri/teaching_with_niri_and_obs.md).
+
 - name: wlr portal is configured for zoom screensharing
   block:
     - name: xdg-desktop-portal-wlr is installed
