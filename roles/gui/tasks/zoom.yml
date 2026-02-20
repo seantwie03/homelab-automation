@@ -1,8 +1,12 @@
 ---
 - name: zoom-us repository key is installed
   ansible.builtin.rpm_key:
-    key: https://zoom.us/linux/download/pubkey?version=6-3-10
-    fingerprint: AE44 6BAB 33EA 9862 AA29 FC3D DDE0 E622 2047 091F
+    key: https://zoom.us/linux/download/pubkey?version=6-7-5
+    # To find fingerprint
+    #     Go to https://zoom.us/download?os=linux
+    #     Download signing key
+    #     Run gpg --show-keys --fingerprint package-signing-key.pub
+    fingerprint: 84C365D6CC9A4886CA926BCC4F2197399706AC24
     state: present
 
 - name: zoom is installed
@@ -13,6 +17,6 @@
     #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
     #     rpm -qp ./zoom_x86_64.rpm
     #     May need to remove -1 suffix
-    name: https://zoom.us/client/6.7.2.6498/zoom_x86_64.rpm
+    name: https://zoom.us/client/6.7.5.6891/zoom_x86_64.rpm
     state: present
 

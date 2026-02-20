@@ -51,3 +51,10 @@
   ansible.builtin.package:
     name: qbittorrent
     state: present
+
+- name: install inkscape
+  ansible.builtin.package:
+    name:
+      - inkscape
+      - colord-gtk
+
