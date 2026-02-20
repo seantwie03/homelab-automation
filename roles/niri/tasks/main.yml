@@ -18,9 +18,11 @@
     name: nautilus
     state: present
 
-- name: pavucontrol is installed
+- name: pulseaudio controls are installed
   ansible.builtin.package:
-    name: pavucontrol
+    name:
+      - pavucontrol
+      - pulseaudio-utils
     state: present
 
 - name: waybar is installed and configured
@@ -61,6 +63,17 @@
 #- name: wofi is installed and configured
 #  ansible.builtin.include_tasks: wofi.yml
 
+# I would like to use xdg-desktop-portal-gnome to use some
+# of Niri's fancy screensharing features, but there is a
+# bug in Zoom 6.7.5 that causes Zoom's PipeWire consumer node
+# to "register zero accepted formats because Zoom calls
+# pw_stream_connect/pw_stream_set_active from a wrong thread context"
+# If I want to improve on this later, I could try using OBS to
+# capture the gnome portal (with Niri fancy features) and output
+# to a V4L2 loopback device. Zoom will see this as a camera source
+# which uses different mechanisms inside of zoom and should work
+# more reliably. If going this route, use pipewire-v4l2 instead
+# of the old DKMS module.
 - name: wlr portal is configured for zoom screensharing
   block:
     - name: xdg-desktop-portal-wlr is installed
@@ -89,7 +102,7 @@
         mode: 0644
       notify: restart xdg-desktop-portal
 
-- name: autostart hyprland
+- name: autostart niri when logging into TTY1
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"

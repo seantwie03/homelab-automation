@@ -389,6 +389,8 @@ binds {
     XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
 
+    Mod+Ctrl+S { spawn-sh "uv run ~/s/IT-230/utils/student-selector/student_selector_gui.py"; }
+
     // Example media keys mapping using playerctl.
     // This will work with any MPRIS-enabled media player.
     XF86AudioPlay        allow-when-locked=true { spawn-sh "playerctl play-pause"; }
@@ -643,6 +645,3 @@ window-rule {
     open-floating true
 }
 
-debug {
-    render-drm-device "/dev/dri/renderD128"
-}
