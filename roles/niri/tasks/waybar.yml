@@ -13,3 +13,36 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+- name: niri_window_buttons build dependencies are installed
+  ansible.builtin.package:
+    name:
+      - glib2-devel
+      - gtk3-devel
+    state: present
+
+- name: niri_window_buttons source is present
+  ansible.builtin.git:
+    repo: https://github.com/adelmonte/niri_window_buttons.git
+    dest: /opt/niri_window_buttons
+    version: "{{ niri_window_buttons_version }}"
+  register: niri_window_buttons_git
+
+- name: niri_window_buttons is compiled
+  ansible.builtin.command:
+    cmd: cargo build --release --locked
+    chdir: /opt/niri_window_buttons
+  when: niri_window_buttons_git.changed
+
+- name: /usr/lib/waybar exists for cffi plugins
+  ansible.builtin.file:
+    path: /usr/lib/waybar
+    state: directory
+    mode: 0755
+
+- name: libniri_window_buttons.so is installed to waybar plugin path
+  ansible.builtin.copy:
+    src: /opt/niri_window_buttons/target/release/libniri_window_buttons.so
+    dest: /usr/lib/waybar/libniri_window_buttons.so
+    mode: 0755
+  when: niri_window_buttons_git.changed
+
