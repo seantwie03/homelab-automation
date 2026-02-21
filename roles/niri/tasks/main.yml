@@ -25,11 +25,15 @@
       - pulseaudio-utils
     state: present
 
+- name: swayidle is installed
+  ansible.builtin.package:
+    name: swayidle
+    state: present
+
 - name: waybar is installed and configured
   ansible.builtin.include_tasks: waybar.yml
 
 # TODO:
-#   - swayidle
 #   - wallpaper
 #   - focus ring graient?
 #   - open presentation kitty window on main monitor maximized (workspace 2?)
