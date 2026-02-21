@@ -2,7 +2,7 @@
 {
     // "layer": "top", // Waybar at top layer
     "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 35, // Waybar height (to be removed for auto height)
+    "height": 40, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     "spacing": 8, // Gaps between modules (4px)
     // Choose the order of the modules
@@ -10,7 +10,7 @@
         "niri/workspaces",
     ],
     "modules-center": [
-        "niri/window",
+        "cffi/niri_window_buttons",
     ],
     "modules-right": [
         "idle_inhibitor",
@@ -72,8 +72,11 @@
         //   "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
         // }
     },
+    "niri/window": {
+        "swap-icon-label": false,
+        "icon": false,
+    },
     "clock": {
-        // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format-alt": "{:%Y-%m-%d}"
     },
@@ -171,5 +174,50 @@
         "format" : "⏻ ",
         "tooltip": "Power Menu",
         "on-click": "/home/sean/.config/waybar/power_menu.sh"
+    },
+    "cffi/niri_window_buttons": {
+        "module_path": "/usr/lib/waybar/libniri_window_buttons.so",
+        "only_current_workspace": false,
+        "show_window_titles": true,
+        "truncate_titles": true,
+        "allow_title_linebreaks": false,
+        "button_alignment": "center",
+        "icon_size": 20,
+        "icon_spacing": 6,
+        "min_button_width": 150,
+        "max_button_width": 235,
+        "max_taskbar_width": 1400,
+        "drag_hover_focus": true,
+        "drag_hover_focus_delay": 500,
+        "click_actions": {
+            "left_click_unfocused": "focus-window",
+            "left_click_focused": "maximize-column",
+            "double_click": "maximize-window-to-edges",
+            "right_click_unfocused": "menu",
+            "right_click_focused": "menu",
+            "middle_click_unfocused": "close-window",
+            "middle_click_focused": "close-window",
+            "scroll_up": "none",
+            "scroll_down": "none"
+        },
+        "context_menu": [
+            {"label": "  Maximize Column", "action": "maximize-column"},
+            {"label": "  Maximize to Edges", "action": "maximize-window-to-edges"},
+            {"label": "󰉩  Toggle Floating", "action": "toggle-window-floating"},
+            {"label": "  Close Window", "action": "close-window"}
+        ],
+        "multi_select_modifier": "ctrl",
+        "multi_select_menu": [
+            {"label": "  Move All Up", "action": "move-to-workspace-up"},
+            {"label": "  Move All Down", "action": "move-to-workspace-down"},
+            {"label": "  Close All", "action": "close-windows"}
+        ],
+        "ignore_rules": [],
+        "notifications": {
+            "enabled": true,
+            "use_desktop_entry": true,
+            "use_fuzzy_matching": false
+        },
+        "apps": {}
     }
 }
