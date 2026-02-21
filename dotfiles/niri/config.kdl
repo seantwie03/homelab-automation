@@ -290,6 +290,10 @@ layout {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "waybar"
 
+// Suspend after 45 minutes of inactivity. -w waits for the compositor to
+// acknowledge the suspend request before actually suspending.
+spawn-at-startup "swayidle" "-w" "timeout" "2700" "systemctl suspend"
+
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
