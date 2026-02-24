@@ -633,6 +633,15 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 }
 
+// Open kitty "Presentation" windows on the right monitor.
+window-rule { 
+    match title="Presentation"
+    match app-id="kitty"
+    open-on-output "HDMI-A-2"
+    open-maximized true
+    open-focused true
+}
+
 // Open Zoom meeting controls as floating.
 window-rule {
     match app-id="zoom" title="as_toolbar"
