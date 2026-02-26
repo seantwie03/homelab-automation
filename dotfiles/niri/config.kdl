@@ -640,12 +640,13 @@ window-rule {
 }
 
 window-rule {
-    match app-id="zoom" title="as_toolbar"
+    match app-id="zoom" title="zoom"
     open-floating true
 }
 
 window-rule {
-    match app-id="zoom" title="zoom"
-    open-floating true
+    match app-id="google-chrome"
+    open-maximized true
 }
+
 
