@@ -17,7 +17,7 @@
 
 - name: enable solopasha/hyprland copr
   community.general.copr:
-    name: solopasha/hyprland
+    name: lionheartp/Hyprland
     state: enabled
 
 - name: hyprland is installed
