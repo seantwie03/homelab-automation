@@ -22,7 +22,9 @@
 
 - name: hyprland is installed
   ansible.builtin.package:
-    name: hyprland
+    name:
+      - hyprland
+      - hyprland-guiutils
     state: present
 
 - name: hyprpaper is installed
