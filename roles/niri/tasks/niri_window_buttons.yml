@@ -1,18 +1,4 @@
 ---
-- name: waybar is installed
-  ansible.builtin.package:
-    name: waybar
-    state: present
-
-- name: symlink waybar dotfiles directory
-  ansible.builtin.file:
-    src: "{{ dotfiles_path }}/waybar"
-    dest: /home/{{ user }}/.config/waybar
-    state: link
-    follow: false
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
 - name: niri_window_buttons build dependencies are installed
   ansible.builtin.package:
     name:
@@ -45,4 +31,3 @@
     dest: /usr/lib/waybar/libniri_window_buttons.so
     mode: 0755
   when: niri_window_buttons_git.changed
-

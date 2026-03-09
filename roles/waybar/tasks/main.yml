@@ -1,0 +1,46 @@
+---
+- name: waybar is installed
+  ansible.builtin.package:
+    name: waybar
+    state: present
+
+- name: waybar dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/waybar"
+    dest: /home/{{ user }}/.config/waybar
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: waybar-launch.sh is executable
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/waybar/waybar-launch.sh
+    mode: 0755
+
+- name: waybar systemd drop-in directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/systemd/user/waybar.service.d
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: waybar systemd override uses launch script
+  ansible.builtin.copy:
+    dest: /home/{{ user }}/.config/systemd/user/waybar.service.d/override.conf
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/home/{{ user }}/.config/waybar/waybar-launch.sh
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  notify: reload waybar systemd unit
+
+- name: waybar service is enabled
+  ansible.builtin.systemd:
+    name: waybar.service
+    enabled: true
+    scope: user
+  become_user: "{{ user }}"

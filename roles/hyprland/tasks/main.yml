@@ -45,18 +45,15 @@
 - name: wofi is installed and configured
   ansible.builtin.include_tasks: wofi.yml
 
-- name: waybar is installed and configured
-  ansible.builtin.include_tasks: waybar.yml
-
-- name: autostart hyprland
+- name: autostart usws selector
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart hyprland"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart uswm select"
     block: |
-      if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-          exec Hyprland
+      if uwsm check may-start && uwsm select; then
+          exec uwsm start default
       fi
 

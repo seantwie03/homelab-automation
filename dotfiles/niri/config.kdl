@@ -287,9 +287,6 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// This line starts waybar, a commonly used bar for Wayland compositors.
-spawn-at-startup "waybar"
-
 // Suspend after 45 minutes of inactivity. -w waits for the compositor to
 // acknowledge the suspend request before actually suspending.
 spawn-at-startup "swayidle" "-w" "timeout" "2700" "systemctl suspend"
@@ -648,5 +645,4 @@ window-rule {
     match app-id="google-chrome"
     open-maximized true
 }
-
 

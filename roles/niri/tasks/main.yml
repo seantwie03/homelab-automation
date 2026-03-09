@@ -30,8 +30,8 @@
     name: swayidle
     state: present
 
-- name: waybar is installed and configured
-  ansible.builtin.include_tasks: waybar.yml
+- name: niri_window_buttons is compiled and installed
+  ansible.builtin.include_tasks: niri_window_buttons.yml
 
 # TODO:
 #   - wallpaper
@@ -90,15 +90,15 @@
         mode: 0644
       notify: restart xdg-desktop-portal
 
-- name: autostart niri when logging into TTY1
+- name: autostart usws selector
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart hyprland"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart uswm select"
     block: |
-      if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-          exec niri-session -l
+      if uwsm check may-start && uwsm select; then
+          exec uwsm start default
       fi
 

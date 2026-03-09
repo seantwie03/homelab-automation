@@ -1,0 +1,6 @@
+---
+- name: reload waybar systemd unit
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+  become_user: "{{ user }}"
