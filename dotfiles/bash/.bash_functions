@@ -67,6 +67,22 @@ echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 }
 
+# This started as alias journalctlu='journalctl --user' but evolved into this craziness to make tab complete work
+journalctlu() {
+    journalctl --user "$@"
+}
+if [[ -r /usr/share/bash-completion/completions/journalctl ]]; then
+    . /usr/share/bash-completion/completions/journalctl
+fi
+
+_journalctlu() {
+    # Prepend '--user' to the words being completed so _journalctl sees it
+    COMP_WORDS=(journalctl --user "${COMP_WORDS[@]:1}")
+    ((COMP_CWORD+=1))
+    _journalctl
+}
+complete -F _journalctlu journalctlu
+
 # This started as alias systemctlu='systemctl --user' but evolved into this craziness to make tab complete work
 systemctlu() {
     systemctl --user "$@"
