@@ -7,6 +7,6 @@ case "${XDG_CURRENT_DESKTOP,,}" in
         exec waybar --config "$HOME/.config/waybar/hyprland.config.jsonc"
         ;;
     *)
-        exec waybar
+        exit # Probably running KDE or something
         ;;
 esac
