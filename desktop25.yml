@@ -22,6 +22,6 @@
     - role: cli
     #- role: network_storage
     - role: devops
-    # - role: niri
+    - role: niri
     - role: hyprland
     - role: gui

@@ -1,0 +1,21 @@
+---
+- name: dunst is installed
+  ansible.builtin.package:
+    name: dunst
+    state: present
+
+- name: dunst dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/dunst"
+    dest: /home/{{ user }}/.config/dunst
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: dunst service is enabled
+  ansible.builtin.systemd:
+    name: dunst.service
+    enabled: true
+    scope: user
+  become_user: "{{ user }}"
