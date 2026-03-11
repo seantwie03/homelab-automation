@@ -1,3 +1,4 @@
 ---
 dependencies:
   - role: waybar
+  - role: dunst

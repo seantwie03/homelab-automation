@@ -22,6 +22,7 @@
     - role: devops
     - role: nodejs
     - role: hyprland
+    - role: niri
     - role: gui
     - role: gaming
 

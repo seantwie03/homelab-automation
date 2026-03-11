@@ -14,7 +14,7 @@ window#waybar {
 #clock,
 #battery,
 #pulseaudio,
-#custom-swaync,
+#custom-dunst,
 #tray,
 #custom-power {
     padding: 0 14px;

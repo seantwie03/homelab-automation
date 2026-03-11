@@ -2,3 +2,4 @@
 dependencies:
   - role: rust
   - role: waybar
+  - role: dunst
