@@ -13,11 +13,6 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-- name: waybar-launch.sh is executable
-  ansible.builtin.file:
-    path: /home/{{ user }}/.config/waybar/waybar-launch.sh
-    mode: 0755
-
 - name: waybar systemd drop-in directory exists
   ansible.builtin.file:
     path: /home/{{ user }}/.config/systemd/user/waybar.service.d
