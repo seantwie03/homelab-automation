@@ -85,7 +85,7 @@
       notify: restart xdg-desktop-portal
 
 - name: autostart uwsm selector
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"

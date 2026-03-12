@@ -4,5 +4,6 @@
     name: xdg-desktop-portal.service
     state: restarted
     scope: user
+  become: true
   become_user: "{{ user }}"
 
