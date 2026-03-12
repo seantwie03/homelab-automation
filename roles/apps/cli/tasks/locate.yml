@@ -11,6 +11,7 @@
     line: 'PRUNENAMES = ".snapshots .btrbk_snapshots node-modules"'
     create: true
     state: present
+    mode: 0644
 
 - name: plocate-updatedb.timer is enabled and started
   ansible.builtin.service:
