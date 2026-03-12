@@ -43,7 +43,7 @@
     state: present
 
 - name: autostart uswm selector
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"

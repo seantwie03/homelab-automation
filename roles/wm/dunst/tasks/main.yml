@@ -18,4 +18,5 @@
     name: dunst.service
     enabled: true
     scope: user
+  become: true
   become_user: "{{ user }}"
