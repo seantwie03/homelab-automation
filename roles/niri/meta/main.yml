@@ -4,3 +4,4 @@ dependencies:
   - role: waybar
   - role: dunst
   - role: fuzzel
+  - role: screenshots
