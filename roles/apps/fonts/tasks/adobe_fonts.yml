@@ -10,13 +10,24 @@
     state: directory
     mode: '0755'
 
-- name: clone adobe fonts repositories
-  ansible.builtin.git:
-    repo: "https://github.com/adobe-fonts/{{ item }}.git"
-    dest: "/usr/share/fonts/adobe-fonts/{{ item }}"
-    depth: 1
+- name: register adobe fonts installation status
+  ansible.builtin.stat:
+    path: /usr/share/fonts/adobe-fonts/{{ item }}
+  register: adobe_fonts_stat
   loop:
     - source-sans
     - source-serif
     - source-code-pro
+
+- name: clone adobe fonts repositories
+  ansible.builtin.git:
+    repo: "https://github.com/adobe-fonts/{{ item.name }}.git"
+    dest: "/usr/share/fonts/adobe-fonts/{{ item.name }}"
+    version: "{{ item.version }}"
+    depth: 1
+  loop:
+    - {name: source-sans, version: "{{ adobe_source_sans_version }}"}
+    - {name: source-serif, version: "{{ adobe_source_serif_version }}"}
+    - {name: source-code-pro, version: "{{ adobe_source_code_pro_version }}"}
+  when: adobe_fonts_stat.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
   notify: rebuild font cache

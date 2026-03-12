@@ -11,3 +11,4 @@
   ansible.builtin.command:
     cmd: "restorecon -Rv {{ item.path }}"
   loop: "{{ smb_shares }}"
+  changed_when: true
