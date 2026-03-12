@@ -8,12 +8,6 @@
     uid: 1000
     gid: 1000
 
-  tasks:
-    - name: /opt/niri_window_buttons is removed
-      ansible.builtin.file:
-        path: /opt/niri_window_buttons
-        state: absent
-
   roles:
     - role: core
     - role: ansible_pull
