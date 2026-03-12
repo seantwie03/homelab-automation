@@ -1,5 +1,5 @@
 #!/bin/sh
-chosen=$(printf "  Shutdown\n  Reboot\n  Suspend" | wofi -d -i -p "Power Menu")
+chosen=$(printf "  Shutdown\n  Reboot\n  Suspend" | fuzzel --dmenu --prompt="Power Menu > ")
 
 case "$chosen" in
     "  Shutdown")
