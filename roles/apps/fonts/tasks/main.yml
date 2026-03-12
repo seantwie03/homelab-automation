@@ -13,10 +13,11 @@
     state: present
   notify: rebuild font cache
 
-- name: install microsoft fonts
-  ansible.builtin.command:
-    cmd: "rpm --nodigest -i {{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
-    creates: /usr/share/fonts/msttcore
+- name: microsoft fonts are installed
+  ansible.builtin.package:
+    name: "{{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
+    state: present
+  notify: rebuild font cache
 
 - name: download and extract nerd fonts
   ansible.builtin.include_tasks: download_extract_fonts.yml
