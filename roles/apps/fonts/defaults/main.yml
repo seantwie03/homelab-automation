@@ -1,6 +1,12 @@
 ---
-# The tag version from https://github.com/ryanoasis/nerd-fonts/releases
+# The tag version from https://github.com/ryanoasis/nerd-fonts/tags
 nerd_fonts_version: v3.4.0
+# The tag version from: https://github.com/adobe-fonts/source-sans/tags
+adobe_source_sans_version: 3.052R
+# The tag version from: https://github.com/adobe-fonts/source-serif/tags
+adobe_source_serif_version: 4.005R
+# The tag version from: https://github.com/adobe-fonts/source-code-pro/tags
+adobe_source_code_pro_version: 2.042R-u/1.062R-i/1.026R-vf
 
 # The font(s) to download and install
 fonts:

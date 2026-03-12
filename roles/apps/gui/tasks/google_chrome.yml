@@ -68,4 +68,5 @@
   become: true
   become_user: "{{ user }}"
   when: vidplay_handler.stdout != 'vid-play.desktop'
+  changed_when: true
 
