@@ -33,21 +33,18 @@
 - name: niri_window_buttons is compiled and installed
   ansible.builtin.include_tasks: niri_window_buttons.yml
 
+- name: screenshot tools are installed
+  ansible.builtin.include_tasks: screenshot_tools.yml
+
 # TODO:
 #   - wallpaper
-#   - decide wofi or fuzzel
-#     - emoji picker
 #   - wayscriber
-#     - screenshots workflow
 #     - how to zoom
 #     - presenter mode by default
 #   - Screenshare
 #     - Retry xdg-desktop-portal-gnome with https://github.com/niri-wm/niri/issues/2223 and nvidia
 #     - OBS for fun and profit
 
-
-#- name: wofi is installed and configured
-#  ansible.builtin.include_tasks: wofi.yml
 
 # I would like to use xdg-desktop-portal-gnome to use some
 # of Niri's fancy screensharing features, but there is a
@@ -90,41 +87,13 @@
         mode: 0644
       notify: restart xdg-desktop-portal
 
-- name: screenshot tool dependencies are installed
-  ansible.builtin.package:
-    name:
-      - grim
-      - slurp
-      - cargo
-      - gtk4-devel
-      - libadwaita-devel
-      - glib2-devel
-      - pango-devel
-      - gdk-pixbuf2-devel
-      - fontconfig-devel
-      - libepoxy-devel
-    state: present
-
-- name: satty is installed from cargo
-  community.general.cargo:
-    name: satty
-    state: present
-    path: "/home/{{ user }}"
-
-- name: satty is executable
-  ansible.builtin.file:
-    path: /home/{{ user }}/bin/satty
-    mode: 0550
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
-- name: autostart usws selector
+- name: autostart uwsm selector
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart uswm select"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: autostart uwsm select"
     block: |
       if uwsm check may-start && uwsm select; then
           exec uwsm start default

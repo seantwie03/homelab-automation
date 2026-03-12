@@ -22,3 +22,34 @@
   ansible.builtin.package:
     name: google-chrome-stable
 
+- name: vid-play.sh is installed
+  ansible.builtin.copy:
+    src: vid-play.sh
+    dest: /home/{{ user }}/bin/vid-play.sh
+    mode: 0755
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: /home/{{ user }}/.local/share/applications directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.local/share/applications
+    state: directory
+    mode: 0755
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: vid-play.desktop is installed
+  ansible.builtin.template:
+    src: vid-play.desktop.j2
+    dest: /home/{{ user }}/.local/share/applications/vid-play.desktop
+    mode: 0644
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: vid-play protocol handler is registered
+  ansible.builtin.command:
+    cmd: xdg-mime default vid-play.desktop x-scheme-handler/vid-play
+  become: true
+  become_user: "{{ user }}"
+  changed_when: false
+

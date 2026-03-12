@@ -375,6 +375,8 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
+    Mod+Period hotkey-overlay-title="Emoji Picker: rofimoji" { spawn "rofimoji" "--selector" "fuzzel"; }
+    Mod+Comma hotkey-overlay-title="Open Downloaded Video: vid-picker" { spawn-sh "$HOME/.config/fuzzel/vid-picker.sh"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
     F2 { spawn "wayscriber" "-a" "--no-resume-session"; }
@@ -554,9 +556,9 @@ binds {
     Mod+BracketRight { consume-or-expel-window-right; }
 
     // Consume one window from the right to the bottom of the focused column.
-    Mod+Comma  { consume-window-into-column; }
+    Mod+Shift+Comma  { consume-window-into-column; }
     // Expel the bottom window from the focused column to the right.
-    Mod+Period { expel-window-from-column; }
+    Mod+Shift+Period { expel-window-from-column; }
 
     Mod+R { switch-preset-column-width; }
     // Cycling through the presets in reverse order is also possible.

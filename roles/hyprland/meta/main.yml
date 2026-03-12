@@ -2,3 +2,4 @@
 dependencies:
   - role: waybar
   - role: dunst
+  - role: fuzzel
