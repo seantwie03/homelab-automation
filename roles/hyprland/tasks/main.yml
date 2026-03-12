@@ -42,9 +42,6 @@
     name: pavucontrol
     state: present
 
-- name: screenshot tools are installed
-  ansible.builtin.include_tasks: screenshot_tools.yml
-
 - name: autostart uswm selector
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"

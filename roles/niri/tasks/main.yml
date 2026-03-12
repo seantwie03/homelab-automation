@@ -33,9 +33,6 @@
 - name: niri_window_buttons is compiled and installed
   ansible.builtin.include_tasks: niri_window_buttons.yml
 
-- name: screenshot tools are installed
-  ansible.builtin.include_tasks: screenshot_tools.yml
-
 # TODO:
 #   - wallpaper
 #   - wayscriber

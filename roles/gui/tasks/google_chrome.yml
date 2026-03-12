@@ -22,6 +22,13 @@
   ansible.builtin.package:
     name: google-chrome-stable
 
+- name: yt-dlp and mpv are installed
+  ansible.builtin.package:
+    name:
+      - yt-dlp
+      - mpv
+    state: present
+
 - name: vid-play.sh is installed
   ansible.builtin.copy:
     src: vid-play.sh
@@ -46,10 +53,19 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+- name: current vid-play protocol handler
+  ansible.builtin.command:
+    cmd: xdg-mime query default x-scheme-handler/vid-play
+  become: true
+  become_user: "{{ user }}"
+  register: vidplay_handler
+  changed_when: false
+  failed_when: false
+
 - name: vid-play protocol handler is registered
   ansible.builtin.command:
     cmd: xdg-mime default vid-play.desktop x-scheme-handler/vid-play
   become: true
   become_user: "{{ user }}"
-  changed_when: false
+  when: vidplay_handler.stdout != 'vid-play.desktop'
 
