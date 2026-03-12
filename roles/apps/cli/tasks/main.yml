@@ -20,6 +20,7 @@
     name:
       - git
       - bat
+      - tree
     state: present
 
 - name: neovim is installed and configured
