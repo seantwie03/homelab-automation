@@ -42,38 +42,10 @@
     name: pavucontrol
     state: present
 
-- name: wofi is installed and configured
-  ansible.builtin.include_tasks: wofi.yml
+- name: screenshot tools are installed
+  ansible.builtin.include_tasks: screenshot_tools.yml
 
-- name: screenshot tool dependencies are installed
-  ansible.builtin.package:
-    name:
-      - grim
-      - slurp
-      - cargo
-      - gtk4-devel
-      - libadwaita-devel
-      - glib2-devel
-      - pango-devel
-      - gdk-pixbuf2-devel
-      - fontconfig-devel
-      - libepoxy-devel
-    state: present
-
-- name: satty is installed from cargo
-  community.general.cargo:
-    name: satty
-    state: present
-    path: "/home/{{ user }}"
-
-- name: satty is executable
-  ansible.builtin.file:
-    path: /home/{{ user }}/bin/satty
-    mode: 0550
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
-- name: autostart usws selector
+- name: autostart uswm selector
   blockinfile:
     path: "/home/{{ user }}/.bash_profile"
     owner: "{{ user }}"

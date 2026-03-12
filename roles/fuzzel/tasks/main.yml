@@ -1,0 +1,19 @@
+---
+- name: fuzzel is installed
+  ansible.builtin.package:
+    name: fuzzel
+    state: present
+
+- name: rofimoji is installed (emoji picker)
+  ansible.builtin.package:
+    name: rofimoji
+    state: present
+
+- name: fuzzel dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/fuzzel"
+    dest: /home/{{ user }}/.config/fuzzel
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"

@@ -1,0 +1,29 @@
+---
+- name: screenshot tool dependencies are installed
+  ansible.builtin.package:
+    name:
+      - grim
+      - slurp
+      - cargo
+      - gtk4-devel
+      - libadwaita-devel
+      - glib2-devel
+      - pango-devel
+      - gdk-pixbuf2-devel
+      - fontconfig-devel
+      - libepoxy-devel
+    state: present
+
+- name: satty is installed (screenshot annotation tool)
+  community.general.cargo:
+    name: satty
+    state: present
+    path: "/home/{{ user }}"
+
+- name: satty is executable
+  ansible.builtin.file:
+    path: /home/{{ user }}/bin/satty
+    mode: 0550
+    owner: "{{ user }}"
+    group: "{{ user }}"
+

@@ -58,3 +58,19 @@
       - inkscape
       - colord-gtk
 
+- name: yt-dlp and mpv are installed
+  ansible.builtin.package:
+    name:
+      - yt-dlp
+      - mpv
+    state: present
+
+- name: mpv dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/mpv"
+    dest: /home/{{ user }}/.config/mpv
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
