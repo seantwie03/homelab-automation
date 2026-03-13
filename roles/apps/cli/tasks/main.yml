@@ -63,3 +63,8 @@
     global: true
     state: present
 
+- name: claude code is installed
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://claude.ai/install.sh | bash
+    creates: /usr/local/bin/claude
+

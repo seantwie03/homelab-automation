@@ -10,6 +10,7 @@
 
   roles:
     - role: core
+    - role: docker
     - role: ansible_pull
     - role: btrfs
     - role: rpm_fusion

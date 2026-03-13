@@ -47,16 +47,21 @@
     name: piper
     state: present
 
-- name: install bittorrent client
+- name: bittorrent client is installed
   ansible.builtin.package:
     name: qbittorrent
     state: present
 
-- name: install inkscape
+- name: inkscape is installed
   ansible.builtin.package:
     name:
       - inkscape
       - colord-gtk
+
+- name: kcalc is installed
+  ansible.builtin.package:
+    name:
+      - kcalc
 
 - name: mpv is installed
   ansible.builtin.package:
