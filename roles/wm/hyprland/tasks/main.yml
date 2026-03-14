@@ -15,7 +15,7 @@
     state: link
     follow: false
 
-- name: enable solopasha/hyprland copr
+- name: enable hyprland copr
   community.general.copr:
     name: lionheartp/Hyprland
     state: enabled
