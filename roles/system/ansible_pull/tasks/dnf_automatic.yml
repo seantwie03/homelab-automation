@@ -67,7 +67,7 @@
   notify: restart dnf-automatic timer
 
 - name: dnf-automatic.timer is enabled and started
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: dnf-automatic.timer
     enabled: true
     state: started

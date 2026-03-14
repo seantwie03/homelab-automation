@@ -19,7 +19,7 @@
     mode: 0644
 
 - name: plocate-updatedb.timer is enabled and started
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: plocate-updatedb.timer
     enabled: true
     state: started
