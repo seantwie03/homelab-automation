@@ -61,6 +61,7 @@ No build or test framework exists — this is declarative Ansible configuration.
 ## Shell Script Conventions
 
 - Indent with **4 spaces** in all `.sh` and `.sh.j2` files.
+- Scripts that must run as root should check at the top: `if [ "$(id -u)" -ne 0 ]; then echo "this script must be run as root" >&2; exit 1; fi`
 
 ## Systemd Service and Timer Conventions
 
