@@ -1,4 +1,11 @@
 ---
+- name: ansible and ansible-lint are up to date
+  ansible.builtin.pip:
+    name:
+      - ansible~={{ ansible_pip_version }}
+      - ansible-lint~={{ ansible_lint_pip_version }}
+    state: latest  # noqa: package-latest
+
 - name: wheel group can edit {{ playbook_path }}
   ansible.builtin.file:
     path: "{{ playbook_path }}"
