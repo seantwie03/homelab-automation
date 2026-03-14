@@ -5,7 +5,11 @@
       - dnf5-plugin-automatic
       - libnotify
     state: present
-  notify: dnf-automatic timer is started and enabled
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
 
 - name: dnf-automatic-notify script is deployed
   ansible.builtin.template:
@@ -61,3 +65,9 @@
     group: root
     mode: 0644
   notify: restart dnf-automatic timer
+
+- name: dnf-automatic.timer is enabled and started
+  ansible.builtin.systemd:
+    name: dnf-automatic.timer
+    enabled: true
+    state: started

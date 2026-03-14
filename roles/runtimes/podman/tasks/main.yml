@@ -4,9 +4,13 @@
     name: podman
     state: present
 
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
 - name: podman auto-update timer is enabled and started
   ansible.builtin.systemd:
     name: podman-auto-update.timer
-    state: started
     enabled: true
-
+    state: started

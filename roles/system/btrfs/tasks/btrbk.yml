@@ -21,12 +21,6 @@
     mode: 0644
     validate: btrbk -c %s config print
 
-- name: Ensure btrbk timer is enabled and started
-  ansible.builtin.systemd:
-    name: btrbk.timer
-    enabled: true
-    state: started
-
 - name: btrbk.timer override directory exists
   ansible.builtin.file:
     path: /etc/systemd/system/btrbk.timer.d
@@ -47,3 +41,13 @@
     mode: 0644
   notify: restart btrbk.timer
 
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
+- name: btrbk.timer is enabled and started
+  ansible.builtin.systemd:
+    name: btrbk.timer
+    enabled: true
+    state: started
