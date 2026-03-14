@@ -1,29 +1,10 @@
 ---
-- name: screenshot tool dependencies are installed
-  ansible.builtin.package:
-    name:
-      - grim
-      - slurp
-      - cargo
-      - gtk4-devel
-      - libadwaita-devel
-      - glib2-devel
-      - pango-devel
-      - gdk-pixbuf2-devel
-      - fontconfig-devel
-      - libepoxy-devel
+- name: gradia is installed (screenshot annotation tool)
+  community.general.flatpak:
+    name: be.alexandervanhee.gradia
     state: present
 
-- name: satty is installed (screenshot annotation tool)
-  community.general.cargo:
-    name: satty
-    state: present
-    path: "/home/{{ user }}"
-
-- name: satty is executable
+- name: satty binary is removed
   ansible.builtin.file:
     path: /home/{{ user }}/bin/satty
-    mode: 0550
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
+    state: absent
