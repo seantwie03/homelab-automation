@@ -42,7 +42,7 @@
     - name: symlink bash dotfiles to home directory
       ansible.builtin.file:
         src: "{{ item.path }}"
-        dest: "/home/{{ user }}/{{ item.path | basename }}"
+        dest: /home/{{ user }}/{{ item.path | basename }}
         state: link
         follow: false
         owner: "{{ user }}"
@@ -66,5 +66,5 @@
 - name: claude code is installed
   ansible.builtin.shell:
     cmd: curl -fsSL https://claude.ai/install.sh | bash
-    creates: /usr/local/bin/claude
+    creates: /home/{{ user }}/.local/bin/claude
 
