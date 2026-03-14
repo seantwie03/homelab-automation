@@ -1,0 +1,29 @@
+#!/bin/bash
+body=$(cat)
+
+count=$(echo "$body" | awk '
+  /^Upgrading:/  { in_section=1; next }
+  /^[^ ]/        { in_section=0 }
+  in_section && /^ [^ ]/ { count++ }
+  END { print count+0 }
+')
+
+if [ "$count" -eq 0 ]; then
+  exit 0
+fi
+
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/{{ uid }}/bus"
+
+notify-send \
+  --urgency=normal \
+  --app-name="dnf-automatic" \
+  "System Updated" \
+  "${count} packages upgraded"
+
+if ! dnf needs-restarting &>/dev/null; then
+  notify-send \
+    --urgency=critical \
+    --app-name="dnf-automatic" \
+    "Reboot Required" \
+    "A reboot is required to apply package updates."
+fi
