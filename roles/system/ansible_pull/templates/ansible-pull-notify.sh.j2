@@ -4,22 +4,36 @@ if [ -z "$log" ]; then
     exit 0
 fi
 
-recap=$(grep "localhost.*: ok=" "$log" | tail -1)
-if [ -z "$recap" ]; then
-  exit 0
-fi
-
-ok=$(echo "$recap"       | grep -oP 'ok=\K[0-9]+')
-changed=$(echo "$recap"  | grep -oP 'changed=\K[0-9]+')
-failed=$(echo "$recap"   | grep -oP 'failed=\K[0-9]+')
-skipped=$(echo "$recap"  | grep -oP 'skipped=\K[0-9]+')
-
+# notify-send must be run as the desktop user, not root. The D-Bus session bus
+# socket is owned by the user and rejects connections from other UIDs — even root.
+# We check the socket exists first so this script exits silently on headless systems
+# (e.g. servers) where no user session is running.
 dbus_socket="/run/user/{{ uid }}/bus"
 if [ ! -S "$dbus_socket" ]; then
     exit 0
 fi
 
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_socket}"
+
+if grep -q "Local modifications exist" "$log"; then
+    runuser -u {{ user }} -- \
+        notify-send \
+            --urgency=critical \
+            --app-name="ansible-pull" \
+            "Ansible Pull Skipped" \
+            "Uncommitted local changes"
+    exit 0
+fi
+
+recap=$(grep "localhost.*: ok=" "$log" | tail -1)
+if [ -z "$recap" ]; then
+    exit 0
+fi
+
+ok=$(echo "$recap"       | grep -oP 'ok=\K[0-9]+')
+changed=$(echo "$recap"  | grep -oP 'changed=\K[0-9]+')
+failed=$(echo "$recap"   | grep -oP 'failed=\K[0-9]+')
+skipped=$(echo "$recap"  | grep -oP 'skipped=\K[0-9]+')
 
 if [ "$failed" -gt 0 ]; then
     title="Ansible Pull Failed"
