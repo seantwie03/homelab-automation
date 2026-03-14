@@ -24,7 +24,7 @@
     state: present
   notify: tailscale install instructions
 
-- name: tailscald is started and enabled
+- name: tailscaled service is enabled and started
   ansible.builtin.service:
     name: tailscaled.service
     state: started

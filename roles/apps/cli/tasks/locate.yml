@@ -1,8 +1,13 @@
 ---
-- name: install plocate for a faster locate command
+- name: plocate is installed
   ansible.builtin.package:
     name: plocate
     state: present
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
 
 - name: PRUNENAMES excludes all snapshot directories
   ansible.builtin.lineinfile:
@@ -14,8 +19,7 @@
     mode: 0644
 
 - name: plocate-updatedb.timer is enabled and started
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: plocate-updatedb.timer
     enabled: true
     state: started
-

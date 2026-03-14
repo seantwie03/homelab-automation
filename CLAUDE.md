@@ -58,6 +58,47 @@ No build or test framework exists — this is declarative Ansible configuration.
 - File modes use **unquoted octal**: `0755` not `'0755'` or `755`.
 - Prefer **generic modules** (`package`, `service`) over distro-specific ones (`dnf`, `systemd`).
 
+## Systemd Service and Timer Conventions
+
+**For timers:** After the package install task, place all configuration and override tasks first, then an unconditional `daemon_reload` task immediately before the enable/start task. This ensures systemd discovers both the new unit file and any overrides before the timer is enabled. The `daemon_reload` task must use `changed_when: false` to preserve idempotency.
+
+```yaml
+- name: foo is installed
+  ansible.builtin.package:
+    name: foo
+    state: present
+
+# ... configuration and override tasks ...
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
+- name: foo.timer is enabled and started
+  ansible.builtin.systemd:
+    name: foo.timer
+    enabled: true
+    state: started
+```
+
+**For services:** No `daemon_reload` is needed — package scriptlets register the unit during install. A regular enable/start task after the package install is sufficient.
+
+```yaml
+- name: foo is installed
+  ansible.builtin.package:
+    name: foo
+    state: present
+
+- name: foo.service is enabled and started
+  ansible.builtin.service:
+    name: foo.service
+    enabled: true
+    state: started
+```
+
+Reference implementation: `roles/system/ansible_pull/tasks/dnf_automatic.yml`.
+
 ## ansible-lint Configuration
 
 `.ansible-lint.yml` skips:
