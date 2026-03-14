@@ -60,3 +60,7 @@ vim.opt.keymodel = { "startsel", "stopsel" }
 vim.opt.selectmode = { "mouse", "key" }
 vim.opt.mousemodel = "popup_setpos"
 vim.o.mouse = "ar"
+-- Disable mouse on headless systems so terminal selection works as expected
+if not vim.env.DISPLAY and not vim.env.WAYLAND_DISPLAY then
+    vim.o.mouse = ""
+end
