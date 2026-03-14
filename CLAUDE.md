@@ -58,6 +58,10 @@ No build or test framework exists — this is declarative Ansible configuration.
 - File modes use **unquoted octal**: `0755` not `'0755'` or `755`.
 - Prefer **generic modules** (`package`, `service`) over distro-specific ones (`dnf`, `systemd`).
 
+## Shell Script Conventions
+
+- Indent with **4 spaces** in all `.sh` and `.sh.j2` files.
+
 ## Systemd Service and Timer Conventions
 
 **For timers:** After the package install task, place all configuration and override tasks first, then an unconditional `daemon_reload` task immediately before the enable/start task. This ensures systemd discovers both the new unit file and any overrides before the timer is enabled. The `daemon_reload` task must use `changed_when: false` to preserve idempotency.

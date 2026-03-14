@@ -12,6 +12,10 @@ if [ "$count" -eq 0 ]; then
     exit 0
 fi
 
+# notify-send must be run as the desktop user, not root. The D-Bus session bus
+# socket is owned by the user and rejects connections from other UIDs — even root.
+# We check the socket exists first so this script exits silently on headless systems
+# (e.g. servers) where no user session is running.
 dbus_socket="/run/user/{{ uid }}/bus"
 if [ ! -S "$dbus_socket" ]; then
     exit 0
