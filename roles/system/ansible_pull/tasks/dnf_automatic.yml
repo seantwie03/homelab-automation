@@ -1,0 +1,61 @@
+---
+- name: dnf-automatic is installed
+  ansible.builtin.package:
+    name: dnf5-plugin-automatic
+    state: present
+  notify: dnf-automatic timer is started and enabled
+
+- name: dnf-automatic-notify script is deployed
+  ansible.builtin.template:
+    src: dnf-automatic-notify.sh.j2
+    dest: /usr/local/bin/dnf-automatic-notify.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: dnf-automatic is configured
+  ansible.builtin.template:
+    src: automatic.conf.j2
+    dest: /etc/dnf/automatic.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart dnf-automatic timer
+
+- name: dnf-automatic.timer override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/dnf-automatic.timer.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: dnf-automatic.timer randomized delay is disabled
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
+    content: |
+      [Timer]
+      RandomizedDelaySec=0
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart dnf-automatic timer
+
+- name: dnf-automatic.service override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/dnf-automatic.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: dnf-automatic.service runs after ansible-pull
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/dnf-automatic.service.d/override.conf
+    content: |
+      [Unit]
+      After=ansible-pull.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart dnf-automatic timer
