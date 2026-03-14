@@ -76,7 +76,7 @@ No build or test framework exists — this is declarative Ansible configuration.
   changed_when: false
 
 - name: foo.timer is enabled and started
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: foo.timer
     enabled: true
     state: started

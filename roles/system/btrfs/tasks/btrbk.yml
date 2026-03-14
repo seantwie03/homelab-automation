@@ -47,7 +47,7 @@
   changed_when: false
 
 - name: btrbk.timer is enabled and started
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: btrbk.timer
     enabled: true
     state: started

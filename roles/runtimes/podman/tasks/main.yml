@@ -10,7 +10,7 @@
   changed_when: false
 
 - name: podman auto-update timer is enabled and started
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: podman-auto-update.timer
     enabled: true
     state: started
