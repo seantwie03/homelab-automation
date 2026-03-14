@@ -1,0 +1,37 @@
+#!/bin/bash
+log=$(ls -t /var/log/ansible-pull/ansible-pull-*.log 2>/dev/null | head -1)
+if [ -z "$log" ]; then
+    exit 0
+fi
+
+recap=$(grep "localhost.*: ok=" "$log" | tail -1)
+if [ -z "$recap" ]; then
+  exit 0
+fi
+
+ok=$(echo "$recap"       | grep -oP 'ok=\K[0-9]+')
+changed=$(echo "$recap"  | grep -oP 'changed=\K[0-9]+')
+failed=$(echo "$recap"   | grep -oP 'failed=\K[0-9]+')
+skipped=$(echo "$recap"  | grep -oP 'skipped=\K[0-9]+')
+
+dbus_socket="/run/user/{{ uid }}/bus"
+if [ ! -S "$dbus_socket" ]; then
+    exit 0
+fi
+
+export DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_socket}"
+
+if [ "$failed" -gt 0 ]; then
+    title="Ansible Pull Failed"
+    urgency="critical"
+else
+    title="Ansible Pull Complete"
+    urgency="normal"
+fi
+
+runuser -u {{ user }} -- \
+    notify-send \
+        --urgency="${urgency}" \
+        --app-name="ansible-pull" \
+        "${title}" \
+        "ok=${ok} changed=${changed} failed=${failed} skipped=${skipped}"
