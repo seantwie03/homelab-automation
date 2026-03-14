@@ -68,6 +68,14 @@
     state: started
     daemon_reload: true
 
+- name: ansible-pull-notify script is deployed
+  ansible.builtin.template:
+    src: ansible-pull-notify.sh.j2
+    dest: /usr/local/bin/ansible-pull-notify.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: template homelab management script (h)
   ansible.builtin.template:
     src: h.sh.j2
