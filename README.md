@@ -29,6 +29,9 @@ sudo ansible-pull \
 
 Notice that the command above installs Ansible via `pip` instead of `dnf`. This is because the ansible package in the Fedora repositories does not include `ansible-pull`. Also, the command above runs `pip` with `sudo`. This is not recommended but `ansible-pull` must be installed system-wide for the persistent systemd-timer that runs as root.
 
+After the first successful run, the `ansible_pull` role takes over version management. It keeps `ansible` and `ansible-lint` pinned to a minor version using pip's compatible release operator (`~=`), so patch updates apply automatically on every ansible-pull run. To adopt a new minor version, bump `ansible_pip_version` or `ansible_lint_pip_version` in `roles/system/ansible_pull/defaults/main.yml`.
+
+The `ansible_pull` role also configures `dnf-automatic` to apply all system package updates daily. It runs after `ansible-pull` completes and sends a desktop notification with the number of upgraded packages. On headless systems with no active user session, the notification is silently skipped.
 
 ## Dotfiles
 
