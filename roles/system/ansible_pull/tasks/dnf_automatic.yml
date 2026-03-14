@@ -1,7 +1,9 @@
 ---
 - name: dnf-automatic is installed
   ansible.builtin.package:
-    name: dnf5-plugin-automatic
+    name:
+      - dnf5-plugin-automatic
+      - libnotify
     state: present
   notify: dnf-automatic timer is started and enabled
 
