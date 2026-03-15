@@ -147,15 +147,24 @@ done. `sean` also needs to be in the `games` group; add that in
 
 **3. session launch via `.bash_profile`**
 
-Template `/home/{{ user }}/.bash_profile`:
-```bash
-# Launch Wayland kiosk session on tty1 login
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    exec cage -- flatpak run org.es_de.ESDE
-fi
+```yaml
+- name: cage session is configured in .bash_profile
+  ansible.builtin.blockinfile:
+    path: /home/{{ user }}/.bash_profile
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: retrogaming autostart"
+    block: |
+      if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+          exec cage -- flatpak run org.es_de.ESDE
+      fi
 ```
 
-Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
+`blockinfile` inserts only the marked block, leaving any existing `.bash_profile`
+content intact. Safe for desktop25 where `sean` may already have a
+`.bash_profile` with legitimate content. Idempotent — subsequent runs update
+the block in place rather than replacing the file.
 
 `tty` asks the kernel what terminal the process is attached to — it does not
 depend on PAM or logind having set `XDG_VTNR` in the environment, making it
@@ -355,16 +364,10 @@ filesystems={{ emulation_roms_path }};{{ emulation_bios_path }};{{ emulation_sav
 `/var/lib/flatpak/overrides/org.libretro.RetroArch`:
 ```ini
 [Context]
-filesystems={{ emulation_bios_path }};{{ emulation_saves_path }};
+filesystems={{ emulation_roms_path }};{{ emulation_bios_path }};{{ emulation_saves_path }};
 ```
 
 ```yaml
-- name: /var/lib/flatpak/overrides directory exists
-  ansible.builtin.file:
-    path: /var/lib/flatpak/overrides
-    state: directory
-    mode: 0755
-
 - name: es-de flatpak override is configured
   ansible.builtin.template:
     src: flatpak-override-esde.j2
