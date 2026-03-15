@@ -101,33 +101,7 @@ role level.
 
 ### Tasks
 
-**1. cage is installed**
-```yaml
-- name: cage is installed
-  ansible.builtin.package:
-    name: cage
-    state: present
-```
-`cage` is in the Fedora default repos — no extra repo needed.
-
-**2. session launch via `.bash_profile`**
-
-Template `/home/{{ user }}/.bash_profile`:
-```bash
-# Launch Wayland kiosk session on tty1 login
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
-    exec cage -- /usr/bin/flatpak run org.es_de.ESDE
-fi
-```
-
-Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
-
-> **Note:** `flatpak run` may need the full path or a wrapper script depending
-> on how the PATH is set in the bare login shell under cage. If ES-DE fails to
-> launch, add a wrapper script at `/home/{{ user }}/.local/bin/start-esde.sh`
-> and call that instead.
-
-**3. gaming user exists**
+**1. gaming user exists**
 ```yaml
 - name: "{{ user }} user exists"
   ansible.builtin.user:
@@ -137,15 +111,43 @@ Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
     state: present
 ```
 
+User creation is task 1 so all subsequent tasks that write into the home
+directory can rely on it unconditionally.
+
+**2. cage is installed**
+```yaml
+- name: cage is installed
+  ansible.builtin.package:
+    name: cage
+    state: present
+```
+`cage` is in the Fedora default repos — no extra repo needed.
+
+**3. session launch via `.bash_profile`**
+
+Template `/home/{{ user }}/.bash_profile`:
+```bash
+# Launch Wayland kiosk session on tty1 login
+if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+    exec cage -- flatpak run org.es_de.ESDE
+fi
+```
+
+Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
+
+`tty` asks the kernel what terminal the process is attached to — it does not
+depend on PAM or logind having set `XDG_VTNR` in the environment, making it
+more reliable under agetty autologin. `exec` replaces the bash process with
+cage rather than forking a child, so when cage exits the session ends cleanly
+instead of dropping to a bash prompt.
+
 **4. ES-DE is installed**
 ```yaml
 - name: es-de is installed
   community.general.flatpak:
     name: org.es_de.ESDE
     state: present
-    method: user
-  become: true
-  become_user: "{{ user }}"
+    method: system
 ```
 > **Verify:** Confirm Flatpak ID is `org.es_de.ESDE` at https://flathub.org
 
@@ -155,9 +157,7 @@ Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
   community.general.flatpak:
     name: org.libretro.RetroArch
     state: present
-    method: user
-  become: true
-  become_user: "{{ user }}"
+    method: system
 ```
 
 **6. RetroArch cores are downloaded**
@@ -263,21 +263,50 @@ Symlink each system's gamelist into that location:
 **10. Flatpak filesystem permission overrides**
 
 Both Flatpaks are sandboxed and will not see emulation paths outside the home
-directory without explicit overrides. Add an Ansible task to grant access:
+directory without explicit overrides. With system-wide installs, overrides are
+managed as files under `/var/lib/flatpak/overrides/` — one file per app,
+owned by root. This is cleaner than `ansible.builtin.command` with
+`changed_when: false` and is a proper declarative Ansible file task.
+
+> **Note — global scope is intentional:** System-level overrides apply to
+> all users on the machine. If `sean` ever runs ES-DE or RetroArch directly,
+> they will also have access to `/srv/tier2/emulation/`. On a NAS where `sean`
+> owns that data anyway, this is desirable. The override file lives in
+> `/var/lib/flatpak/overrides/` (not in any user's home directory) to make
+> its system-wide scope visible and explicit.
+
+The override file format is INI. Template two files:
+
+`/var/lib/flatpak/overrides/org.es_de.ESDE`:
+```ini
+[Context]
+filesystems={{ emulation_roms_path }};{{ emulation_bios_path }};{{ emulation_saves_path }};
+```
+
+`/var/lib/flatpak/overrides/org.libretro.RetroArch`:
+```ini
+[Context]
+filesystems={{ emulation_bios_path }};{{ emulation_saves_path }};
+```
 
 ```yaml
-- name: es-de has filesystem access to emulation paths
-  ansible.builtin.command:
-    cmd: flatpak override --user --filesystem={{ item }} org.es_de.ESDE
-  become: true
-  become_user: "{{ user }}"
-  changed_when: false   # flatpak override is idempotent; mark unchanged
-  loop:
-    - "{{ emulation_roms_path }}"
-    - "{{ emulation_bios_path }}"
-    - "{{ emulation_saves_path }}"
+- name: /var/lib/flatpak/overrides directory exists
+  ansible.builtin.file:
+    path: /var/lib/flatpak/overrides
+    state: directory
+    mode: 0755
 
-# Repeat for org.libretro.RetroArch
+- name: es-de flatpak override is configured
+  ansible.builtin.template:
+    src: flatpak-override-esde.j2
+    dest: /var/lib/flatpak/overrides/org.es_de.ESDE
+    mode: 0644
+
+- name: retroarch flatpak override is configured
+  ansible.builtin.template:
+    src: flatpak-override-retroarch.j2
+    dest: /var/lib/flatpak/overrides/org.libretro.RetroArch
+    mode: 0644
 ```
 
 **11. ES-DE settings template**
