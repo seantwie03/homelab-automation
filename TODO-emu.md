@@ -27,40 +27,21 @@ Systems in use: `atari2600`, `gb`, `gba`, `gbc`, `gamegear`, `genesis`, `n64`, `
 
 ## New Role: `roles/system/autologin`
 
-Handles auto-login on tty1 and launching the Wayland kiosk session for a
-configurable user.
+Handles auto-login on tty1 and launching the Wayland kiosk session. Uses
+`{{ user }}` — the same variable all other roles use — so no new variable names
+are needed. Override `user` at the role level when auto-login should target a
+different account than the play-level `user`.
 
 ### `defaults/main.yml`
 
 ```yaml
 ---
-autologin_user: sean
-```
-
-### Per-playbook overrides
-
-```yaml
-# odroidh3plus.yml — auto-login as the dedicated retrogaming user
-vars:
-  autologin_user: retrogaming
-
-# desktop22.yml — auto-login as the normal user (physical security is fine)
-vars:
-  autologin_user: sean   # or omit entirely; the default covers it
+user: sean
 ```
 
 ### Tasks
 
-**1. cage is installed**
-```yaml
-- name: cage is installed
-  ansible.builtin.package:
-    name: cage
-    state: present
-```
-`cage` is in the Fedora default repos — no extra repo needed.
-
-**2. agetty auto-login drop-in directory exists**
+**1. agetty auto-login drop-in directory exists**
 ```yaml
 - name: getty@tty1 drop-in directory exists
   ansible.builtin.file:
@@ -75,7 +56,7 @@ Template `/etc/systemd/system/getty@tty1.service.d/autologin.conf`:
 ```ini
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin {{ autologin_user }} --noclear %I $TERM
+ExecStart=-/sbin/agetty --autologin {{ user }} --noclear %I $TERM
 ```
 
 Follow the daemon_reload convention from CLAUDE.md: run `daemon_reload`
@@ -84,9 +65,47 @@ Follow the daemon_reload convention from CLAUDE.md: run `daemon_reload`
 `getty@tty1.service` is already enabled by default — no explicit enable task
 needed unless the host has it disabled.
 
-**4. Session launch via `.bash_profile`**
+---
 
-Template `/home/{{ autologin_user }}/.bash_profile`:
+## New Role: `roles/apps/retrogaming`
+
+Handles Flatpak setup, ES-DE, RetroArch, symlinks, config files, and
+controller driver. Uses `{{ user }}` like all other roles. Override at the
+role level on playbooks where the gaming user differs from the admin user.
+
+### `defaults/main.yml`
+
+```yaml
+---
+user: sean
+create_user: false
+emulation_roms_path: /home/{{ user }}/ROMs
+emulation_bios_path: /home/{{ user }}/BIOS
+emulation_saves_path: /home/{{ user }}/saves
+```
+
+`create_user: false` means the role assumes the user already exists (correct
+for desktop25 where `sean` exists). Set to `true` on odroidh3plus where a
+dedicated `retrogaming` account is needed.
+
+The default paths are sensible for a desktop install where ROMs live in the
+user's home directory. Playbooks with NAS-backed storage override them at the
+role level.
+
+### Tasks
+
+**1. cage is installed**
+```yaml
+- name: cage is installed
+  ansible.builtin.package:
+    name: cage
+    state: present
+```
+`cage` is in the Fedora default repos — no extra repo needed.
+
+**2. session launch via `.bash_profile`**
+
+Template `/home/{{ user }}/.bash_profile`:
 ```bash
 # Launch Wayland kiosk session on tty1 login
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
@@ -94,89 +113,44 @@ if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
 fi
 ```
 
-Use `ansible.builtin.template` with `owner: "{{ autologin_user }}"`,
-`mode: 0644`.
+Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
 
 > **Note:** `flatpak run` may need the full path or a wrapper script depending
 > on how the PATH is set in the bare login shell under cage. If ES-DE fails to
-> launch, add a wrapper script at
-> `/home/{{ autologin_user }}/.local/bin/start-esde.sh` and call that instead.
+> launch, add a wrapper script at `/home/{{ user }}/.local/bin/start-esde.sh`
+> and call that instead.
 
----
-
-## New Role: `roles/apps/retrogaming`
-
-Handles Flatpak setup, ES-DE, RetroArch, symlinks, config files, and
-controller driver for a configurable user and storage paths.
-
-### `defaults/main.yml`
-
+**3. gaming user exists (conditional)**
 ```yaml
----
-retrogaming_user: sean
-retrogaming_create_user: false
-emulation_roms_path: "{{ ansible_env.HOME }}/ROMs"
-emulation_bios_path: "{{ ansible_env.HOME }}/BIOS"
-emulation_saves_path: "{{ ansible_env.HOME }}/saves"
-```
-
-`retrogaming_create_user: false` means the role assumes the user already
-exists (correct for desktop25 where `sean` exists, or desktop22). Set to
-`true` on odroidh3plus where a dedicated `retrogaming` account is needed.
-
-The default paths are sensible for a desktop install where ROMs live in the
-user's home directory. Playbooks with NAS-backed storage override them.
-
-### Per-playbook overrides
-
-```yaml
-# odroidh3plus.yml — dedicated user, ROMs on NAS storage
-vars:
-  retrogaming_user: retrogaming
-  retrogaming_create_user: true
-  emulation_roms_path: /srv/tier2/emulation/roms
-  emulation_bios_path: /srv/tier2/emulation/BIOS
-  emulation_saves_path: /srv/tier2/emulation/saves
-
-# desktop25.yml — install for existing sean user, ROMs wherever sean keeps them
-vars:
-  # retrogaming_user: sean  ← default already covers this, omit
-  emulation_roms_path: /path/to/roms   # set as appropriate
-```
-
-### Tasks
-
-**1. retrogaming user exists (conditional)**
-```yaml
-- name: retrogaming user exists
+- name: "{{ user }} user exists"
   ansible.builtin.user:
-    name: "{{ retrogaming_user }}"
+    name: "{{ user }}"
     shell: /bin/bash
     create_home: true
     state: present
-  when: retrogaming_create_user
+  when: create_user
 ```
 
-> **Note:** When `retrogaming_create_user: true`, also verify no UID conflict
-> on odroidh3plus by running `getent passwd` before first apply.
+> **Note:** When `create_user: true`, verify no UID conflict on odroidh3plus
+> by running `getent passwd` before first apply.
 
-**2. Flathub remote is enabled**
+**4. Flathub remote is enabled**
 
 ES-DE and RetroArch are installed per-user as Flatpaks. Check how existing
 hosts (e.g., desktop25) set up Flathub and follow the same pattern.
 
 ```yaml
-- name: flathub remote is enabled for {{ retrogaming_user }}
+- name: flathub remote is enabled for {{ user }}
   community.general.flatpak_remote:
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: user
   become: true
-  become_user: "{{ retrogaming_user }}"
+  become_user: "{{ user }}"
 ```
 
-**3. ES-DE is installed**
+**5. ES-DE is installed**
 ```yaml
 - name: es-de is installed
   community.general.flatpak:
@@ -184,11 +158,11 @@ hosts (e.g., desktop25) set up Flathub and follow the same pattern.
     state: present
     method: user
   become: true
-  become_user: "{{ retrogaming_user }}"
+  become_user: "{{ user }}"
 ```
 > **Verify:** Confirm Flatpak ID is `org.es_de.ESDE` at https://flathub.org
 
-**4. RetroArch is installed**
+**6. RetroArch is installed**
 ```yaml
 - name: retroarch is installed
   community.general.flatpak:
@@ -196,15 +170,15 @@ hosts (e.g., desktop25) set up Flathub and follow the same pattern.
     state: present
     method: user
   become: true
-  become_user: "{{ retrogaming_user }}"
+  become_user: "{{ user }}"
 ```
 
-**5. RetroArch cores are downloaded**
+**7. RetroArch cores are downloaded**
 
 RetroArch's built-in core downloader is the standard mechanism. However, for
 Ansible idempotency, use `ansible.builtin.command` to download cores via the
 RetroArch CLI if they are not already present. Cores live at:
-`~/.var/app/org.libretro.RetroArch/config/retroarch/cores/`
+`/home/{{ user }}/.var/app/org.libretro.RetroArch/config/retroarch/cores/`
 
 Cores needed (one task per core or a loop):
 
@@ -226,15 +200,15 @@ Cores needed (one task per core or a loop):
 > Ansible can enforce presence with `ansible.builtin.stat` + skip-if-exists
 > logic. Decide based on how reproducible you need core installation to be.
 
-**6. Emulation directories exist and are accessible**
+**8. Emulation directories exist and are accessible**
 
 ```yaml
 - name: emulation directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ retrogaming_user }}"
-    group: "{{ retrogaming_user }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
     recurse: false
   loop:
     - "{{ emulation_roms_path }}"
@@ -244,14 +218,14 @@ Cores needed (one task per core or a loop):
 > **Note:** Do not recurse — the roms directory may contain thousands of files
 > and a recursive chown on every ansible-pull run is expensive.
 
-**7. ES-DE data directories exist**
+**9. ES-DE data directories exist**
 ```yaml
 - name: es-de data directories exist
   ansible.builtin.file:
-    path: /home/{{ retrogaming_user }}/{{ item }}
+    path: /home/{{ user }}/{{ item }}
     state: directory
-    owner: "{{ retrogaming_user }}"
-    group: "{{ retrogaming_user }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
     mode: 0755
   loop:
     - .local/share/ES-DE
@@ -259,7 +233,7 @@ Cores needed (one task per core or a loop):
     - .local/share/ES-DE/themes
 ```
 
-**8. Gamelist symlinks**
+**10. Gamelist symlinks**
 
 The existing gamelists use relative `./images/...` paths which ES-DE resolves
 relative to the ROM directory — these should work without modification.
@@ -271,10 +245,10 @@ Symlink each system's gamelist into that location:
 - name: gamelist symlinks exist
   ansible.builtin.file:
     src: "{{ emulation_roms_path }}/{{ item }}/gamelist.xml"
-    dest: /home/{{ retrogaming_user }}/.local/share/ES-DE/gamelists/{{ item }}/gamelist.xml
+    dest: /home/{{ user }}/.local/share/ES-DE/gamelists/{{ item }}/gamelist.xml
     state: link
-    owner: "{{ retrogaming_user }}"
-    group: "{{ retrogaming_user }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
   loop:
     - atari2600
     - gb
@@ -299,7 +273,7 @@ Symlink each system's gamelist into that location:
 > the gamelist symlink tasks will silently do nothing useful if ROMs aren't
 > scraped yet. That is fine — idempotent no-ops.
 
-**9. Flatpak filesystem permission overrides**
+**11. Flatpak filesystem permission overrides**
 
 Both Flatpaks are sandboxed and will not see emulation paths outside the home
 directory without explicit overrides. Add an Ansible task to grant access:
@@ -309,7 +283,7 @@ directory without explicit overrides. Add an Ansible task to grant access:
   ansible.builtin.command:
     cmd: flatpak override --user --filesystem={{ item }} org.es_de.ESDE
   become: true
-  become_user: "{{ retrogaming_user }}"
+  become_user: "{{ user }}"
   changed_when: false   # flatpak override is idempotent; mark unchanged
   loop:
     - "{{ emulation_roms_path }}"
@@ -319,10 +293,10 @@ directory without explicit overrides. Add an Ansible task to grant access:
 # Repeat for org.libretro.RetroArch
 ```
 
-**10. ES-DE settings template**
+**12. ES-DE settings template**
 
 Template to
-`/home/{{ retrogaming_user }}/.var/app/org.es_de.ESDE/config/ES-DE/es_settings.xml`.
+`/home/{{ user }}/.var/app/org.es_de.ESDE/config/ES-DE/es_settings.xml`.
 
 Key settings to carry forward from rasnasretro:
 - `ThemeSet` → `carbon` (or choose a new theme)
@@ -337,10 +311,10 @@ Key settings to carry forward from rasnasretro:
 > Do not copy `es_settings.cfg` from the backup — create a fresh template
 > using ES-DE's documented options.
 
-**11. RetroArch global config template**
+**13. RetroArch global config template**
 
 Template to
-`/home/{{ retrogaming_user }}/.var/app/org.libretro.RetroArch/config/retroarch/retroarch.cfg`.
+`/home/{{ user }}/.var/app/org.libretro.RetroArch/config/retroarch/retroarch.cfg`.
 
 Key settings:
 ```ini
@@ -349,22 +323,22 @@ config_save_on_exit = "false"
 system_directory = "{{ emulation_bios_path }}"
 savefile_directory = "{{ emulation_saves_path }}"
 savestate_directory = "{{ emulation_saves_path }}/states"
-libretro_directory = "/home/{{ retrogaming_user }}/.var/app/org.libretro.RetroArch/config/retroarch/cores"
+libretro_directory = "/home/{{ user }}/.var/app/org.libretro.RetroArch/config/retroarch/cores"
 ```
 
 The per-system `retroarch.cfg` backups from rasnasretro only contained
 `input_remapping_directory` pointing to RetroPie paths — not portable.
 Start fresh; RetroArch's defaults are reasonable.
 
-**12. PSX duplicate listing fix**
+**14. PSX duplicate listing fix**
 
 The PSX system in ES-DE should not show both `.bin` and `.cue` files as
 separate entries. Investigate ES-DE's `custom_systems.xml` mechanism to remove
 `.cue` and `.CUE` from the PSX extension list, mirroring the fix applied on
 rasnasretro. Template the file to
-`/home/{{ retrogaming_user }}/.var/app/org.es_de.ESDE/config/ES-DE/custom_systems.xml`.
+`/home/{{ user }}/.var/app/org.es_de.ESDE/config/ES-DE/custom_systems.xml`.
 
-**13. Xbox One wireless controller driver**
+**15. Xbox One wireless controller driver**
 
 rasnasretro used `xow` which is deprecated. On Fedora with a modern kernel,
 use `xone` (or `xpadneo` for the wireless adapter).
@@ -398,12 +372,6 @@ vars:
   user: sean
   uid: 1000
   gid: 1000
-  autologin_user: retrogaming
-  retrogaming_user: retrogaming
-  retrogaming_create_user: true
-  emulation_roms_path: /srv/tier2/emulation/roms
-  emulation_bios_path: /srv/tier2/emulation/BIOS
-  emulation_saves_path: /srv/tier2/emulation/saves
 
 roles:
   - role: core
@@ -411,32 +379,34 @@ roles:
   - role: btrfs
   - role: cli
   - role: karakeep
-  - role: autologin      # new
-  - role: retrogaming    # new
+  - role: autologin          # new — override user for a different login account
+    vars:
+      user: retrogaming
+  - role: retrogaming        # new — override user and paths for NAS storage
+    vars:
+      user: retrogaming
+      create_user: true
+      emulation_roms_path: /srv/tier2/emulation/roms
+      emulation_bios_path: /srv/tier2/emulation/BIOS
+      emulation_saves_path: /srv/tier2/emulation/saves
 ```
 
 ### `desktop25.yml` — install for existing sean user, local ROMs
 
 ```yaml
-vars:
-  # autologin_user not set — do not add autologin role here
-  # retrogaming_user defaults to sean
-  emulation_roms_path: /path/to/roms   # set as appropriate
-
 roles:
   # ... existing roles ...
-  - role: retrogaming    # new, no autologin role
+  - role: retrogaming        # new — user defaults to sean, paths default to ~/ROMs etc.
+    vars:
+      emulation_roms_path: /path/to/roms   # set as appropriate
 ```
 
 ### `desktop22.yml` — auto-login only, no retrogaming
 
 ```yaml
-vars:
-  autologin_user: sean   # or omit; default covers it
-
 roles:
   # ... existing roles ...
-  - role: autologin      # new, no retrogaming role
+  - role: autologin          # new — no vars: override needed, user defaults to sean
 ```
 
 > **Note:** The role short names (`autologin`, `retrogaming`) assume the
