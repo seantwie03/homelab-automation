@@ -73,20 +73,27 @@ Handles Flatpak setup, ES-DE, RetroArch, symlinks, config files, and
 controller driver. Uses `{{ user }}` like all other roles. Override at the
 role level on playbooks where the gaming user differs from the admin user.
 
+### `meta/main.yml`
+
+```yaml
+---
+dependencies:
+  - role: flatpak
+```
+
+Flatpak and the Flathub remote are set up system-wide by the `flatpak` runtime
+role. The `retrogaming` role declares it as a dependency so it runs
+automatically — no manual Flathub task needed here.
+
 ### `defaults/main.yml`
 
 ```yaml
 ---
 user: sean
-create_user: false
 emulation_roms_path: /home/{{ user }}/ROMs
 emulation_bios_path: /home/{{ user }}/BIOS
 emulation_saves_path: /home/{{ user }}/saves
 ```
-
-`create_user: false` means the role assumes the user already exists (correct
-for desktop25 where `sean` exists). Set to `true` on odroidh3plus where a
-dedicated `retrogaming` account is needed.
 
 The default paths are sensible for a desktop install where ROMs live in the
 user's home directory. Playbooks with NAS-backed storage override them at the
@@ -120,7 +127,7 @@ Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
 > launch, add a wrapper script at `/home/{{ user }}/.local/bin/start-esde.sh`
 > and call that instead.
 
-**3. gaming user exists (conditional)**
+**3. gaming user exists**
 ```yaml
 - name: "{{ user }} user exists"
   ansible.builtin.user:
@@ -128,29 +135,9 @@ Use `ansible.builtin.template` with `owner: "{{ user }}"`, `mode: 0644`.
     shell: /bin/bash
     create_home: true
     state: present
-  when: create_user
 ```
 
-> **Note:** When `create_user: true`, verify no UID conflict on odroidh3plus
-> by running `getent passwd` before first apply.
-
-**4. Flathub remote is enabled**
-
-ES-DE and RetroArch are installed per-user as Flatpaks. Check how existing
-hosts (e.g., desktop25) set up Flathub and follow the same pattern.
-
-```yaml
-- name: flathub remote is enabled for {{ user }}
-  community.general.flatpak_remote:
-    name: flathub
-    state: present
-    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-    method: user
-  become: true
-  become_user: "{{ user }}"
-```
-
-**5. ES-DE is installed**
+**4. ES-DE is installed**
 ```yaml
 - name: es-de is installed
   community.general.flatpak:
@@ -162,7 +149,7 @@ hosts (e.g., desktop25) set up Flathub and follow the same pattern.
 ```
 > **Verify:** Confirm Flatpak ID is `org.es_de.ESDE` at https://flathub.org
 
-**6. RetroArch is installed**
+**5. RetroArch is installed**
 ```yaml
 - name: retroarch is installed
   community.general.flatpak:
@@ -173,7 +160,7 @@ hosts (e.g., desktop25) set up Flathub and follow the same pattern.
   become_user: "{{ user }}"
 ```
 
-**7. RetroArch cores are downloaded**
+**6. RetroArch cores are downloaded**
 
 RetroArch's built-in core downloader is the standard mechanism. However, for
 Ansible idempotency, use `ansible.builtin.command` to download cores via the
@@ -200,7 +187,7 @@ Cores needed (one task per core or a loop):
 > Ansible can enforce presence with `ansible.builtin.stat` + skip-if-exists
 > logic. Decide based on how reproducible you need core installation to be.
 
-**8. Emulation directories exist and are accessible**
+**7. Emulation directories exist and are accessible**
 
 ```yaml
 - name: emulation directories exist
@@ -218,7 +205,7 @@ Cores needed (one task per core or a loop):
 > **Note:** Do not recurse — the roms directory may contain thousands of files
 > and a recursive chown on every ansible-pull run is expensive.
 
-**9. ES-DE data directories exist**
+**8. ES-DE data directories exist**
 ```yaml
 - name: es-de data directories exist
   ansible.builtin.file:
@@ -233,7 +220,7 @@ Cores needed (one task per core or a loop):
     - .local/share/ES-DE/themes
 ```
 
-**10. Gamelist symlinks**
+**9. Gamelist symlinks**
 
 The existing gamelists use relative `./images/...` paths which ES-DE resolves
 relative to the ROM directory — these should work without modification.
@@ -273,7 +260,7 @@ Symlink each system's gamelist into that location:
 > the gamelist symlink tasks will silently do nothing useful if ROMs aren't
 > scraped yet. That is fine — idempotent no-ops.
 
-**11. Flatpak filesystem permission overrides**
+**10. Flatpak filesystem permission overrides**
 
 Both Flatpaks are sandboxed and will not see emulation paths outside the home
 directory without explicit overrides. Add an Ansible task to grant access:
@@ -293,7 +280,7 @@ directory without explicit overrides. Add an Ansible task to grant access:
 # Repeat for org.libretro.RetroArch
 ```
 
-**12. ES-DE settings template**
+**11. ES-DE settings template**
 
 Template to
 `/home/{{ user }}/.var/app/org.es_de.ESDE/config/ES-DE/es_settings.xml`.
@@ -311,7 +298,7 @@ Key settings to carry forward from rasnasretro:
 > Do not copy `es_settings.cfg` from the backup — create a fresh template
 > using ES-DE's documented options.
 
-**13. RetroArch global config template**
+**12. RetroArch global config template**
 
 Template to
 `/home/{{ user }}/.var/app/org.libretro.RetroArch/config/retroarch/retroarch.cfg`.
@@ -330,7 +317,7 @@ The per-system `retroarch.cfg` backups from rasnasretro only contained
 `input_remapping_directory` pointing to RetroPie paths — not portable.
 Start fresh; RetroArch's defaults are reasonable.
 
-**14. PSX duplicate listing fix**
+**13. PSX duplicate listing fix**
 
 The PSX system in ES-DE should not show both `.bin` and `.cue` files as
 separate entries. Investigate ES-DE's `custom_systems.xml` mechanism to remove
@@ -338,7 +325,7 @@ separate entries. Investigate ES-DE's `custom_systems.xml` mechanism to remove
 rasnasretro. Template the file to
 `/home/{{ user }}/.var/app/org.es_de.ESDE/config/ES-DE/custom_systems.xml`.
 
-**15. Xbox One wireless controller driver**
+**14. Xbox One wireless controller driver**
 
 rasnasretro used `xow` which is deprecated. On Fedora with a modern kernel,
 use `xone` (or `xpadneo` for the wireless adapter).
@@ -385,7 +372,6 @@ roles:
   - role: retrogaming        # new — override user and paths for NAS storage
     vars:
       user: retrogaming
-      create_user: true
       emulation_roms_path: /srv/tier2/emulation/roms
       emulation_bios_path: /srv/tier2/emulation/BIOS
       emulation_saves_path: /srv/tier2/emulation/saves
