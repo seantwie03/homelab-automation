@@ -101,7 +101,7 @@ role level.
 
 ### Tasks
 
-**1. gaming user exists**
+**1. gaming user exists and is in the games group**
 ```yaml
 - name: "{{ user }} user exists"
   ansible.builtin.user:
@@ -109,10 +109,32 @@ role level.
     shell: /bin/bash
     create_home: true
     state: present
+
+- name: "{{ user }} is in the games group"
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: games
+    append: true
 ```
 
 User creation is task 1 so all subsequent tasks that write into the home
 directory can rely on it unconditionally.
+
+Fedora ships a `games` group by default — no group creation needed. Membership
+grants access to `/srv/tier2/emulation/` once the bootstrap step below is
+done. `sean` also needs to be in the `games` group; add that in
+`odroidh3plus.yml` as a play-level task or extend the core role for that host.
+
+**One-time bootstrap — run before first ansible-pull:**
+ ```bash
+ chgrp -R games /srv/tier2/emulation
+ chmod -R g+rwX,o+rX /srv/tier2/emulation
+ find /srv/tier2/emulation -type d -exec chmod g+s {} \;
+ ```
+ Sets group ownership to `games`, makes directories setgid (new content
+ inherits the group), and makes everything group-writable and world-readable.
+ The setgid bit on directories ensures this is a one-time operation — all
+ future content inherits `games` ownership automatically.
 
 **2. cage is installed**
 ```yaml
@@ -187,27 +209,50 @@ Cores needed (one task per core or a loop):
 > Ansible can enforce presence with `ansible.builtin.stat` + skip-if-exists
 > logic. Decide based on how reproducible you need core installation to be.
 
-**7. Emulation directories exist and are accessible**
+**7. Emulation directories exist**
 
 ```yaml
 - name: emulation directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    recurse: false
   loop:
     - "{{ emulation_roms_path }}"
     - "{{ emulation_bios_path }}"
     - "{{ emulation_saves_path }}"
+    - "{{ emulation_saves_path }}/states"
 ```
-> **Note:** Do not recurse — the roms directory may contain thousands of files
-> and a recursive chown on every ansible-pull run is expensive.
 
-**8. ES-DE data directories exist**
+Ownership and permissions on emulation directories are a manual bootstrap
+concern, not managed by this role. The role only ensures the directories
+exist. The `saves/states` entry is included here because RetroArch writes
+savestates to that subdirectory and will fail silently if it is absent.
+
+Document the required layout in `roles/apps/retrogaming/README.md`:
+
+```
+## Prerequisites — emulation directory permissions
+
+Before running this role on a host where emulation data lives outside the
+user's home directory, the following must be done once manually:
+
+    chgrp -R games /path/to/emulation
+    chmod -R g+rwX,o+rX /path/to/emulation
+    find /path/to/emulation -type d -exec chmod g+s {} \;
+
+Required layout:
+  emulation_roms_path   group: games, mode: 2775
+  emulation_bios_path   group: games, mode: 2775
+  emulation_saves_path  group: games, mode: 2775
+
+The gaming user (retrogaming) must be a member of the games group —
+handled by task 1. The setgid bit ensures new content inherits the
+games group automatically.
+```
+
+**8. ES-DE data and config directories exist**
 ```yaml
-- name: es-de data directories exist
+- name: es-de directories exist
   ansible.builtin.file:
     path: /home/{{ user }}/{{ item }}
     state: directory
@@ -216,9 +261,33 @@ Cores needed (one task per core or a loop):
     mode: 0755
   loop:
     - .local/share/ES-DE
-    - .local/share/ES-DE/gamelists
     - .local/share/ES-DE/themes
+    - .local/share/ES-DE/gamelists
+    - .local/share/ES-DE/gamelists/atari2600
+    - .local/share/ES-DE/gamelists/gb
+    - .local/share/ES-DE/gamelists/gba
+    - .local/share/ES-DE/gamelists/gbc
+    - .local/share/ES-DE/gamelists/gamegear
+    - .local/share/ES-DE/gamelists/genesis
+    - .local/share/ES-DE/gamelists/n64
+    - .local/share/ES-DE/gamelists/neogeo
+    - .local/share/ES-DE/gamelists/nes
+    - .local/share/ES-DE/gamelists/psx
+    - .local/share/ES-DE/gamelists/sega32x
+    - .local/share/ES-DE/gamelists/snes
+    - .var/app/org.es_de.ESDE/config/ES-DE
+    - .var/app/org.libretro.RetroArch/config/retroarch
 ```
+
+Per-system gamelist subdirectories must exist before the symlink task (9)
+attempts to place links inside them. The two `.var/app/...` entries create the
+Flatpak config directories before the template tasks (11, 12, 13) write into
+them — these directories are normally created by the apps on first run, but
+since the user is new and the apps haven't run yet, Ansible must create them.
+
+> **Note:** The per-system directory names in the gamelist loop must match
+> ES-DE's internal system names, not RetroPie's. Verify before implementing
+> (see Open Question 3).
 
 **9. Gamelist symlinks**
 
@@ -451,18 +520,13 @@ roles:
 5. **RetroArch core download mechanism** — Decide whether to automate core
    installation via CLI or do it once interactively via the RetroArch menu.
 
-6. **Flatpak filesystem permissions** — ES-DE and RetroArch Flatpaks need
-   explicit `--filesystem` overrides to access `/srv/tier2/emulation/`. Grant
-   these via `flatpak override`:
-   ```
-   flatpak override --user --filesystem=/srv/tier2/emulation org.es_de.ESDE
-   flatpak override --user --filesystem=/srv/tier2/emulation org.libretro.RetroArch
-   ```
-   Add an Ansible task using `ansible.builtin.command` with `changed_when`
-   logic, or manage via `~/.local/share/flatpak/overrides/` files directly.
-
-7. **Xbox controller driver** — Test whether the wireless dongle works without
+6. **Xbox controller driver** — Test whether the wireless dongle works without
    any extra package on Fedora 43's kernel before adding a driver role.
+
+7. **sean in games group** — Add `sean` to the `games` group on odroidh3plus
+   so he retains write access to `/srv/tier2/emulation/` after the bootstrap
+   chgrp. This can be a task in `odroidh3plus.yml` pre_tasks or in the host's
+   core role configuration.
 
 8. **Image paths in gamelists** — Not all systems have an `images/` directory
    in `/srv/tier2/emulation/roms/<system>/`. Systems with missing images will
