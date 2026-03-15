@@ -10,3 +10,9 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
+- name: flatpak system overrides directory exists
+  ansible.builtin.file:
+    path: /var/lib/flatpak/overrides
+    state: directory
+    mode: 0755
+
