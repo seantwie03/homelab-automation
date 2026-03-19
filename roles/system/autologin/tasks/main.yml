@@ -1,0 +1,29 @@
+---
+- name: getent passwd is populated
+  ansible.builtin.getent:
+    database: passwd
+
+- name: "{{ user }} user exists"
+  ansible.builtin.assert:
+    that: user in ansible_facts.getent_passwd
+    fail_msg: "User '{{ user }}' does not exist. Create the user before running the autologin role."
+
+- name: getty@tty1 drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/getty@tty1.service.d
+    state: directory
+    mode: 0755
+
+- name: getty@tty1 autologin drop-in is configured
+  ansible.builtin.template:
+    src: autologin.conf.j2
+    dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+

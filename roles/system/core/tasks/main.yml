@@ -13,6 +13,7 @@
       - zip
       - unzip
       - tar
+      - p7zip
     state: present
 
 - name: community.general prerequisites are installed

@@ -1,0 +1,164 @@
+---
+- name: "{{ user }} user exists"
+  ansible.builtin.user:
+    name: "{{ user }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: "{{ user }} is in the games, video, and input groups"
+  ansible.builtin.user:
+    name: "{{ user }}"
+    groups: games,video,input
+    append: true
+
+- name: cage and xwayland are installed
+  ansible.builtin.package:
+    name:
+      - cage
+      - xorg-x11-server-Xwayland
+    state: present
+
+- name: cage session is configured in .bash_profile
+  ansible.builtin.blockinfile:
+    path: /home/{{ user }}/.bash_profile
+    create: true
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: retrogaming autostart"
+    block: |
+      if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+          export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          exec cage -- /opt/ES-DE_{{ emulationstation_version }}_x64.AppImage
+      fi
+
+- name: "es-de {{ emulationstation_version }} appimage stat"
+  ansible.builtin.stat:
+    path: /opt/ES-DE_{{ emulationstation_version }}_x64.AppImage
+  register: esde_appimage
+
+- name: "es-de {{ emulationstation_version }} appimage is downloaded"
+  ansible.builtin.get_url:
+    url: https://gitlab.com/api/v4/projects/es-de%2Femulationstation-de/packages/generic/ES-DE_Stable/{{ emulationstation_version }}/ES-DE_x64.AppImage
+    dest: /opt/ES-DE_{{ emulationstation_version }}_x64.AppImage
+    mode: 0755
+    owner: root
+    group: root
+  when: not esde_appimage.stat.exists
+
+- name: es-de rom directory is configured
+  ansible.builtin.lineinfile:
+    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
+    regexp: '<string name="ROMDirectory"'
+    line: '<string name="ROMDirectory" value="{{ emulation_roms_path }}" />'
+
+- name: es-de application updater is disabled
+  ansible.builtin.lineinfile:
+    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
+    regexp: '<string name="ApplicationUpdaterFrequency"'
+    line: '<string name="ApplicationUpdaterFrequency" value="never" />'
+
+- name: es-de scraper only downloads media used by linear-es-de
+  ansible.builtin.lineinfile:
+    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
+    regexp: '<bool name="{{ item.key }}"'
+    line: '<bool name="{{ item.key }}" value="{{ item.value }}" />'
+  loop:
+    - {key: ScrapeCovers,         value: "true"}
+    - {key: ScrapeScreenshots,    value: "true"}
+    - {key: ScrapeVideos,         value: "true"}
+    - {key: Scrape3DBoxes,        value: "true"}
+    - {key: ScrapeBackCovers,     value: "false"}
+    - {key: ScrapeFanArt,         value: "false"}
+    - {key: ScrapeManuals,        value: "false"}
+    - {key: ScrapeMarquees,       value: "true"}
+    - {key: ScrapePhysicalMedia,  value: "true"}
+    - {key: ScrapeTitleScreens,   value: "false"}
+
+- name: kernel-modules-extra is installed for controller support
+  ansible.builtin.package:
+    name: kernel-modules-extra
+    state: present
+
+- name: retroarch is installed
+  ansible.builtin.package:
+    name: retroarch
+    state: present
+
+- name: "retroarch cores {{ retroarch_cores_version }} archive stat"
+  ansible.builtin.stat:
+    path: /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
+  register: retroarch_cores_archive
+
+- name: "retroarch cores {{ retroarch_cores_version }} archive is downloaded"
+  ansible.builtin.get_url:
+    url: https://buildbot.libretro.com/stable/{{ retroarch_cores_version }}/linux/x86_64/RetroArch_cores.7z
+    dest: /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
+    mode: 0644
+    owner: root
+    group: root
+  when: not retroarch_cores_archive.stat.exists
+
+- name: retroarch cores are extracted
+  ansible.builtin.command:
+    argv:
+      - 7za
+      - e
+      - /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
+      - -o/usr/lib64/libretro/
+      - -y
+    creates: /usr/lib64/libretro/snes9x_libretro.so
+
+- name: es-de downloaded_media is symlinked to emulation media path
+  ansible.builtin.file:
+    src: "{{ emulation_media_path }}"
+    dest: /home/{{ user }}/ES-DE/downloaded_media
+    state: link
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  when: emulation_media_path != '/home/' ~ user ~ '/ES-DE/downloaded_media'
+
+- name: es-de gamelist directories exist
+  ansible.builtin.file:
+    path: /home/{{ user }}/ES-DE/gamelists/{{ item }}
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+  loop:
+    - atari2600
+    - gb
+    - gba
+    - gbc
+    - gamegear
+    - genesis
+    - n64
+    - nds
+    - neogeo
+    - nes
+    - psx
+    - sega32x
+    - snes
+
+- name: gamelist symlinks exist
+  ansible.builtin.file:
+    src: "{{ emulation_roms_path }}/{{ item }}/gamelist.xml"
+    dest: /home/{{ user }}/ES-DE/gamelists/{{ item }}/gamelist.xml
+    state: link
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  loop:
+    - atari2600
+    - gb
+    - gba
+    - gbc
+    - gamegear
+    - genesis
+    - n64
+    - neogeo
+    - nes
+    - psx
+    - sega32x
+    - snes
+
