@@ -2,6 +2,8 @@
 
 Installs and configures [ES-DE (frontend)](https://gitlab.com/es-de/emulationstation-de/-/blob/master/USERGUIDE.md) and [RetroArch (emulator)](https://buildbot.libretro.com/stable/) for a retro gaming station. Intended to run with `cage` as the Wayland kiosk compositor — no full desktop environment required.
 
+Replaces [RasNasRetro](https://github.com/seantwie03/homelab-old/blob/main/docs/rasnasretro.md).
+
 ## Prerequisites — emulation directory permissions
 
 Before running this role on a host where emulation data lives outside the user's home directory, the following must be done once manually:
@@ -29,3 +31,10 @@ The gaming user must be a member of the `games` group — handled by task 2. The
 | `emulation_bios_path` | `/home/{{ user }}/BIOS` | Path to BIOS files. |
 | `emulation_saves_path` | `/home/{{ user }}/saves` | Path to save files and states. |
 
+## TODO
+
+- Wireless Xbox One Controller
+- Scrape all games (10k api requests/day)
+- Configure retroarch (input, saves, savestates)
+    - unused retroarch config file in templates
+- Moonlight/Steam Game streaming
