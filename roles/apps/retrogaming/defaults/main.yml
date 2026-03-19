@@ -1,0 +1,8 @@
+---
+user: sean
+emulation_roms_path: /home/{{ user }}/ROMs
+emulation_bios_path: /home/{{ user }}/BIOS
+emulation_saves_path: /home/{{ user }}/saves
+emulation_media_path: /home/{{ user }}/ES-DE/downloaded_media
+emulationstation_version: "3.4.0"
+retroarch_cores_version: "1.22.2"

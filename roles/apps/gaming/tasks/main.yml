@@ -15,3 +15,8 @@
   ansible.builtin.package:
     name: steam
     state: present
+
+- name: kernel-modules-extra is installed for controller support
+  ansible.builtin.package:
+    name: kernel-modules-extra
+    state: present
