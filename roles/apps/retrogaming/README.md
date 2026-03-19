@@ -1,6 +1,6 @@
 # retrogaming
 
-Installs and configures ES-DE (frontend) and RetroArch (emulator) via Flatpak for a retro gaming station. Intended to run with `cage` as the Wayland kiosk compositor — no full desktop environment required.
+Installs and configures [ES-DE (frontend)](https://gitlab.com/es-de/emulationstation-de/-/blob/master/USERGUIDE.md) and [RetroArch (emulator)](https://buildbot.libretro.com/stable/) for a retro gaming station. Intended to run with `cage` as the Wayland kiosk compositor — no full desktop environment required.
 
 ## Prerequisites — emulation directory permissions
 
@@ -29,8 +29,3 @@ The gaming user must be a member of the `games` group — handled by task 2. The
 | `emulation_bios_path` | `/home/{{ user }}/BIOS` | Path to BIOS files. |
 | `emulation_saves_path` | `/home/{{ user }}/saves` | Path to save files and states. |
 
-## Open items
-
-- **RetroArch cores** — Not automated. Download cores interactively via RetroArch's built-in Online Updater on first boot.
-- **PSX duplicate listing** — ES-DE may show both `.bin` and `.cue` files as separate entries. Fix via `custom_systems.xml` if needed.
-- **ES-DE system names** — Gamelist symlink destinations use RetroPie directory names. Verify against ES-DE's built-in system list (especially `sega32x` vs `32x` and `neogeo`).
