@@ -8,6 +8,17 @@
     uid: 1000
     gid: 1000
 
+  tasks:
+    - name: dunst dnd override.conf is absent
+      ansible.builtin.file:
+        path: /home/{{ user }}/.config/systemd/user/dunst.service.d/override.conf
+        state: absent
+
+    - name: dunst systemd drop-in directory is absent
+      ansible.builtin.file:
+        path: /home/{{ user }}/.config/systemd/user/dunst.service.d
+        state: absent
+
   roles:
     - role: core
     - role: docker

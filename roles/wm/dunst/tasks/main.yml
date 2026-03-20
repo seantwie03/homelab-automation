@@ -13,25 +13,6 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-- name: dunst systemd drop-in directory exists
-  ansible.builtin.file:
-    path: /home/{{ user }}/.config/systemd/user/dunst.service.d
-    state: directory
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0755
-
-- name: dunst starts in dnd mode
-  ansible.builtin.copy:
-    dest: /home/{{ user }}/.config/systemd/user/dunst.service.d/override.conf
-    content: |
-      [Service]
-      ExecStartPost=/usr/bin/dunstctl set-paused true
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0644
-  notify: reload dunst systemd unit
-
 - name: dunst service is enabled
   ansible.builtin.systemd:
     name: dunst.service
@@ -39,3 +20,4 @@
     scope: user
   become: true
   become_user: "{{ user }}"
+
