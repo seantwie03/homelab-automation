@@ -28,6 +28,13 @@ fi
 
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_socket}"
 
+echo "runuser -u {{ user }} -- \
+    notify-send \
+        --urgency=normal \
+        --app-name='dnf-automatic' \
+        'System Updated' \
+        ${count} packages upgraded"
+
 runuser -u {{ user }} -- \
     notify-send \
         --urgency=normal \
@@ -36,6 +43,13 @@ runuser -u {{ user }} -- \
         "${count} packages upgraded"
 
 if ! dnf needs-restarting &>/dev/null; then
+    echo "runuser -u {{ user }} -- \
+        notify-send \
+            --urgency='critical' \
+            --app-name='dnf-automatic' \
+            'Reboot Required' \
+            A reboot is required to apply package updates."
+
     runuser -u {{ user }} -- \
         notify-send \
             --urgency=critical \
@@ -43,3 +57,4 @@ if ! dnf needs-restarting &>/dev/null; then
             "Reboot Required" \
             "A reboot is required to apply package updates."
 fi
+

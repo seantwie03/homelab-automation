@@ -48,9 +48,17 @@ else
     urgency="normal"
 fi
 
+echo "runuser -u {{ user }} -- \
+    notify-send \
+        --urgency=${urgency} \
+        --app-name='ansible-pull' \
+        ${title} \
+        ok=${ok} changed=${changed} failed=${failed} skipped=${skipped}"
+
 runuser -u {{ user }} -- \
     notify-send \
         --urgency="${urgency}" \
         --app-name="ansible-pull" \
         "${title}" \
         "ok=${ok} changed=${changed} failed=${failed} skipped=${skipped}"
+
