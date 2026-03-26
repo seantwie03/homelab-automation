@@ -7,8 +7,8 @@
 -- More information about using Lua in Neovim can be found in :h lua-guide
 
 -- General
-vim.opt.fileencoding = "utf-8"
-vim.opt.fileformat = "unix"
+vim.opt_global.fileencoding = "utf-8"
+vim.opt_global.fileformat = "unix"
 vim.opt.shortmess:append("I")
 vim.opt.nrformats:append("alpha")
 vim.opt.updatetime = 250

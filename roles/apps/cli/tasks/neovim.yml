@@ -1,7 +1,16 @@
 ---
-- name: neovim is installed
+- name: neovim and its dependencies are installed
   ansible.builtin.package:
-    name: neovim
+    name:
+      - neovim
+      - wl-clipboard
+    state: present
+
+- name: neovim image support packages are installed
+  ansible.builtin.package:
+    name:
+      - fd-find
+      - ImageMagick
     state: present
 
 - name: symlink nvim dotfiles directory

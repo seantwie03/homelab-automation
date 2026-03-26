@@ -8,6 +8,8 @@ return {
             ["<Leader>fg"] = { name = "+git" },
             ["<Leader>fl"] = { name = "+linux" },
             ["<Leader>fv"] = { name = "+vim" },
+            ["<Leader>p"] = { name = "+paste" },
+            ["<Leader>t"] = { name = "+toggle" },
         },
     },
     keys = {

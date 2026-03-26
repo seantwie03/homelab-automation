@@ -89,5 +89,5 @@ vim.keymap.set({ "n" }, "}", "}zz", { desc = "center next paragraph"})
 -- Open new lines
 -- These mappings are useful when I want to paste a character-wise selection on
 -- a new line above or below the current line
-vim.keymap.set({ "n", "v" }, "<Leader>O", "O<Esc>", { desc = "Open new line above"})
-vim.keymap.set({ "n", "v" }, "<Leader>o", "o<Esc>", { desc = "open new line below"})
+vim.keymap.set({ "n", "v" }, "<Leader>O", "O<Esc>", { desc = "Open new line above (stay normal)"})
+vim.keymap.set({ "n", "v" }, "<Leader>o", "o<Esc>", { desc = "open new line below (stay normal)"})
