@@ -71,3 +71,4 @@
     name: dnf-automatic.timer
     enabled: true
     state: started
+
