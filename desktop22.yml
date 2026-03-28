@@ -14,6 +14,7 @@
     - role: ansible_pull
     - role: btrfs
     - role: rpm_fusion
+    - role: wifi
     - role: cli
     - role: fonts
     - role: onepassword

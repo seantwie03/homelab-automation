@@ -1,0 +1,15 @@
+---
+- name: wifi packages are installed
+  ansible.builtin.package:
+    name:
+      - iwlwifi-mvm-firmware
+      - NetworkManager-wifi
+      - wpa_supplicant
+    state: present
+  notify: restart NetworkManager
+
+- name: wpa_supplicant.service is enabled and started
+  ansible.builtin.service:
+    name: wpa_supplicant.service
+    enabled: true
+    state: started

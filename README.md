@@ -12,6 +12,8 @@ However, this approach assumes that Managed Hosts are always online and accessib
 
 With `ansible-pull`, you install Ansible on each Managed Host. Each host then pulls the latest version of a repository (like this one) and applies the configuration to itself. Combine this with a scheduled job and you can ensure that even intermittently available machines stay up to date with configuration changes.
 
+## Getting Started
+
 To get started, install the required packages and run `ansible-pull` as follows:
 
 **Note:** The command below (along with many other things in this repository) has only been tested on Fedora and/or a recent version of an Enterprise Linux distribution (RHEL9+).
@@ -32,6 +34,17 @@ Notice that the command above installs Ansible via `pip` instead of `dnf`. This 
 After the first successful run, the `ansible_pull` role takes over version management. It keeps `ansible` and `ansible-lint` pinned to a minor version using pip's compatible release operator (`~=`), so patch updates apply automatically on every ansible-pull run. To adopt a new minor version, bump `ansible_pip_version` or `ansible_lint_pip_version` in `roles/system/ansible_pull/defaults/main.yml`.
 
 The `ansible_pull` role also configures `dnf-automatic` to apply all system package updates daily. It runs after `ansible-pull` completes and sends a desktop notification with the number of upgraded packages. On headless systems with no active user session, the notification is silently skipped.
+
+## WiFi Setup (Optional)
+
+The steps above require internet connectivity. On a fresh system with a WiFi-only connection, set up WiFi manually before running anything else:
+
+```sh
+sudo dnf install iwlwifi-mvm-firmware NetworkManager-wifi wpa_supplicant
+sudo systemctl enable --now wpa_supplicant
+sudo systemctl restart NetworkManager
+nmcli dev wifi connect "YourSSID" --ask
+```
 
 ## Dotfiles
 
