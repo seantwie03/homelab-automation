@@ -1,0 +1,27 @@
+---
+- name: xone firmware is approved
+  ansible.builtin.shell: yes | lpf approve xone-firmware
+  become: true
+  become_user: "{{ user }}"
+  changed_when: true
+  notify: xone firmware is built
+
+- name: xone firmware is built
+  ansible.builtin.command: lpf build xone-firmware
+  become: true
+  become_user: "{{ user }}"
+  changed_when: true
+  notify: xone firmware is installed
+
+- name: xone firmware is installed
+  ansible.builtin.command: lpf install xone-firmware
+  become: true
+  become_user: "{{ user }}"
+  changed_when: true
+  notify: xone module is loaded
+
+- name: xone module is loaded
+  community.general.modprobe:
+    name: xone
+    state: present
+

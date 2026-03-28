@@ -30,15 +30,15 @@
       vars:
         user: retrogaming
         emulation_roms_path: /srv/tier2/emulation/roms
-        #emulation_bios_path: /srv/tier2/emulation/BIOS
-        #emulation_saves_path: /srv/tier2/emulation/saves
+        emulation_bios_path: /srv/tier2/emulation/bios
+        emulation_saves_path: /srv/tier2/emulation/saves
         emulation_media_path: /srv/tier2/emulation/media
     - role: autologin
       vars:
         user: retrogaming
-    # - role: libvirt
-    # - role: fonts
-    # - role: onepassword
-    # - role: tailscale
+    - role: libvirt
+    - role: fonts
+    - role: onepassword
+    - role: tailscale
     # - role: smb
     # - role: nfs

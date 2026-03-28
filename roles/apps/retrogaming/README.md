@@ -20,21 +20,34 @@ Required layout:
 - `emulation_bios_path` — group: games, mode: 2775
 - `emulation_saves_path` — group: games, mode: 2775
 
-The gaming user must be a member of the `games` group — handled by task 2. The setgid bit on directories ensures new content inherits the `games` group automatically, making this a one-time operation.
+The gaming user must be a member of the `games` group. The setgid bit on directories ensures new content inherits the `games` group automatically, making this a one-time operation.
 
 ## Variables
 
 | Variable | Default | Description |
 |---|---|---|
 | `user` | `sean` | User to configure. Created if absent, added to `games` group. |
-| `emulation_roms_path` | `/home/{{ user }}/ROMs` | Path to ROM directories (one subdirectory per system). |
-| `emulation_bios_path` | `/home/{{ user }}/BIOS` | Path to BIOS files. |
+| `emulation_roms_path` | `/home/{{ user }}/roms` | Path to rom directories (one subdirectory per system). |
+| `emulation_bios_path` | `/home/{{ user }}/bios` | Path to bios files. |
 | `emulation_saves_path` | `/home/{{ user }}/saves` | Path to save files and states. |
 
-## TODO
+## RetroArch Hotkeys
 
-- Wireless Xbox One Controller
-- Scrape all games (10k api requests/day)
-- Configure retroarch (input, saves, savestates)
-    - unused retroarch config file in templates
-- Moonlight/Steam Game streaming
+Hotkey enable button: **Xbox button**
+
+| Action | Binding |
+|---|---|
+| Menu | Xbox + X |
+| Reset | Xbox + B |
+| Fast-Forward (Toggle) | Xbox + D-pad Up |
+| Slow-Motion (Toggle) | Xbox + D-pad Down |
+| Pause | Xbox + Y |
+| Load State | Xbox + LB |
+| Save State | Xbox + RB |
+| Previous Save Slot | Xbox + D-pad Left |
+| Next Save Slot | Xbox + D-pad Right |
+| Run Ahead (Toggle) | Xbox + R2 |
+| Preemptive Frames (Toggle) | Xbox + L2 |
+| Show FPS | Xbox + A |
+| Quit | Xbox + Menu (Start) |
+

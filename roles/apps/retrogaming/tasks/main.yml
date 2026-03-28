@@ -1,15 +1,11 @@
 ---
-- name: "{{ user }} user exists"
+- name: "{{ user }} user exists and is in the required groups"
   ansible.builtin.user:
     name: "{{ user }}"
     shell: /bin/bash
     create_home: true
     state: present
-
-- name: "{{ user }} is in the games, video, and input groups"
-  ansible.builtin.user:
-    name: "{{ user }}"
-    groups: games,video,input
+    groups: games,video,input,pkg-build
     append: true
 
 - name: cage and xwayland are installed
@@ -47,51 +43,64 @@
     group: root
   when: not esde_appimage.stat.exists
 
-- name: es-de rom directory is configured
-  ansible.builtin.lineinfile:
-    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
-    regexp: '<string name="ROMDirectory"'
-    line: '<string name="ROMDirectory" value="{{ emulation_roms_path }}" />'
+- name: es-de directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/ES-DE
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
 
-- name: es-de application updater is disabled
-  ansible.builtin.lineinfile:
-    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
-    regexp: '<string name="ApplicationUpdaterFrequency"'
-    line: '<string name="ApplicationUpdaterFrequency" value="never" />'
+- name: es-de settings directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/ES-DE/settings
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
 
-- name: es-de scraper only downloads media used by linear-es-de
-  ansible.builtin.lineinfile:
-    path: /home/{{ user }}/ES-DE/settings/es_settings.xml
-    regexp: '<bool name="{{ item.key }}"'
-    line: '<bool name="{{ item.key }}" value="{{ item.value }}" />'
-  loop:
-    - {key: ScrapeCovers,         value: "true"}
-    - {key: ScrapeScreenshots,    value: "true"}
-    - {key: ScrapeVideos,         value: "true"}
-    - {key: Scrape3DBoxes,        value: "true"}
-    - {key: ScrapeBackCovers,     value: "false"}
-    - {key: ScrapeFanArt,         value: "false"}
-    - {key: ScrapeManuals,        value: "false"}
-    - {key: ScrapeMarquees,       value: "true"}
-    - {key: ScrapePhysicalMedia,  value: "true"}
-    - {key: ScrapeTitleScreens,   value: "false"}
+- name: es-de settings are configured
+  ansible.builtin.template:
+    src: es_settings.xml.j2
+    dest: /home/{{ user }}/ES-DE/settings/es_settings.xml
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+- name: retroarch config directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/retroarch
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: retroarch is configured
+  ansible.builtin.template:
+    src: retroarch.cfg.j2
+    dest: /home/{{ user }}/.config/retroarch/retroarch.cfg
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
 
 - name: kernel-modules-extra is installed for controller support
   ansible.builtin.package:
     name: kernel-modules-extra
     state: present
 
-- name: retroarch is installed
+- name: retroarch and mame-tools are installed
   ansible.builtin.package:
-    name: retroarch
+    name:
+      - retroarch
+      - mame-tools
     state: present
 
-- name: "retroarch cores {{ retroarch_cores_version }} archive stat"
+- name: retroarch cores {{ retroarch_cores_version }} archive stat
   ansible.builtin.stat:
     path: /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
   register: retroarch_cores_archive
 
-- name: "retroarch cores {{ retroarch_cores_version }} archive is downloaded"
+- name: retroarch cores {{ retroarch_cores_version }} archive is downloaded
   ansible.builtin.get_url:
     url: https://buildbot.libretro.com/stable/{{ retroarch_cores_version }}/linux/x86_64/RetroArch_cores.7z
     dest: /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
@@ -108,7 +117,7 @@
       - /opt/RetroArch_cores_{{ retroarch_cores_version }}.7z
       - -o/usr/lib64/libretro/
       - -y
-    creates: /usr/lib64/libretro/snes9x_libretro.so
+  when: not retroarch_cores_archive.stat.exists
 
 - name: es-de downloaded_media is symlinked to emulation media path
   ansible.builtin.file:
@@ -156,9 +165,24 @@
     - gamegear
     - genesis
     - n64
+    - nds
     - neogeo
     - nes
+    - psp
     - psx
     - sega32x
     - snes
+
+- name: xone copr is enabled
+  community.general.copr:
+    name: jackgreiner/xone-git
+    state: enabled
+
+- name: xone wireless controller driver is installed
+  ansible.builtin.package:
+    name:
+      - xone
+      - lpf-xone-firmware
+    state: present
+  notify: xone firmware is approved
 

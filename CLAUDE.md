@@ -56,6 +56,9 @@ No build or test framework exists — this is declarative Ansible configuration.
   - Good: `'btrbk is installed'`
   - Bad: `'Ensure btrbk is installed'` or `'Install btrbk'`
 - File modes use **unquoted octal**: `0755` not `'0755'` or `755`.
+- **Do not quote strings** unless required. Quotes are required when the value starts with a Jinja2 variable (`"{{ var }}/path"`), starts with a YAML special character, or is a boolean/number that must be treated as a string.
+  - Good: `state: present`, `dest: /home/{{ user }}/.config`
+  - Bad: `state: "present"`, `dest: "/etc/foo"`
 - Prefer **generic modules** (`package`, `service`) over distro-specific ones (`dnf`, `systemd`).
 
 ## Shell Script Conventions
