@@ -322,8 +322,10 @@ animations {
     // off
 
     // Slow down all animations by this factor. Values below 1 speed them up instead.
-    slowdown 0.5
+    slowdown 1
 }
+
+include "animations/energize_b_niri.kdl"
 
 // Window rules let you adjust behavior for individual windows.
 // Find more information on the wiki:
@@ -353,7 +355,7 @@ window-rule {
 
 // Example: enable rounded corners for all windows.
 window-rule {
-    geometry-corner-radius 4 
+    geometry-corner-radius 4
     clip-to-geometry true
 }
 
