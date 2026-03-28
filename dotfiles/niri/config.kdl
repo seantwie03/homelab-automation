@@ -325,6 +325,7 @@ animations {
     slowdown 1
 }
 
+// https://github.com/jgarza9788/niri-animation-collection/tree/main
 include "animations/energize_b_niri.kdl"
 
 // Window rules let you adjust behavior for individual windows.
