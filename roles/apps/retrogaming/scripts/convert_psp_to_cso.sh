@@ -40,7 +40,7 @@ for iso_file in "$roms_dir"/*.iso; do
         --threads=4 \
         --use-zopfli \
         --quiet \
-        "/roms/$(basename "$iso_file")" "/roms/$(basename "$cso_file")"
+        "/roms/$(basename "$iso_file")" -o "/roms/$(basename "$cso_file")"
     echo "created: $(basename "$cso_file")"
 done
 

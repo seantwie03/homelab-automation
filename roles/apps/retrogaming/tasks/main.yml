@@ -8,12 +8,21 @@
     groups: games,video,input,pkg-build
     append: true
 
-- name: cage and xwayland are installed
+- name: cage, xwayland, and wlr-randr are installed
   ansible.builtin.package:
     name:
       - cage
       - xorg-x11-server-Xwayland
+      - wlr-randr
     state: present
+
+- name: esde startup script is configured
+  ansible.builtin.template:
+    src: esde_start.sh.j2
+    dest: /opt/esde_start.sh
+    owner: root
+    group: root
+    mode: 0755
 
 - name: cage session is configured in .bash_profile
   ansible.builtin.blockinfile:
@@ -26,7 +35,7 @@
     block: |
       if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
           export XDG_RUNTIME_DIR=/run/user/$(id -u)
-          exec cage -- /opt/ES-DE_{{ emulationstation_version }}_x64.AppImage
+          exec cage -- /opt/esde_start.sh
       fi
 
 - name: "es-de {{ emulationstation_version }} appimage stat"
@@ -74,6 +83,22 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0755
+
+- name: retroarch mupen64plus-next core options directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/retroarch/config/Mupen64Plus-Next
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: retroarch mupen64plus-next core options are configured
+  ansible.builtin.template:
+    src: mupen64plus_next.opt.j2
+    dest: /home/{{ user }}/.config/retroarch/config/Mupen64Plus-Next/Mupen64Plus-Next.opt
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
 
 - name: retroarch is configured
   ansible.builtin.template:
