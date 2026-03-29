@@ -33,12 +33,11 @@ for iso_file in "$roms_dir"/*.iso; do
     fi
 
     echo "converting: $(basename "$iso_file")"
-    docker run --rm \
+    nice -n 19 docker run --rm \
         -v "${roms_dir}:/roms" \
         "$image" \
         --block=2048 \
         --threads=4 \
-        --use-zopfli \
         --quiet \
         "/roms/$(basename "$iso_file")" -o "/roms/$(basename "$cso_file")"
     echo "created: $(basename "$cso_file")"

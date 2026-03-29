@@ -92,10 +92,12 @@
     group: "{{ user }}"
     mode: 0755
 
-- name: retroarch mupen64plus-next core options are configured
-  ansible.builtin.template:
-    src: mupen64plus_next.opt.j2
-    dest: /home/{{ user }}/.config/retroarch/config/Mupen64Plus-Next/Mupen64Plus-Next.opt
+- name: mupen64plus-next rdp plugin is parallel
+  ansible.builtin.lineinfile:
+    path: /home/{{ user }}/.config/retroarch/config/Mupen64Plus-Next/Mupen64Plus-Next.opt
+    regexp: ^mupen64plus-rdp-plugin =
+    line: mupen64plus-rdp-plugin = "parallel"
+    create: true
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
