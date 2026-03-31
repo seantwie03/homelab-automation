@@ -8,13 +8,29 @@
     groups: games,video,input,pkg-build
     append: true
 
-- name: cage, xwayland, and wlr-randr are installed
+- name: cage, xwayland, and kanshi are installed
   ansible.builtin.package:
     name:
       - cage
       - xorg-x11-server-Xwayland
-      - wlr-randr
+      - kanshi
     state: present
+
+- name: kanshi config directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/kanshi
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: kanshi is configured
+  ansible.builtin.template:
+    src: kanshi_config.j2
+    dest: /home/{{ user }}/.config/kanshi/config
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
 
 - name: esde startup script is configured
   ansible.builtin.template:
@@ -173,6 +189,7 @@
     - nds
     - neogeo
     - nes
+    - psp
     - psx
     - sega32x
     - snes
