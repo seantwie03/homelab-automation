@@ -41,6 +41,8 @@
     dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
     content: |
       [Timer]
+      OnCalendar=
+      OnCalendar=Tue *-*-* 23:00:00
       RandomizedDelaySec=0
     owner: root
     group: root
