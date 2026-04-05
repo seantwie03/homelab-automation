@@ -1,0 +1,3 @@
+---
+tailscale_advertise_exit_node: false
+tailscale_subnet_routes: []

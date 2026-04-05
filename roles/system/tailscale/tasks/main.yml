@@ -29,3 +29,27 @@
     name: tailscaled.service
     state: started
     enabled: true
+
+- name: ipv4 forwarding is enabled
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_file: /etc/sysctl.d/99-tailscale.conf
+    reload: true
+  when: tailscale_subnet_routes | length > 0
+
+- name: ipv6 forwarding is enabled
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    sysctl_file: /etc/sysctl.d/99-tailscale.conf
+    reload: true
+  when: tailscale_subnet_routes | length > 0
+
+- name: tailscale subnet routes and exit node are advertised
+  ansible.builtin.command: >-
+    tailscale set
+    --advertise-routes={{ tailscale_subnet_routes | join(',') }}
+    {{ '--advertise-exit-node' if tailscale_advertise_exit_node else '' }}
+  changed_when: false
+  when: tailscale_subnet_routes | length > 0 or tailscale_advertise_exit_node

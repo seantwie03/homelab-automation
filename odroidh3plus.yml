@@ -40,5 +40,9 @@
     - role: fonts
     - role: onepassword
     - role: tailscale
+      vars:
+        tailscale_advertise_exit_node: true
+        tailscale_subnet_routes:
+          - 192.168.0.0/24
     # - role: smb
     # - role: nfs
