@@ -1,0 +1,5 @@
+---
+nextdns_search_domain: odh3p.3246.win
+nextdns_dot_servers:
+  - 45.90.28.0#e8fc2a.dns.nextdns.io
+  - 45.90.30.0#e8fc2a.dns.nextdns.io

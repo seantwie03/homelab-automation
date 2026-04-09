@@ -19,6 +19,7 @@
     - role: fonts
     - role: onepassword
     - role: tailscale
+    - role: nextdns
     - role: network_storage
     - role: libvirt
     - role: devops

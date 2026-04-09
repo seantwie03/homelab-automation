@@ -17,6 +17,7 @@
     - role: onepassword
     - role: rpm_fusion
     - role: tailscale
+    - role: nextdns
     - role: nodejs
     - role: python
     - role: cli

@@ -1,0 +1,6 @@
+[Resolve]
+{% for server in nextdns_dot_servers -%}
+DNS={{ server }}
+{% endfor -%}
+DNSOverTLS=yes
+Domains={{ nextdns_search_domain + ' ' if nextdns_search_domain else '' }}~.
