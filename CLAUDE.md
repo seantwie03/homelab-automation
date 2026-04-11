@@ -112,3 +112,13 @@ Reference implementation: `roles/system/ansible_pull/tasks/dnf_automatic.yml`.
 `.ansible-lint.yml` skips:
 - `var-naming[no-role-prefix]` — role variables don't need the role name prefix.
 - `name[template]` — Jinja2 expressions are allowed in task names.
+
+## Adding New Homelab Services
+
+Services run on the ODroid H3+ (`192.168.0.149`). The naming convention is `SERVICE.odh3p.3246.win`.
+
+**DNS:** No changes required. A wildcard rewrite in NextDNS (`odh3p.3246.win → 192.168.0.149`) already covers all subdomains — a new service name resolves automatically. For full details on how DNS resolution works across all device types, see `dns-overview.md`.
+
+**Short names:** On Linux and Windows, `SERVICE` (no domain suffix) resolves to `SERVICE.odh3p.3246.win` via the `odh3p.3246.win` search domain configured by the `nextdns` role. Android requires the full name.
+
+**HTTPS:** Certificates are issued via Let's Encrypt DNS-01 challenge against the `3246.win` domain. No ports need to be opened on the home router. The DNS-01 challenge validates domain ownership by writing a TXT record to `3246.win` — this works from inside the LAN with no inbound firewall changes.
