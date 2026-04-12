@@ -23,6 +23,7 @@
   roles:
     - role: core
     - role: ansible_pull
+    - role: dnf
     - role: btrfs
     - role: cli
     - role: karakeep

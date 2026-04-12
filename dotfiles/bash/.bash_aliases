@@ -7,6 +7,3 @@ fi
 
 alias vim='nvim'
 
-# For some reason dnf has separate cache for each user
-# Always use root's cache
-alias dnf='sudo dnf'

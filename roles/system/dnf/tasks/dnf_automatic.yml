@@ -6,11 +6,6 @@
       - libnotify
     state: present
 
-- name: systemd daemon is reloaded
-  ansible.builtin.systemd:
-    daemon_reload: true
-  changed_when: false
-
 - name: dnf-automatic-notify script is deployed
   ansible.builtin.template:
     src: dnf-automatic-notify.sh.j2
@@ -68,9 +63,13 @@
     mode: 0644
   notify: restart dnf-automatic timer
 
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
 - name: dnf-automatic.timer is enabled and started
   ansible.builtin.service:
     name: dnf-automatic.timer
     enabled: true
     state: started
-

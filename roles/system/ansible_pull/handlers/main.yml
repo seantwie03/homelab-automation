@@ -4,10 +4,3 @@
     name: ansible-pull.timer
     state: restarted
     daemon_reload: true
-
-- name: restart dnf-automatic timer
-  ansible.builtin.systemd:
-    name: dnf-automatic.timer
-    state: restarted
-    daemon_reload: true
-  changed_when: true

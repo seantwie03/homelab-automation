@@ -1,0 +1,6 @@
+---
+- name: dnf-automatic tasks
+  ansible.builtin.include_tasks: dnf_automatic.yml
+
+- name: dnf-makecache tasks
+  ansible.builtin.include_tasks: dnf_makecache.yml

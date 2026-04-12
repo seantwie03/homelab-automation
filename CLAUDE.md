@@ -68,7 +68,7 @@ No build or test framework exists — this is declarative Ansible configuration.
 
 ## Systemd Service and Timer Conventions
 
-**For timers:** After the package install task, place all configuration and override tasks first, then an unconditional `daemon_reload` task immediately before the enable/start task. This ensures systemd discovers both the new unit file and any overrides before the timer is enabled. The `daemon_reload` task must use `changed_when: false` to preserve idempotency.
+**For timers:** After the package install task, place all configuration and override tasks first, then an unconditional `daemon_reload` task immediately before the enable/start task. This ensures systemd discovers both the new unit file and any overrides before the timer is enabled. The `daemon_reload` task must use `changed_when: false` to preserve idempotency. Override tasks must always use `notify` to trigger a handler that restarts the timer.
 
 ```yaml
 - name: foo is installed
@@ -105,7 +105,7 @@ No build or test framework exists — this is declarative Ansible configuration.
     state: started
 ```
 
-Reference implementation: `roles/system/ansible_pull/tasks/dnf_automatic.yml`.
+Reference implementation: `roles/system/dnf/tasks/dnf_automatic.yml`.
 
 ## ansible-lint Configuration
 

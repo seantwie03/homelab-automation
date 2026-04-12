@@ -13,6 +13,12 @@
       - ImageMagick
     state: present
 
+- name: vim is aliased to nvim for all users
+  ansible.builtin.copy:
+    content: "alias vim='nvim'\n"
+    dest: /etc/profile.d/nvim-alias.sh
+    mode: 0644
+
 - name: symlink nvim dotfiles directory
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/nvim"

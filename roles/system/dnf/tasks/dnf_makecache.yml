@@ -1,0 +1,101 @@
+---
+- name: root dnf-makecache configuration
+  block:
+    - name: dnf-makecache.timer override directory exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/dnf-makecache.timer.d
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: dnf-makecache.timer runs every 4 hours
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/dnf-makecache.timer.d/override.conf
+        content: |
+          [Timer]
+          OnBootSec=
+          OnUnitInactiveSec=
+          OnCalendar=*-*-* 0/4:00:00
+          Persistent=true
+          RandomizedDelaySec=300
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart dnf-makecache timer
+
+    - name: systemd daemon is reloaded
+      ansible.builtin.systemd:
+        daemon_reload: true
+      changed_when: false
+
+    - name: dnf-makecache.timer is enabled and started
+      ansible.builtin.service:
+        name: dnf-makecache.timer
+        enabled: true
+        state: started
+
+- name: "{{ user }} dnf-makecache configuration"
+  block:
+    - name: /home/{{ user }}/.config/systemd/user directory exists
+      ansible.builtin.file:
+        path: /home/{{ user }}/.config/systemd/user
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+
+    - name: user dnf-makecache.service exists
+      ansible.builtin.copy:
+        dest: /home/{{ user }}/.config/systemd/user/dnf-makecache.service
+        content: |
+          [Unit]
+          Description=dnf5 makecache (user)
+          After=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/bin/dnf5 makecache
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+
+    - name: user dnf-makecache.timer exists
+      ansible.builtin.copy:
+        dest: /home/{{ user }}/.config/systemd/user/dnf-makecache.timer
+        content: |
+          [Unit]
+          Description=dnf5 makecache (user)
+
+          [Timer]
+          OnCalendar=*-*-* 0/4:00:00
+          Persistent=true
+          RandomizedDelaySec=300
+
+          [Install]
+          WantedBy=timers.target
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+      notify: restart user dnf-makecache timer
+
+    - name: systemd user daemon is reloaded
+      ansible.builtin.systemd:
+        daemon_reload: true
+        scope: user
+      become: true
+      become_user: "{{ user }}"
+      environment:
+        XDG_RUNTIME_DIR: /run/user/{{ uid }}
+      changed_when: false
+
+    - name: user dnf-makecache.timer is enabled and started
+      ansible.builtin.systemd:
+        name: dnf-makecache.timer
+        enabled: true
+        state: started
+        scope: user
+      become: true
+      become_user: "{{ user }}"
+      environment:
+        XDG_RUNTIME_DIR: /run/user/{{ uid }}

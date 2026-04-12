@@ -92,5 +92,3 @@
     owner: root
     group: wheel
 
-- name: dnf-automatic tasks
-  ansible.builtin.include_tasks: dnf_automatic.yml

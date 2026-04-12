@@ -1,0 +1,26 @@
+---
+- name: restart dnf-automatic timer
+  ansible.builtin.systemd:
+    name: dnf-automatic.timer
+    state: restarted
+    daemon_reload: true
+  changed_when: true
+
+- name: restart dnf-makecache timer
+  ansible.builtin.systemd:
+    name: dnf-makecache.timer
+    state: restarted
+    daemon_reload: true
+  changed_when: true
+
+- name: restart user dnf-makecache timer
+  ansible.builtin.systemd:
+    name: dnf-makecache.timer
+    state: restarted
+    scope: user
+    daemon_reload: true
+  become: true
+  become_user: "{{ user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ uid }}
+  changed_when: true

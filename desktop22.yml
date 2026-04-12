@@ -12,6 +12,7 @@
     - role: core
     - role: docker
     - role: ansible_pull
+    - role: dnf
     - role: btrfs
     - role: rpm_fusion
     - role: wifi
