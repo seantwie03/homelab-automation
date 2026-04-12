@@ -21,12 +21,50 @@ fi
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_socket}"
 
 if grep -q "Local modifications exist" "$log"; then
+    echo "runuser -u {{ user }} -- \
+    notify-send \
+        --urgency=critical \
+        --app-name='ansible-pull' \
+        'Ansible Pull Skipped' \
+        'Uncommitted local changes'"
     runuser -u {{ user }} -- \
         notify-send \
             --urgency=critical \
             --app-name="ansible-pull" \
             "Ansible Pull Skipped" \
             "Uncommitted local changes"
+    exit 0
+fi
+
+if grep -q "Failed to download remote objects and refs" "$log"; then
+    echo "runuser -u {{ user }} -- \
+    notify-send \
+        --urgency=critical \
+        --app-name='ansible-pull' \
+        'Ansible Pull Failed' \
+        'Network error: unable to reach GitHub'"
+    runuser -u {{ user }} -- \
+        notify-send \
+            --urgency=critical \
+            --app-name="ansible-pull" \
+            "Ansible Pull Failed" \
+            "Network error: unable to reach GitHub"
+    exit 0
+fi
+
+if grep -q "localhost | FAILED!" "$log"; then
+    echo "runuser -u {{ user }} -- \
+    notify-send \
+        --urgency=critical \
+        --app-name='ansible-pull' \
+        'Ansible Pull Failed' \
+        'Check /var/log/ansible-pull for details'"
+    runuser -u {{ user }} -- \
+        notify-send \
+            --urgency=critical \
+            --app-name="ansible-pull" \
+            "Ansible Pull Failed" \
+            "Check /var/log/ansible-pull for details"
     exit 0
 fi
 
@@ -61,4 +99,3 @@ runuser -u {{ user }} -- \
         --app-name="ansible-pull" \
         "${title}" \
         "ok=${ok} changed=${changed} failed=${failed} skipped=${skipped}"
-
