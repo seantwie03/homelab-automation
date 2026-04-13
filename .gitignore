@@ -13,4 +13,4 @@ pip-delete-this-directory.txt
 
 # Ignore machine-specific symlinks
 machine-specific.conf
-docs
+docs/
