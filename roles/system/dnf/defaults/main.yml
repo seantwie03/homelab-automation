@@ -1,3 +1,6 @@
 ---
 user: sean
 uid: 1000
+# Whether to reboot after updates are applied.
+# Valid values: never, when-needed, always
+dnf_automatic_reboot: "never"

@@ -85,13 +85,6 @@
     owner: root
     group: wheel
 
-- name: docs symlink points to homelab docs on nas
-  ansible.builtin.file:
-    src: "{{ homelab_docs_dir }}"
-    dest: "{{ playbook_path }}/docs"
-    state: link
-    follow: false
-
 - name: template homelab management script (h) bash completion
   ansible.builtin.template:
     src: h_completion.bash.j2
