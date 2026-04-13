@@ -13,6 +13,7 @@
     owner: root
     group: wheel
     recurse: true
+    follow: false
   changed_when: false
 
 - name: template ansible-pull systemd service
@@ -83,6 +84,13 @@
     mode: 0750
     owner: root
     group: wheel
+
+- name: docs symlink points to homelab docs on nas
+  ansible.builtin.file:
+    src: "{{ homelab_docs_dir }}"
+    dest: "{{ playbook_path }}/docs"
+    state: link
+    follow: false
 
 - name: template homelab management script (h) bash completion
   ansible.builtin.template:

@@ -75,14 +75,7 @@ set -o noclobber
 alias ls='ls --almost-all --color=auto'
 alias grep='grep --color=auto'
 
-# Add Color to Man Pages
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
+eval "$(dircolors ~/.dircolors)"
 
 # Add Color to Prompt
 # This is a great breakdown for how to set the colors: https://chrisyeh96.github.io/2020/03/28/terminal-colors.html

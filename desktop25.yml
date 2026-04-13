@@ -22,7 +22,7 @@
     - role: nodejs
     - role: python
     - role: cli
-    #- role: network_storage
+    - role: network_storage
     - role: devops
     - role: niri
     - role: hyprland

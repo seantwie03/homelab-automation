@@ -11,5 +11,6 @@ pip-delete-this-directory.txt
 # Ansible
 .ansible/
 
-# Ignore machine-specfic symlink
+# Ignore machine-specific symlinks
 machine-specific.conf
+docs
