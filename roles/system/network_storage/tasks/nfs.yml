@@ -1,0 +1,25 @@
+---
+- name: nfs-utils is installed
+  ansible.builtin.package:
+    name: nfs-utils
+    state: present
+
+- name: mount points exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0775
+  loop: "{{ nfs_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: automount configured for nfs shares
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.server }}:{{ item.path }}"
+    fstype: nfs
+    boot: false
+    opts: x-systemd.device-timeout=10,x-systemd.automount,nofail
+    state: present
+  loop: "{{ nfs_mounts }}"
+  notify: restart remote-fs.target

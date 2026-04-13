@@ -2,6 +2,11 @@
 user: sean
 network_share_group: networkshare
 network_share_gid: 5567
+nfs_mounts:
+  - server: odroidh3plus
+    path: /srv/tier1
+  - server: odroidh3plus
+    path: /srv/tier2
 samba_mounts:
   - server: odroidh3plus
     share: tier1

@@ -47,5 +47,5 @@
         tailscale_subnet_routes:
           - 192.168.0.0/24
     - role: nextdns
-    # - role: smb
-    # - role: nfs
+    - role: smb
+    - role: nfs
