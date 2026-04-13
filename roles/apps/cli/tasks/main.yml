@@ -21,6 +21,7 @@
       - git
       - bat
       - tree
+      - bind-utils # nslookup/dig/etc.
     state: present
 
 - name: neovim is installed and configured
@@ -29,7 +30,7 @@
 - name: asciinema is installed and configured
   ansible.builtin.include_tasks: asciinema.yml
 
-# Special handling for bash dotfiles because they go 
+# Special handling for bash dotfiles because they go
 # into the home directory instead of ~/.config
 - name: install bash dotfiles
   block:
