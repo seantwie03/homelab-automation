@@ -2,5 +2,5 @@
 {% for server in nextdns_dot_servers -%}
 DNS={{ server }}
 {% endfor -%}
-DNSOverTLS=opportunistic
+DNSOverTLS=yes
 Domains={{ nextdns_search_domain + ' ' if nextdns_search_domain else '' }}~.

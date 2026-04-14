@@ -7,13 +7,8 @@
     state: latest  # noqa: package-latest
 
 - name: wheel group can edit {{ playbook_path }}
-  ansible.builtin.file:
-    path: "{{ playbook_path }}"
-    mode: u=rwX,g=rwX,o=rX
-    owner: root
-    group: wheel
-    recurse: true
-    follow: false
+  ansible.builtin.shell:
+    cmd: "find {{ playbook_path }} -xdev -not -path '{{ playbook_path }}/docs' -exec chown root:wheel {} + && find {{ playbook_path }} -xdev -not -path '{{ playbook_path }}/docs' -exec chmod u=rwX,g=rwX,o=rX {} +"
   changed_when: false
 
 - name: template ansible-pull systemd service
