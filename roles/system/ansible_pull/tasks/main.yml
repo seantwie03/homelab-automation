@@ -6,6 +6,12 @@
       - ansible-lint~={{ ansible_lint_pip_version }}
     state: latest  # noqa: package-latest
 
+- name: "{{ playbook_path }} is a safe git directory for root"
+  community.general.git_config:
+    name: safe.directory
+    value: "{{ playbook_path }}"
+    scope: global
+
 - name: wheel group can edit {{ playbook_path }}
   ansible.builtin.shell:
     cmd: "find {{ playbook_path }} -xdev -not -path '{{ playbook_path }}/docs' -not -path '{{ playbook_path }}/.git' -not -path '{{ playbook_path }}/.git/*' -exec chown root:wheel {} + && find {{ playbook_path }} -xdev -not -path '{{ playbook_path }}/docs' -not -path '{{ playbook_path }}/.git' -not -path '{{ playbook_path }}/.git/*' -exec chmod u=rwX,g=rwX,o=rX {} +"
