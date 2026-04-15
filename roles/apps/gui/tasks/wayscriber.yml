@@ -17,6 +17,10 @@
         repo_gpgcheck: true
         gpgkey: https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc
         skip_if_unavailable: true
+  rescue:
+    - name: wayscriber repository configuration skipped
+      ansible.builtin.debug:
+        msg: wayscriber repository setup skipped due to (hopefully) temporary URL unavailability
 
 - name: wayscriber is installed
   ansible.builtin.package:
