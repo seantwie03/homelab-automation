@@ -2,13 +2,15 @@
 Description=Ansible Pull Workstation Configuration
 Documentation={{ homelab_ansible_repo_url }}
 After=network-online.target
+After=dnf-makecache.service
+After=dns-online.service
 Wants=network-online.target
+Wants=dns-online.service
 
 [Service]
 Type=oneshot
 User=root
 EnvironmentFile=-/run/ansible-pull.env
-ExecStartPre=/bin/bash -c "i=0; until systemd-resolve github.com >/dev/null 2>&1; do i=$((i+1)); [ $i -ge 30 ] && exit 1; sleep 2; done"
 ExecStartPre=-/bin/bash -c "echo PRE_NUM=$(snapper create --type pre --print-number --description 'Before ansible-pull' --cleanup-algorithm timeline) > /run/ansible-pull.env"
 WorkingDirectory={{ playbook_path }}
 Environment="PYTHONUNBUFFERED=True"

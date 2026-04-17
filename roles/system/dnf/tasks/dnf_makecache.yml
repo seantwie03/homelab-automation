@@ -32,12 +32,13 @@
         group: root
         mode: 0755
 
-    - name: dnf-makecache.service waits for dns before running
+    - name: dnf-makecache.service waits for dns-online.service
       ansible.builtin.copy:
         dest: /etc/systemd/system/dnf-makecache.service.d/override.conf
         content: |
-          [Service]
-          ExecStartPre=/bin/bash -c "i=0; until systemd-resolve mirrors.fedoraproject.org >/dev/null 2>&1; do i=$((i+1)); [ $i -ge 30 ] && exit 1; sleep 2; done"
+          [Unit]
+          After=dns-online.service
+          Wants=dns-online.service
         owner: root
         group: root
         mode: 0644

@@ -47,3 +47,24 @@
     dest: /etc/resolv.conf
     state: link
     force: true
+
+- name: wait-dns-online.sh is deployed
+  ansible.builtin.copy:
+    src: wait-dns-online.sh
+    dest: /usr/local/bin/wait-dns-online.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: dns-online.service is deployed
+  ansible.builtin.copy:
+    src: dns-online.service
+    dest: /etc/systemd/system/dns-online.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false

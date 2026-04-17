@@ -1,0 +1,10 @@
+[Unit]
+Description=Wait for DNS to be online
+After=systemd-resolved.service
+Wants=systemd-resolved.service
+StopWhenUnneeded=yes
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/wait-dns-online.sh
