@@ -9,6 +9,6 @@
   ansible.builtin.unarchive:
     src: https://github.com/google/fonts/archive/main.zip
     dest: /usr/share/fonts/google
-    remote_src: yes
+    remote_src: true
     creates: /usr/share/fonts/google/fonts-main
   notify: rebuild font cache

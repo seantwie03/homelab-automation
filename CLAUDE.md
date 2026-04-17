@@ -111,6 +111,7 @@ Reference implementation: `roles/system/dnf/tasks/dnf_automatic.yml`.
 
 `.ansible-lint.yml` skips:
 - `var-naming[no-role-prefix]` — role variables don't need the role name prefix.
+- `name[casing]` — task names are intentionally all-lowercase per project convention.
 - `name[template]` — Jinja2 expressions are allowed in task names.
 
 ## Adding New Homelab Services

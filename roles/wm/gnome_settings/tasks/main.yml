@@ -11,7 +11,7 @@
 
 - name: app-indicators (system-tray icons) is installed
   ansible.builtin.package:
-    name: 
+    name:
       - gnome-shell-extension-appindicator
       - libappindicator
     state: present

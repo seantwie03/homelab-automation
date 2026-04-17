@@ -12,8 +12,8 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-#- name: agg is installed (Asciinema Gif Generator)
-#  community.general.cargo:
-#    name: https://github.com/asciinema/agg
-#    state: present
-#    path: "/home/{{ user }}" # cargo automatically appends /bin
+# - name: agg is installed (Asciinema Gif Generator)
+#   community.general.cargo:
+#     name: https://github.com/asciinema/agg
+#     state: present
+#     path: "/home/{{ user }}" # cargo automatically appends /bin

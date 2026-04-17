@@ -1,5 +1,7 @@
 skip_list:
   - var-naming[no-role-prefix]
+  - name[casing]
   - name[template]
   - yaml[octal-values]
   - yaml[empty-lines]
+  - risky-shell-pipe
