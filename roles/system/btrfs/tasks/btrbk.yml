@@ -31,11 +31,8 @@
 
 - name: btrbk.timer runs hourly
   ansible.builtin.copy:
+    src: btrbk-timer-override.conf
     dest: /etc/systemd/system/btrbk.timer.d/override.conf
-    content: |
-      [Timer]
-      OnCalendar=
-      OnCalendar=hourly
     owner: root
     group: root
     mode: 0644

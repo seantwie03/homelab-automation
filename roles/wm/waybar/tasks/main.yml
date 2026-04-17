@@ -22,12 +22,9 @@
     mode: 0755
 
 - name: waybar systemd override uses launch script
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: waybar-service-override.conf.j2
     dest: /home/{{ user }}/.config/systemd/user/waybar.service.d/override.conf
-    content: |
-      [Service]
-      ExecStart=
-      ExecStart=/home/{{ user }}/.config/waybar/waybar-launch.sh
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644

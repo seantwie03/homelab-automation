@@ -11,14 +11,8 @@
 
     - name: dnf-makecache.timer runs every 4 hours
       ansible.builtin.copy:
+        src: dnf-makecache-timer-override.conf
         dest: /etc/systemd/system/dnf-makecache.timer.d/override.conf
-        content: |
-          [Timer]
-          OnBootSec=
-          OnUnitInactiveSec=
-          OnCalendar=*-*-* 0/4:00:00
-          Persistent=true
-          RandomizedDelaySec=300
         owner: root
         group: root
         mode: 0644
@@ -34,11 +28,8 @@
 
     - name: dnf-makecache.service waits for dns-online.service
       ansible.builtin.copy:
+        src: dnf-makecache-service-override.conf
         dest: /etc/systemd/system/dnf-makecache.service.d/override.conf
-        content: |
-          [Unit]
-          After=dns-online.service
-          Wants=dns-online.service
         owner: root
         group: root
         mode: 0644
@@ -66,34 +57,16 @@
 
     - name: user dnf-makecache.service exists
       ansible.builtin.copy:
+        src: dnf-makecache-user.service
         dest: /home/{{ user }}/.config/systemd/user/dnf-makecache.service
-        content: |
-          [Unit]
-          Description=dnf5 makecache (user)
-          After=network-online.target
-
-          [Service]
-          Type=oneshot
-          ExecStartPre=/bin/bash -c "i=0; until systemd-resolve mirrors.fedoraproject.org >/dev/null 2>&1; do i=$((i+1)); [ $i -ge 30 ] && exit 1; sleep 2; done"
-          ExecStart=/usr/bin/dnf5 makecache
         owner: "{{ user }}"
         group: "{{ user }}"
         mode: 0644
 
     - name: user dnf-makecache.timer exists
       ansible.builtin.copy:
+        src: dnf-makecache-user.timer
         dest: /home/{{ user }}/.config/systemd/user/dnf-makecache.timer
-        content: |
-          [Unit]
-          Description=dnf5 makecache (user)
-
-          [Timer]
-          OnCalendar=*-*-* 0/4:00:00
-          Persistent=true
-          RandomizedDelaySec=300
-
-          [Install]
-          WantedBy=timers.target
         owner: "{{ user }}"
         group: "{{ user }}"
         mode: 0644

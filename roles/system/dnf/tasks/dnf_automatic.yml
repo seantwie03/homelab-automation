@@ -33,12 +33,8 @@
 
 - name: dnf-automatic.timer randomized delay is disabled
   ansible.builtin.copy:
+    src: dnf-automatic-timer-override.conf
     dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
-    content: |
-      [Timer]
-      OnCalendar=
-      OnCalendar=Tue *-*-* 23:00:00
-      RandomizedDelaySec=0
     owner: root
     group: root
     mode: 0644
@@ -54,14 +50,8 @@
 
 - name: dnf-automatic.service runs after ansible-pull and dnf-makecache
   ansible.builtin.copy:
+    src: dnf-automatic-service-override.conf
     dest: /etc/systemd/system/dnf-automatic.service.d/override.conf
-    content: |
-      [Unit]
-      After=dns-online.service
-      After=ansible-pull.service
-      After=dnf-makecache.service
-      Wants=dns-online.service
-      Wants=dnf-makecache.service
     owner: root
     group: root
     mode: 0644
