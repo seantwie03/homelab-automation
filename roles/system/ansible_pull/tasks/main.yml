@@ -1,9 +1,4 @@
 ---
-- name: ansible pip package is removed
-  ansible.builtin.pip:
-    name: ansible
-    state: absent
-
 - name: ansible-core and ansible-lint are up to date
   ansible.builtin.pip:
     name:
