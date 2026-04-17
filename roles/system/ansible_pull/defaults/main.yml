@@ -6,5 +6,5 @@ homelab_ansible_repo_git_ssh: git@github.com:seantwie03/homelab-automation.git
 homelab_docs_dir: /srv/tier1/docs/areas/homelab
 # Pinned to minor version — patch updates apply automatically.
 # To adopt a new minor version, bump X.Y.
-ansible_pip_version: "13.3.0"
+ansible_pip_version: "2.20.4"
 ansible_lint_pip_version: "26.4.0"

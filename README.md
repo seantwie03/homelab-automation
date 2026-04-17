@@ -21,7 +21,9 @@ To get started, install the required packages and run `ansible-pull` as follows:
 ```sh
 rm ~/.bashrc # Remove existing bashrc
 sudo dnf install python3-libdnf5 python3-pip git wget hostname
-sudo python3 -m pip install ansible ansible-lint
+sudo python3 -m pip install ansible-core ansible-lint
+sudo git clone https://github.com/seantwie03/homelab-automation.git /opt/homelab-automation
+sudo ansible-galaxy collection install -r /opt/homelab-automation/collections/requirements.yml
 sudo ansible-pull \
     --limit localhost \
     --directory /opt/homelab-automation \
@@ -29,9 +31,9 @@ sudo ansible-pull \
     $(hostname --short).yml
 ```
 
-Notice that the command above installs Ansible via `pip` instead of `dnf`. This is because the ansible package in the Fedora repositories does not include `ansible-pull`. Also, the command above runs `pip` with `sudo`. This is not recommended but `ansible-pull` must be installed system-wide for the persistent systemd-timer that runs as root.
+Notice that the command above installs `ansible-core` via `pip` rather than `dnf` to get a newer version than what ships with Fedora. The commands above run with `sudo` because `ansible-pull` must be installed system-wide for the persistent systemd-timer that runs as root. Collections are installed with `sudo` so they land in `/root/.ansible/collections/` and are accessible when the timer runs as root.
 
-After the first successful run, the `ansible_pull` role takes over version management. It keeps `ansible` and `ansible-lint` pinned to a minor version using pip's compatible release operator (`~=`), so patch updates apply automatically on every ansible-pull run. To adopt a new minor version, bump `ansible_pip_version` or `ansible_lint_pip_version` in `roles/system/ansible_pull/defaults/main.yml`.
+After the first successful run, the `ansible_pull` role takes over version management. It keeps `ansible-core` and `ansible-lint` pinned to a minor version using pip's compatible release operator (`~=`), so patch updates apply automatically on every ansible-pull run. To adopt a new minor version, bump `ansible_pip_version` or `ansible_lint_pip_version` in `roles/system/ansible_pull/defaults/main.yml`.
 
 The `ansible_pull` role also configures `dnf-automatic` to apply all system package updates daily. It runs after `ansible-pull` completes and sends a desktop notification with the number of upgraded packages. On headless systems with no active user session, the notification is silently skipped.
 
