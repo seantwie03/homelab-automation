@@ -107,6 +107,10 @@ No build or test framework exists — this is declarative Ansible configuration.
 
 Reference implementation: `roles/system/dnf/tasks/dnf_automatic.yml`.
 
+## Role Documentation
+
+When modifying a role, check whether `MONITORING.md` or `README.md` exists in the role directory. If either file exists, review it and update any content that the change makes inaccurate — commands, expected values, thresholds, timer schedules, or known issues.
+
 ## ansible-lint Configuration
 
 `.ansible-lint.yml` skips:
