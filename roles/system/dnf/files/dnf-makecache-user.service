@@ -5,4 +5,4 @@ After=network-online.target
 [Service]
 Type=oneshot
 ExecStartPre=/bin/bash -c "i=0; until systemd-resolve mirrors.fedoraproject.org >/dev/null 2>&1; do i=$((i+1)); [ $i -ge 30 ] && exit 1; sleep 2; done"
-ExecStart=/usr/bin/dnf5 makecache
+ExecStart=/usr/bin/dnf5 makecache --setopt=optional_metadata_types=all
