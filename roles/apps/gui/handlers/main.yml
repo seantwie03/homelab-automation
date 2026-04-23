@@ -1,9 +1,11 @@
 ---
 - name: enable wayscriber service
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: wayscriber.service
     enabled: true
     state: started
     scope: user
   become: true
   become_user: "{{ user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ uid }}
