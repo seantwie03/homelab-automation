@@ -13,12 +13,11 @@
     state: present
   notify: rebuild font cache
 
-- name: microsoft fonts are installed
-  ansible.builtin.dnf:
-    name: "{{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
-    state: present
-    disable_gpg_check: true
-  notify: rebuild font cache
+#- name: microsoft fonts are installed
+#  ansible.builtin.dnf:
+#    name: "{{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
+#    state: present
+#  notify: rebuild font cache
 
 - name: download and extract nerd fonts
   ansible.builtin.include_tasks: download_extract_fonts.yml
