@@ -1,0 +1,30 @@
+- name: Configure x1carbon2018 as a workstation
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    user: sean
+    uid: 1000
+    gid: 1000
+
+  roles:
+    - role: core
+    - role: ansible_pull
+    - role: dnf
+    - role: libvirt
+    - role: btrfs
+    - role: fonts
+    - role: onepassword
+    - role: rpm_fusion
+    - role: tailscale
+    - role: nextdns
+    - role: nodejs
+    - role: python
+    - role: cli
+    - role: network_storage
+    - role: devops
+    - role: niri
+    - role: hyprland
+    - role: gui
+
