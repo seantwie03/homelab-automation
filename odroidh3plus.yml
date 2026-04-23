@@ -2,6 +2,7 @@
   hosts: localhost
   connection: local
   become: true
+  force_handlers: true
 
   vars:
     user: sean
