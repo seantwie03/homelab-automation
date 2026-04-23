@@ -41,10 +41,12 @@ The `ansible_pull` role also configures `dnf-automatic` to apply all system pack
 
 The steps above require internet connectivity. On a fresh system with a WiFi-only connection, set up WiFi manually before running anything else:
 
+If the laptop you are installing does not have an ethernet port, plug in a dongle or docking station, then connect ethernet. If that is not available, you may need to load the Installation Media, connect to WiFi, chroot into your fedora install, then do the steps below.
+
 ```sh
 sudo dnf install iwlwifi-mvm-firmware NetworkManager-wifi wpa_supplicant
 sudo systemctl enable --now wpa_supplicant
-sudo systemctl restart NetworkManager
+reboot
 nmcli dev wifi connect "YourSSID" --ask
 ```
 
