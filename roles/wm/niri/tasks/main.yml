@@ -25,10 +25,21 @@
       - pulseaudio-utils
     state: present
 
-- name: swayidle is installed
+- name: swaylock and swayidle are installed
   ansible.builtin.package:
-    name: swayidle
+    name:
+      - swayidle
+      - swaylock
     state: present
+
+- name: symlink machine-specific niri config
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/niri/{{ ansible_facts['hostname'] }}.conf"
+    dest: "{{ dotfiles_path }}/niri/machine-specific.conf"
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
 
 - name: niri_window_buttons is compiled and installed
   ansible.builtin.include_tasks: niri_window_buttons.yml

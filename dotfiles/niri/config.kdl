@@ -288,9 +288,8 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Suspend after 45 minutes of inactivity. -w waits for the compositor to
-// acknowledge the suspend request before actually suspending.
-spawn-at-startup "swayidle" "-w" "timeout" "2700" "systemctl suspend"
+// Machine-specific settings (swayidle, etc.) are in machine-specific.conf.
+include "machine-specific.conf"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
