@@ -13,3 +13,12 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+- name: symlink machine-specific kitty config
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/kitty/{{ ansible_facts['hostname'] }}.conf"
+    dest: "{{ dotfiles_path }}/kitty/machine-specific.conf"
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
