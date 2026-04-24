@@ -4,6 +4,11 @@
     name: waybar
     state: present
 
+- name: gnome-calendar is installed
+  ansible.builtin.package:
+    name: gnome-calendar
+    state: present
+
 - name: waybar dotfiles directory is symlinked
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/waybar"
