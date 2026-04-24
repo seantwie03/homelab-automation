@@ -17,13 +17,9 @@
     cmd: >-
       find {{ playbook_path }} -xdev
       -not -path '{{ playbook_path }}/docs'
-      -not -path '{{ playbook_path }}/.git'
-      -not -path '{{ playbook_path }}/.git/*'
       -exec chown root:wheel {} + &&
       find {{ playbook_path }} -xdev
       -not -path '{{ playbook_path }}/docs'
-      -not -path '{{ playbook_path }}/.git'
-      -not -path '{{ playbook_path }}/.git/*'
       -exec chmod u=rwX,g=rwX,o=rX {} +
   changed_when: false
 

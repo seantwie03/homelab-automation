@@ -84,6 +84,12 @@
         mode: 0644
       notify: restart xdg-desktop-portal
 
+- name: graphical.target is the default systemd target
+  ansible.builtin.file:
+    src: /usr/lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link
+
 - name: autostart uwsm selector
   ansible.builtin.blockinfile:
     path: "/home/{{ user }}/.bash_profile"

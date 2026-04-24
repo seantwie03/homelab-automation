@@ -42,6 +42,12 @@
     name: pavucontrol
     state: present
 
+- name: graphical.target is the default systemd target
+  ansible.builtin.file:
+    src: /usr/lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link
+
 - name: autostart uswm selector
   ansible.builtin.blockinfile:
     path: "/home/{{ user }}/.bash_profile"

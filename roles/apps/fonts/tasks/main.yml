@@ -13,7 +13,7 @@
     state: present
   notify: rebuild font cache
 
-#- name: microsoft fonts are installed
+# - name: microsoft fonts are installed
 #  ansible.builtin.dnf:
 #    name: "{{ role_path }}/files/msttcore-fonts-installer-2.6-1.noarch.rpm"
 #    state: present
