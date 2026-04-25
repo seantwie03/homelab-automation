@@ -33,7 +33,7 @@ show_automation_usage() {
     echo "  g, git [args]           - Run arbitrary git commands in the Automation directory ($AUTOMATION_DIR)"
     echo "                            Any arguments after g[it] will be passed directly to git."
     echo "                            If no arguments are provided, defaults to showing git status"
-    echo "  l, logs                 - View journald logs for ${AUTOMATION_SERVICE_NAME}.service"
+    echo "  l, logs [n]             - View the last n log files for ${AUTOMATION_SERVICE_NAME} (default: 1)"
     echo "  r, run                  - Runs ${AUTOMATION_SERVICE_NAME}.service (requires sudo)"
     echo "  t, test [playbook]      - Runs ansible-pull on a playbook with --force to ignore dirty working directory"
     echo "                            If no playbook specified, defaults to {hostname --short}.yml'"
@@ -97,7 +97,13 @@ case "$1" in
                 git push "$AUTOMATION_GIT_REMOTE" main
                 ;;
             l|logs)
-                journalctl -u ${AUTOMATION_SERVICE_NAME}.service
+                _count="${3:-1}"
+                mapfile -t _files < <(ls -t /var/log/${AUTOMATION_SERVICE_NAME}/*.log 2>/dev/null | head -n "$_count")
+                if [ -z "${_files[0]}" ]; then
+                    echo "No logs found in /var/log/${AUTOMATION_SERVICE_NAME}/" >&2
+                    exit 1
+                fi
+                less +G "${_files[@]}"
                 ;;
             r|run)
                 echo "Running ${AUTOMATION_SERVICE_NAME}.service immediately..."
