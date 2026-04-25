@@ -19,7 +19,7 @@
     src: "{{ item.server }}:{{ item.path }}"
     fstype: nfs
     boot: false
-    opts: x-systemd.device-timeout=10,x-systemd.automount,nofail
+    opts: x-systemd.mount-timeout=10,x-systemd.automount,nofail
     state: present
   loop: "{{ nfs_mounts }}"
   notify: restart remote-fs.target
