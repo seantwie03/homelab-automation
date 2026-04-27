@@ -32,6 +32,27 @@
       - swaylock
     state: present
 
+- name: swaybg is installed
+  ansible.builtin.package:
+    name: swaybg
+    state: present
+
+- name: backgrounds directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.local/share/backgrounds
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: astronaut_jellyfish wallpaper is installed
+  ansible.builtin.copy:
+    src: astronaut_jellyfish.jpg
+    dest: /home/{{ user }}/.local/share/backgrounds/astronaut_jellyfish.jpg
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
 - name: symlink machine-specific niri config
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/niri/{{ ansible_facts['hostname'] }}.conf"
