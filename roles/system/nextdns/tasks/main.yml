@@ -56,6 +56,14 @@
     group: root
     mode: 0755
 
+- name: dns_over_tls_toggle.sh is deployed
+  ansible.builtin.copy:
+    src: dns_over_tls_toggle.sh
+    dest: /usr/local/bin/dns_over_tls_toggle.sh
+    owner: root
+    group: root
+    mode: 0755
+
 - name: dns-online.service is deployed
   ansible.builtin.copy:
     src: dns-online.service

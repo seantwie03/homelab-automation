@@ -19,18 +19,16 @@ This setup breaks captive portal authentication because:
 
 Open a browser and navigate to `http://1.1.1.1`. Many captive portals intercept all outbound port 80 traffic regardless of destination and redirect to the login page. If the portal appears, authenticate and you're done.
 
-### Step 2 — If that fails, temporarily remove the resolved override
+### Step 2 — If that fails, use the toggle script
 
 ```bash
-sudo mv /etc/systemd/resolved.conf.d/nextdns.conf /tmp/nextdns.conf.bak
-sudo systemctl restart systemd-resolved
+sudo dns_over_tls_toggle.sh
 ```
 
-This drops resolved back to using only the DHCP-provided hotel DNS (NM still passes per-link DNS to resolved via DBus even with `dns=none`). Navigate to any HTTP site to trigger the portal redirect, then authenticate.
+This moves the resolved override aside and restarts resolved, dropping it back to the DHCP-provided hotel DNS (NM still passes per-link DNS to resolved via DBus even with `dns=none`). Navigate to any HTTP site to trigger the portal redirect, then authenticate.
 
-Restore NextDNS once connected:
+Run the script again to restore NextDNS:
 
 ```bash
-sudo mv /tmp/nextdns.conf.bak /etc/systemd/resolved.conf.d/nextdns.conf
-sudo systemctl restart systemd-resolved
+sudo dns_over_tls_toggle.sh
 ```
