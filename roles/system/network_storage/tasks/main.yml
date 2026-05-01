@@ -16,3 +16,6 @@
 
 # - name: samba tasks
 #   ansible.builtin.import_tasks: samba.yml
+
+- name: bind mount tasks
+  ansible.builtin.import_tasks: bind_mounts.yml

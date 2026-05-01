@@ -12,3 +12,8 @@ samba_mounts:
     share: tier1
   - server: odroidh3plus
     share: tier2
+bind_mounts:
+  - src: /srv/tier1/docs/areas/homelab
+    path: /opt/homelab-automation/docs
+  - src: /srv/tier1/docs
+    path: /home/{{ user }}/u

@@ -1,0 +1,22 @@
+---
+- name: bind mount points exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0775
+  loop: "{{ bind_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: automount configured for bind mounts
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: none
+    boot: false
+    opts: bind,x-systemd.mount-timeout=10,x-systemd.automount,nofail
+    state: present
+  loop: "{{ bind_mounts }}"
+  loop_control:
+    label: "{{ item.path }}"
+  notify: restart local-fs.target

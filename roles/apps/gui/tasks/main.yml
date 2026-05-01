@@ -60,10 +60,9 @@
       - inkscape
       - colord-gtk
 
-- name: kcalc is installed
+- name: gnome-calculator is installed
   ansible.builtin.package:
-    name:
-      - kcalc
+    name: gnome-calculator
 
 - name: mpv is installed
   ansible.builtin.package:
