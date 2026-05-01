@@ -44,7 +44,7 @@ The steps above require internet connectivity. On a fresh system with a WiFi-onl
 If the laptop you are installing does not have an ethernet port, plug in a dongle or docking station, then connect ethernet. If that is not available, you may need to load the Installation Media, connect to WiFi, chroot into your fedora install, then do the steps below.
 
 ```sh
-sudo dnf install iwlwifi-mvm-firmware NetworkManager-wifi wpa_supplicant
+sudo dnf install iwlwifi-mvm-firmware NetworkManager-wifi wpa_supplicant NetworkManager-tui
 sudo systemctl enable --now wpa_supplicant
 reboot
 nmcli dev wifi connect "YourSSID" --ask

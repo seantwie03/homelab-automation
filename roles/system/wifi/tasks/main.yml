@@ -5,6 +5,7 @@
       - iwlwifi-mvm-firmware
       - NetworkManager-wifi
       - wpa_supplicant
+      - NetworkManager-tui
     state: present
   notify: restart NetworkManager
 
