@@ -30,10 +30,3 @@
     - role: gui
     - role: gaming
 
-  tasks:
-    # TODO: remove this task after it has run on all hosts
-    - name: kcalc is removed
-      ansible.builtin.package:
-        name: kcalc
-        state: absent
-
