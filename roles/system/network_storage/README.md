@@ -41,6 +41,8 @@ The `ansible.posix` collection must be available.
             path: /srv/tier1
           - server: odroidh3plus
             path: /srv/tier2
+          - server: odroidh3plus
+            path: /source
         bind_mounts:
           - src: /srv/tier1/docs/areas/homelab
             path: /opt/homelab/docs

@@ -7,6 +7,8 @@ nfs_mounts:
     path: /srv/tier1
   - server: odroidh3plus
     path: /srv/tier2
+  - server: odroidh3plus
+    path: /source
 samba_mounts:
   - server: odroidh3plus
     share: tier1
