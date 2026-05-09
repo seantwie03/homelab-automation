@@ -2,6 +2,18 @@
 
 Install graphical software packages
 
+## JetBrains Toolbox
+
+The playbook downloads and extracts the Toolbox installer into
+`~/.local/share/JetBrains/Toolbox/Installer/` but does not launch it. After
+running the playbook, start the app once manually to complete installation:
+
+```sh
+~/.local/share/JetBrains/Toolbox/Installer/jetbrains-toolbox-<version>/bin/jetbrains-toolbox
+```
+
+This creates the desktop entry and sets up `~/.local/share/JetBrains/Toolbox`.
+
 ## vid-play Chrome Bookmarklet
 
 After running the playbook, add the bookmarklet to Chrome to enable one-click video

@@ -1,0 +1,22 @@
+---
+- name: jetbrains toolbox installer directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.local/share/JetBrains/Toolbox/Installer
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: jetbrains toolbox {{ jetbrains_toolbox_version }} installer stat
+  ansible.builtin.stat:
+    path: /home/{{ user }}/.local/share/JetBrains/Toolbox/Installer/jetbrains-toolbox-{{ jetbrains_toolbox_version }}/bin/jetbrains-toolbox
+  register: jetbrains_toolbox_installer
+
+- name: jetbrains toolbox {{ jetbrains_toolbox_version }} is extracted
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: https://download.jetbrains.com/toolbox/jetbrains-toolbox-{{ jetbrains_toolbox_version }}.tar.gz
+    dest: /home/{{ user }}/.local/share/JetBrains/Toolbox/Installer
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  when: not jetbrains_toolbox_installer.stat.exists
