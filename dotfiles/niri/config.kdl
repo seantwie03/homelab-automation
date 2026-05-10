@@ -119,7 +119,7 @@ layout {
         // Essential: moves the indicator inside the window area
         place-within-column
 
-        inactive-color "#7fb4ca" // Duller color for background tabs
+        inactive-color "#9f9f9f" // Duller color for background tabs
 
         // Optional: make it thicker so it's easier to see
         width 6
@@ -188,13 +188,13 @@ layout {
         // - CSS-like notation: "rgb(255, 127, 0)", rgba(), hsl() and a few others.
 
         // Color of the ring on the active monitor.
-        active-color "#7fc8ff"
+        active-color "#3548cf"
 
         // Color of the ring on inactive monitors.
         //
         // The focus ring only draws around the active window, so the only place
         // where you can see its inactive-color is on other monitors.
-        inactive-color "#505050"
+        inactive-color "#9f9f9f"
 
         // You can also use gradients. They take precedence over solid colors.
         // Gradients are rendered the same as CSS linear-gradient(angle, from, to).
@@ -219,11 +219,11 @@ layout {
         off
 
         width 4
-        active-color "#ffc87f"
-        inactive-color "#505050"
+        active-color "#3548cf"
+        inactive-color "#9f9f9f"
 
         // Color of the border around windows that request your attention.
-        urgent-color "#9b0000"
+        urgent-color "#a60000"
 
         // Gradients can use a few different interpolation color spaces.
         // For example, this is a pastel rainbow gradient via in="oklch longer hue".

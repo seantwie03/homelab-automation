@@ -2,7 +2,7 @@
     font = Noto Sans 11
     corner_radius = 10
     frame_width = 2
-    frame_color = "#888888"
+    frame_color = "#3548cf"
     transparency = 10
     follow = mouse
     origin = top-right
@@ -24,8 +24,8 @@
     timeout = 3
 
 [urgency_critical]
-    background = "#fff0f0"
-    foreground = "#000000"
-    frame_color = "#cc0000"
+    background = "#ffffff"
+    foreground = "#a0132f"
+    frame_color = "#a0132f"
     frame_width = 3
     timeout = 0

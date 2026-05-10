@@ -1,10 +1,14 @@
-window#waybar {
-    background: transparent;
+* {
+    border: none;
+    border-radius: 0;
     font-family: 'Noto Sans', 'UbuntuMono Nerd Font', monospace;
     font-size: 16px;
     font-weight: 600;
-    color: rgb(0, 0, 0);
-    background: rgba(255, 255, 255, 0.9);
+}
+
+window#waybar {
+    background: #ffffff;
+    color: #000000;
     border-radius: 0.6rem;
 }
 
@@ -15,14 +19,16 @@ window#waybar {
 #battery,
 #pulseaudio,
 #custom-dunst,
+#power-profiles-daemon,
+#backlight,
 #tray,
 #custom-power {
     padding: 0 14px;
 }
 
 #workspaces button {
-    color: black;
-    padding: 0px 10px;
+    color: #595959;
+    padding: 0 10px;
     margin: 4px 2px;
     border-radius: 20px;
     border: none;
@@ -31,36 +37,80 @@ window#waybar {
     transition: all 250ms ease;
 }
 
-
-
-/* * { */
-/*   font-family: 'Noto Sans', 'UbuntuMono Nerd Font', monospace; */
-/*   font-size: 16px; */
-/*   padding: 1px 1px 0 1px; */
-/* } */
-/**/
-/* window#waybar { */
-/*   background: rgba(255, 255, 255, 0.9); */
-/*   color: rgb(0, 0, 0); */
-/*   border-radius: 0.6rem; */
-/* } */
-/**/
-#workspaces button {
-    padding: 0 5px;
-    color: #505050;
-    /* border-bottom: 6px solid #505050; */
+#workspaces button:hover,
+#workspaces button.active {
+    color: #3548cf;
+    background: rgba(53, 72, 207, 0.15);
+    border-radius: 0;
+    border-bottom: 3px solid #0031a9;
+    margin-bottom: 0;
 }
 
-#workspaces button.active {
-    background: rgba(127, 200, 255, 0.2);
-    /* border-bottom: 6px solid #7fc8ff; */
+#clock {
+    color: #3548cf;
+}
+
+#pulseaudio:hover,
+#custom-dunst:hover {
+    color: #3548cf;
 }
 
 button.focused {
-    background: rgba(127, 200, 255, 0.2);
-    /* border-bottom: 6px solid #7fc8ff; */
+    background: rgba(53, 72, 207, 0.15);
+    border-bottom: 3px solid #3548cf;
 }
 
-button:not(.focused) {
-    /* border-bottom: 6px solid #505050; */
+#custom-dunst {
+    color: #595959;
+}
+
+#idle_inhibitor {
+    color: #595959;
+}
+
+#idle_inhibitor.activated {
+    color: #3548cf;
+}
+
+#custom-power {
+    color: #a60000;
+}
+
+#power-profiles-daemon.performance {
+    color: #a60000;
+}
+
+#power-profiles-daemon.balanced {
+    color: #3548cf;
+}
+
+#power-profiles-daemon.power-saver {
+    color: #006800;
+}
+
+#battery.warning {
+    color: #884900;
+}
+
+#battery.critical {
+    color: #a60000;
+}
+
+#tray {
+    padding: 4px;
+    margin: 4px;
+}
+
+#tray > * > * {
+    margin: 0 5px;
+}
+
+tooltip {
+    background: #ffffff;
+    border: 2px solid #3548cf;
+}
+
+tooltip label {
+    color: #3548cf;
+    font-weight: 600;
 }

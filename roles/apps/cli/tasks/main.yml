@@ -52,6 +52,15 @@
       loop_control:
         label: "Symlinking {{ item.path | basename }}"
 
+- name: bat dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/bat"
+    dest: /home/{{ user }}/.config/bat
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
 - name: install and configure locate
   ansible.builtin.include_tasks: locate.yml
 
