@@ -652,3 +652,5 @@ window-rule {
     open-maximized true
 }
 
+spawn-at-startup "swaybg" "-i" "/home/sean/.local/share/backgrounds/astronaut_jellyfish.jpg" "-m" "fill"
+
