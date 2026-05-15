@@ -18,6 +18,15 @@
     state: present
     mode: 0644
 
+- name: PRUNE_BIND_MOUNTS is true
+  ansible.builtin.lineinfile:
+    path: /etc/updatedb.conf
+    regexp: '^PRUNE_BIND_MOUNTS ='
+    line: 'PRUNE_BIND_MOUNTS = yes'
+    create: true
+    state: present
+    mode: 0644
+
 - name: plocate-updatedb.timer is enabled and started
   ansible.builtin.service:
     name: plocate-updatedb.timer

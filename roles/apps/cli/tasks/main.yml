@@ -61,6 +61,13 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+- name: bat cache is built to pick up modus theme
+  ansible.builtin.command:
+    cmd: bat cache --build
+  become: true
+  become_user: "{{ user }}"
+  changed_when: false
+
 - name: install and configure locate
   ansible.builtin.include_tasks: locate.yml
 
