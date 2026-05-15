@@ -29,5 +29,5 @@
     - role: hyprland
     - role: niri
     - role: gui
-    # - role: gaming
+    - role: gaming
 
