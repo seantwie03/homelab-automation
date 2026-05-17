@@ -66,6 +66,29 @@ No build or test framework exists — this is declarative Ansible configuration.
 - Indent with **4 spaces** in all `.sh` and `.sh.j2` files.
 - Scripts that must run as root should check at the top: `if [ "$(id -u)" -ne 0 ]; then echo "this script must be run as root" >&2; exit 1; fi`
 
+## Repository Signing Key Conventions
+
+When adding a DNF/YUM repository that uses a remote RPM signing key:
+
+- Check the upstream public key into the role under `files/`.
+- Deploy it to `/etc/pki/rpm-gpg/RPM-GPG-KEY-<name>` with `ansible.builtin.copy`.
+- Import it with `ansible.builtin.rpm_key` from the deployed local file, not from the upstream URL.
+- Pin the full expected fingerprint in the `rpm_key` task.
+- Configure `ansible.builtin.yum_repository.gpgkey` with a `file:///etc/pki/rpm-gpg/RPM-GPG-KEY-<name>` URL, not an `https://` URL.
+- Keep `gpgcheck: true`; use `repo_gpgcheck: true` when the upstream repository supports signed metadata.
+- Update the role README with signing key rotation instructions: fetch command, fingerprint inspection command, and the task file/fingerprint value to update.
+
+Reference implementation: `roles/apps/onepassword/tasks/main.yml`.
+
+For direct remote RPM installs or release RPMs that own their repository files, such as Zoom or RPM Fusion, add retries around networked key imports and package installs:
+
+```yaml
+register: package_install
+retries: 3
+delay: 10
+until: package_install is succeeded
+```
+
 ## Systemd Service and Timer Conventions
 
 **For timers:** After the package install task, place all configuration and override tasks first, then an unconditional `daemon_reload` task immediately before the enable/start task. This ensures systemd discovers both the new unit file and any overrides before the timer is enabled. The `daemon_reload` task must use `changed_when: false` to preserve idempotency. Override tasks must always use `notify` to trigger a handler that restarts the timer.

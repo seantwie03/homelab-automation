@@ -26,6 +26,15 @@
         gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource
         skip_if_unavailable: true
 
+- name: fedora nodejs split packages are absent
+  ansible.builtin.package:
+    name:
+      - nodejs-libs
+      - nodejs-full-i18n
+      - nodejs-npm
+      - nodejs-docs
+    state: absent
+
 - name: nodejs is installed
   ansible.builtin.package:
     name: nodejs
