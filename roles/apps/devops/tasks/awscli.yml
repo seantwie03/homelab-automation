@@ -1,11 +1,94 @@
-- name: awscli v2 is downloaded
-  ansible.builtin.unarchive:
-    src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
-    dest: /var/tmp/
-    remote_src: true
-    creates: /var/tmp/aws/install
+---
+- name: awscli install dependencies are installed
+  ansible.builtin.package:
+    name:
+      - gnupg2
+      - unzip
+    state: present
 
-- name: awscli v2 is installed
+- name: awscli installed version is checked
   ansible.builtin.command:
-    cmd: /var/tmp/aws/install --update
-    creates: /usr/local/bin/aws
+    cmd: /usr/local/bin/aws --version
+  register: awscli_installed_version
+  changed_when: false
+  failed_when: false
+
+- name: awscli {{ awscli_version }} is installed
+  when: awscli_installed_version.stdout is not search('aws-cli/' ~ awscli_version)
+  block:
+    - name: awscli {{ awscli_version }} archive is downloaded
+      ansible.builtin.get_url:
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ awscli_version }}.zip
+        dest: /var/tmp/awscli-{{ awscli_version }}.zip
+        owner: root
+        group: root
+        mode: 0644
+      register: awscli_archive_download
+      retries: 3
+      delay: 10
+      until: awscli_archive_download is succeeded
+
+    - name: awscli {{ awscli_version }} signature is downloaded
+      ansible.builtin.get_url:
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ awscli_version }}.zip.sig
+        dest: /var/tmp/awscli-{{ awscli_version }}.zip.sig
+        owner: root
+        group: root
+        mode: 0644
+      register: awscli_signature_download
+      retries: 3
+      delay: 10
+      until: awscli_signature_download is succeeded
+
+    - name: awscli gpg directory exists
+      ansible.builtin.file:
+        path: /var/tmp/awscli-gpg
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: awscli signing key is imported
+      ansible.builtin.command:
+        cmd: gpg --homedir /var/tmp/awscli-gpg --import {{ role_path }}/files/aws-cli.asc
+      changed_when: false
+
+    - name: awscli signing key fingerprint is pinned
+      ansible.builtin.command:
+        cmd: gpg --homedir /var/tmp/awscli-gpg --fingerprint A6310ACC4672475C
+      register: awscli_signing_key_fingerprint
+      changed_when: false
+      failed_when: >-
+        'FB5D B77F D5C1 18B8 0511  ADA8 A631 0ACC 4672 475C'
+        not in awscli_signing_key_fingerprint.stdout
+
+    - name: awscli {{ awscli_version }} archive signature is verified
+      ansible.builtin.command:
+        cmd: >-
+          gpg --homedir /var/tmp/awscli-gpg
+          --verify /var/tmp/awscli-{{ awscli_version }}.zip.sig
+          /var/tmp/awscli-{{ awscli_version }}.zip
+      changed_when: false
+
+    - name: awscli {{ awscli_version }} installer directory exists
+      ansible.builtin.file:
+        path: /var/tmp/awscli-{{ awscli_version }}
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: awscli {{ awscli_version }} installer is extracted
+      ansible.builtin.unarchive:
+        src: /var/tmp/awscli-{{ awscli_version }}.zip
+        dest: /var/tmp/awscli-{{ awscli_version }}
+        remote_src: true
+
+    - name: awscli {{ awscli_version }} is installed
+      ansible.builtin.command:
+        cmd: >-
+          /var/tmp/awscli-{{ awscli_version }}/aws/install
+          --bin-dir /usr/local/bin
+          --install-dir /usr/local/aws-cli
+          {{ '--update' if awscli_installed_version.rc == 0 else '' }}
+      changed_when: true
