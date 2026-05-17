@@ -1,9 +1,17 @@
 ---
 - name: configure vscode repository
   block:
+    - name: vscode repository key file is installed
+      ansible.builtin.copy:
+        src: microsoft.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-microsoft
+        owner: root
+        group: root
+        mode: 0644
+
     - name: vscode repository key is installed
       ansible.builtin.rpm_key:
-        key: https://packages.microsoft.com/keys/microsoft.asc
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-microsoft
         fingerprint: bc528686b50d79e339d3721ceb3e94adbe1229cf
         state: present
 
@@ -15,7 +23,7 @@
         enabled: true
         gpgcheck: true
         repo_gpgcheck: true
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-microsoft
         skip_if_unavailable: true
 
 - name: vscode is installed

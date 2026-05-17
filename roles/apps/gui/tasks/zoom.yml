@@ -8,6 +8,10 @@
     #     Run gpg --show-keys --fingerprint package-signing-key.pub
     fingerprint: 84C365D6CC9A4886CA926BCC4F2197399706AC24
     state: present
+  register: zoom_repository_key
+  retries: 3
+  delay: 10
+  until: zoom_repository_key is succeeded
 
 - name: installed packages are gathered
   ansible.builtin.package_facts:
@@ -23,5 +27,8 @@
     #     May need to remove -1 suffix
     name: https://zoom.us/client/6.7.5.6891/zoom_x86_64.rpm
     state: present
+  register: zoom_package
+  retries: 3
+  delay: 10
+  until: zoom_package is succeeded
   when: "'zoom' not in ansible_facts.packages"
-

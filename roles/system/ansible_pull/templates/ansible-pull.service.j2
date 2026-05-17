@@ -14,7 +14,7 @@ EnvironmentFile=-/run/ansible-pull.env
 ExecStartPre=-/bin/bash -c "echo PRE_NUM=$(snapper create --type pre --print-number --description 'Before ansible-pull' --cleanup-algorithm timeline) > /run/ansible-pull.env"
 WorkingDirectory={{ playbook_path }}
 Environment="PYTHONUNBUFFERED=True"
-ExecStart=/bin/bash -c "{{ ansible_pull_path }} \
+ExecStart=/bin/bash -c "set -o pipefail; {{ ansible_pull_path }} \
     --limit localhost \
     --accept-host-key \
     --directory {{ playbook_path }} \

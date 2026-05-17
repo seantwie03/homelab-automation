@@ -1,9 +1,17 @@
 ---
 - name: docker repository is added
   block:
+    - name: docker repository key file is installed
+      ansible.builtin.copy:
+        src: docker.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-docker
+        owner: root
+        group: root
+        mode: 0644
+
     - name: docker repository key is installed
       ansible.builtin.rpm_key:
-        key: https://download.docker.com/linux/fedora/gpg
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-docker
         fingerprint: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
         state: present
 
@@ -15,7 +23,7 @@
         enabled: true
         gpgcheck: true
         repo_gpgcheck: true
-        gpgkey: https://download.docker.com/linux/fedora/gpg
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-docker
         skip_if_unavailable: true
 
 - name: docker packages are installed
@@ -39,4 +47,3 @@
     name: "{{ user }}"
     groups: docker
     append: true
-

@@ -1,9 +1,17 @@
 ---
 - name: nodesource repository is configured
   block:
+    - name: nodesource repository key file is installed
+      ansible.builtin.copy:
+        src: nodesource.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource
+        owner: root
+        group: root
+        mode: 0644
+
     - name: nodesource repository key is installed
       ansible.builtin.rpm_key:
-        key: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource
         fingerprint: 242b813831af09562b6c46f76b88da4e3af28a14
         state: present
 
@@ -15,7 +23,7 @@
         enabled: true
         gpgcheck: true
         priority: 10
-        gpgkey: https://rpm.nodesource.com/gpgkey/ns-operations-public.key
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource
         skip_if_unavailable: true
 
 - name: nodejs is installed
@@ -28,4 +36,3 @@
     name: pnpm
     global: true
     state: present
-

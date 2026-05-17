@@ -1,9 +1,17 @@
 ---
 - name: 1password repository is configured
   block:
+    - name: 1password repository key file is installed
+      ansible.builtin.copy:
+        src: 1password.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
+        owner: root
+        group: root
+        mode: 0644
+
     - name: 1password repository key is installed
       ansible.builtin.rpm_key:
-        key: https://downloads.1password.com/linux/keys/1password.asc
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
         fingerprint: 3fef9748469adbe15da7ca80ac2d62742012ea22
         state: present
 
@@ -15,7 +23,7 @@
         enabled: true
         gpgcheck: true
         repo_gpgcheck: true
-        gpgkey: https://downloads.1password.com/linux/keys/1password.asc
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-1password
         skip_if_unavailable: true
 
 - name: 1password CLI is installed

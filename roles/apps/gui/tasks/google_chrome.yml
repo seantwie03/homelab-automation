@@ -1,9 +1,17 @@
 ---
 - name: configure google-chrome repository
   block:
+    - name: google repository key file is installed
+      ansible.builtin.copy:
+        src: google_linux_signing_key.pub
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-google
+        owner: root
+        group: root
+        mode: 0644
+
     - name: google repository key is installed
       ansible.builtin.rpm_key:
-        key: https://dl.google.com/linux/linux_signing_key.pub
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-google
         fingerprint: eb4c1bfd4f042f6dddccec917721f63bd38b4796
         state: present
 
@@ -15,7 +23,7 @@
         enabled: true
         gpgcheck: true
         repo_gpgcheck: true
-        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-google
         skip_if_unavailable: true
 
 - name: google chrome is installed
@@ -69,4 +77,3 @@
   become_user: "{{ user }}"
   when: vidplay_handler.stdout != 'vid-play.desktop'
   changed_when: true
-

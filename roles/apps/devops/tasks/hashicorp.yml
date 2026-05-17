@@ -1,8 +1,16 @@
 - name: hasicorp repository is configured
   block:
+    - name: hasicorp repository key file is installed
+      ansible.builtin.copy:
+        src: hashicorp.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-hashicorp
+        owner: root
+        group: root
+        mode: 0644
+
     - name: hasicorp repository key is installed
       ansible.builtin.rpm_key:
-        key: https://rpm.releases.hashicorp.com/gpg
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-hashicorp
         fingerprint: 798aec654e5c15428c8e42eeaa16fcbca621e701
         state: present
 
@@ -14,7 +22,7 @@
         enabled: true
         gpgcheck: true
         repo_gpgcheck: true
-        gpgkey: https://rpm.releases.hashicorp.com/gpg
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-hashicorp
         skip_if_unavailable: true
 
 - name: terraform is installed
