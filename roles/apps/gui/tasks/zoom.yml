@@ -19,16 +19,12 @@
 
 - name: zoom is installed
   ansible.builtin.package:
-    # Find the latest version
-    #     cd ~/Downloads
-    #     rm zoom_x86_64.rpm 2>/dev/null
-    #     wget https://zoom.us/client/latest/zoom_x86_64.rpm
-    #     rpm -qp ./zoom_x86_64.rpm
-    #     May need to remove -1 suffix
-    name: https://zoom.us/client/6.7.5.6891/zoom_x86_64.rpm
+    name: https://zoom.us/client/{{ zoom_version }}/zoom_x86_64.rpm
     state: present
   register: zoom_package
   retries: 3
   delay: 10
   until: zoom_package is succeeded
-  when: "'zoom' not in ansible_facts.packages"
+  when: >-
+    'zoom' not in ansible_facts.packages
+    or ansible_facts.packages.zoom[0].version != zoom_version

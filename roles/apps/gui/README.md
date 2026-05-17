@@ -89,6 +89,29 @@ Use the full fingerprint with no spaces, for example:
 fingerprint: 4489BCBB3CB130533709175F027B1C752E38957A
 ```
 
+## Zoom Updates
+
+Zoom is installed from a versioned remote RPM URL and pinned by `zoom_version`
+in `roles/apps/gui/defaults/main.yml`. The role checks the installed RPM version
+before installing, so the remote package is only downloaded when Zoom is missing
+or the installed version differs from `zoom_version`.
+
+To update Zoom, find the latest RPM version:
+
+```sh
+cd ~/Downloads
+rm zoom_x86_64.rpm 2>/dev/null
+wget https://zoom.us/client/latest/zoom_x86_64.rpm
+rpm -qp ./zoom_x86_64.rpm
+```
+
+Use the RPM version without the release suffix as `zoom_version`. For example,
+if `rpm -qp` returns `zoom-6.7.5.6891-1.x86_64`, use:
+
+```yaml
+zoom_version: 6.7.5.6891
+```
+
 ## JetBrains Toolbox
 
 The playbook downloads and extracts the Toolbox installer into
