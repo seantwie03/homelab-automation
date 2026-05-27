@@ -1,0 +1,11 @@
+---
+- name: yazi copr is enabled
+  community.general.copr:
+    name: lihaohong/yazi
+    state: enabled
+
+- name: yazi is installed
+  ansible.builtin.package:
+    name: yazi
+    state: present
+

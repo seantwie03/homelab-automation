@@ -18,7 +18,9 @@
 
 - name: community.general prerequisites are installed
   ansible.builtin.package:
-    name: python3-dnf
+    name:
+      - python3-dnf
+      - dnf-plugins-core
     state: present
 
 - name: usbutils are installed (lsusb)

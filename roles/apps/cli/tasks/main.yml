@@ -71,6 +71,9 @@
 - name: install and configure locate
   ansible.builtin.include_tasks: locate.yml
 
+- name: yazi is installed
+  ansible.builtin.include_tasks: yazi.yml
+
 # - name: install and configure presenterm
 #   ansible.builtin.include_tasks: presenterm.yml
 
