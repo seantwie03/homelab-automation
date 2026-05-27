@@ -1,0 +1,158 @@
+"==================== Key handling ====================
+sethandler <c-a> a:vim
+sethandler <c-b> n:vim i-v:ide
+sethandler <c-c> n-i:vim v:ide
+sethandler <c-d> a:vim
+sethandler <c-e> n:vim i-v:ide
+sethandler <c-f> n:vim i-v:ide
+sethandler <c-g> a:ide
+sethandler <c-h> n:vim i-v:ide
+sethandler <c-i> a:vim
+sethandler <c-j> n:vim i-v:ide
+sethandler <c-k> n:vim i-v:ide
+sethandler <c-l> n:vim i-v:ide
+sethandler <c-m> a:vim " up for  grabs
+sethandler <c-n> i:vim n-v:ide "might not use, down and up are pretty easy to press on my keyboard
+sethandler <c-o> a:vim
+sethandler <c-p> i:vim n-v:ide "might not use, down and up are pretty easy to press on my keyboard
+sethandler <c-q> a:vim " up for grabs
+sethandler <c-r> a:vim
+sethandler <c-s> a:vim
+sethandler <c-t> a:vim
+sethandler <c-u> a:vim
+sethandler <c-v> n:vim i-v:ide
+sethandler <c-w> a:vim
+sethandler <c-x> a:vim
+sethandler <c-y> a:vim
+sethandler <c-z> a:ide
+sethandler <c-[> a:vim
+sethandler <c-]> a:vim
+sethandler <s-del> a:ide
+sethandler <s-ins> a:ide
+sethandler <c-ins> a:ide
+sethandler <S-CR> a:vim
+sethandler <C-S-6> a:vim
+sethandler <C-\> a:vim
+
+" ideavim specific settings - https://github.com/jetbrains/ideavim/wiki/%22set%22-commands
+set keymodel=startsel,stopsel
+set ideajoin
+set showmode
+set showcmd
+set idearefactormode=keep
+set clipboard^=unnamed,unnamedplus,ideaput
+set incsearch
+set startofline=on
+set scrolloff=8
+
+"==================== Emulated Plugins ====================
+Plug 'tpope/vim-surround'
+Plug 'vim-scripts/ReplaceWithRegister'
+Plug 'machakann/vim-highlightedyank'
+Plug 'dbakker/vim-paragraph-motion'
+Plug 'vim-scripts/argtextobj.vim'
+
+"==================== Vim Settings ====================
+set visualbell
+set noerrorbells
+
+"==================== Vim Mappings ====================
+" Leader
+let mapleader = " "
+
+" Split Navigation
+nnoremap <C-j> <C-w><C-j>
+nnoremap <C-k> <C-w><C-k>
+nnoremap <C-l> <C-w><C-l>
+nnoremap <C-h> <C-w><C-h>
+
+" Allow j and k to move to wrapped lines
+nnoremap j gj
+nnoremap k gk
+
+" Keep view centered when navigating vertically
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+
+" Keep view centered when searching
+nnoremap n nzz
+nnoremap N Nzz
+
+" Backspace in Visual mode deletes selection
+vnoremap <BS> d
+
+" 0 goes to first non-whitespace
+noremap 0 ^
+
+" Save in a more natural way
+" Easier way to exit insert mode
+noremap <C-s> :w<CR>
+vnoremap <C-s> <ESC>:w<CR>
+" ideavim doesn't like map!
+inoremap <C-s> <ESC>:w<CR>
+cnoremap <C-s> <ESC>:w<CR>
+
+" Remap original CTRL-A functionality to <leader>
+nnoremap <leader><C-a> <C-a>
+vnoremap <leader><C-a> <C-a>
+" CTRL-A is Select All '$VIMRUNTIME/mswin.vim'
+noremap <C-A> ggvG$
+inoremap <C-A> <ESC>ggvG$
+
+" Remap original CTRL-X functionality to <leader>
+nnoremap <leader><C-x> <C-x>
+vnoremap <leader><C-x> <C-x>
+" CTRL-X and SHIFT-Del are Cut in Visual
+vnoremap <C-x> "+x
+vnoremap <S-Del> "+x
+" CTRL-X on a line in normal mode cuts the entire line
+nnoremap <C-x> dd
+
+" CTRL-C and C-Insert are Copy
+vnoremap <C-c> "+y
+vnoremap <C-Insert> "+y
+" CTRL-C on a line in normal mode copies the entire line
+nnoremap <C-c> yy
+
+" Y behaves like D, C, etc.
+map Y y$
+
+" CTRL-V and SHIFT-Insert are Paste in commandline mode
+cnoremap <C-v> <C-r>+
+cnoremap <S-Insert> <C-r>+
+
+" Insert a new line above the cursor
+map <leader>O O<Esc>
+" Insert a new line below the cursor
+map <leader>o o<Esc>
+
+"==================== IdeaVim Action Mappings ====================
+map <C-w>q <Action>(CloseAllEditors)
+map <C-w>m <Action>(MaximizeEditorInSplit)
+map <C-w>s <Action>(SplitHorizontally)
+map <C-w>v <Action>(MoveTabRight)
+map <C-w>= <Action>(MaximizeEditorInSplit)
+
+" Leader-d (Diagnostic)
+map <leader>dn <Action>(GotoNextError)
+map ]d <Action>(GotoNextError)
+map <leader>dp <Action>(GotoPreviousError)
+map [d <Action>(GotoPreviousError)
+
+" Leader-f (Find-Something)
+map <leader>fa <Action>(GotoAction)
+map <leader>fb <Action>(RecentLocations)
+map <leader>ff <Action>(GotoFile)
+map <leader>ft <Action>(FindInPath)
+map <leader>fr <Action>(RecentFiles)
+
+" Leader-r (Refactor-Something)
+map <leader>rc <Action>(Refactorings.QuickListPopupAction)
+map <leader>re <Action>(ExtractMethod)
+map <leader>rr <Action>(RenameElement)
+map <leader>rt <Action>(ChangeTypeSignature)
+
+" Leader-v[a-z] (Vim-Something)
+map <leader>vr <Action>(IdeaVim.ReloadVimRc.reload)
+
+" Find more examples here: https://jb.gg/share-ideavimrc

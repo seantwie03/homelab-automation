@@ -20,3 +20,13 @@
     owner: "{{ user }}"
     group: "{{ user }}"
   when: not jetbrains_toolbox_installer.stat.exists
+
+- name: symlink ideavim dotfiles directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/ideavim"
+    dest: /home/{{ user }}/.config/ideavim
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
