@@ -4,6 +4,7 @@
     name:
       - glib2-devel
       - gtk3-devel
+      - pulseaudio-libs-devel
     state: present
 
 - name: /home/{{ user }}/.local/src directory exists
