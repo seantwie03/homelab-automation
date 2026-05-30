@@ -146,6 +146,9 @@ map <leader>ff <Action>(GotoFile)
 map <leader>ft <Action>(FindInPath)
 map <leader>fr <Action>(RecentFiles)
 
+" Leader-s (Start-Something)
+map <leader>sa <Action>(Run)
+
 " Leader-r (Refactor-Something)
 map <leader>rc <Action>(Refactorings.QuickListPopupAction)
 map <leader>re <Action>(ExtractMethod)
