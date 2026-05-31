@@ -34,4 +34,4 @@ ansible-pull creates a snapper pre/post snapshot pair around each run. Verify th
 snapper -c root list | grep ansible-pull
 ```
 
-All ansible-pull pre/post rows should show the same value in the `Cleanup` column. A mix of `number` and `timeline` values indicates the snapper integration changed at some point. See the snapper section of the host runbook for how to handle stale `number`-type snapshots.
+All ansible-pull pre/post rows should use the `number` cleanup algorithm.

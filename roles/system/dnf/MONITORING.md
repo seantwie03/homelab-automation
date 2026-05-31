@@ -29,3 +29,13 @@ journalctl -u dnf5-automatic.service --since "7 days ago" | tail -20
 Expected: `Transaction finished.` with exit code 0. The run consumes significant memory (~2 GiB peak) and CPU — that is normal.
 
 If no entry appears in the last 7 days, the machine was likely off on Tuesday night. `Persistent=true` is not set on this timer, so missed runs are not caught up automatically.
+
+## Snapper Pre/Post Snapshots
+
+dnf-automatic creates a snapper pre/post snapshot pair around each update run using the `number` cleanup algorithm.
+
+```
+snapper -c root list | grep dnf-automatic
+```
+
+The pre snapshot should show `Before dnf-automatic`, and the matching post snapshot should show `After dnf-automatic`.

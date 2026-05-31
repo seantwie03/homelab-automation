@@ -48,7 +48,7 @@
     group: root
     mode: 0755
 
-- name: dnf-automatic.service runs after ansible-pull and dnf-makecache
+- name: dnf-automatic.service is after ansible-pull and snapshotted
   ansible.builtin.copy:
     src: dnf-automatic-service-override.conf
     dest: /etc/systemd/system/dnf-automatic.service.d/override.conf

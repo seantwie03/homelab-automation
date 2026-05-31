@@ -27,3 +27,8 @@
   ansible.builtin.package:
     name: usbutils
     state: present
+
+- name: kitty terminfo is installed
+  ansible.builtin.package:
+    name: kitty-terminfo
+    state: present

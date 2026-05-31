@@ -8,6 +8,7 @@
     user: sean
     uid: 1000
     gid: 1000
+    dnf_automatic_reboot: when-needed
     btrbk_volumes:
       - volume: /
         snapshot_dir: /.btrbk_snapshots
@@ -24,8 +25,6 @@
     - role: core
     - role: ansible_pull
     - role: dnf
-      vars:
-        dnf_automatic_reboot: when-needed
     - role: btrfs
     - role: cli
     - role: karakeep
