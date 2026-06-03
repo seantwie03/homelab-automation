@@ -1,0 +1,34 @@
+@import url("style.css");
+
+* {
+    font-size: 14px;
+}
+
+#idle_inhibitor,
+#workspaces,
+#cffi\.niri_window_buttons,
+#clock,
+#battery,
+#pulseaudio,
+#custom-dunst,
+#power-profiles-daemon,
+#backlight,
+#tray,
+#custom-power {
+    padding: 0 7px;
+}
+
+#workspaces button {
+    padding: 0 6px;
+    min-width: 18px;
+}
+
+#tray {
+    padding: 2px;
+    margin: 2px;
+}
+
+#tray > * > * {
+    margin: 0 2px;
+}
+
