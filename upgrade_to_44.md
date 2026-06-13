@@ -102,8 +102,8 @@ Check enabled repositories:
 dnf repolist
 ```
 
-`desktop25` uses Fedora, RPM Fusion, Docker, HashiCorp, 1Password, Tailscale,
-NodeSource, Google Chrome, VS Code, Wayscriber, and virtio-win repositories.
+`desktop25` uses Fedora, RPM Fusion, Docker, HashiCorp, 1Password, NodeSource,
+Google Chrome, VS Code, Wayscriber, and virtio-win repositories.
 The upgrade solver is the final compatibility check for these repositories.
 Do not use `--allowerasing` merely to hide an unavailable third-party
 repository or an unexplained dependency conflict.

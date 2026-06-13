@@ -1,30 +1,18 @@
 ---
-- name: configure tailscale repository
-  block:
-    - name: tailscale repository key file is installed
-      ansible.builtin.copy:
-        src: tailscale.gpg
-        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-tailscale
-        owner: root
-        group: root
-        mode: 0644
+- name: tailscale-stable repository is absent
+  ansible.builtin.yum_repository:
+    name: tailscale-stable
+    state: absent
 
-    - name: tailscale repository key is installed
-      ansible.builtin.rpm_key:
-        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-tailscale
-        fingerprint: 2596a99eaab33821893c0a79458ca832957f5868
-        state: present
+- name: tailscale repository key is absent
+  ansible.builtin.rpm_key:
+    key: 2596a99eaab33821893c0a79458ca832957f5868
+    state: absent
 
-    - name: tailscale repository is enabled
-      ansible.builtin.yum_repository:
-        name: tailscale-stable
-        description: Tailscale stable
-        baseurl: https://pkgs.tailscale.com/stable/fedora/$basearch/
-        enabled: true
-        gpgcheck: true
-        repo_gpgcheck: true
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-tailscale
-        skip_if_unavailable: true
+- name: tailscale repository key file is absent
+  ansible.builtin.file:
+    path: /etc/pki/rpm-gpg/RPM-GPG-KEY-tailscale
+    state: absent
 
 - name: tailscale is installed
   ansible.builtin.package:
