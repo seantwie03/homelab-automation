@@ -80,19 +80,21 @@ sudo rpm -qa >/dev/null
 sudo dnf check
 ```
 
-On this host, enumerating the RPM database currently reports a bad signature
-on the installed Zoom package. If `rpm -qa` still produces that error, remove
-Zoom before the upgrade:
+On this host, Zoom's current RPM signature is incompatible with RPM 6 and
+causes RPM database enumeration to skip the installed package. Zoom is not
+needed during this upgrade, so remove it without signature verification:
 
 ```bash
 sudo rpm -e --nosignature zoom
 sudo rpm --verifydb
 sudo rpm -qa >/dev/null
+sudo dnf check
 ```
 
-The `gui` role will reinstall the configured Zoom version when Ansible is run
-after the upgrade. Do not continue until both RPM checks complete without an
-RPM database error.
+The `gui` role temporarily keeps Zoom uninstalled. Leave it uninstalled until
+Zoom publishes an RPM that passes RPM 6 signature validation and the
+installation tasks are restored. Do not continue until all package checks
+complete without errors.
 
 Check enabled repositories:
 
