@@ -208,7 +208,7 @@ cat /etc/fedora-release
 uname -r
 sudo dnf system-upgrade log
 sudo systemctl --failed
-sudo journalctl -b -p warning
+sudo journalctl -b -p warning --no-pager
 ```
 
 Synchronize installed packages with the Fedora 44 repositories and verify
