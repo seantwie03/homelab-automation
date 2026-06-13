@@ -9,7 +9,7 @@ SLEEP_INTERVAL=2
 echo "Testing DNS resolution of ${HOST}..."
 
 for i in $(seq 1 ${MAX_ATTEMPTS}); do
-    if systemd-resolve "${HOST}" >/dev/null 2>&1; then
+    if resolvectl query "${HOST}" >/dev/null 2>&1; then
         echo "DNS is online (attempt ${i}/${MAX_ATTEMPTS})"
         exit 0
     fi

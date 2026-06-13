@@ -298,16 +298,6 @@ journalctl -u dnf-makecache.service -n 100 --no-pager
 These tasks are not required to complete the upgrade. Perform them only after
 Fedora 44 and the desktop environment are stable.
 
-### Replace deprecated DNS query commands
-
-Replace `systemd-resolve` with `resolvectl query` in:
-
-- `roles/system/nextdns/files/wait-dns-online.sh`
-- `roles/system/dnf/files/dnf-makecache-user.service`
-
-Fedora 44 still provides the compatibility command, so this is preventive
-maintenance rather than an upgrade blocker.
-
 ### Remove old DNF Automatic drop-ins
 
 After the role has migrated to canonical `dnf5-automatic` names and has run
