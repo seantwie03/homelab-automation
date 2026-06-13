@@ -1,9 +1,16 @@
 ---
-- name: gemini is installed
+- name: gemini cli is absent
   community.general.npm:
     name: "@google/gemini-cli"
     global: true
-    state: present
+    state: absent
+
+- name: antigravity cli is installed
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://antigravity.google/cli/install.sh | bash  # noqa: command-instead-of-module
+    creates: /home/{{ user }}/.local/bin/agy
+  become: true
+  become_user: "{{ user }}"
 
 - name: codex is installed
   community.general.npm:
@@ -17,7 +24,4 @@
     creates: /home/{{ user }}/.local/bin/claude
   become: true
   become_user: "{{ user }}"
-
-# - name: antigravity is installed
-#   ansible.builtin.include_tasks: antigravity.yml
 
