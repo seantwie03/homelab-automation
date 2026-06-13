@@ -312,27 +312,15 @@ sudo systemctl daemon-reload
 
 Do not remove the `dnf-makecache.*` overrides.
 
-### Remove retired Fedora 43 packages
-
-Install Fedora's retired-package utility and remove packages retired between
-Fedora 43 and Fedora 44:
-
-```bash
-sudo dnf install remove-retired-packages
-sudo remove-retired-packages 43
-```
-
-Review the proposed removals before confirming.
-
-### Review duplicate and unsatisfied packages
+### Review duplicate packages and dependency problems
 
 ```bash
 sudo dnf repoquery --duplicates
-sudo dnf repoquery --unsatisfied
 sudo dnf check
 ```
 
-Investigate duplicates before removing anything.
+`dnf check` reports unsatisfied dependencies and package conflicts. Investigate
+duplicates before removing anything.
 
 ### Review configuration file replacements
 
