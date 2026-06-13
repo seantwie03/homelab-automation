@@ -32,10 +32,10 @@ If no entry appears in the last 7 days, the machine was likely off on Tuesday ni
 
 ## Snapper Pre/Post Snapshots
 
-dnf-automatic creates a snapper pre/post snapshot pair around each update run using the `number` cleanup algorithm.
+dnf5-automatic creates a snapper pre/post snapshot pair around each update run using the `number` cleanup algorithm.
 
 ```
-snapper -c root list | grep dnf-automatic
+snapper -c root list | grep dnf5-automatic
 ```
 
-The pre snapshot should show `Before dnf-automatic`, and the matching post snapshot should show `After dnf-automatic`.
+The pre snapshot should show `Before dnf5-automatic`, and the matching post snapshot should show `After dnf5-automatic`.

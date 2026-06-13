@@ -21,49 +21,57 @@
     owner: root
     group: root
     mode: 0644
-  notify: restart dnf-automatic timer
+  notify: restart dnf5-automatic timer
 
-- name: dnf-automatic.timer override directory exists
+- name: dnf5-automatic.timer override directory exists
   ansible.builtin.file:
-    path: /etc/systemd/system/dnf-automatic.timer.d
+    path: /etc/systemd/system/dnf5-automatic.timer.d
     state: directory
     owner: root
     group: root
     mode: 0755
 
-- name: dnf-automatic.timer randomized delay is disabled
+- name: dnf5-automatic.timer randomized delay is disabled
   ansible.builtin.copy:
-    src: dnf-automatic-timer-override.conf
-    dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
+    src: dnf5-automatic-timer-override.conf
+    dest: /etc/systemd/system/dnf5-automatic.timer.d/override.conf
     owner: root
     group: root
     mode: 0644
-  notify: restart dnf-automatic timer
+  notify: restart dnf5-automatic timer
 
-- name: dnf-automatic.service override directory exists
+- name: dnf5-automatic.service override directory exists
   ansible.builtin.file:
-    path: /etc/systemd/system/dnf-automatic.service.d
+    path: /etc/systemd/system/dnf5-automatic.service.d
     state: directory
     owner: root
     group: root
     mode: 0755
 
-- name: dnf-automatic.service is after ansible-pull and snapshotted
+- name: dnf5-automatic.service is after ansible-pull and snapshotted
   ansible.builtin.copy:
-    src: dnf-automatic-service-override.conf
-    dest: /etc/systemd/system/dnf-automatic.service.d/override.conf
+    src: dnf5-automatic-service-override.conf
+    dest: /etc/systemd/system/dnf5-automatic.service.d/override.conf
     owner: root
     group: root
     mode: 0644
-  notify: restart dnf-automatic timer
+  notify: restart dnf5-automatic timer
+
+- name: legacy dnf-automatic override directories are absent
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ item }}
+    state: absent
+  loop:
+    - dnf-automatic.timer.d
+    - dnf-automatic.service.d
 
 - name: systemd daemon is reloaded
   ansible.builtin.systemd:
     daemon_reload: true
   changed_when: false
 
-- name: dnf-automatic.timer is enabled and started
+- name: dnf5-automatic.timer is enabled and started
   ansible.builtin.service:
-    name: dnf-automatic.timer
+    name: dnf5-automatic.timer
     enabled: true
     state: started

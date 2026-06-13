@@ -1,6 +1,6 @@
-# Upgrade desktop22 from Fedora 43 to Fedora 44
+# Upgrade desktop25 from Fedora 43 to Fedora 44
 
-This procedure upgrades `desktop22` using Fedora's supported DNF5 offline
+This procedure upgrades `desktop25` using Fedora's supported DNF5 offline
 system-upgrade workflow.
 
 References:
@@ -29,7 +29,7 @@ Complete these changes before upgrading the host:
 5. Apply the final Fedora 43 configuration and confirm that it succeeds:
 
    ```bash
-   sudo h a test desktop22.yml
+   sudo h a test desktop25.yml
    ```
 
 6. Confirm that the DNF5 Automatic schedule and service override are loaded:
@@ -100,7 +100,7 @@ Check enabled repositories:
 dnf repolist
 ```
 
-`desktop22` uses Fedora, RPM Fusion, Docker, HashiCorp, 1Password, Tailscale,
+`desktop25` uses Fedora, RPM Fusion, Docker, HashiCorp, 1Password, Tailscale,
 NodeSource, Google Chrome, VS Code, Wayscriber, and virtio-win repositories.
 The upgrade solver is the final compatibility check for these repositories.
 Do not use `--allowerasing` merely to hide an unavailable third-party
@@ -222,19 +222,19 @@ Run the complete host configuration:
 
 ```bash
 cd /opt/homelab-automation
-sudo h a test desktop22.yml
+sudo h a test desktop25.yml
 ```
 
 Run it a second time to check idempotency:
 
 ```bash
-sudo h a test desktop22.yml
+sudo h a test desktop25.yml
 ```
 
 The second run should complete with `failed=0`; investigate unexpected changes
 that repeat on every run.
 
-## 9. Verify desktop22 services
+## 9. Verify desktop25 services
 
 Check the services and timers most likely to expose an upgrade regression:
 
