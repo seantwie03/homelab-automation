@@ -76,22 +76,3 @@
 
 # - name: install and configure presenterm
 #   ansible.builtin.include_tasks: presenterm.yml
-
-- name: gemini is installed
-  community.general.npm:
-    name: "@google/gemini-cli"
-    global: true
-    state: present
-
-- name: codex is installed
-  community.general.npm:
-    name: "@openai/codex"
-    global: true
-    state: present
-
-- name: claude code is installed
-  ansible.builtin.shell:
-    cmd: curl -fsSL https://claude.ai/install.sh | bash  # noqa: command-instead-of-module
-    creates: /home/{{ user }}/.local/bin/claude
-  become: true
-  become_user: "{{ user }}"

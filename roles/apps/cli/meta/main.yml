@@ -1,4 +1,4 @@
 ---
 dependencies:
-  - role: nodejs # To install gemini and presenterm
+  - role: nodejs # To support neovim plugins
   # - role: rust # To install presenterm

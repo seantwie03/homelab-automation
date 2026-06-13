@@ -41,9 +41,6 @@
 - name: jetbrains toolbox is installed
   ansible.builtin.include_tasks: jetbrains_toolbox.yml
 
-# - name: install google antigravity
-#   ansible.builtin.include_tasks: antigravity.yml
-
 - name: print packages are installed
   ansible.builtin.include_tasks: printer.yml
 
@@ -80,4 +77,3 @@
     follow: false
     owner: "{{ user }}"
     group: "{{ user }}"
-

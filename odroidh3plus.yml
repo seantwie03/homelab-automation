@@ -27,6 +27,7 @@
     - role: dnf
     - role: btrfs
     - role: cli
+    - role: ai
     - role: karakeep
     - role: retrogaming
       vars:

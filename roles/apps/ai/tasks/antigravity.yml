@@ -1,5 +1,5 @@
 ---
-- name: add antigravity repo
+- name: antigravity repository is configured
   ansible.builtin.copy:
     src: antigravity.repo
     dest: /etc/yum.repos.d/antigravity.repo
@@ -11,3 +11,4 @@
   ansible.builtin.package:
     name: antigravity
     state: present
+

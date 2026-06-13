@@ -23,6 +23,7 @@
     - role: nodejs
     - role: python
     - role: cli
+    - role: ai
     - role: network_storage
     - role: devops
     - role: niri
@@ -35,4 +36,3 @@
       ansible.builtin.file:
         path: /etc/profile.d/nvim-alias.sh
         state: absent
-

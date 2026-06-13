@@ -18,6 +18,7 @@
     - role: rpm_fusion
     - role: wifi
     - role: cli
+    - role: ai
     - role: fonts
     - role: onepassword
     - role: tailscale
@@ -30,4 +31,3 @@
     - role: niri
     - role: gui
     - role: gaming
-
