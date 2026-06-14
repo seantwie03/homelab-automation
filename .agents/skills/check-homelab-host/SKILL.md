@@ -41,7 +41,9 @@ Check:
 - graphical user services only when the host has a graphical role and session
 - DNS, networking, and Tailscale when their roles are present
 - RPM database and dependency health
-- current-boot kernel errors, storage errors, and OOM events
+- current-boot kernel warnings, errors, and hardware initialization failures
+- `/sys` health and security status interfaces for degraded or vulnerable states
+- storage errors and OOM events
 
 Use read-only system commands and request scoped elevated access when the
 sandbox blocks the system bus, journal, or device metadata. Commands requiring
