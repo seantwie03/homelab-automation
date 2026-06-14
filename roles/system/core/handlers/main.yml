@@ -6,4 +6,4 @@
       - --force
       - --kver
       - "{{ ansible_facts['kernel'] }}"
-
+  changed_when: true
