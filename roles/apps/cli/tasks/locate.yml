@@ -22,7 +22,7 @@
   ansible.builtin.lineinfile:
     path: /etc/updatedb.conf
     regexp: '^PRUNE_BIND_MOUNTS ='
-    line: 'PRUNE_BIND_MOUNTS = yes'
+    line: 'PRUNE_BIND_MOUNTS = "yes"'
     create: true
     state: present
     mode: 0644
