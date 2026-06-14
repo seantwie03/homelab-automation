@@ -1,0 +1,9 @@
+---
+- name: current kernel initramfs is rebuilt
+  ansible.builtin.command:
+    argv:
+      - dracut
+      - --force
+      - --kver
+      - "{{ ansible_facts['kernel'] }}"
+

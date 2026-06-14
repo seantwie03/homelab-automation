@@ -32,3 +32,13 @@
   ansible.builtin.package:
     name: kitty-terminfo
     state: present
+
+- name: intel cpu microcode is installed
+  ansible.builtin.package:
+    name: microcode_ctl
+    state: present
+  notify: current kernel initramfs is rebuilt
+  when:
+    - ansible_facts['architecture'] == 'x86_64'
+    - ansible_facts['processor'] | select('search', 'GenuineIntel') | length > 0
+

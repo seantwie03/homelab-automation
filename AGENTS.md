@@ -62,6 +62,9 @@ No build or test framework exists; this is declarative Ansible configuration.
 - **Do not quote strings** unless required. Quotes are required when the value starts with a Jinja2 variable (`"{{ var }}/path"`), starts with a YAML special character, or is a boolean/number that must be treated as a string.
   - Good: `state: present`, `dest: /home/{{ user }}/.config`
   - Bad: `state: "present"`, `dest: "/etc/foo"`
+- Access gathered facts through `ansible_facts`, not deprecated injected top-level `ansible_*` variables.
+  - Good: `ansible_facts['architecture']`
+  - Bad: `ansible_architecture`
 - Prefer **generic modules** (`package`, `service`) over distro-specific ones (`dnf`, `systemd`).
 
 ## Shell Script Conventions
