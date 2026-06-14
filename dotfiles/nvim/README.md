@@ -8,9 +8,6 @@
 - Yazi to replace Oil
     - https://github.com/mikavilpas/yazi.nvim
     - https://github.com/sxyazi/yazi
-- Diff Viewer
-    - https://www.lazyvim.org/extras/editor/mini-diff
-
 ## Blogs
 
 - Workflow for Command Line Demonstrations
