@@ -1,0 +1,4 @@
+interface:
+  display_name: "Check Homelab Host"
+  short_description: "Audit health of an Ansible-managed homelab host"
+  default_prompt: "Use $check-homelab-host to audit this host and investigate any unhealthy results."

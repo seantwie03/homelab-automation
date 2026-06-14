@@ -1,43 +1,95 @@
-# btrfs Role — Monitoring
+# btrfs Role - Monitoring
+
+## Managed Filesystems And Snapshot Policy
+
+Read `btrbk_volumes` in the host playbook and the role defaults. Confirm the
+deployed configuration agrees:
+
+```sh
+btrbk -c /etc/btrbk/btrbk.conf config print
+findmnt -t btrfs -o TARGET,SOURCE,FSTYPE,OPTIONS
+```
+
+The default configuration manages `/` and snapshots `/home`. Server hosts may
+also manage filesystems such as `/srv`.
 
 ## btrbk Snapshots
 
-List snapshots and their retention status:
-
-```
-sudo btrbk list snapshots
+```sh
+btrbk -c /etc/btrbk/btrbk.conf list snapshots
 ```
 
-Verify counts match the `snapshot_preserve 24h 7d 4w` policy:
+Compare the snapshots with the configured volumes, subvolumes, and
+`snapshot_preserve` policies in this repository. Allow for hosts being powered
+off and for retention buckets to overlap. Investigate missing configured
+subvolumes, unexpectedly stale snapshot history, command errors, or snapshots
+that are not being pruned over time.
 
-| Bucket | Expected |
-|--------|----------|
-| Hourly (last 24h) | up to 24 (fewer if machine was off) |
-| Daily (last 7d) | 7 |
-| Weekly (last 4w) | 4 |
+## Filesystem Usage
 
-All rows should show `STATUS: -` (retained). Any showing `ACTION: delete` will be pruned on the next btrbk run.
-
-## btrfs Filesystem Usage
-
-```
+```sh
 sudo btrfs filesystem usage /
 ```
 
-| Metric | Threshold |
-|--------|-----------|
-| `Free (estimated)` | Alert if < 30 GiB |
-| `Data` used % | Alert if > 90% — run a balance |
-| `Metadata` used % | Alert if > 75% — urgent, can cause ENOSPC even when data appears free |
-| `Device unallocated` | Alert if < 10 GiB — allocation headroom is nearly gone |
+Repeat for every distinct managed filesystem, such as `/srv`.
 
-## Timers
+| Metric | Follow up when |
+|---|---|
+| `Free (estimated)` | Less than 30 GiB |
+| `Data` used | Greater than 90% |
+| `Metadata` used | Greater than 75% |
+| `Device unallocated` | Less than 10 GiB |
+| `Device missing` | Nonzero |
 
-| Timer | Cadence | What it does |
-|-------|---------|-------------|
-| `btrbk.timer` | Hourly | Creates and prunes `/home` snapshots |
-| `btrfs-scrub.timer` | Monthly (1st) | Verifies data integrity |
-| `btrfs-balance.timer` | Monthly (1st) | Repacks chunks, reclaims unallocated space |
-| `btrfs-trim.timer` | Monthly (1st) | TRIM SSD |
+High allocated-chunk utilization is different from low filesystem free space.
+Review both before recommending a balance.
 
-A gap longer than ~35 days on the monthly timers means the machine was likely off on the 1st.
+## Device Errors And Scrub
+
+```sh
+sudo btrfs device stats /
+sudo btrfs scrub status /
+```
+
+Repeat for every distinct managed filesystem.
+
+Expected:
+
+- All device error counters are zero.
+- The latest scrub finished successfully with no errors.
+
+Persistent device errors require investigation even if the latest scrub
+completed successfully.
+
+## Timers And Last Results
+
+```sh
+systemctl list-timers \
+    btrbk.timer \
+    btrfs-scrub.timer \
+    btrfs-balance.timer \
+    btrfs-trim.timer \
+    --all
+systemctl is-enabled fstrim.timer
+```
+
+| Timer | Expected cadence |
+|---|---|
+| `btrbk.timer` | Hourly |
+| `btrfs-scrub.timer` | Monthly |
+| `btrfs-balance.timer` | Monthly |
+| `btrfs-trim.timer` | Monthly |
+
+`fstrim.timer` should be disabled because `btrfs-trim.timer` replaces it.
+Oneshot maintenance services are normally inactive between runs. Judge them by
+their last result and journal:
+
+```sh
+systemctl show btrbk.service btrfs-scrub.service \
+    btrfs-balance.service btrfs-trim.service \
+    -p Id -p Result -p ExecMainStatus
+journalctl -u btrbk.service -u btrfs-scrub.service \
+    -u btrfs-balance.service -u btrfs-trim.service \
+    --since '40 days ago' --no-pager
+```
+

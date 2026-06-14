@@ -1,41 +1,83 @@
-# dnf Role — Monitoring
+# dnf Role - Monitoring
+
+## Package Health
+
+```sh
+sudo rpm --verifydb
+sudo rpm -qa >/dev/null
+sudo dnf check
+```
+
+All three commands should complete without output. Signature errors, unreadable
+RPM headers, or dependency problems require investigation before unattended
+updates can be trusted.
 
 ## Timers
 
-| Timer | Schedule | What it does |
-|-------|----------|-------------|
-| `dnf-makecache.timer` | Every 4h | Refreshes package metadata cache |
-| `dnf5-automatic.timer` | Weekly (Tue 23:00) | Downloads and installs updates unattended |
-
-## dnf-makecache
-
-Check the last run succeeded:
-
-```
-journalctl -u dnf-makecache.service --since "24 hours ago"
+```sh
+systemctl list-timers \
+    dnf-makecache.timer \
+    dnf5-automatic.timer \
+    --all
+systemctl --user list-timers dnf-makecache.timer --all
 ```
 
-Expected: `Metadata cache created.` with exit code 0.
+| Timer | Expected schedule |
+|---|---|
+| System `dnf-makecache.timer` | Every 4 hours, persistent, up to 5 minutes random delay |
+| User `dnf-makecache.timer` | Every 4 hours, persistent, up to 5 minutes random delay |
+| `dnf5-automatic.timer` | Tuesday at 23:00, no random delay |
 
-## dnf5-automatic (weekly updates)
+The user timer exists so package metadata remains available to unprivileged DNF
+commands.
 
-Check when it last ran:
+## Metadata Refresh
 
+```sh
+systemctl show dnf-makecache.service -p Result -p ExecMainStatus
+journalctl -u dnf-makecache.service --since '12 hours ago' --no-pager
+
+systemctl --user show dnf-makecache.service -p Result -p ExecMainStatus
+journalctl --user -u dnf-makecache.service \
+    --since '12 hours ago' --no-pager
 ```
-systemctl status dnf5-automatic.timer
-journalctl -u dnf5-automatic.service --since "7 days ago" | tail -20
+
+Expected:
+
+- The last result is successful.
+- The system service reports `Metadata cache created.`
+- The user service completes its DNS pre-check and metadata refresh.
+
+Oneshot services are normally inactive between runs.
+
+## Automatic Updates
+
+```sh
+systemctl status dnf5-automatic.timer --no-pager
+systemctl show dnf5-automatic.service -p Result -p ExecMainStatus
+journalctl -u dnf5-automatic.service --since '8 days ago' --no-pager
+systemctl cat dnf5-automatic.timer dnf5-automatic.service
 ```
 
-Expected: `Transaction finished.` with exit code 0. The run consumes significant memory (~2 GiB peak) and CPU — that is normal.
+Expected:
 
-If no entry appears in the last 7 days, the machine was likely off on Tuesday night. `Persistent=true` is not set on this timer, so missed runs are not caught up automatically.
+- The timer is enabled and active.
+- A continuously running host has a successful transaction on its weekly
+  schedule.
+- The journal reports `Transaction finished.` when updates were available.
+- The effective service orders itself after DNS, Ansible Pull, and the system
+  metadata refresh.
+
+The timer is not persistent. A host that was off Tuesday at 23:00 can
+legitimately have no run for that week.
 
 ## Snapper Pre/Post Snapshots
 
-dnf5-automatic creates a snapper pre/post snapshot pair around each update run using the `number` cleanup algorithm.
-
-```
+```sh
 snapper -c root list | grep dnf5-automatic
 ```
 
-The pre snapshot should show `Before dnf5-automatic`, and the matching post snapshot should show `After dnf5-automatic`.
+Recent completed runs should have matching `Before dnf5-automatic` and `After
+dnf5-automatic` snapshots using the `number` cleanup algorithm. The snapshots
+wrap the service, so a run with no package changes may still create a pair.
+

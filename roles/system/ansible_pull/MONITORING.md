@@ -1,37 +1,70 @@
-# ansible_pull Role — Monitoring
+# ansible_pull Role - Monitoring
 
 ## Timer
 
-`ansible-pull.timer` runs daily at 03:00 with up to 10 minutes of random delay (`RandomizedDelaySec=600`). `Persistent=true` means it catches up on the next boot if the machine was off at 03:00.
+`ansible-pull.timer` runs daily at 03:00 with up to 10 minutes of random delay.
+It is persistent, so a missed run starts after the next boot.
 
-Check when it last ran and when it will run next:
-
-```
-systemctl status ansible-pull.timer
-```
-
-## Last Run Result
-
-```
-journalctl -u ansible-pull.service --since "24 hours ago" | grep "PLAY RECAP"
+```sh
+systemctl status ansible-pull.timer --no-pager
+systemctl list-timers ansible-pull.timer --all
 ```
 
-Expected output:
+Expected:
 
-```
-localhost : ok=NNN  changed=0  unreachable=0  failed=0  skipped=NN
+- The timer is enabled and active.
+- The last and next trigger are consistent with the configured daily schedule.
+
+## Last Run
+
+Find the newest Ansible Pull log:
+
+```sh
+ls -t /var/log/ansible-pull | head -1
 ```
 
-- `failed=0` and `unreachable=0` are required — anything else is an error.
-- `changed=0` means the system was already in the desired state.
-- `changed>0` means the run applied updates — normal after a repo push.
+Read that file from `/var/log/ansible-pull/` and find its final play recap:
+
+```text
+localhost : ok=NNN changed=N unreachable=0 failed=0 skipped=NN ...
+```
+
+Expected:
+
+- `failed=0` and `unreachable=0`.
+- A nonzero `changed` count is normal after configuration changes.
+- A second run with no intervening changes should normally report `changed=0`.
+- A missing recap means the run ended before Ansible completed. Read the entire
+  log and inspect the service journal.
+
+```sh
+systemctl show ansible-pull.service \
+    -p Result -p ExecMainCode -p ExecMainStatus
+journalctl -u ansible-pull.service --since '2 days ago' --no-pager
+```
 
 ## Snapper Pre/Post Snapshots
 
-ansible-pull creates a snapper pre/post snapshot pair around each run. Verify the cleanup type is consistent:
-
-```
+```sh
 snapper -c root list | grep ansible-pull
 ```
 
-All ansible-pull pre/post rows should use the `number` cleanup algorithm.
+Recent completed runs should have a `Before ansible-pull` pre snapshot and a
+matching `After ansible-pull` post snapshot. Both should use the `number`
+cleanup algorithm.
+
+Older unmatched snapshots or rows using `timeline` may reflect historical
+configuration bugs. Report them as historical unless the problem recurs on
+recent runs. A new unmatched pre snapshot can indicate an interrupted run or a
+failed post-snapshot command.
+
+## Logs
+
+```sh
+ls -lh /var/log/ansible-pull
+cat /etc/logrotate.d/ansible-pull
+```
+
+The role retains up to 30 rotations or 30 days of logs. Missing logs after a
+successful timer activation are unexpected.
+
