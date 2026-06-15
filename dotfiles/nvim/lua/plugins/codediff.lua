@@ -8,10 +8,5 @@ return {
             "<Cmd>CodeDiff<CR>",
             desc = "Git diff",
         },
-        {
-            "<leader>gD",
-            "<Cmd>CodeDiff origin/main...HEAD<CR>",
-            desc = "Git diff against origin/main",
-        },
     },
 }

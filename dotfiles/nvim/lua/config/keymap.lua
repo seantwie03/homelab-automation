@@ -54,9 +54,6 @@ vim.keymap.set({ "n", "v", "i", "c" }, "<C-s>", "<Esc><Cmd>update<CR>", { desc =
 -- https://www.reddit.com/r/vim/comments/uorjet/comment/i8gmxgn/?utm_source=share&utm_medium=web2x&context=3
 vim.cmd([[nnoremap <expr> <silent> 0 col('.') == match(getline('.'),'\S')+1 ? '0' : '^']])
 
--- Open Oil with bare - instead of the built-in previous-line motion
-vim.keymap.set('n', '-', '<Cmd>Oil<CR>', { desc = 'open oil' })
-
 -- Y behaves like D, C, etc.
 vim.keymap.set({ "n" }, "Y", "y$", { desc = "copy to end of line"})
 vim.keymap.set({ "v" }, "Y", "$y", { desc = "copy to end of line"})

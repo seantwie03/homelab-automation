@@ -98,3 +98,30 @@ _systemctlu() {
     _systemctl
 }
 complete -F _systemctlu systemctlu
+
+# CodeDiff is weird about attaching lsps to buffers
+# It will only attach them when diffing unstaged changes
+# This function will put all the changes for a
+# specified branch in the current change set (unstaged)
+# Remove this if CodeDiff is no longer used
+mr_review() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: mr_review <branch>"
+    fi
+    local branch="$1"
+    git fetch origin "$branch"
+    git switch -C "review/${branch##*/}"
+    git merge --squash "origin/$branch"
+    git reset HEAD .
+    nvim -c CodeDiff
+}
+
+# Remove this if CodeDiff is no longer used
+mr_review_cleanup() {
+    local branch
+    branch="$(git branch --show-current)"
+    git restore .
+    git clean -fd
+    git switch master
+}
+
