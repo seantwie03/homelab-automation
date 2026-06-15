@@ -10,10 +10,19 @@ vim.lsp.enable('lua_ls')
 vim.lsp.enable('yamlls')
 vim.lsp.enable('ansiblels')
 vim.lsp.enable('harper_ls')
+vim.lsp.enable('jdtls')
+vim.lsp.enable('pyright')
+vim.lsp.enable('kotlin_language_server')
+vim.lsp.enable('ts_ls')
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {
+      buffer = ev.buf,
+      desc = 'Go to definition',
+    })
+
     if client:supports_method('textDocument/completion') then
       vim.opt.completeopt = { 'menu', 'menuone','noinsert','fuzzy','popup' }
       vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
