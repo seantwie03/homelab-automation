@@ -4,6 +4,7 @@ return {
     opts = {
         defaults = {
             mode = { "n", "v" },
+            ["<Leader>c"] = { name = "+code" },
             ["<Leader>f"] = { name = "+find" },
             ["<Leader>fg"] = { name = "+git" },
             ["<Leader>fl"] = { name = "+linux" },
