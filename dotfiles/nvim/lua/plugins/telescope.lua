@@ -1,6 +1,6 @@
 return {
     'nvim-telescope/telescope.nvim',
-    tag = '0.1.8',
+    version = '*',
     dependencies = {
         "nvim-lua/plenary.nvim",
         {
@@ -43,48 +43,11 @@ return {
         { "<Leader>fr", "<Cmd>Telescope oldfiles<CR>",   desc = "Telescope oldfiles (recent)" },
         { "<Leader>fR", "<Cmd>Telescope resume<CR>",     desc = "Telescope resume" },
         { "<Leader>ft", "<Cmd>Telescope live_grep<CR>",  desc = "Telescope live_grep (text)" },
-        {
-            "<Leader>fs",
-            function()
-                require("telescope.builtin").lsp_document_symbols({
-                    symbols = {
-                        "Class",
-                        "Function",
-                        "Method",
-                        "Constructor",
-                        "Interface",
-                        "Module",
-                        "Struct",
-                        "Trait",
-                        "Field",
-                        "Property",
-                    },
-                })
-            end,
-            desc = "Telescope lsp_document_symbols",
-        },
-        {
-            "<Leader>fS",
-            function()
-                require("telescope.builtin").lsp_dynamic_workspace_symbols({
-                    symbols = {
-                        "Class",
-                        "Function",
-                        "Method",
-                        "Constructor",
-                        "Interface",
-                        "Module",
-                        "Struct",
-                        "Trait",
-                        "Field",
-                        "Property",
-                    },
-                })
-            end,
-            desc = "Telescope lsp_dynamic_workspace_symbols",
-        },
+        { "<Leader>fw", "<Cmd>Telescope grep_string<CR>",  desc = "Telescope grep_string (word)" },
         -- [F]ind [G]it stuff
-        { "<Leader>fgc", "<Cmd>Telescope git_commits<CR>",  desc = "Telescope git_commits" },
+        { "<Leader>fgb", "<Cmd>Telescope git_branches<CR>",  desc = "Telescope git_branches" },
+        { "<Leader>fgc", "<Cmd>Telescope git_branches<CR>",  desc = "Telescope git_branches" },
+        { "<Leader>fgh", "<Cmd>Telescope git_bcommits<CR>",  desc = "Telescope git_bcommits (buffer history)" },
         { "<Leader>fgs", "<Cmd>Telescope git_status<CR>",   desc = "Telescope git_status" },
         -- [F]ind [L]inux stuff
         { "<Leader>flm", "<Cmd>Telescope man_pages<CR>",    desc = "Telescope man pages" },
@@ -94,7 +57,9 @@ return {
         { "<Leader>fvC", "<Cmd>Telescope highlights<CR>",   desc = "Telescope highlights (colors)" },
         { "<Leader>fvh", "<Cmd>Telescope help_tags<CR>",    desc = "Telescope help_tags" },
         { "<Leader>fvk", "<Cmd>Telescope keymaps<CR>",      desc = "Telescope keymaps" },
+        { "<Leader>fvl", "<Cmd>Telescope loclist<CR>",      desc = "Telescope loclist" },
         { "<Leader>fvo", "<Cmd>Telescope vim_options<CR>",  desc = "Telescope vim_options" },
+        { "<Leader>fvq", "<Cmd>Telescope quickfix<CR>",      desc = "Telescope quickfix" },
         {
             "<Leader>fvs",
             function()
@@ -116,29 +81,17 @@ return {
             mappings = {
                 i = {
                     --   ['<Esc>'] = 'close',
-                    ["<C-Down>"] = function(...)
-                        return require("telescope.actions").cycle_history_next(...)
-                    end,
-                    ["<C-Up>"] = function(...)
-                        return require("telescope.actions").cycle_history_prev(...)
-                    end,
-                    ["<C-f>"] = function(...)
-                        return require("telescope.actions").preview_scrolling_down(...)
-                    end,
-                    ["<C-b>"] = function(...)
-                        return require("telescope.actions").preview_scrolling_up(...)
-                    end,
+                    ["<C-Down>"] = function(...) require("telescope.actions").cycle_history_next(...) end,
+                    ["<C-Up>"] = function (...) require("telescope.actions").cycle_history_prev(...) end,
                 },
                 n = {
-                    ["q"] = function(...)
-                        return require("telescope.actions").close(...)
-                    end,
+                    ["q"] = function(...) return require("telescope.actions").close(...) end,
                 },
             },
         },
     },
     config = function(_, opts)
-        pcall(require("telescope").load_extension, "fzf")
         require("telescope").setup(opts)
+        pcall(require("telescope").load_extension, "fzf")
     end,
 }
