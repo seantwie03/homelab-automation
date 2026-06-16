@@ -105,6 +105,12 @@ return {
     },
     opts = {
         defaults = {
+            layout_strategy = "flex",
+            layout_config = {
+                flex = {
+                    flip_columns = 150,
+                },
+            },
             prompt_prefix = "🔎 ",
             selection_caret = " ",
             mappings = {

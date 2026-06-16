@@ -3,17 +3,10 @@
 -- See https://gpanders.com/blog/whats-new-in-neovim-0-11/ for a nice overview
 -- of how the lsp setup works in neovim 0.11+.
 
--- This actually just enables the lsp servers.
--- The configuration is found in the lsp folder inside the nvim config folder,
--- so in ~.config/lsp/lua_ls.lua for lua_ls, for example.
-vim.lsp.enable('lua_ls')
-vim.lsp.enable('yamlls')
-vim.lsp.enable('ansiblels')
-vim.lsp.enable('harper_ls')
-vim.lsp.enable('jdtls')
-vim.lsp.enable('pyright')
-vim.lsp.enable('kotlin_language_server')
-vim.lsp.enable('ts_ls')
+-- Enable the lsp servers configured in the lsp folder.
+for server, _ in pairs(require('config.lsp_servers')) do
+  vim.lsp.enable(server)
+end
 
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)

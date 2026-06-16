@@ -16,7 +16,6 @@ return {
     },
     keys = {
         { "<Leader>pi", "<Cmd>PasteImage<CR>", desc = "PasteImage" },
-        { "<Leader>v",  "<Cmd>PasteImage<CR>", desc = "PasteImage" },
         {
             "<Leader>fi",
             function()
