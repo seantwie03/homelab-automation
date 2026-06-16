@@ -58,6 +58,16 @@ vim.cmd([[nnoremap <expr> <silent> 0 col('.') == match(getline('.'),'\S')+1 ? '0
 vim.keymap.set({ "n" }, "Y", "y$", { desc = "copy to end of line"})
 vim.keymap.set({ "v" }, "Y", "$y", { desc = "copy to end of line"})
 
+-- Copy context
+vim.keymap.set({ 'v' }, '<leader>y', function()
+    local start_line = vim.fn.line('v')
+    local rel_path = vim.fn.expand('%..')
+    local lang = vim.bo.filetype
+    local lines = vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode()})
+    local code = table.concat(lines, '\n')
+    vim.fn.setreg('+', rel_path .. ':' .. start_line .. '\n\n```' .. lang .. '\n' .. code .. '\n```')
+end, { desc = 'Copy path:line and selection' })
+
 -- Make Backspace behave more like other applications:
 -- Pressing Backspace in visual mode will delete selected text without changing the unnamed register
 vim.keymap.set({ "v" }, "<Backspace>", '"_d', { desc = "delete selection"})
