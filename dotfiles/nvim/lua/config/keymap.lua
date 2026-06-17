@@ -65,7 +65,7 @@ vim.keymap.set({ 'v' }, '<leader>y', function()
     local lang = vim.bo.filetype
     local lines = vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode()})
     local code = table.concat(lines, '\n')
-    vim.fn.setreg('+', rel_path .. ':' .. start_line .. '\n\n```' .. lang .. '\n' .. code .. '\n```')
+    vim.fn.setreg('+', rel_path .. ':' .. start_line .. '\n```' .. lang .. '\n' .. code .. '\n```')
 end, { desc = 'Copy path:line and selection' })
 
 -- Make Backspace behave more like other applications:
