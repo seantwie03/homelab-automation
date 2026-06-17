@@ -42,7 +42,7 @@ runuser -u {{ user }} -- \
         "System Updated" \
         "${count} packages upgraded"
 
-if ! dnf needs-restarting &>/dev/null; then
+if ! dnf needs-restarting --skip-file-locks &>/dev/null; then
     echo "runuser -u {{ user }} -- \
         notify-send \
             --urgency='critical' \
@@ -57,4 +57,3 @@ if ! dnf needs-restarting &>/dev/null; then
             "Reboot Required" \
             "A reboot is required to apply package updates."
 fi
-
