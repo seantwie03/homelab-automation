@@ -18,6 +18,12 @@
     global: true
     state: present
 
+- name: opencode is installed
+  community.general.npm:
+    name: "opencode-ai"
+    global: true
+    state: present
+
 - name: claude code is installed
   ansible.builtin.shell:
     cmd: curl -fsSL https://claude.ai/install.sh | bash  # noqa: command-instead-of-module
