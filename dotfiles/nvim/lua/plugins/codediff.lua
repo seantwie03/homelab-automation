@@ -4,7 +4,7 @@ return {
     opts = {},
     keys = {
         {
-            "<leader>gd",
+            "<leader>gr",
             "<Cmd>CodeDiff<CR>",
             desc = "Git diff",
         },
