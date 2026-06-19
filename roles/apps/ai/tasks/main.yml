@@ -12,11 +12,8 @@
   become: true
   become_user: "{{ user }}"
 
-- name: codex is installed
-  community.general.npm:
-    name: "@openai/codex"
-    global: true
-    state: present
+- name: codex tasks are included
+  ansible.builtin.include_tasks: codex.yml
 
 - name: opencode is installed
   community.general.npm:
@@ -30,4 +27,3 @@
     creates: /home/{{ user }}/.local/bin/claude
   become: true
   become_user: "{{ user }}"
-

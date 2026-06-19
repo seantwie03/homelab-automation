@@ -1,0 +1,39 @@
+---
+- name: codex is installed
+  community.general.npm:
+    name: "@openai/codex"
+    global: true
+    state: present
+
+- name: codex config directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.codex
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+
+- name: codex openrouter profile is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/codex/openrouter.config.toml"
+    dest: /home/{{ user }}/.codex/openrouter.config.toml
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: user bin directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/bin
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0750
+
+- name: codex-openrouter wrapper is installed
+  ansible.builtin.copy:
+    src: codex-openrouter.sh
+    dest: /home/{{ user }}/bin/codex-openrouter
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0550

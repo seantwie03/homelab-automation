@@ -1,0 +1,15 @@
+model_provider = "openrouter"
+model = "deepseek/deepseek-v4-flash"
+model_reasoning_effort = "high"
+
+[model_providers.openrouter]
+name = "openrouter"
+base_url = "https://openrouter.ai/api/v1"
+
+[model_providers.openrouter.auth]
+command = "/usr/bin/cat"
+args = ["/home/sean/.config/openrouter-api-key"]
+
+[tui]
+status_line = ["current-dir", "model", "reasoning", "git-branch", "branch-changes", "context-remaining", "total-input-tokens", "total-output-tokens"]
+status_line_use_colors = true
