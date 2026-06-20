@@ -443,26 +443,3 @@ No other manual setup is required.
 12. Confirm unknown verdict or agent failure sends a critical notification when `sean` has an active D-Bus session.
 13. Enable and start `ai-health-monitor.timer`, then confirm it appears in `systemctl list-timers`.
 
-## Issues to Resolve
-
- ### High Severity
-
-- [x] ai-health-monitor.md:181: The wrapper runs codex exec --dangerously-bypass-approvals-and-sandbox. That makes “read-only” purely prompt-based, not enforced. The agent would have unsandboxed shell access as ai-health-monitor plus whitelisted sudo. A safer design should keep Codex sandboxed/read-only and have the wrapper write the final report itself via -o, instead of asking the model to write files.
-- [x] ai-health-monitor.md:110: The new ai-health-monitor user is not guaranteed to have the $check-homelab-host skill installed or visible. The skill exists in this session, but the service user’s Codex environment will be separate. The role needs to install/copy/register that skill for the service user, or avoid relying on skill discovery and embed explicit instructions.
-- [x] ai-health-monitor/ai-health-monitor.md:151: Notification sudo is likely wrong. The wrapper runs sudo -u sean DBUS_SESSION_BUS_ADDRESS=... /usr/bin/dunstify, but sudoers only allows /usr/bin/dunstify *; it does not allow setting DBUS_SESSION_BUS_ADDRESS. Existing repo scripts use runuser -u {{ user }} -- notify-send after exporting the D-Bus address. The plan should reuse that pattern and probably use notify-send, not dunstify.
-- [x] ai-health-monitor.md:287: “Add to each managed host playbook after core and ansible_pull” conflicts with desktop22.yml, where docker is currently before ansible_pull. Also, placing this before ai/nodejs means the role must be fully self-contained. If it depends on the existing ai role, the ordering must say so.
-- [x] Address TODO in timer about dependency. See how this is addressed in other roles and copy the pattern here.
-
-### Medium Severity
-
-- [x] ai-health-monitor.md:84: agent-config.toml is static while defaults claim health_monitor_repo_path is the source of truth. This should be a template, otherwise changing health_monitor_repo_path or health_monitor_home silently breaks Codex trust and API-key lookup.
-- [x] ai-health-monitor.md:64: “Install the agent CLI globally via npm” is underspecified. Existing role uses community.general.npm with @openai/codex; the plan should name that package/module explicitly.
-- [x] ai-health-monitor.md:192: Verdict parsing only matches **verdict:** .... If Codex emits plain verdict: as the prompt says “exactly one line” but includes Markdown formatting in examples, this is brittle. Pick one exact format and parse only that.
-- [x] ai-health-monitor.md:173: The report file is created by the agent, not the wrapper. If Codex fails before writing it, the notification points at a missing report. Prefer codex exec -o "$REPORT_FILE" or write a failure report in the wrapper.
-- [x] ai-health-monitor.md:135: The sudo allowlist may not match likely commands from the monitoring skill. The skill emphasizes journals, timers, failed units, RPM health, /sys, storage, etc. Some are unprivileged, but privileged journalctl access may still be needed beyond systemd- journal group. The test plan should include real skill-run command coverage, not just three sample sudo commands.
-
-### Low Severity / Cleanup
-
-- [x] ai-health-monitor.md:20: handlers/main.yml is listed but no handlers are specified. Either define restart/reload handlers for timer changes or remove it.
-- [x] ai-health-monitor.md:49: Project convention says avoid quotes unless required. health_monitor_schedule: "Fri 12:00:00" does need quotes because of the colon, so this one is fine, but the plan should preserve that reasoning during implementation.
-- [x] ai-health-monitor.md:320: The file ends with an unmatched closing code fence. Remove the trailing ```.
