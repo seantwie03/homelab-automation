@@ -1,0 +1,6 @@
+interface:
+  display_name: "Add Scheduled Job"
+  short_description: "Design repo systemd timers safely"
+  default_prompt: "Use $add-scheduled-job to add or review a systemd timer in this homelab Ansible repository."
+policy:
+  allow_implicit_invocation: true

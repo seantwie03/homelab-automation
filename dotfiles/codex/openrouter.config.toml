@@ -11,5 +11,5 @@ command = "/usr/bin/cat"
 args = ["/home/sean/.config/openrouter-api-key"]
 
 [tui]
-status_line = ["current-dir", "model", "reasoning", "git-branch", "branch-changes", "context-remaining", "total-input-tokens", "total-output-tokens"]
+status_line = ["current-dir", "model", "reasoning", "context-remaining", "total-input-tokens", "total-output-tokens"]
 status_line_use_colors = true
