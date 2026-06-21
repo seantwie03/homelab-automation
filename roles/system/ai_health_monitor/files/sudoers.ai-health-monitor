@@ -1,0 +1,21 @@
+ai-health-monitor ALL=(root) NOPASSWD: \
+    /usr/bin/systemctl --no-pager is-system-running, \
+    /usr/bin/systemctl --no-pager is-active *, \
+    /usr/bin/systemctl --no-pager status *, \
+    /usr/bin/systemctl --no-pager show *, \
+    /usr/bin/systemctl --no-pager list-timers *, \
+    /usr/bin/systemctl --no-pager list-units *, \
+    /usr/bin/systemctl --no-pager is-enabled *, \
+    /usr/bin/systemctl --no-pager cat *, \
+    /usr/bin/btrfs filesystem usage *, \
+    /usr/bin/btrfs device stats *, \
+    /usr/bin/btrfs scrub status *, \
+    /usr/bin/snapper -c root list, \
+    /usr/bin/btrbk -c /etc/btrbk/btrbk.conf list *, \
+    /usr/bin/btrbk -c /etc/btrbk/btrbk.conf stats, \
+    /usr/bin/btrbk -c /etc/btrbk/btrbk.conf dryrun
+
+ai-health-monitor ALL=(root) NOPASSWD: \
+    /usr/local/bin/ai-health-monitor-notify requires-attention *, \
+    /usr/local/bin/ai-health-monitor-notify all-good *, \
+    /usr/local/bin/ai-health-monitor-notify monitor-failed

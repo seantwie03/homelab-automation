@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly host health check schedule
+Documentation={{ homelab_ansible_repo_url }}
+
+[Timer]
+OnCalendar={{ health_monitor_schedule }}
+Persistent=true
+RandomizedDelaySec={{ health_monitor_delay_sec }}
+
+[Install]
+WantedBy=timers.target
+

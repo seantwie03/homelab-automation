@@ -1,0 +1,9 @@
+---
+dependencies:
+  - role: ansible_pull
+  - role: dnf
+  - role: btrfs
+  - role: cli
+  - role: nextdns
+  - role: ai
+

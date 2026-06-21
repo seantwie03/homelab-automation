@@ -1,0 +1,25 @@
+[Unit]
+Description=Weekly automated ai host health check
+Documentation={{ homelab_ansible_repo_url }}
+After=network-online.target
+After=dns-online.service
+After=ansible-pull.service
+After=dnf5-automatic.service
+After=btrbk.service
+After=btrfs-scrub.service
+After=btrfs-balance.service
+After=btrfs-trim.service
+After=plocate-updatedb.service
+Wants=network-online.target
+Wants=dns-online.service
+
+[Service]
+Type=oneshot
+User={{ health_monitor_user }}
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ProtectSystem=strict
+InaccessiblePaths=/home/sean
+ReadOnlyPaths={{ health_monitor_openrouter_dir }}
+ReadWritePaths={{ health_monitor_report_dir }} {{ health_monitor_home }}/.codex
+ExecStart=/usr/local/bin/ai-health-monitor-run
+

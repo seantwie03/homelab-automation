@@ -18,16 +18,34 @@ snapshots, or otherwise alter the host unless the user asks for remediation.
    `meta/main.yml`.
 3. Open `<hostname>.yml` and read its variables to resolve host-specific
    behavior.
-4. For each role in the script output, fully read its `README.md` and
-   `MONITORING.md` when those files exist.
-5. Apply the role's monitoring instructions. Note checks that are documented
-   but not applicable to this host.
-6. Read role tasks and defaults when needed to resolve expected
+4. List all monitoring files with `find roles -name MONITORING.md -print`.
+   Use this only as a path index for locating documentation for roles that
+   apply to the current host. Do not treat every returned file as applicable.
+   Do not use a fixed `-maxdepth`; roles live under category directories such
+   as `roles/system`, `roles/apps`, `roles/runtimes`, and `roles/wm`.
+5. For each role in the script output, locate that role's directory under
+   `roles/` and fully read its `README.md` and `MONITORING.md` when those files
+   exist.
+6. Apply only the monitoring instructions for roles in the current host's role
+   inventory. Note checks that are documented but not applicable to this host.
+7. Read role tasks and defaults when needed to resolve expected
    service names, schedules, paths, thresholds, or host-specific variables.
+
+If role discovery fails, report that failure and derive a conservative role
+list from the host playbook and role dependencies. Do not fall back to applying
+every `MONITORING.md` file in the repository.
 
 Do not treat monitoring documentation as infallible. Compare it with the
 deployed units, current package behavior, and role implementation. Report stale
 documentation separately from host failures.
+
+Prioritize problems that are easy to miss during normal interactive use, such
+as failed jobs, missed timers, stale automation, skipped maintenance, storage
+pressure, recurring background warnings, and disabled or degraded services.
+Still record hardware or desktop-session problems when evidence is clear, but
+de-emphasize issues that the user would likely notice directly through normal
+computer use, such as obviously malfunctioning input devices, displays, audio,
+or peripherals.
 
 ## Run The Common Baseline
 

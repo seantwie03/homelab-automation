@@ -8,6 +8,9 @@
 [ -f "$HOME"/.bash_functions ] && source $HOME/.bash_functions
 [ -f "$HOME"/.bash_aliases ] && source $HOME/.bash_aliases
 
+# Keep less attached to real files so follow mode works.
+unset LESSOPEN
+
 # User specific environment
 if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin: ]]; then
   export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
@@ -19,9 +22,6 @@ export VISUAL=/usr/bin/code
 
 # Allow ctrl-S for history navigation (with ctrl-R)
 stty -ixon
-
-# Make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe.sh ] && export LESSOPEN="||/usr/bin/lesspipe.sh %s"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.

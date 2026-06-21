@@ -2,14 +2,14 @@
 
 ## Summary
 
-A new Ansible role `roles/system/ai-health-monitor` creates the `ai-health-monitor` user, configures its agent environment, sets up a tightly scoped sudoers whitelist, deploys the monitoring wrapper, configures systemd timer + service, sets up log rotation, and sends desktop notifications to `sean`.
+A new Ansible role `roles/system/ai_health_monitor` creates the `ai-health-monitor` user, configures its agent environment, sets up a tightly scoped sudoers whitelist, deploys the monitoring wrapper, configures systemd timer + service, sets up log rotation, and sends desktop notifications to `sean`.
 
 The only manual setup step is placing the OpenRouter API key.
 
 ## Role Structure
 
 ```text
-roles/system/ai-health-monitor/
+roles/system/ai_health_monitor/
 ├── defaults/
 │   └── main.yml
 ├── files/
@@ -33,7 +33,7 @@ roles/system/ai-health-monitor/
 
 ## Defaults
 
-`roles/system/ai-health-monitor/defaults/main.yml`:
+`roles/system/ai_health_monitor/defaults/main.yml`:
 
 ```yaml
 ---
@@ -64,11 +64,16 @@ health_monitor_prompt: |
 
   Work in read-only mode. Do not modify files, restart services, clear failed
   units, prune containers, change snapshots, update packages, apply Ansible, or
-  otherwise remediate anything. If a check requires elevated access, use only
-  the sudo commands explicitly allowed in the
-  /etc/sudoers.d/{{ health_monitor_user }} file. If a useful check is blocked,
-  record exactly what was blocked and why rather than trying to broaden access 
-  or work around the restriction.
+  otherwise remediate anything. Prefer unprivileged commands first, and do not
+  prepend sudo to commands that are readable as {{ health_monitor_user }}.
+
+  Never run interactive sudo. For checks that truly require elevated access,
+  use only `sudo -n` followed by a command explicitly allowed in
+  /etc/sudoers.d/{{ health_monitor_user }}. Do not run broad probes such as
+  `sudo ls`, `sudo cat`, `sudo dmesg`, `sudo journalctl`, or `sudo systemctl`
+  forms that are not listed in that sudoers file. If `sudo -n` fails or a useful
+  check is blocked, record exactly what was blocked and why rather than trying
+  to broaden access or work around the restriction.
 
   Pay particular attention to systemd health, failed units, missed timers,
   Ansible pull results, DNF automatic updates, kernel and hardware warnings,
@@ -96,7 +101,7 @@ health_monitor_prompt: |
 
 ## Tasks
 
-`roles/system/ai-health-monitor/meta/main.yml` should declare:
+`roles/system/ai_health_monitor/meta/main.yml` should declare:
 
 ```yaml
 ---
@@ -106,7 +111,7 @@ dependencies:
 
 The `ai-health-monitor` role must not install Codex, Node.js, npm packages, or other AI tools directly. The existing `ai` role owns global AI tool installation.
 
-`roles/system/ai-health-monitor/tasks/main.yml` should:
+`roles/system/ai_health_monitor/tasks/main.yml` should:
 
 1. Rely on the `ai` role dependency for globally installed AI tools and on the `ansible_pull` role for logrotate.
 2. Create the `ai-health-monitor` group.
@@ -129,7 +134,7 @@ The `ai-health-monitor` role must not install Codex, Node.js, npm packages, or o
 
 ## Handlers
 
-`roles/system/ai-health-monitor/handlers/main.yml`:
+`roles/system/ai_health_monitor/handlers/main.yml`:
 
 ```yaml
 ---
@@ -142,12 +147,9 @@ The `ai-health-monitor` role must not install Codex, Node.js, npm packages, or o
 
 ## Agent Config
 
-`roles/system/ai-health-monitor/templates/agent-config.toml.j2`:
+`roles/system/ai_health_monitor/templates/agent-config.toml.j2`:
 
 ```toml
-[projects."{{ health_monitor_repo_path }}"]
-trust_level = "trusted"
-
 model_provider = "openrouter"
 model = "deepseek/deepseek-v4-flash"
 model_reasoning_effort = "high"
@@ -159,6 +161,9 @@ base_url = "https://openrouter.ai/api/v1"
 [model_providers.openrouter.auth]
 command = "/usr/bin/cat"
 args = ["{{ health_monitor_openrouter_key_file }}"]
+
+[projects."{{ health_monitor_repo_path }}"]
+trust_level = "trusted"
 ```
 
 ## Prompt Variable
@@ -167,19 +172,28 @@ The prompt lives in `health_monitor_prompt` in `defaults/main.yml`. The wrapper 
 
 The wrapper exports `REPORT_FILE` before invoking Codex. Keep the prompt static in Ansible defaults and render it with Jinja's `quote` filter so shell variables such as `$check-homelab-host` are not expanded by the wrapper.
 
+The wrapper must set both `HOME={{ health_monitor_home }}` and
+`CODEX_HOME={{ health_monitor_home }}/.codex` for `codex exec`. Codex loads
+its config from `CODEX_HOME/config.toml`; setting only `HOME` can allow the
+command to fall back to the wrong Codex provider/auth state.
+
+If `codex exec` fails or the report does not contain a valid verdict, the
+wrapper should notify `monitor-failed` and exit nonzero so systemd records the
+health monitor itself as failed.
+
 ## Sudoers
 
-`roles/system/ai-health-monitor/files/sudoers.ai-health-monitor`:
+`roles/system/ai_health_monitor/files/sudoers.ai-health-monitor`:
 
 ```sudoers
 ai-health-monitor ALL=(root) NOPASSWD: \
-    SYSTEMD_PAGER= /usr/bin/systemctl is-system-running, \
-    SYSTEMD_PAGER= /usr/bin/systemctl status * --no-pager, \
-    SYSTEMD_PAGER= /usr/bin/systemctl show *, \
-    SYSTEMD_PAGER= /usr/bin/systemctl list-timers * --all, \
-    SYSTEMD_PAGER= /usr/bin/systemctl list-units *, \
-    SYSTEMD_PAGER= /usr/bin/systemctl is-enabled *, \
-    SYSTEMD_PAGER= /usr/bin/systemctl cat *, \
+    /usr/bin/systemctl --no-pager is-system-running, \
+    /usr/bin/systemctl --no-pager status *, \
+    /usr/bin/systemctl --no-pager show *, \
+    /usr/bin/systemctl --no-pager list-timers *, \
+    /usr/bin/systemctl --no-pager list-units *, \
+    /usr/bin/systemctl --no-pager is-enabled *, \
+    /usr/bin/systemctl --no-pager cat *, \
     /usr/bin/btrfs filesystem usage *, \
     /usr/bin/btrfs device stats *, \
     /usr/bin/btrfs scrub status *, \
@@ -196,7 +210,7 @@ ai-health-monitor ALL=(root) NOPASSWD: \
 
 Notes:
 
-- `SYSTEMD_PAGER=` prevents pager-based root shell escape during interactive debugging.
+- `systemctl --no-pager` prevents pager-based root shell escape during interactive debugging.
 - `systemctl` is restricted to read-only subcommands. Wildcards remain only where the monitoring workflow needs arbitrary unit names, timer names, or unit-file inspection.
 - Commands that do not require sudo should not be added to this sudoers file.
 - `btrfs` is restricted to read-only inspection subcommands. Wildcards are used only for mount points or device paths discovered from the host.
@@ -207,7 +221,7 @@ Notes:
 
 ## Notification Helper
 
-`roles/system/ai-health-monitor/templates/ai-health-monitor-notify.sh.j2`:
+`roles/system/ai_health_monitor/templates/ai-health-monitor-notify.sh.j2`:
 
 ```bash
 #!/bin/bash
@@ -277,7 +291,7 @@ Helper behavior:
 
 ## Wrapper Script
 
-`roles/system/ai-health-monitor/templates/ai-health-monitor-run.sh.j2`:
+`roles/system/ai_health_monitor/templates/ai-health-monitor-run.sh.j2`:
 
 ```bash
 #!/bin/bash
@@ -325,7 +339,7 @@ Script behavior:
 
 ## Systemd Service
 
-`roles/system/ai-health-monitor/templates/ai-health-monitor.service.j2`:
+`roles/system/ai_health_monitor/templates/ai-health-monitor.service.j2`:
 
 ```ini
 [Unit]
@@ -369,7 +383,7 @@ Notes:
 
 ## Systemd Timer
 
-`roles/system/ai-health-monitor/templates/ai-health-monitor.timer.j2`:
+`roles/system/ai_health_monitor/templates/ai-health-monitor.timer.j2`:
 
 ```ini
 [Unit]
@@ -387,7 +401,7 @@ WantedBy=timers.target
 
 ## Logrotate
 
-`roles/system/ai-health-monitor/templates/logrotate.ai-health-monitor.j2`:
+`roles/system/ai_health_monitor/templates/logrotate.ai-health-monitor.j2`:
 
 ```text
 {{ health_monitor_report_dir }}/*.md {
@@ -406,7 +420,7 @@ WantedBy=timers.target
 Add the role only to `desktop25.yml` at first, immediately after the existing `ai` role:
 
 ```yaml
-    - role: ai-health-monitor
+    - role: ai_health_monitor
 ```
 
 ## Manual Setup
@@ -442,4 +456,3 @@ No other manual setup is required.
 11. Verify `/usr/local/bin/ai-health-monitor-notify` accepts only supported modes and rejects report paths outside `{{ health_monitor_report_dir }}`.
 12. Confirm unknown verdict or agent failure sends a critical notification when `sean` has an active D-Bus session.
 13. Enable and start `ai-health-monitor.timer`, then confirm it appears in `systemctl list-timers`.
-

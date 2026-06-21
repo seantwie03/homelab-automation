@@ -1,0 +1,7 @@
+---
+- name: restart ai-health-monitor timer
+  ansible.builtin.systemd:
+    name: ai-health-monitor.timer
+    state: restarted
+    daemon_reload: true
+

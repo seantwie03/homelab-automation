@@ -1,0 +1,57 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "this script must be run as root" >&2
+    exit 1
+fi
+
+mode=${1:-}
+report_file=${2:-}
+dbus_socket=/run/user/{{ health_monitor_notify_uid }}/bus
+
+if [ ! -S "$dbus_socket" ]; then
+    echo "notification skipped: no D-Bus session bus at $dbus_socket" >&2
+    exit 0
+fi
+
+case "$mode" in
+    requires-attention)
+        urgency=critical
+        title="Host Health: Requires Your Attention"
+        body="Review the report at $report_file"
+        ;;
+    all-good)
+        urgency=normal
+        title="Host Health: All Good"
+        body="Full report at $report_file"
+        ;;
+    monitor-failed)
+        urgency=critical
+        title="Host Health: Monitoring System Failure"
+        body="The health check script failed or returned an unknown verdict. Check systemd logs."
+        ;;
+    *)
+        echo "usage: ai-health-monitor-notify {requires-attention|all-good|monitor-failed} [report-file]" >&2
+        exit 2
+        ;;
+esac
+
+if [ "$mode" != "monitor-failed" ]; then
+    case "$report_file" in
+        {{ health_monitor_report_dir }}/*.md) ;;
+        *)
+            echo "invalid report path: $report_file" >&2
+            exit 2
+            ;;
+    esac
+fi
+
+export DBUS_SESSION_BUS_ADDRESS="unix:path=${dbus_socket}"
+
+runuser -u {{ health_monitor_notify_user }} -- \
+    notify-send \
+        --urgency="$urgency" \
+        --app-name="ai-health-monitor" \
+        "$title" \
+        "$body"

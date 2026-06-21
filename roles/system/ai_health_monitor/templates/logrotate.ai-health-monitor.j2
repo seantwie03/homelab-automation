@@ -1,0 +1,10 @@
+{{ health_monitor_report_dir }}/*.md {
+    su {{ health_monitor_user }} {{ health_monitor_group }}
+    rotate {{ health_monitor_log_retention }}
+    maxage 90
+    missingok
+    notifempty
+    nocompress
+    nocreate
+}
+

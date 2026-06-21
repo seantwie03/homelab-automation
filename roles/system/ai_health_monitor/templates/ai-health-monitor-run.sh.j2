@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+REPORT_FILE={{ health_monitor_report_dir }}/health-report-$TIMESTAMP.md
+CODEX_LOG={{ health_monitor_report_dir }}/health-report-$TIMESTAMP.codex.log
+export REPORT_FILE
+
+cd {{ health_monitor_repo_path }}
+
+echo "ai-health-monitor report: $REPORT_FILE"
+echo "ai-health-monitor codex log: $CODEX_LOG"
+
+AGENT_STATUS=0
+HOME={{ health_monitor_home }} \
+CODEX_HOME={{ health_monitor_home }}/.codex \
+codex exec \
+    --dangerously-bypass-approvals-and-sandbox \
+    -C {{ health_monitor_repo_path }} \
+    {{ (health_monitor_prompt ~ '\n\nAllowed sudo commands:\n\n```sudoers\n' ~ lookup('ansible.builtin.file', role_path ~ '/files/sudoers.ai-health-monitor') ~ '\n```\n') | quote }} \
+    > "$CODEX_LOG" 2>&1 || AGENT_STATUS=$?
+
+if [ "$AGENT_STATUS" -ne 0 ]; then
+    VERDICT=unknown
+else
+    VERDICT=$(grep -Ei '^VERDICT: (Healthy|Attention Required)$' "$REPORT_FILE" | tail -1 | sed -E 's/^VERDICT: //I' | tr '[:upper:]' '[:lower:]' || echo "unknown")
+fi
+
+if [ "$VERDICT" = "attention required" ]; then
+    sudo /usr/local/bin/ai-health-monitor-notify requires-attention "$REPORT_FILE"
+elif [ "$VERDICT" = "healthy" ]; then
+    sudo /usr/local/bin/ai-health-monitor-notify all-good "$REPORT_FILE"
+else
+    sudo /usr/local/bin/ai-health-monitor-notify monitor-failed
+    exit 1
+fi

@@ -1,0 +1,133 @@
+---
+- name: ai-health-monitor group exists
+  ansible.builtin.group:
+    name: "{{ health_monitor_group }}"
+    state: present
+
+- name: ai-health-monitor user exists
+  ansible.builtin.user:
+    name: "{{ health_monitor_user }}"
+    group: "{{ health_monitor_group }}"
+    groups:
+      - systemd-journal
+    append: true
+    home: "{{ health_monitor_home }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: codex config directory exists
+  ansible.builtin.file:
+    path: "{{ health_monitor_home }}/.codex"
+    state: directory
+    owner: "{{ health_monitor_user }}"
+    group: "{{ health_monitor_group }}"
+    mode: 0700
+
+- name: ai-health-monitor config directory exists
+  ansible.builtin.file:
+    path: "{{ health_monitor_home }}/.config"
+    state: directory
+    owner: root
+    group: "{{ health_monitor_group }}"
+    mode: 0750
+
+- name: openrouter config directory exists
+  ansible.builtin.file:
+    path: "{{ health_monitor_openrouter_dir }}"
+    state: directory
+    owner: root
+    group: "{{ health_monitor_group }}"
+    mode: 0750
+
+- name: openrouter api key file state is checked
+  ansible.builtin.stat:
+    path: "{{ health_monitor_openrouter_key_file }}"
+  register: openrouter_api_key
+
+- name: openrouter api key file permissions are enforced
+  ansible.builtin.file:
+    path: "{{ health_monitor_openrouter_key_file }}"
+    owner: root
+    group: "{{ health_monitor_group }}"
+    mode: 0440
+  when: openrouter_api_key.stat.exists
+
+- name: codex config is deployed
+  ansible.builtin.template:
+    src: agent-config.toml.j2
+    dest: "{{ health_monitor_home }}/.codex/config.toml"
+    owner: "{{ health_monitor_user }}"
+    group: "{{ health_monitor_group }}"
+    mode: 0600
+
+- name: sudoers file is deployed
+  ansible.builtin.copy:
+    src: sudoers.ai-health-monitor
+    dest: /etc/sudoers.d/ai-health-monitor
+    owner: root
+    group: root
+    mode: 0440
+    validate: /usr/sbin/visudo -cf %s
+
+- name: health report directory exists
+  ansible.builtin.file:
+    path: "{{ health_monitor_report_dir }}"
+    state: directory
+    owner: "{{ health_monitor_user }}"
+    group: "{{ health_monitor_group }}"
+    mode: 0755
+
+- name: logrotate configuration is deployed
+  ansible.builtin.template:
+    src: logrotate.ai-health-monitor.j2
+    dest: /etc/logrotate.d/ai-health-monitor
+    owner: root
+    group: root
+    mode: 0644
+
+- name: ai-health-monitor notify script is deployed
+  ansible.builtin.template:
+    src: ai-health-monitor-notify.sh.j2
+    dest: /usr/local/bin/ai-health-monitor-notify
+    owner: root
+    group: root
+    mode: 0555
+
+- name: ai-health-monitor run script is deployed
+  ansible.builtin.template:
+    src: ai-health-monitor-run.sh.j2
+    dest: /usr/local/bin/ai-health-monitor-run
+    owner: root
+    group: root
+    mode: 0755
+
+- name: ai-health-monitor service is deployed
+  ansible.builtin.template:
+    src: ai-health-monitor.service.j2
+    dest: /etc/systemd/system/ai-health-monitor.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart ai-health-monitor timer
+
+- name: ai-health-monitor timer is deployed
+  ansible.builtin.template:
+    src: ai-health-monitor.timer.j2
+    dest: /etc/systemd/system/ai-health-monitor.timer
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart ai-health-monitor timer
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
+- name: ai-health-monitor.timer is enabled and started
+  ansible.builtin.service:
+    name: ai-health-monitor.timer
+    enabled: true
+    state: started
+

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ansible Commands"
+  short_description: "Run repo Ansible checks with host-visible execution"
+  default_prompt: "Use $ansible-commands when running ansible, ansible-doc, ansible-playbook syntax checks, or ansible-lint in this repository."
+policy:
+  allow_implicit_invocation: true
