@@ -19,6 +19,7 @@
     - role: wifi
     - role: cli
     - role: ai
+    - role: ai_health_monitor
     - role: fonts
     - role: onepassword
     - role: tailscale
