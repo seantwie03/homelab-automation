@@ -642,19 +642,18 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 }
 
-// Open Zoom meeting controls as floating.
+// Floating apps
 window-rule {
     match app-id="zoom" title="as_toolbar"
-    open-floating true
-}
-
-window-rule {
     match app-id="zoom" title="zoom"
     open-floating true
 }
 
+// Maximized Apps
 window-rule {
     match app-id="google-chrome"
+    match app-id="org.mozilla.firefox"
+    match app-id="jetbrains-idea"
     open-maximized true
 }
 
