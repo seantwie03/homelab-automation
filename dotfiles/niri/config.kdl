@@ -646,6 +646,7 @@ binds {
 window-rule {
     match app-id="zoom" title="as_toolbar"
     match app-id="zoom" title="zoom"
+    match app-id="jetbrains-idea" title="Welcome to IntelliJ IDEA"
     open-floating true
 }
 
