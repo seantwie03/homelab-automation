@@ -58,9 +58,9 @@ animations {
             color.g = texture2D(niri_tex, tc_g.st).g;
             color.b = texture2D(niri_tex, tc_b.st).b;
             color.a = max(max(
-                texture2D(niri_tex, tc_r.st).a,
-                texture2D(niri_tex, tc_g.st).a),
-                texture2D(niri_tex, tc_b.st).a);
+            texture2D(niri_tex, tc_r.st).a,
+            texture2D(niri_tex, tc_g.st).a),
+            texture2D(niri_tex, tc_b.st).a);
 
             float big_glitch = step(0.85, gh(tick * 0.77));
             vec2 shift = vec2((gh(tick * 1.5) - 0.5) * 0.06 * big_glitch * intensity, 0.0);
@@ -120,9 +120,9 @@ animations {
             color.g = texture2D(niri_tex, tc_g.st).g;
             color.b = texture2D(niri_tex, tc_b.st).b;
             color.a = max(max(
-                texture2D(niri_tex, tc_r.st).a,
-                texture2D(niri_tex, tc_g.st).a),
-                texture2D(niri_tex, tc_b.st).a);
+            texture2D(niri_tex, tc_r.st).a,
+            texture2D(niri_tex, tc_g.st).a),
+            texture2D(niri_tex, tc_b.st).a);
 
             float big_glitch = step(0.8 - p * 0.3, gh(tick * 0.77));
             vec2 shift = vec2((gh(tick * 1.5) - 0.5) * 0.08 * big_glitch * intensity, 0.0);
@@ -164,13 +164,13 @@ animations {
             vec2 u = f * f * (3.0 - 2.0 * f);
 
             return mix(a, b, u.x) +
-                    (c - a) * u.y * (1.0 - u.x) +
-                    (d - b) * u.y * u.x;
+            (c - a) * u.y * (1.0 - u.x) +
+            (d - b) * u.y * u.x;
         }
 
         vec4 resize_color(vec3 coords_geo, vec3 size_geo) {
             if (coords_geo.x < 0.0 || coords_geo.x > 1.0 ||
-                coords_geo.y < 0.0 || coords_geo.y > 1.0) {
+            coords_geo.y < 0.0 || coords_geo.y > 1.0) {
                 return vec4(0.0);
             }
 
@@ -216,9 +216,9 @@ animations {
     }
 
 
-// ***animations below do not use a shaders ***
-// these are not required
-/*
+    // ***animations below do not use a shaders ***
+    // these are not required
+    /*
     workspace-switch {
         spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
     }
@@ -251,5 +251,5 @@ animations {
     recent-windows-close {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.001
     }
-*/
+    */
 }

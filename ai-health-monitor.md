@@ -84,7 +84,7 @@ health_monitor_prompt: |
 
   Write a concise but complete report to the path in the REPORT_FILE
   environment variable. Lead with actionable findings ordered by severity, then
-  summarize healthy areas and checks that were skipped or blocked. Include 
+  summarize healthy areas and checks that were skipped or blocked. Include
   exact unit names, command evidence, relevant timestamps, and the likely owning
   role for each issue when you can determine it. Do not overstate uncertainty;
   if the evidence is incomplete, say what remains unknown.

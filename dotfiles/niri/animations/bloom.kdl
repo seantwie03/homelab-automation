@@ -20,7 +20,7 @@ animations {
         curve "linear"
 
         custom-shader r"
-          vec4 open_color(vec3 coords_geo, vec3 size_geo) {
+        vec4 open_color(vec3 coords_geo, vec3 size_geo) {
             float p0 = niri_clamped_progress;
             float p  = smoothstep(0.0, 1.0, p0);
 
@@ -34,12 +34,12 @@ animations {
             vec2 uv = scaled_pos / size;
 
             if (uv.x < 0.0 || uv.x > 1.0 ||
-                uv.y < 0.0 || uv.y > 1.0) {
+            uv.y < 0.0 || uv.y > 1.0) {
                 return vec4(0.0, 0.0, 0.0, 0.0);
             }
 
             return texture2D(niri_tex, uv);
-          }
+        }
         "
     }
 
@@ -48,7 +48,7 @@ animations {
         curve "linear"
 
         custom-shader r"
-          vec4 close_color(vec3 coords_geo, vec3 size_geo) {
+        vec4 close_color(vec3 coords_geo, vec3 size_geo) {
             float p0 = niri_clamped_progress;
             float p  = smoothstep(0.0, 1.0, p0);
 
@@ -62,12 +62,12 @@ animations {
             vec2 uv = scaled_pos / size;
 
             if (uv.x < 0.0 || uv.x > 1.0 ||
-                uv.y < 0.0 || uv.y > 1.0) {
+            uv.y < 0.0 || uv.y > 1.0) {
                 return vec4(0.0, 0.0, 0.0, 0.0);
             }
 
             return texture2D(niri_tex, uv);
-          }
+        }
         "
     }
 }
