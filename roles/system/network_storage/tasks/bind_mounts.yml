@@ -7,7 +7,6 @@
   loop: "{{ bind_mounts }}"
   loop_control:
     label: "{{ item.path }}"
-  when: item.state | default('present') != 'absent'
 
 - name: automount configured for bind mounts
   ansible.posix.mount:
@@ -16,7 +15,7 @@
     fstype: none
     boot: false
     opts: bind,x-systemd.mount-timeout=10,x-systemd.automount,nofail
-    state: "{{ item.state | default('present') }}"
+    state: present
   loop: "{{ bind_mounts }}"
   loop_control:
     label: "{{ item.path }}"

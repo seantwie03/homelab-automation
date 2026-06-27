@@ -3,7 +3,7 @@
 ## Expected Mounts
 
 Read `nfs_mounts` and `bind_mounts` from the role defaults and host variables.
-Then compare present mounts with the deployed configuration:
+Then compare them with the deployed configuration:
 
 ```sh
 findmnt --fstab
@@ -11,11 +11,9 @@ systemctl list-units --type=automount --all
 systemctl list-units --type=mount --all
 ```
 
-Every configured path with `state` omitted or set to `present` should have a
-generated automount unit. Because these mounts use `x-systemd.automount`, the
-corresponding mount unit may remain inactive until the path is accessed. Paths
-with `state: absent` should not appear in `/etc/fstab`, `findmnt`, or generated
-systemd mount and automount units.
+Every configured path should have a generated automount unit. Because these
+mounts use `x-systemd.automount`, the corresponding mount unit may remain
+inactive until the path is accessed.
 
 ## Trigger And Verify
 
