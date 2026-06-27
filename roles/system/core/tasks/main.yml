@@ -42,6 +42,11 @@
     name: usbutils
     state: present
 
+- name: lsof is installed
+  ansible.builtin.package:
+    name: lsof
+    state: present
+
 - name: kitty terminfo is installed
   ansible.builtin.package:
     name: kitty-terminfo

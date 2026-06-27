@@ -18,6 +18,7 @@ The `ansible.posix` collection must be available.
 `bind_mounts`: List of local bind mounts to automount. Each entry requires:
 - `src`: Source directory to expose at a second path.
 - `path`: Local mount point.
+- `state` *(optional)*: Mount state for `ansible.posix.mount`. Defaults to `present`; use `absent` to remove a previously managed bind mount.
 
 `samba_mounts` *(disabled)*: List of CIFS shares. Currently commented out. Each entry requires `server` and `share`.
 
@@ -46,4 +47,5 @@ The `ansible.posix` collection must be available.
         bind_mounts:
           - src: /srv/tier1/docs/areas/homelab
             path: /opt/homelab/docs
+            state: absent
 ```

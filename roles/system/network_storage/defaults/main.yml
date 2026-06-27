@@ -17,5 +17,6 @@ samba_mounts:
 bind_mounts:
   - src: /srv/tier1/docs/areas/homelab
     path: /opt/homelab-automation/docs
+    state: absent
   - src: /srv/tier1/docs
     path: /home/{{ user }}/u
