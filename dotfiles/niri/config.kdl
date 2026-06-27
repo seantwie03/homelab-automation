@@ -385,7 +385,6 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Mod+Period hotkey-overlay-title="Emoji Picker: rofimoji" { spawn "rofimoji" "--selector" "fuzzel"; }
-    Mod+Comma hotkey-overlay-title="Open Downloaded Video: vid-picker" { spawn-sh "$HOME/.config/fuzzel/vid-picker.sh"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
     F2 { spawn "wayscriber" "-a" "--no-resume-session"; }
@@ -659,4 +658,3 @@ window-rule {
 }
 
 spawn-at-startup "swaybg" "-i" "/home/sean/.local/share/backgrounds/astronaut_jellyfish.jpg" "-m" "fill"
-
