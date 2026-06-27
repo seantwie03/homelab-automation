@@ -13,7 +13,7 @@ unset LESSOPEN
 
 # User specific environment
 if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin: ]]; then
-  export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
+    export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
 fi
 
 ######################################## Defaults ########################################
@@ -32,7 +32,7 @@ PROMPT_COMMAND="history -a; history -n; $PROMPT_COMMAND"
 # Notify the terminal about the current working directory.
 # This allows Windows Terminal to open new splits in the same directory.
 if is_wsl ; then
-  PROMPT_COMMAND=${PROMPT_COMMAND:+"$PROMPT_COMMAND; "}'printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"'
+    PROMPT_COMMAND=${PROMPT_COMMAND:+"$PROMPT_COMMAND; "}'printf "\e]9;9;%s\e\\" "$(wslpath -w "$PWD")"'
 fi
 
 shopt -s autocd
@@ -45,8 +45,8 @@ if is_wsl; then
     alias ssh-add="ssh-add.exe"
 else
     if [ ! -S ~/.ssh/ssh_auth_sock ]; then
-      eval "$(ssh-agent)"
-      ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+        eval "$(ssh-agent)"
+        ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
     fi
     export SSH_AUTH_SOCK=~/.ssh/ssh_auth_sock
 fi
@@ -69,9 +69,9 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 # Prevent Clobber by Redirection - Bypass restriction with >|
-set -o noclobber 
+set -o noclobber
 
-######################################## Color ######################################## 
+######################################## Color ########################################
 alias ls='ls --almost-all --color=auto'
 alias grep='grep --color=auto'
 
@@ -85,26 +85,24 @@ eval "$(dircolors ~/.dircolors)"
 ####################################### Completion #######################################
 # Load AWS CLI completion if available
 if command -v aws &> /dev/null && command -v aws_completer &> /dev/null; then
-  complete -C '/usr/local/bin/aws_completer' aws
+    complete -C '/usr/local/bin/aws_completer' aws
 fi
 
 if command -v terraform &> /dev/null; then
-  complete -C /usr/bin/terraform terraform
+    complete -C /usr/bin/terraform terraform
 fi
 
 ######################################## Variables ########################################
 # Windows Home (WH) - This variable is the linux-style path to the windows user's home directory
 if is_wsl ; then
-  # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
-  # that by adding a sed substitution to remove the \r
-  WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
-  export WH
+    # Apparently wslpath or PowerShell returns a \r on the end of the path which causes 'cd $WH' to not work. I 'fixed'
+    # that by adding a sed substitution to remove the \r
+    WH=$(wslpath "$(powershell.exe -NoProfile -NonInteractive -Command \$env:USERPROFILE)" | sed 's/\r//')
+    export WH
 fi
 
 # Use libvirt with Vagrant
 export VAGRANT_DEFAULT_PROVIDER='libvirt'
-
-
 
 # Added by Antigravity CLI installer
 export PATH="/home/sean/.local/bin:$PATH"

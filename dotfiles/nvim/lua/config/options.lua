@@ -8,7 +8,8 @@
 
 -- General
 vim.opt_global.fileencoding = "utf-8"
-vim.opt_global.fileformat = "unix"
+vim.opt.fileformats = { "unix" }
+vim.opt.fixendofline = true
 vim.opt.shortmess:append("I")
 vim.opt.nrformats:append("alpha")
 vim.opt.updatetime = 250

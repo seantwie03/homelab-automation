@@ -49,10 +49,10 @@ _h() {
                                 while IFS= read -r -d '' file; do
                                     yaml_files+=("$(basename "$file")")
                                 done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
-                                
+
                                 {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
                                     COMPREPLY=( $(compgen -W "${yaml_files[*]}" -- "${cur}") )
-                                fi
+                            fi
                             fi
                             ;;
                         j|job)

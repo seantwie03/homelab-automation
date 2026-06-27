@@ -14,8 +14,8 @@ return {
             validation = {
                 enabled = true,
                 lint = {
-                  enabled = true,
-                  path = 'ansible-lint',
+                    enabled = true,
+                    path = 'ansible-lint',
                 },
             },
         },

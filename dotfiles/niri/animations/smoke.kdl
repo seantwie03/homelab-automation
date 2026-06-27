@@ -1,6 +1,6 @@
 /*
 Title: smoke
-Authors: liixini | https://github.com/liixini 
+Authors: liixini | https://github.com/liixini
 Desc: a smoke animation preset for niri.
 Demo: ./demos/smoke.gif
 Note:
@@ -227,7 +227,7 @@ animations {
             vec4 color = texture2D(niri_tex_next, coords_geo.st );
             return color * (1.0 - sin(reveal*3.14));
             //              ^ this will curve from one to zero and back up onw
-            
+
         }
         "
     }
@@ -268,5 +268,5 @@ animations {
     recent-windows-close {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.001
     }
-*/    
+*/
 }

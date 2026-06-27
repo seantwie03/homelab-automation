@@ -1,7 +1,7 @@
 /*
 Title: glitch_01
-Authors: liixini | https://github.com/liixini 
-+ adjustments by Justin Garza <JGarza9788@gmail.com> 
+Authors: liixini | https://github.com/liixini
++ adjustments by Justin Garza <JGarza9788@gmail.com>
 Desc: a glitch animation preset for niri.
 Demo: ./demos/glitch_01.gif
 Note:
@@ -167,7 +167,7 @@ animations {
                     (c - a) * u.y * (1.0 - u.x) +
                     (d - b) * u.y * u.x;
         }
-        
+
         vec4 resize_color(vec3 coords_geo, vec3 size_geo) {
             if (coords_geo.x < 0.0 || coords_geo.x > 1.0 ||
                 coords_geo.y < 0.0 || coords_geo.y > 1.0) {
@@ -251,5 +251,5 @@ animations {
     recent-windows-close {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.001
     }
-*/    
+*/
 }
