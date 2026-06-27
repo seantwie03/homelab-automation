@@ -47,9 +47,6 @@
     name: be.alexandervanhee.gradia
     state: present
 
-- name: wayscriber is installed and configured
-  ansible.builtin.include_tasks: wayscriber.yml
-
 - name: graphical.target is the default systemd target
   ansible.builtin.file:
     src: /usr/lib/systemd/system/graphical.target
@@ -67,4 +64,3 @@
       if uwsm check may-start && uwsm select; then
           exec uwsm start default
       fi
-

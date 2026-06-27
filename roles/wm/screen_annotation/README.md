@@ -1,4 +1,6 @@
-# Hyprland
+# Screen Annotation
+
+Installs Wayscriber for screen annotation.
 
 ## Wayscriber Signing Key Rotation
 
@@ -13,16 +15,16 @@ To update the trusted key:
 ```sh
 curl -fsSL \
     https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc \
-    -o roles/wm/hyprland/files/wayscriber.asc
+    -o roles/wm/screen_annotation/files/wayscriber.asc
 ```
 
 Inspect the new fingerprint:
 
 ```sh
-gpg --show-keys --with-fingerprint roles/wm/hyprland/files/wayscriber.asc
+gpg --show-keys --with-fingerprint roles/wm/screen_annotation/files/wayscriber.asc
 ```
 
-Update the `fingerprint` value in `roles/wm/hyprland/tasks/wayscriber.yml` to match the new key.
+Update the `fingerprint` value in `roles/wm/screen_annotation/tasks/main.yml` to match the new key.
 Use the full fingerprint with no spaces, for example:
 
 ```yaml

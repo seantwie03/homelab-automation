@@ -74,9 +74,6 @@
   ansible.builtin.package:
     name: gnome-calculator
 
-- name: wayscriber is installed and configured
-  ansible.builtin.include_tasks: wayscriber.yml
-
 # TODO:
 #   - wayscriber
 #     - how to zoom
@@ -143,4 +140,3 @@
       if uwsm check may-start && uwsm select; then
           exec uwsm start default
       fi
-

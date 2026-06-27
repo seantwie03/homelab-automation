@@ -6,4 +6,4 @@ dependencies:
   - role: flatpak # For gradia
   - role: fuzzel
   - role: bluetooth
-
+  - role: screen_annotation

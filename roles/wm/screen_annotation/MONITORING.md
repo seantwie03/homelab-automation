@@ -1,4 +1,4 @@
-# Hyprland
+# screen_annotation Role - Monitoring
 
 ## Graphical User Services and Autostart
 
