@@ -12,11 +12,6 @@
   community.general.flatpak:
     name: org.mozilla.firefox
 
-- name: flatseal is installed
-  community.general.flatpak:
-    name: com.github.tchx84.Flatseal
-    state: present
-
 - name: google-chrome is installed
   ansible.builtin.include_tasks: google_chrome.yml
 

@@ -22,3 +22,4 @@
         owner: "{{ user }}"
         group: "{{ user }}"
         mode: 0644
+

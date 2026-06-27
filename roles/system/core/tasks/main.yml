@@ -1,4 +1,18 @@
 ---
+- name: default systemd target is registered
+  ansible.builtin.command:
+    cmd: systemctl get-default
+  register: default_target
+  changed_when: false
+
+- name: is_graphical_system fact is set
+  ansible.builtin.set_fact:
+    is_graphical_system: "{{ default_target.stdout == 'graphical.target' }}"
+
+- name: is_graphical_system fact is printed
+  ansible.builtin.debug:
+    var: is_graphical_system
+
 - name: downloader tools are installed
   ansible.builtin.package:
     name:

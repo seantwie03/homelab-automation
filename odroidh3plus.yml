@@ -22,7 +22,6 @@
           - .
 
   roles:
-    - role: core
     - role: ansible_pull
     - role: dnf
     - role: btrfs
@@ -52,9 +51,3 @@
     - role: smb
     - role: nfs
 
-  tasks:
-    # TODO: remove this task after it has run on all hosts
-    - name: /etc/profile.d/nvim-alias.sh is absent
-      ansible.builtin.file:
-        path: /etc/profile.d/nvim-alias.sh
-        state: absent

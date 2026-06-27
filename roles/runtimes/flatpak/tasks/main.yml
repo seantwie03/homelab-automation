@@ -16,3 +16,9 @@
     state: directory
     mode: 0755
 
+- name: flatseal is installed on graphical systems
+  community.general.flatpak:
+    name: com.github.tchx84.Flatseal
+    state: present
+  when: is_graphical_system
+

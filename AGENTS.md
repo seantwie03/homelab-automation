@@ -54,6 +54,7 @@ No build or test framework exists; this is declarative Ansible configuration.
 
 ## YAML and Task Conventions
 
+- Follow `.editorconfig` for all edits, including final newlines, LF line endings, indentation, and trailing-whitespace behavior.
 - YAML files begin with `---` and end with a blank line.
 - Task names are **entirely lowercase** and written as a state description, not an action. Omit leading "Ensure".
   - Good: `btrbk is installed`
@@ -65,6 +66,7 @@ No build or test framework exists; this is declarative Ansible configuration.
 - Access gathered facts through `ansible_facts`, not deprecated injected top-level `ansible_*` variables.
   - Good: `ansible_facts['architecture']`
   - Bad: `ansible_architecture`
+- The `ansible_pull` role depends on `core`, so roles can use the `is_graphical_system` fact from `core` to gate graphical-only packages.
 - Prefer **generic modules** (`package`, `service`) over distro-specific ones (`dnf`, `systemd`).
 
 ## Shell Script Conventions

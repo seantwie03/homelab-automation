@@ -31,16 +31,7 @@
     name: 1password-cli
     state: present
 
-- name: register default systemd target
-  ansible.builtin.stat:
-    path: /etc/systemd/system/default.target
-  register: default_target
-
-- name: print default systemd target
-  ansible.builtin.debug:
-    var: default_target.stat.lnk_target
-    verbosity: 1
-
 - name: 1password GUI is installed
   ansible.builtin.include_tasks: gui.yml
-  when: "'graphical' in default_target.stat.lnk_target"
+  when: is_graphical_system
+
