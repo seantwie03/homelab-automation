@@ -16,3 +16,4 @@
     name: bluetui
     state: present
     path: "/home/{{ user }}" # cargo automatically appends /bin
+

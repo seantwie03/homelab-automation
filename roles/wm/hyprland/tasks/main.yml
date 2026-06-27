@@ -42,6 +42,14 @@
     name: pavucontrol
     state: present
 
+- name: gradia is installed (screenshot annotation tool)
+  community.general.flatpak:
+    name: be.alexandervanhee.gradia
+    state: present
+
+- name: wayscriber is installed and configured
+  ansible.builtin.include_tasks: wayscriber.yml
+
 - name: graphical.target is the default systemd target
   ansible.builtin.file:
     src: /usr/lib/systemd/system/graphical.target

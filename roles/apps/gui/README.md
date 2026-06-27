@@ -1,6 +1,6 @@
 # GUI
 
-Install graphical software packages
+Install graphical software packages. These are packages that I would install on ANY graphical fedora system regardless of Desktop Environment or Window Manager.
 
 ## Google Chrome Signing Key Rotation
 
@@ -60,35 +60,6 @@ Use the full fingerprint with no spaces, for example:
 fingerprint: bc528686b50d79e339d3721ceb3e94adbe1229cf
 ```
 
-## Wayscriber Signing Key Rotation
-
-The Wayscriber RPM signing key is checked into this role and deployed to `/etc/pki/rpm-gpg/RPM-GPG-KEY-wayscriber`.
-The DNF repository uses that local key file instead of the upstream key URL so unattended updates cannot automatically trust a rotated remote key.
-
-If Wayscriber rotates its RPM signing key, package updates may fail until this role is updated.
-This is intentional: the playbook pins the trusted key fingerprint, and DNF is configured to use only the local key file managed by this repo.
-
-To update the trusted key:
-
-```sh
-curl -fsSL \
-    https://wayscriber.com/rpm/RPM-GPG-KEY-wayscriber.asc \
-    -o roles/apps/gui/files/wayscriber.asc
-```
-
-Inspect the new fingerprint:
-
-```sh
-gpg --show-keys --with-fingerprint roles/apps/gui/files/wayscriber.asc
-```
-
-Update the `fingerprint` value in `roles/apps/gui/tasks/wayscriber.yml` to match the new key.
-Use the full fingerprint with no spaces, for example:
-
-```yaml
-fingerprint: 4489BCBB3CB130533709175F027B1C752E38957A
-```
-
 ## Zoom Updates
 
 Zoom is installed from a versioned remote RPM URL and pinned by `zoom_version`
@@ -141,3 +112,4 @@ downloading and playback via mpv.
 The first time, Chrome will ask *"Open vid-play?"* — click **Open** and check
 **Always allow** so it never prompts again. The video will download in the background
 and open in mpv when ready.
+

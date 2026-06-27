@@ -2,5 +2,7 @@
 dependencies:
   - role: waybar
   - role: dunst
+  - role: flatpak # For gradia
   - role: fuzzel
-  - role: screenshots
+  - role: bluetooth
+

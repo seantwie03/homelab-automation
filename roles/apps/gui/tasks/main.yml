@@ -23,31 +23,9 @@
 - name: kitty is installed and configured
   ansible.builtin.include_tasks: kitty.yml
 
-- name: bluetooth is installed
-  ansible.builtin.include_tasks: bluetooth.yml
-
 # Temporarily remove Zoom until its RPM signature is compatible with RPM 6.
 # - name: zoom is installed
 #   ansible.builtin.include_tasks: zoom.yml
-
-- name: zoom installation is detected without signature verification # noqa command-instead-of-module
-  ansible.builtin.command:
-    cmd: rpm --nosignature -q zoom
-  register: zoom_query
-  changed_when: false
-  failed_when: zoom_query.rc not in [0, 1]
-
-- name: zoom is removed without signature verification # noqa command-instead-of-module
-  ansible.builtin.command:
-    cmd: rpm -e --nosignature zoom
-  when: zoom_query.rc == 0
-  changed_when: true
-
-- name: gromit-mpx is uninstalled and removed
-  ansible.builtin.include_tasks: gromit_mpx.yml
-
-- name: wayscriber is installed and configured
-  ansible.builtin.include_tasks: wayscriber.yml
 
 - name: vscode and vscode-insiders are installed
   ansible.builtin.include_tasks: vscode.yml
@@ -55,7 +33,7 @@
 - name: jetbrains toolbox is installed
   ansible.builtin.include_tasks: jetbrains_toolbox.yml
 
-- name: print packages are installed
+- name: printer packages are installed
   ansible.builtin.include_tasks: printer.yml
 
 - name: mouse configuration software is installed
@@ -74,10 +52,6 @@
       - inkscape
       - colord-gtk
 
-- name: gnome-calculator is installed
-  ansible.builtin.package:
-    name: gnome-calculator
-
 - name: mpv is installed
   ansible.builtin.package:
     name: mpv
@@ -91,3 +65,4 @@
     follow: false
     owner: "{{ user }}"
     group: "{{ user }}"
+
