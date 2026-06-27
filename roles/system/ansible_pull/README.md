@@ -22,14 +22,16 @@ The Systemd Service name is `ansible-pull`. It is hardcoded in several places.
 
 `ansible_lint_pip_version`: Same pinning behavior as `ansible_pip_version`, but for `ansible-lint`.
 
+`editorconfig_checker_pip_version`: Same pinning behavior as `ansible_pip_version`, but for `editorconfig-checker`.
+
 `dnf_automatic_reboot`: Controls whether the system reboots after dnf-automatic applies updates. Valid values: `never`, `when-needed`, `always`. Default: `never`.
 
 ## Ansible Version Management
 
-This role manages the `ansible` and `ansible-lint` pip packages using a minor-version pin (`~=X.Y.0`). This means:
+This role manages the `ansible`, `ansible-lint`, and `editorconfig-checker` pip packages using a minor-version pin (`~=X.Y.0`). This means:
 
 - Patch updates (e.g. `13.3.0` → `13.3.1`) are applied automatically on every ansible-pull run.
-- Minor and major upgrades require a deliberate change to `ansible_pip_version` or `ansible_lint_pip_version` in `defaults/main.yml`.
+- Minor and major upgrades require a deliberate change to `ansible_pip_version`, `ansible_lint_pip_version`, or `editorconfig_checker_pip_version` in `defaults/main.yml`.
 
 ## Automated System Updates (dnf-automatic)
 
@@ -49,7 +51,7 @@ This role also configures `dnf-automatic` to apply all package updates on a dail
 
 ```sh
 sudo dnf install python3-pip
-sudo python3 -m pip install ansible ansible-lint
+sudo python3 -m pip install ansible ansible-lint editorconfig-checker
 ```
 
 Ansible is installed via `pip` instead of `dnf` because the Fedora-packaged `ansible` does not include `ansible-pull`. `pip` is run with `sudo` because `ansible-pull` must be available system-wide for the root-owned systemd timer. After the first successful run, this role takes over version management.
@@ -70,4 +72,3 @@ Ansible is installed via `pip` instead of `dnf` because the Fedora-packaged `ans
         homelab_ansible_repo_git: git@github.com:your_username/your_reponame.git
         homelab_docs_dir: /srv/docs/areas/homelab
 ```
-

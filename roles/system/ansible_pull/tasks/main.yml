@@ -1,9 +1,10 @@
 ---
-- name: ansible-core and ansible-lint are up to date
+- name: ansible-core, ansible-lint, and editorconfig-checker are up to date
   ansible.builtin.pip:
     name:
       - ansible-core~={{ ansible_pip_version }}
       - ansible-lint~={{ ansible_lint_pip_version }}
+      - editorconfig-checker~={{ editorconfig_checker_pip_version }}
     state: latest  # noqa: package-latest
 
 - name: "{{ playbook_path }} is a safe git directory for root"

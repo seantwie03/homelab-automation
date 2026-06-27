@@ -8,3 +8,4 @@ homelab_docs_dir: /srv/tier1/docs/areas/homelab
 # To adopt a new minor version, bump X.Y.
 ansible_pip_version: "2.20.4"
 ansible_lint_pip_version: "26.4.0"
+editorconfig_checker_pip_version: "3.6.1"
