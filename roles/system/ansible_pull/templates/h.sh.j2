@@ -64,6 +64,52 @@ show_documentation_usage() {
     echo "  h d inbox"
 }
 
+write_ansible_log_summary() {
+    local _log_file
+
+    for _log_file in "$@"; do
+        printf 'Log: %s\n\n' "${_log_file}"
+
+        awk '
+            /^TASK \[/ {
+                task = $0
+            }
+
+            /"changed": true/ {
+                changed = changed task "\n" $0 "\n\n"
+                changed_found = 1
+            }
+
+            /^PLAY RECAP / {
+                recap_started = 1
+            }
+
+            recap_started {
+                recap = recap $0 "\n"
+                recap_found = 1
+            }
+
+            END {
+                if (recap_found) {
+                    printf "%s", recap
+                } else {
+                    print "No play recap found."
+                }
+                print ""
+
+                print "CHANGED TASKS ******************************************************************"
+                if (!changed_found) {
+                    print "No changed tasks found."
+                } else {
+                    printf "%s", changed
+                }
+            }
+        ' "${_log_file}"
+
+        printf '\n'
+    done
+}
+
 if [ "$#" -eq 0 ]; then
     show_usage
     exit 0
@@ -103,7 +149,10 @@ case "$1" in
                     echo "No logs found in /var/log/${AUTOMATION_SERVICE_NAME}/" >&2
                     exit 1
                 fi
-                less +G "${_files[@]}"
+                _summary_file="$(mktemp --tmpdir "${AUTOMATION_SERVICE_NAME}-summary.XXXXXXXXXX")"
+                trap 'rm -f "$_summary_file"' EXIT
+                write_ansible_log_summary "${_files[@]}" > "$_summary_file"
+                less "$_summary_file" "${_files[@]}"
                 ;;
             r|run)
                 echo "Running ${AUTOMATION_SERVICE_NAME}.service immediately..."

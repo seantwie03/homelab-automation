@@ -23,7 +23,14 @@ Find the newest Ansible Pull log:
 ls -t /var/log/ansible-pull | head -1
 ```
 
-Read that file from `/var/log/ansible-pull/` and find its final play recap:
+Open the newest log summary:
+
+```sh
+h a logs
+```
+
+The first `less` buffer shows the final play recap and changed tasks.
+Press `:n` in `less` to move to the full log. The play recap should look like:
 
 ```text
 localhost : ok=NNN changed=N unreachable=0 failed=0 skipped=NN ...
@@ -67,4 +74,3 @@ cat /etc/logrotate.d/ansible-pull
 
 The role retains up to 30 rotations or 30 days of logs. Missing logs after a
 successful timer activation are unexpected.
-
