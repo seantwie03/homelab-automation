@@ -18,6 +18,10 @@ gstat() {
     git status
 }
 
+em() {
+    emacs -nw "$@"
+}
+
 # kitty-demo-cmd-file-updater
 kdcfu() {
     local target_path="$1"
@@ -98,4 +102,3 @@ _systemctlu() {
     _systemctl
 }
 complete -F _systemctlu systemctlu
-

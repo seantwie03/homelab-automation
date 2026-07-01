@@ -2,6 +2,11 @@
 
 Install graphical software packages. These are packages that I would install on ANY graphical fedora system regardless of Desktop Environment or Window Manager.
 
+## Emacs
+
+The role installs Fedora's default Emacs package and symlinks
+`dotfiles/emacs` to `~/.config/emacs`.
+
 ## Google Chrome Signing Key Rotation
 
 The Google Linux RPM signing key is checked into this role and deployed to `/etc/pki/rpm-gpg/RPM-GPG-KEY-google`.

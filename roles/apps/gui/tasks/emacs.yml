@@ -1,0 +1,22 @@
+---
+- name: emacs packages are installed
+  ansible.builtin.package:
+    name: emacs
+    state: present
+
+- name: emacs config parent directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: emacs dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/emacs"
+    dest: /home/{{ user }}/.config/emacs
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"

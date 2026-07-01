@@ -18,6 +18,9 @@
 - name: kitty is installed and configured
   ansible.builtin.include_tasks: kitty.yml
 
+- name: emacs is installed and configured
+  ansible.builtin.include_tasks: emacs.yml
+
 # Temporarily remove Zoom until its RPM signature is compatible with RPM 6.
 # - name: zoom is installed
 #   ansible.builtin.include_tasks: zoom.yml
@@ -60,4 +63,3 @@
     follow: false
     owner: "{{ user }}"
     group: "{{ user }}"
-
