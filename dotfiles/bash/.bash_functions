@@ -22,6 +22,23 @@ em() {
     emacs -nw "$@"
 }
 
+emo() {
+    local emacs_eval
+
+    emacs_eval='(progn
+        (require (quote org-agenda))
+        (setq org-agenda-window-setup (quote current-window))
+        (find-file (expand-file-name "~/u/org/inbox.org"))
+        (delete-other-windows)
+        (let ((inbox-window (selected-window))
+            (agenda-window (split-window-below)))
+            (select-window agenda-window)
+            (org-agenda-list)
+            (select-window inbox-window)))'
+
+    emacs -nw --chdir "$HOME/u/org" --eval "$emacs_eval"
+}
+
 # kitty-demo-cmd-file-updater
 kdcfu() {
     local target_path="$1"
