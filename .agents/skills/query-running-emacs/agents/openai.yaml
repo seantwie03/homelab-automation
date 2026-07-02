@@ -1,0 +1,4 @@
+interface:
+  display_name: "Query Running Emacs"
+  short_description: "Inspect live Emacs docs and state"
+  default_prompt: "Use $query-running-emacs to inspect my running Emacs documentation and state with emacsclient."

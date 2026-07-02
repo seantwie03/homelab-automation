@@ -12,6 +12,8 @@ insert_final_newline = true
 [*.{yml,yaml,yml.j2,yaml.j2}]
 indent_size = 2
 
+[*.el]
+indent_size = 2
+
 [*.md]
 indent_size = 1
-

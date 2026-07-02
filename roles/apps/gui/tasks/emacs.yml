@@ -12,6 +12,14 @@
     group: "{{ user }}"
     mode: 0755
 
+- name: emacs state directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.local/state/emacs
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
 - name: emacs dotfiles directory is symlinked
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/emacs"

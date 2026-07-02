@@ -5,7 +5,8 @@ Install graphical software packages. These are packages that I would install on 
 ## Emacs
 
 The role installs Fedora's default Emacs package and symlinks
-`dotfiles/emacs` to `~/.config/emacs`.
+`dotfiles/emacs` to `~/.config/emacs`. It also creates
+`~/.local/state/emacs` for Emacs backup and auto-save state.
 
 ## Google Chrome Signing Key Rotation
 
