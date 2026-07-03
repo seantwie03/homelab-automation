@@ -5,25 +5,35 @@
   (error "Emacs Bedrock only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
 ;;; Package management
-(setopt package-archives
-        '(("gnu" . "https://elpa.gnu.org/packages/")
-          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-          ("melpa" . "https://melpa.org/packages/")))
+(use-package package
+  :ensure nil
+  :custom
+  (package-archives
+   '(("gnu" . "https://elpa.gnu.org/packages/")
+     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+     ("melpa" . "https://melpa.org/packages/"))))
 
 ;;; Generated state
-(setopt custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file 'noerror 'nomessage)
+(use-package cus-edit
+  :ensure nil
+  :custom
+  (custom-file (expand-file-name "custom.el" user-emacs-directory))
+  :config
+  (load custom-file 'noerror 'nomessage))
 
-;; Keep generated backup and auto-save files out of project directories.
-(dolist (dir (list
-              (expand-file-name "backups/" user-emacs-directory)
-              (expand-file-name "auto-saves/" user-emacs-directory)))
-  (make-directory dir t))
-
-(setopt backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory))))
-(setopt auto-save-file-name-transforms
-        `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
-(setopt create-lockfiles nil)
+(use-package files
+  :ensure nil
+  :init
+  ;; Keep generated backup and auto-save files out of project directories.
+  (dolist (dir (list
+                (expand-file-name "backups/" user-emacs-directory)
+                (expand-file-name "auto-saves/" user-emacs-directory)))
+    (make-directory dir t))
+  :custom
+  (backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory))))
+  (auto-save-file-name-transforms
+   `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
+  (create-lockfiles nil))
 
 (use-package savehist
   :ensure nil
@@ -48,10 +58,18 @@
 ;;; UI
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
-(show-paren-mode 1)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
-(blink-cursor-mode -1)
+
+(use-package paren
+  :ensure nil
+  :config
+  (show-paren-mode 1))
+
+(use-package frame
+  :ensure nil
+  :config
+  (blink-cursor-mode -1))
 
 ;;; Mode line
 (column-number-mode 1)
@@ -110,17 +128,21 @@
 ;;; File behavior
 (setopt vc-follow-symlinks t)
 
-;; Automatically reread from disk if the underlying file changes
-;; Check if polling is being used for the current buffer by running the
-;; following elisp and looking for :watch in the output
-;; (with-current-buffer (window-buffer (selected-window))
-;;     (list :buffer (buffer-name) :file buffer-file-name :watch
-;;           (and (boundp 'auto-revert-notify-watch-descriptor)
-;;                auto-revert-notify-watch-descriptor)))
-(setopt auto-revert-avoid-polling t)
-(setopt auto-revert-interval 5)
-(setopt auto-revert-check-vc-info t)
-(global-auto-revert-mode)
+(use-package autorevert
+  :ensure nil
+  :custom
+  (auto-revert-avoid-polling t)
+  (auto-revert-interval 5)
+  (auto-revert-check-vc-info t)
+  :config
+  ;; Automatically reread from disk if the underlying file changes.
+  ;; Check if polling is being used for the current buffer by running the
+  ;; following elisp and looking for :watch in the output:
+  ;; (with-current-buffer (window-buffer (selected-window))
+  ;;     (list :buffer (buffer-name) :file buffer-file-name :watch
+  ;;           (and (boundp 'auto-revert-notify-watch-descriptor)
+  ;;                auto-revert-notify-watch-descriptor)))
+  (global-auto-revert-mode 1))
 
 (use-package dired
   :ensure nil
