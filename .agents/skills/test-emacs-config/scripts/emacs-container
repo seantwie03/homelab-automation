@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v podman >/dev/null 2>&1; then
+    echo "podman is not installed; run the host playbook so the ansible_pull dependency installs it" >&2
+    exit 1
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+fedora_version="$(
+    . /etc/os-release
+    printf '%s' "${VERSION_ID:?}"
+)"
+image_name="homelab-emacs-test:fedora-${fedora_version}"
+
+if ! podman image exists "$image_name"; then
+    podman build \
+        --tag "$image_name" \
+        --build-arg "FEDORA_VERSION=$fedora_version" \
+        --file "$repo_root/tools/emacs-container/Containerfile" \
+        "$repo_root/tools/emacs-container"
+fi
+
+podman run \
+    --rm \
+    --pull=never \
+    --tmpfs /root/.config/emacs \
+    --mount type=volume,source=homelab-emacs-elpa,destination=/root/.config/emacs/elpa \
+    --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly \
+    --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly \
+    "$image_name" \
+    emacs --batch \
+        --load /root/.config/emacs/early-init.el \
+        --load /root/.config/emacs/init.el \
+        "$@"

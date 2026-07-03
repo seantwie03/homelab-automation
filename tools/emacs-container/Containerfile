@@ -1,0 +1,9 @@
+ARG FEDORA_VERSION
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION}
+
+RUN dnf -y install \
+        emacs-nox \
+        fontconfig \
+        git \
+        ripgrep \
+    && dnf clean all

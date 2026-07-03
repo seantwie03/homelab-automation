@@ -46,6 +46,7 @@ This role also configures `dnf-automatic` to apply all package updates on a dail
 ## Dependencies
 
 `ansible-pull` must be installed on the managed host before the first run.
+The role depends on `podman` because it is used in some agent skill wrappers.
 
 ### Bootstrap
 

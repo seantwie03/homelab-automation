@@ -4,6 +4,7 @@
 (when (< emacs-major-version 30)
   (error "Emacs Bedrock only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
+;;; Generated files
 ;; Keep generated backup and auto-save files out of project directories.
 (dolist (dir (list
               (expand-file-name "backups/" user-emacs-directory)
@@ -19,6 +20,7 @@
 (setopt create-lockfiles nil)
 (setopt vc-follow-symlinks t)
 
+;;; Editing
 ;; Use spaces by default; EditorConfig can override this per project.
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
@@ -43,6 +45,7 @@
 
 (add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
 
+;;; Files
 ;; Automatically reread from disk if the underlying file changes
 ;; Check if polling is being used for the current buffer by running the
 ;; following elisp and looking for :watch in the output
@@ -54,11 +57,6 @@
 (setopt auto-revert-interval 5)
 (setopt auto-revert-check-vc-info t)
 (global-auto-revert-mode)
-
-(setq read-extended-command-predicate #'command-completion-default-include-p)
-(setq enable-recursive-minibuffers t)
-(setq completions-detailed t)
-(minibuffer-depth-indicate-mode 1)
 
 (use-package savehist
   :ensure nil
@@ -74,6 +72,14 @@
   ("C-c r" . recentf-open)
   :config
   (recentf-mode 1))
+
+;;; Completion and navigation
+(setopt read-extended-command-predicate #'command-completion-default-include-p)
+(setopt enable-recursive-minibuffers t)
+(setopt completions-detailed t)
+(setopt completion-cycle-threshold 3)
+(setopt completions-sort 'historical)
+(minibuffer-depth-indicate-mode 1)
 
 (use-package icomplete
   :ensure nil
@@ -105,6 +111,8 @@
 
 (use-package marginalia
   :ensure t
+  :custom
+  (marginalia-field-width 160)
   :config
   (marginalia-mode 1))
 
@@ -118,9 +126,7 @@
    ("C-c i" . consult-imenu)
    ("M-y" . consult-yank-pop)))
 
-(setq completion-cycle-threshold 3
-      completions-sort 'historical)
-
+;;; Scrolling
 ;; Scroll like Vim's scrolloff: keep point away from the window edges.
 (setopt scroll-margin 8)
 (setopt scroll-conservatively 101)
@@ -128,6 +134,7 @@
 (setopt scroll-preserve-screen-position t)
 (setq next-screen-context-lines 8)
 
+;;; Startup cleanup
 ;; Undo early-init.el setting
 (setq gc-cons-threshold (or my--initial-gc-threshold 800000))
 (custom-set-variables
