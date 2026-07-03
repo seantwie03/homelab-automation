@@ -10,56 +10,40 @@
           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
           ("melpa" . "https://melpa.org/packages/")))
 
-;;; Generated files
+(setopt custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file 'noerror 'nomessage)
+
+;;; Backups
 ;; Keep generated backup and auto-save files out of project directories.
 (dolist (dir (list
               (expand-file-name "backups/" user-emacs-directory)
-              (expand-file-name "auto-saves/" user-emacs-directory)
-              (expand-file-name "auto-save-list/" user-emacs-directory)))
+              (expand-file-name "auto-saves/" user-emacs-directory)))
   (make-directory dir t))
 
 (setopt backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory))))
 (setopt auto-save-file-name-transforms
         `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
-(setopt auto-save-list-file-prefix
-        (expand-file-name "auto-save-list/.saves-" user-emacs-directory))
 (setopt create-lockfiles nil)
-(setopt vc-follow-symlinks t)
 
 ;;; UI
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
 (column-number-mode 1)
 (show-paren-mode 1)
+(setopt inhibit-splash-screen t)
+(setopt initial-major-mode 'org-mode)
+(blink-cursor-mode -1)
+(setopt vc-follow-symlinks t)
 
 ;;; Mode line
 (line-number-mode 1)
-(setopt display-time-24hr-format t)
-(setopt display-time-default-load-average nil)
-(display-time-mode 1)
-(when (and (fboundp 'display-battery-mode)
-           (boundp 'battery-status-function)
-           battery-status-function)
-  (display-battery-mode 1))
 
 (use-package doom-modeline
   :ensure t
   :custom
-  (doom-modeline-battery nil)
-  (doom-modeline-buffer-file-name-style 'truncate-nil)
-  (doom-modeline-buffer-state-icon t)
-  (doom-modeline-buffer-modification-icon t)
-  (doom-modeline-check nil)
-  (doom-modeline-env-enable-elixir nil)
-  (doom-modeline-env-enable-go nil)
-  (doom-modeline-env-enable-perl nil)
-  (doom-modeline-env-enable-python nil)
-  (doom-modeline-env-enable-ruby nil)
-  (doom-modeline-env-enable-rust nil)
-  (doom-modeline-github nil)
   (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-minor-modes nil)
+  (doom-modeline-battery nil)
+  (doom-modeline-time nil)
   :config
   (doom-modeline-mode 1))
 
@@ -121,8 +105,6 @@
 
 (use-package saveplace
   :ensure nil
-  :custom
-  (save-place-file (expand-file-name "places" user-emacs-directory))
   :config
   (save-place-mode 1))
 
@@ -214,15 +196,3 @@
 ;;; Startup cleanup
 ;; Undo early-init.el setting
 (setq gc-cons-threshold (or my--initial-gc-threshold 800000))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(consult doom-modeline helpful marginalia orderless)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
