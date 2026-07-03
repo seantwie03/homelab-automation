@@ -4,16 +4,16 @@
 (when (< emacs-major-version 30)
   (error "Emacs Bedrock only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
-;;; Packages
+;;; Package management
 (setopt package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
           ("melpa" . "https://melpa.org/packages/")))
 
+;;; Generated state
 (setopt custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror 'nomessage)
 
-;;; Backups
 ;; Keep generated backup and auto-save files out of project directories.
 (dolist (dir (list
               (expand-file-name "backups/" user-emacs-directory)
@@ -25,17 +25,36 @@
         `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
 (setopt create-lockfiles nil)
 
+(use-package savehist
+  :ensure nil
+  :config
+  (savehist-mode 1))
+
+(use-package saveplace
+  :ensure nil
+  :config
+  (save-place-mode 1))
+
+(use-package recentf
+  :ensure nil
+  :custom
+  (recentf-max-saved-items 200)
+  (recentf-auto-cleanup 'never)
+  :bind
+  ("C-c r" . recentf-open)
+  :config
+  (recentf-mode 1))
+
 ;;; UI
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
-(column-number-mode 1)
 (show-paren-mode 1)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
 (blink-cursor-mode -1)
-(setopt vc-follow-symlinks t)
 
 ;;; Mode line
+(column-number-mode 1)
 (line-number-mode 1)
 
 (use-package doom-modeline
@@ -59,13 +78,6 @@
   :config
   (editorconfig-mode 1))
 
-(use-package which-key
-  :ensure nil
-  :custom
-  (which-key-idle-delay 0.5)
-  :config
-  (which-key-mode 1))
-
 (use-package delsel
   :ensure nil
   :config
@@ -85,7 +97,16 @@
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
 
-;;; Files
+;; Scroll like Vim's scrolloff: keep point away from the window edges.
+(setopt scroll-margin 8)
+(setopt scroll-conservatively 101)
+(setopt scroll-step 1)
+(setopt scroll-preserve-screen-position t)
+(setq next-screen-context-lines 8)
+
+;;; File behavior
+(setopt vc-follow-symlinks t)
+
 ;; Automatically reread from disk if the underlying file changes
 ;; Check if polling is being used for the current buffer by running the
 ;; following elisp and looking for :watch in the output
@@ -97,26 +118,6 @@
 (setopt auto-revert-interval 5)
 (setopt auto-revert-check-vc-info t)
 (global-auto-revert-mode)
-
-(use-package savehist
-  :ensure nil
-  :config
-  (savehist-mode 1))
-
-(use-package saveplace
-  :ensure nil
-  :config
-  (save-place-mode 1))
-
-(use-package recentf
-  :ensure nil
-  :custom
-  (recentf-max-saved-items 200)
-  (recentf-auto-cleanup 'never)
-  :bind
-  ("C-c r" . recentf-open)
-  :config
-  (recentf-mode 1))
 
 (use-package dired
   :ensure nil
@@ -177,6 +178,13 @@
    ("M-y" . consult-yank-pop)))
 
 ;;; Help and discovery
+(use-package which-key
+  :ensure nil
+  :custom
+  (which-key-idle-delay 0.5)
+  :config
+  (which-key-mode 1))
+
 (use-package helpful
   :ensure t
   :bind
@@ -184,14 +192,6 @@
    ("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
    ("C-h x" . helpful-command)))
-
-;;; Scrolling
-;; Scroll like Vim's scrolloff: keep point away from the window edges.
-(setopt scroll-margin 8)
-(setopt scroll-conservatively 101)
-(setopt scroll-step 1)
-(setopt scroll-preserve-screen-position t)
-(setq next-screen-context-lines 8)
 
 ;;; Startup cleanup
 ;; Undo early-init.el setting
