@@ -80,6 +80,18 @@ unrelated generated or external-format files can add noise.
 - Indent with **4 spaces** in all `.sh` and `.sh.j2` files.
 - Scripts that must run as root should check at the top: `if [ "$(id -u)" -ne 0 ]; then echo "this script must be run as root" >&2; exit 1; fi`
 
+## Emacs Lisp Conventions
+
+- Custom private variables use the `my--` prefix.
+- Custom functions and commands use the `my/` namespace.
+- Predicate functions end with `-p`.
+- Use `#'` for function references, such as hook entries and key bindings.
+- Prefer `setopt` for user options and `setq-default` for buffer-local defaults.
+- When adding a setting to `dotfiles/emacs/init.el`, prefer the package-specific
+  `use-package` block for the file where the variable or function is defined.
+  Use `C-h v` or `C-h f` in Emacs to find the source file. Do not create a
+  catch-all `use-package emacs` block.
+
 ## Repository Signing Key Conventions
 
 When adding a DNF/YUM repository that uses a remote RPM signing key:
