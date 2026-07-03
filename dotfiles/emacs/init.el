@@ -60,11 +60,14 @@
 (use-package doom-modeline
   :ensure t
   :custom
+  (doom-modeline-bar-width 1)
   (doom-modeline-icon t)
   (doom-modeline-battery nil)
   (doom-modeline-time nil)
   :config
-  (doom-modeline-mode 1))
+  (doom-modeline-mode 1)
+  (set-face-attribute 'mode-line nil :background "#f2f2f2" :height 130)
+  (doom-modeline-refresh-bars))
 
 ;;; Editing
 ;; Use spaces by default; EditorConfig can override this per project.
