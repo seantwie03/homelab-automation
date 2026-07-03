@@ -4,6 +4,12 @@
 (when (< emacs-major-version 30)
   (error "Emacs Bedrock only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
+;;; Packages
+(setopt package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa" . "https://melpa.org/packages/")))
+
 ;;; Generated files
 ;; Keep generated backup and auto-save files out of project directories.
 (dolist (dir (list
@@ -20,10 +26,49 @@
 (setopt create-lockfiles nil)
 (setopt vc-follow-symlinks t)
 
+;;; UI
+(load-theme 'modus-operandi t)
+(setopt ring-bell-function #'ignore)
+(column-number-mode 1)
+(show-paren-mode 1)
+
+;;; Mode line
+(line-number-mode 1)
+(setopt display-time-24hr-format t)
+(setopt display-time-default-load-average nil)
+(display-time-mode 1)
+(when (and (fboundp 'display-battery-mode)
+           (boundp 'battery-status-function)
+           battery-status-function)
+  (display-battery-mode 1))
+
+(use-package doom-modeline
+  :ensure t
+  :custom
+  (doom-modeline-battery nil)
+  (doom-modeline-buffer-file-name-style 'truncate-nil)
+  (doom-modeline-buffer-state-icon t)
+  (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-check nil)
+  (doom-modeline-env-enable-elixir nil)
+  (doom-modeline-env-enable-go nil)
+  (doom-modeline-env-enable-perl nil)
+  (doom-modeline-env-enable-python nil)
+  (doom-modeline-env-enable-ruby nil)
+  (doom-modeline-env-enable-rust nil)
+  (doom-modeline-github nil)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-minor-modes nil)
+  :config
+  (doom-modeline-mode 1))
+
 ;;; Editing
 ;; Use spaces by default; EditorConfig can override this per project.
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
+(setq-default show-trailing-whitespace t)
+(setopt sentence-end-double-space nil)
 
 (use-package editorconfig
   :ensure nil
@@ -37,12 +82,23 @@
   :config
   (which-key-mode 1))
 
+(use-package delsel
+  :ensure nil
+  :config
+  (delete-selection-mode 1))
+
+(use-package elec-pair
+  :ensure nil
+  :config
+  (electric-pair-mode 1))
+
 (defun my/format-emacs-lisp-buffer ()
   "Indent the current Emacs Lisp buffer."
   (when (derived-mode-p 'emacs-lisp-mode)
     (save-excursion
       (indent-region (point-min) (point-max)))))
 
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
 
 ;;; Files
@@ -79,6 +135,11 @@
   ("C-c r" . recentf-open)
   :config
   (recentf-mode 1))
+
+(use-package dired
+  :ensure nil
+  :custom
+  (dired-kill-when-opening-new-dired-buffer t))
 
 ;;; Completion and navigation
 (setopt read-extended-command-predicate #'command-completion-default-include-p)
@@ -133,6 +194,15 @@
    ("C-c i" . consult-imenu)
    ("M-y" . consult-yank-pop)))
 
+;;; Help and discovery
+(use-package helpful
+  :ensure t
+  :bind
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h x" . helpful-command)))
+
 ;;; Scrolling
 ;; Scroll like Vim's scrolloff: keep point away from the window edges.
 (setopt scroll-margin 8)
@@ -149,7 +219,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(consult marginalia orderless)))
+ '(package-selected-packages '(consult doom-modeline helpful marginalia orderless)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

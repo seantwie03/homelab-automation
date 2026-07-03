@@ -1,6 +1,7 @@
 # Nerd Fonts
 
-Install [NerdFonts](https://www.nerdfonts.com/) at system-level.
+Install [NerdFonts](https://www.nerdfonts.com/) at system-level, including the
+symbols-only font used by packages such as Emacs `nerd-icons`.
 
 Requires access to https://github.com/ryanoasis/nerd-fonts/releases
 
@@ -9,4 +10,3 @@ Requires access to https://github.com/ryanoasis/nerd-fonts/releases
 `nerd_fonts_version`: The tag version from https://github.com/ryanoasis/nerd-fonts/releases
 
 `fonts`: The font(s) to download and install
-
