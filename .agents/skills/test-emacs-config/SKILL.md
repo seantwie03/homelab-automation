@@ -23,6 +23,25 @@ Run commands through the wrapper instead of host `emacs`:
 The wrapper already loads `early-init.el` and `init.el`. Pass only additional
 batch arguments such as `--eval` or `--funcall`.
 
+The wrapper initializes package.el between `early-init.el` and `init.el`, which
+matches the relevant part of normal Emacs startup and makes installed ELPA
+packages available before `use-package` forms are evaluated.
+
+Use the default cached run for normal validation:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container --eval '(princ "ok\n")'
+```
+
+Use `--fresh` when changing package bootstrap behavior or when checking that a
+new `use-package :ensure t` dependency can install into an empty ELPA directory:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container --fresh --eval '(princ "ok\n")'
+```
+
+Use `--rebuild-image` after changing `tools/emacs-container/Containerfile`.
+
 Use this for:
 
 - verifying the config loads

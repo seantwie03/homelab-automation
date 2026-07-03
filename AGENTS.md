@@ -12,8 +12,8 @@ This is an **ansible-pull** based homelab configuration management system. Rathe
 # Lint all YAML/Ansible files
 ansible-lint
 
-# Check repository files against .editorconfig
-ec
+# Check changed files against .editorconfig
+ec FILE [FILE...]
 
 # Install required collections
 ansible-galaxy collection install -r collections/requirements.yml
@@ -33,7 +33,9 @@ h a test desktop25.yml
 ```
 
 No build or test framework exists; this is declarative Ansible configuration.
-After making a change, run both `ansible-lint` and `ec`.
+After making a change, run `ansible-lint` and run `ec` only on files changed by
+the current task. Avoid repository-wide `ec` during routine validation because
+unrelated generated or external-format files can add noise.
 
 ## Architecture
 

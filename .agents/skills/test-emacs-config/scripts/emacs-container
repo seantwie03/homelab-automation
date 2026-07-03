@@ -6,6 +6,47 @@ if ! command -v podman >/dev/null 2>&1; then
     exit 1
 fi
 
+usage() {
+    cat <<'EOF'
+usage: emacs-container [--fresh] [--rebuild-image] [--help] [-- EMACS_ARGS...]
+
+Run this repository's Emacs config in an isolated Fedora container.
+
+Options:
+    --fresh          Use a disposable ELPA directory for this run. This tests
+                    first-run package installation instead of the cached volume.
+    --rebuild-image  Rebuild the Fedora image even if the matching tag exists.
+    --help           Show this help text.
+EOF
+}
+
+fresh=false
+rebuild_image=false
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --fresh)
+            fresh=true
+            shift
+            ;;
+        --rebuild-image)
+            rebuild_image=true
+            shift
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 repo_root="$(git rev-parse --show-toplevel)"
 fedora_version="$(
     . /etc/os-release
@@ -13,23 +54,36 @@ fedora_version="$(
 )"
 image_name="homelab-emacs-test:fedora-${fedora_version}"
 
-if ! podman image exists "$image_name"; then
+if "$rebuild_image" || ! podman image exists "$image_name"; then
+    echo "building $image_name" >&2
     podman build \
+        --quiet \
         --tag "$image_name" \
         --build-arg "FEDORA_VERSION=$fedora_version" \
         --file "$repo_root/tools/emacs-container/Containerfile" \
         "$repo_root/tools/emacs-container"
 fi
 
+podman_mounts=(
+    --tmpfs /root/.config/emacs
+    --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly
+    --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly
+)
+
+if ! "$fresh"; then
+    podman_mounts+=(
+        --mount type=volume,source=homelab-emacs-elpa,destination=/root/.config/emacs/elpa
+    )
+fi
+
 podman run \
     --rm \
     --pull=never \
-    --tmpfs /root/.config/emacs \
-    --mount type=volume,source=homelab-emacs-elpa,destination=/root/.config/emacs/elpa \
-    --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly \
-    --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly \
+    "${podman_mounts[@]}" \
     "$image_name" \
     emacs --batch \
+        --init-directory /root/.config/emacs \
         --load /root/.config/emacs/early-init.el \
+        --eval "(package-initialize)" \
         --load /root/.config/emacs/init.el \
         "$@"
