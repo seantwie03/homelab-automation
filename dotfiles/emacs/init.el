@@ -108,11 +108,25 @@
   :config
   (marginalia-mode 1))
 
+(use-package consult
+  :ensure t
+  :bind
+  (("C-x b" . consult-buffer)
+   ("C-s" . consult-line)
+   ("C-c g" . consult-ripgrep)
+   ("C-c f" . consult-find)
+   ("C-c i" . consult-imenu)
+   ("M-y" . consult-yank-pop)))
+
 (setq completion-cycle-threshold 3
       completions-sort 'historical)
 
-;; Less aggressive screen scrolling
-(setq next-screen-context-lines 10)
+;; Scroll like Vim's scrolloff: keep point away from the window edges.
+(setopt scroll-margin 8)
+(setopt scroll-conservatively 101)
+(setopt scroll-step 1)
+(setopt scroll-preserve-screen-position t)
+(setq next-screen-context-lines 8)
 
 ;; Undo early-init.el setting
 (setq gc-cons-threshold (or my--initial-gc-threshold 800000))
@@ -121,7 +135,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(marginalia orderless)))
+ '(package-selected-packages '(consult marginalia orderless)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

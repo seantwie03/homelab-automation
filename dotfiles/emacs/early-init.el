@@ -21,6 +21,7 @@
 (if (fboundp 'tooltip-mode) (tooltip-mode -1))
 
 (setq default-frame-alist '((fullscreen . maximized)
+                            (font . "Iosevka Nerd Font-14")
 
                             ;; You can turn off scroll bars by uncommenting these lines:
                             (vertical-scroll-bars . nil)
