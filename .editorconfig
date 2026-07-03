@@ -13,7 +13,15 @@ insert_final_newline = true
 indent_size = 2
 
 [*.el]
-indent_size = 2
+indent_size = unset
+
+[*.vil]
+charset = unset
+end_of_line = unset
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = unset
+insert_final_newline = unset
 
 [*.md]
 indent_size = 1
