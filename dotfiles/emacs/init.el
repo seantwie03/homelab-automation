@@ -93,6 +93,7 @@
 (setq-default tab-width 4)
 (setq-default show-trailing-whitespace t)
 (setopt sentence-end-double-space nil)
+(global-display-line-numbers-mode)
 
 (use-package editorconfig
   :ensure nil
