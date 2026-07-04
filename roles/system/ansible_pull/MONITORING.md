@@ -72,5 +72,10 @@ ls -lh /var/log/ansible-pull
 cat /etc/logrotate.d/ansible-pull
 ```
 
-The role retains up to 30 rotations or 30 days of logs. Missing logs after a
-successful timer activation are unexpected.
+Expected:
+
+- `/var/log/ansible-pull` is owned by `root:wheel` with mode `0775` so
+  unprivileged health checks can list available logs.
+- The role retains up to 30 rotations or 30 days of logs.
+
+Missing logs after a successful timer activation are unexpected.

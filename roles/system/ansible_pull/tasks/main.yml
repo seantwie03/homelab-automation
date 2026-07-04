@@ -45,7 +45,7 @@
   ansible.builtin.file:
     path: /var/log/ansible-pull
     state: directory
-    mode: 0770
+    mode: 0775
     owner: root
     group: wheel
 

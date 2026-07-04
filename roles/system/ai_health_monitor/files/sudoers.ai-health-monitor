@@ -13,9 +13,20 @@ ai-health-monitor ALL=(root) NOPASSWD: \
     /usr/bin/snapper -c root list, \
     /usr/bin/btrbk -c /etc/btrbk/btrbk.conf list *, \
     /usr/bin/btrbk -c /etc/btrbk/btrbk.conf stats, \
-    /usr/bin/btrbk -c /etc/btrbk/btrbk.conf dryrun
+    /usr/bin/btrbk -c /etc/btrbk/btrbk.conf dryrun, \
+    /usr/bin/rpm --verifydb, \
+    /usr/sbin/rpm --verifydb, \
+    /usr/bin/dnf check, \
+    /usr/bin/dnf5 check
 
 ai-health-monitor ALL=(root) NOPASSWD: \
     /usr/local/bin/ai-health-monitor-notify requires-attention *, \
     /usr/local/bin/ai-health-monitor-notify all-good *, \
     /usr/local/bin/ai-health-monitor-notify monitor-failed
+
+ai-health-monitor ALL=(ALL) NOPASSWD: \
+    /usr/bin/podman ps --all, \
+    /usr/bin/podman ps --all --format json, \
+    /usr/bin/podman auto-update --dry-run, \
+    /usr/bin/podman system df, \
+    /usr/bin/podman info
