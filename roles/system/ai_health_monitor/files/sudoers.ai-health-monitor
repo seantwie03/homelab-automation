@@ -17,7 +17,8 @@ ai-health-monitor ALL=(root) NOPASSWD: \
     /usr/bin/rpm --verifydb, \
     /usr/sbin/rpm --verifydb, \
     /usr/bin/dnf check, \
-    /usr/bin/dnf5 check
+    /usr/bin/dnf5 check, \
+    /usr/bin/virsh -c qemu\:///system version
 
 ai-health-monitor ALL=(root) NOPASSWD: \
     /usr/local/bin/ai-health-monitor-notify requires-attention *, \
