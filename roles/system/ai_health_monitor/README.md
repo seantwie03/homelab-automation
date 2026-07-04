@@ -33,3 +33,7 @@ orders itself after existing repo maintenance services so missed persistent
 timers do not all run at once after a workstation wakes.
 
 Reports are written to `/var/log/ai-health-monitor/` and rotated by logrotate.
+Reports separate findings into action required, ongoing follow-up,
+informational observations, healthy areas, and skipped or blocked checks.
+Only action required findings and unresolved ongoing follow-up items should
+produce an attention-required notification.

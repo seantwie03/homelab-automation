@@ -35,6 +35,19 @@ Investigate missing reports, unknown verdict notifications, or repeated Codex
 failures. If the report says a check was blocked, compare the command with
 `/etc/sudoers.d/ai-health-monitor` before broadening permissions.
 
+Expected report structure:
+
+- Action required
+- Ongoing follow-up
+- Informational observations
+- Healthy areas
+- Checks skipped or blocked
+
+`VERDICT: Attention Required` should appear only when the report contains at
+least one action required finding or unresolved ongoing follow-up item. Healthy
+systems with only informational observations or non-critical skipped checks
+should use `VERDICT: Healthy`.
+
 ## Credentials And Hardening
 
 ```sh
@@ -48,4 +61,3 @@ Expected:
 - The service uses `ProtectSystem=strict`, `InaccessiblePaths=/home/sean`,
   `ReadOnlyPaths=/home/ai-health-monitor/.config/openrouter`, and writable
   paths only for reports and Codex state.
-

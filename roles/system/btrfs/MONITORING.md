@@ -44,6 +44,21 @@ Repeat for every distinct managed filesystem, such as `/srv`.
 High allocated-chunk utilization is different from low filesystem free space.
 Review both before recommending a balance.
 
+Treat high `Data` or `Metadata` usage as an attention item only when it is paired
+with low `Device unallocated`, low `Free (estimated)`, failed allocation or ENOSPC
+messages in the journal, or failed maintenance jobs. High metadata usage within
+the currently allocated metadata block groups does not mean the filesystem is
+close to its total metadata limit when the device still has plenty of
+unallocated space; Btrfs can allocate additional metadata block groups as needed.
+
+The monthly balance from `btrfsmaintenance` intentionally uses conservative
+filters. The defaults only relocate very empty block groups, such as data groups
+below 5% or 10% usage and metadata groups below 5% usage. A successful balance
+can therefore leave `Data` and `Metadata` percentages high when chunks are
+densely packed and the filesystem still has ample unallocated space. `trim`
+does not change these Btrfs allocation percentages; it only tells the SSD which
+freed physical blocks can be discarded.
+
 ## Device Errors And Scrub
 
 ```sh
@@ -92,4 +107,3 @@ journalctl -u btrbk.service -u btrfs-scrub.service \
     -u btrfs-balance.service -u btrfs-trim.service \
     --since '40 days ago' --no-pager
 ```
-

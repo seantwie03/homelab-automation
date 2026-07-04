@@ -50,22 +50,42 @@ health_monitor_prompt: |
   applicable, container health when container roles are present, and user
   graphical services when graphical roles are present.
 
+  Classify findings by operational impact before choosing the verdict:
+
+  - Action required: active failures, failed or stale maintenance, failed
+    automation, package/dependency integrity problems, storage pressure,
+    networking breakage, new or increasing hardware/storage errors, or stale
+    documentation that could hide a real operational problem.
+  - Ongoing follow-up: previously reported findings that are stable and do not
+    show current worsening, but still have a concrete next step the user has
+    not completed.
+  - Informational: expected boot races, historical one-time events, stale unit
+    references, blocked optional checks, warnings with no evidence of current
+    impact, or conditional monitoring checks that do not apply to this host.
+
+  Structure the report so "Action required" and "Ongoing follow-up" are
+  distinct from informational observations. Do not put informational findings
+  under an actionable heading.
+
   Write the full markdown report to the path in the REPORT_FILE environment
   variable by using a shell tool to create or overwrite that exact file. Do not
   rely on your final response as the report, and do not print the full report in
-  your final response. Lead the file with actionable findings ordered by
-  severity, then summarize healthy areas and checks that were skipped or
-  blocked. Include exact unit names, command evidence, relevant timestamps, and
-  the likely owning role for each issue when you can determine it. Do not
-  overstate uncertainty; if the evidence is incomplete, say what remains
-  unknown.
+  your final response. Lead the file with action required findings ordered by
+  severity, then ongoing follow-up items, then informational observations,
+  healthy areas, and checks that were skipped or blocked. Include exact unit
+  names, command evidence, relevant timestamps, and the likely owning role for
+  each issue when you can determine it. Do not overstate uncertainty; if the
+  evidence is incomplete, say what remains unknown.
 
   The very last line in the report should be either:
   VERDICT: Healthy
   or
   VERDICT: Attention Required
 
-  Choose 'VERDICT: Attention Required' when the user needs to read the report and take action.
+  Choose 'VERDICT: Attention Required' only when the report contains at least
+  one action required finding or ongoing follow-up item that the user still
+  needs to address. Choose 'VERDICT: Healthy' when the report contains only
+  healthy areas, informational observations, or non-critical skipped checks.
 
   After the report file has been written, keep your final response to one short
   sentence that names the report path and verdict.
