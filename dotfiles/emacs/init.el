@@ -219,6 +219,18 @@
    ("C-h k" . helpful-key)
    ("C-h x" . helpful-command)))
 
+(use-package org
+  :ensure nil
+  :hook
+  ((org-mode . org-indent-mode)
+   (org-mode . visual-line-mode)
+   (org-mode . visual-wrap-prefix-mode))
+  :custom
+  ((org-adapt-indentation 'headline-data)
+   (org-blank-before-new-entry
+    '((heading . t)
+      (plain-list-item . auto)))))
+
 ;;; Startup cleanup
 ;; Undo early-init.el setting
 (setq gc-cons-threshold (or my--initial-gc-threshold 800000))
