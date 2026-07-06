@@ -68,6 +68,9 @@
 
 (use-package frame
   :ensure nil
+  :custom
+  (cursor-in-non-selected-windows nil)
+  (cursor-type '(hbar . 5))
   :config
   (blink-cursor-mode -1))
 
@@ -219,17 +222,103 @@
    ("C-h k" . helpful-key)
    ("C-h x" . helpful-command)))
 
+(use-package project
+  :ensure nil
+  :custom
+  (project-vc-extra-root-markers '(".project")))
+
+(use-package ghostel
+  :ensure t
+  :bind
+  (("C-c t" . ghostel)
+   :map project-prefix-map
+   ("s" . ghostel-project))
+  :hook
+  (ghostel-mode . my/ghostel-disable-trailing-whitespace)
+  :config
+  (defun my/ghostel-disable-trailing-whitespace ()
+    "Disable trailing whitespace display in Ghostel buffers."
+    (setq-local show-trailing-whitespace nil)))
+
 (use-package org
   :ensure nil
+  :bind
+  (("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ("C-c l" . org-store-link))
   :hook
   ((org-mode . org-indent-mode)
-   (org-mode . visual-line-mode)
-   (org-mode . visual-wrap-prefix-mode))
+   (org-mode . visual-line-mode))
+
   :custom
-  ((org-adapt-indentation 'headline-data)
-   (org-blank-before-new-entry
-    '((heading . t)
-      (plain-list-item . auto)))))
+  (org-blank-before-new-entry
+   '((heading . t)
+     (plain-list-item . auto)))
+
+  ;; Recursively include all .org files under ~/u/org in the agenda.
+  ;; Files ending in .org_archive will not match this regex.
+  (org-agenda-files
+   (directory-files-recursively "~/u/org" "\\.org$"))
+
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+
+  ;; TODO workflow:
+  ;; TODO      = known work, but not currently active/actionable
+  ;; NEXT      = active/actionable, including in-progress work
+  ;; WAITING   = blocked
+  ;; DONE      = complete
+  ;; CANCELLED = no longer relevant
+  (org-todo-keywords
+   '((sequence
+      "TODO(t)"
+      "NEXT(n)"
+      "WAITING(w)"
+      "|"
+      "DONE(d)"
+      "CANCELLED(c)")))
+
+  ;; Tags:
+  ;; Place: choose one of home/computer/device/away
+  ;; Effort: choose one of short/medium/long
+  ;; Mode: optionally add menial and/or physical
+  (org-tag-alist
+   '((:startgroup)
+     ("home" . ?h)
+     ("computer" . ?c)
+     ("device" . ?d)
+     ("away" . ?a)
+     (:endgroup)
+
+     (:startgroup)
+     ("short" . ?s) ;; Less than 15 minutes
+     ("medium" . ?m) ;; Between 15 and 30 minutes
+     ("long" . ?l) ;; Greater than 30 minutes
+     (:endgroup)
+
+     ("menial" . ?n) ;; Can listen to book/podcast while preforming this action
+     ("physical" . ?p))) ;; Requires movement
+
+  ;; Custom agenda commands:
+  ;;
+  ;; C-c a d = daily dashboard
+  ;; C-c a n = all NEXT actions
+  ;;
+  ;; In the NEXT view, press "/" and type a tag:
+  ;; medium RET
+  ;; home RET
+  ;; menial RET
+  (org-agenda-custom-commands
+   '(("d" "Daily dashboard"
+      ((agenda "" ((org-agenda-span 1)))
+       (todo "NEXT"
+             ((org-agenda-overriding-header "Next actions")))))
+
+     ("n" "Next actions"
+      todo "NEXT")))
+
+  :config
+  (require 'org-habit))
 
 ;;; Startup cleanup
 ;; Undo early-init.el setting
