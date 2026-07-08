@@ -1,0 +1,13 @@
+---
+orbit_user: "{{ user }}"
+orbit_uid: "{{ uid }}"
+orbit_group: "{{ orbit_user }}"
+orbit_config_dir: /home/{{ orbit_user }}/.config/orbit
+orbit_systemd_user_dir: /home/{{ orbit_user }}/.config/systemd/user
+orbit_backend_dir: /home/{{ orbit_user }}/.local/share/orbit/backend
+orbit_org_dir: /srv/tier1/docs/org
+orbit_host: 0.0.0.0
+orbit_port: 8787
+orbit_actionable_todo_keywords:
+  - NEXT
+

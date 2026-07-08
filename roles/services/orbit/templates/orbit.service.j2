@@ -1,0 +1,13 @@
+[Unit]
+Description=Orbit Emacs Org backend
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/orbit/orbit.env
+WorkingDirectory=%h
+ExecStart=emacs --batch -Q --load %h/.config/orbit/orbit-start.el
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

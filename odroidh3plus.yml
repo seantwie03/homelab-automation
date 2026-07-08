@@ -27,6 +27,7 @@
     - role: btrfs
     - role: cli
     - role: ai
+    - role: orbit
     - role: karakeep
     - role: retrogaming
       vars:
@@ -50,4 +51,3 @@
     - role: nextdns
     - role: smb
     - role: nfs
-

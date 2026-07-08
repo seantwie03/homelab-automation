@@ -12,18 +12,6 @@
     group: "{{ user }}"
     mode: 0755
 
-- name: emacs config path is checked
-  ansible.builtin.stat:
-    path: /home/{{ user }}/.config/emacs
-    follow: false
-  register: emacs_config_path
-
-- name: old emacs config directory symlink is absent
-  ansible.builtin.file:
-    path: /home/{{ user }}/.config/emacs
-    state: absent
-  when: emacs_config_path.stat.islnk | default(false)
-
 - name: emacs config directory exists
   ansible.builtin.file:
     path: /home/{{ user }}/.config/emacs

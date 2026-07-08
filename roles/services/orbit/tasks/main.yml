@@ -1,0 +1,77 @@
+---
+- name: orbit configuration directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ orbit_user }}"
+    group: "{{ orbit_group }}"
+    mode: 0755
+  loop:
+    - "{{ orbit_config_dir }}"
+    - "{{ orbit_systemd_user_dir }}"
+    - "{{ orbit_backend_dir }}"
+
+- name: orbit api token file exists
+  ansible.builtin.copy:
+    dest: "{{ orbit_config_dir }}/orbit.env"
+    content: |
+      ORBIT_API_TOKEN={{ lookup('password', '/dev/null length=48 chars=ascii_letters,digits') }}
+    owner: "{{ orbit_user }}"
+    group: "{{ orbit_group }}"
+    mode: 0600
+    force: false
+  no_log: true
+  notify: restart orbit service
+
+- name: orbit backend is installed
+  ansible.builtin.copy:
+    src: orbit-server.el
+    dest: "{{ orbit_backend_dir }}/orbit-server.el"
+    owner: "{{ orbit_user }}"
+    group: "{{ orbit_group }}"
+    mode: 0644
+  notify: restart orbit service
+
+- name: orbit startup file is templated
+  ansible.builtin.template:
+    src: orbit-start.el.j2
+    dest: "{{ orbit_config_dir }}/orbit-start.el"
+    owner: "{{ orbit_user }}"
+    group: "{{ orbit_group }}"
+    mode: 0644
+  notify: restart orbit service
+
+- name: orbit.service is templated
+  ansible.builtin.template:
+    src: orbit.service.j2
+    dest: "{{ orbit_systemd_user_dir }}/orbit.service"
+    owner: "{{ orbit_user }}"
+    group: "{{ orbit_group }}"
+    mode: 0644
+  notify: restart orbit service
+
+- name: "{{ orbit_user }} lingering is enabled"
+  ansible.builtin.command:
+    cmd: loginctl enable-linger {{ orbit_user }}
+    creates: /var/lib/systemd/linger/{{ orbit_user }}
+
+- name: systemd user daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+  become: true
+  become_user: "{{ orbit_user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ orbit_uid }}
+  changed_when: false
+
+- name: orbit.service is enabled and started
+  ansible.builtin.systemd:
+    name: orbit.service
+    enabled: true
+    state: started
+    scope: user
+  become: true
+  become_user: "{{ orbit_user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ orbit_uid }}

@@ -119,7 +119,12 @@
     (save-excursion
       (indent-region (point-min) (point-max)))))
 
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
+(defun my/delete-trailing-whitespace-maybe ()
+  "Delete trailing whitespace unless the current buffer is in Org mode."
+  (unless (derived-mode-p 'org-mode)
+    (delete-trailing-whitespace)))
+
+(add-hook 'before-save-hook #'my/delete-trailing-whitespace-maybe)
 (add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
 
 ;; Scroll like Vim's scrolloff: keep point away from the window edges.
@@ -128,6 +133,10 @@
 (setopt scroll-step 1)
 (setopt scroll-preserve-screen-position t)
 (setq next-screen-context-lines 8)
+
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.md\\'" . markdown-mode))
 
 ;;; File behavior
 (setopt vc-follow-symlinks t)
@@ -255,13 +264,20 @@
    '((heading . t)
      (plain-list-item . auto)))
 
+  (org-support-shift-select t)
+
   ;; Recursively include all .org files under ~/u/org in the agenda.
   ;; Files ending in .org_archive will not match this regex.
   (org-agenda-files
    (directory-files-recursively "~/u/org" "\\.org$"))
 
+  (org-agneda-skip-scheduled-if-done nil)
+  (org-agneda-skip-deadline-if-done nil)
+  (org-agneda-skip-timestamp-if-done nil)
+
   (org-log-done 'time)
-  (org-log-into-drawer t)
+  (org-log-repeat 'time)
+  (org-log-into-drawer "LOGBOOK")
 
   ;; TODO workflow:
   ;; TODO      = known work, but not currently active/actionable
@@ -275,8 +291,8 @@
       "NEXT(n)"
       "WAITING(w)"
       "|"
-      "DONE(d)"
-      "CANCELLED(c)")))
+      "DONE(d!)"
+      "CANCELLED(c!)")))
 
   ;; Tags:
   ;; Place: choose one of home/computer/device/away

@@ -1,0 +1,13 @@
+---
+- name: restart orbit service
+  ansible.builtin.systemd:
+    name: orbit.service
+    state: restarted
+    scope: user
+    daemon_reload: true
+  become: true
+  become_user: "{{ orbit_user }}"
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ orbit_uid }}
+  changed_when: true
+

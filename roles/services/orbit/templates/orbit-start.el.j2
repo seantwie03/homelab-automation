@@ -1,0 +1,31 @@
+;;; orbit-start.el --- machine-local Orbit service config -*- lexical-binding: t; -*-
+
+(require 'org)
+(require 'org-clock)
+
+(add-to-list 'load-path "{{ orbit_backend_dir }}")
+(require 'orbit-server)
+
+(setq orbit-org-files
+      (directory-files "{{ orbit_org_dir }}" t "\\.org\\'"))
+
+(setq orbit-api-token (getenv "ORBIT_API_TOKEN"))
+(setq orbit-host "{{ orbit_host }}")
+(setq orbit-port {{ orbit_port }})
+(setq orbit-actionable-todo-keywords
+      '({% for keyword in orbit_actionable_todo_keywords %}"{{ keyword }}"{% if not loop.last %} {% endif %}{% endfor %}))
+
+(setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)"
+                                    "|" "DONE(d!)" "CANCELLED(c!)"))
+      org-log-into-drawer "LOGBOOK"
+      org-log-done 'time
+      org-log-repeat 'time
+      org-clock-into-drawer "LOGBOOK")
+
+(setq org-log-reschedule 'time
+      org-log-redeadline 'time)
+
+(orbit-start-server)
+
+(while t
+  (accept-process-output nil 1))
