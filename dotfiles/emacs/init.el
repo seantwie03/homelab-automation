@@ -238,10 +238,8 @@
 (use-package keycast
   :config
   (setopt keycast-mode-line-format "%1s%K%c%r")
-
   (add-hook 'post-command-hook #'keycast--update t)
   (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
-
   (add-to-list 'global-mode-string '("" keycast-mode-line)))
 
 (use-package project
