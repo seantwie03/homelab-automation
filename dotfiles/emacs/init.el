@@ -236,6 +236,7 @@
    ("C-h x" . helpful-command)))
 
 (use-package keycast
+  :ensure t
   :config
   (setopt keycast-mode-line-format "%1s%K%c%r")
   (add-hook 'post-command-hook #'keycast--update t)
