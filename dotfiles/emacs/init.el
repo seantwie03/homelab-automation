@@ -87,7 +87,11 @@
   (doom-modeline-time nil)
   :config
   (doom-modeline-mode 1)
-  (set-face-attribute 'mode-line nil :background "#f2f2f2" :height 130)
+  (set-face-attribute 'mode-line nil
+                      :background "#f2f2f2"
+                      :height 130)
+  (doom-modeline-remove-segment 'misc-info 'main)
+  (doom-modeline-add-segment 'misc-info 'buffer-position :after 'main)
   (doom-modeline-refresh-bars))
 
 ;;; Editing
@@ -230,6 +234,15 @@
    ("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
    ("C-h x" . helpful-command)))
+
+(use-package keycast
+  :config
+  (setopt keycast-mode-line-format "%1s%K%c%r")
+
+  (add-hook 'post-command-hook #'keycast--update t)
+  (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
+
+  (add-to-list 'global-mode-string '("" keycast-mode-line)))
 
 (use-package project
   :ensure nil
