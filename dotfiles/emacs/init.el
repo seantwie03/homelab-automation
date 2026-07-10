@@ -418,6 +418,7 @@
   :ensure t
   :init
   (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
+  (setq evil-respect-visual-line-mode t)
   :config
   (evil-mode 1))
 
