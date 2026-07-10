@@ -42,6 +42,32 @@ new `use-package :ensure t` dependency can install into an empty ELPA directory:
 
 Use `--rebuild-image` after changing `tools/emacs-container/Containerfile`.
 
+## Evil keybinding validation
+
+When changing Evil, leader, localleader, Org, or which-key-related bindings,
+run the dedicated keybinding test:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --load /workspace/tools/emacs-container/check-evil-bindings.el
+```
+
+This test verifies implemented rows from
+`dotfiles/emacs/doom-remix-bindings.org`, including Evil state maps, `SPC`
+leader maps, Org `\` localleader maps, selected Org motion bindings, and
+which-key discoverability metadata.
+
+If a keybinding is intentionally added, removed, or changed, update both:
+
+- `dotfiles/emacs/doom-remix-bindings.org`
+- `tools/emacs-container/check-evil-bindings.el`
+
+Then rerun the keybinding test and the basic smoke test:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container --eval '(princ "ok\n")'
+```
+
 Use this for:
 
 - verifying the config loads

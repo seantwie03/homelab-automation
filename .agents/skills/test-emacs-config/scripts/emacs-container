@@ -66,6 +66,7 @@ fi
 
 podman_mounts=(
     --tmpfs /root/.config/emacs
+    --mount type=bind,source="$repo_root/tools/emacs-container",destination=/workspace/tools/emacs-container,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly
 )
@@ -79,6 +80,7 @@ fi
 podman run \
     --rm \
     --pull=never \
+    --security-opt label=disable \
     "${podman_mounts[@]}" \
     "$image_name" \
     emacs --batch \

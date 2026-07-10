@@ -427,3 +427,346 @@
   :after evil
   :config
   (evil-collection-init))
+
+;;; Evil keybindings
+(defun my/keymap-set-many (keymaps key command)
+  "Bind KEY to COMMAND in each keymap in KEYMAPS."
+  (dolist (keymap keymaps)
+    (keymap-set keymap key command)))
+
+;;; Evil leader keymaps
+(defvar-keymap my/leader-buffers-map
+  :doc "Buffer commands."
+  "b" #'switch-to-buffer
+  "B" #'switch-to-buffer
+  "d" #'kill-current-buffer
+  "k" #'kill-current-buffer
+  "i" #'ibuffer
+  "l" #'evil-switch-to-windows-last-buffer
+  "n" #'next-buffer
+  "p" #'previous-buffer
+  "r" #'revert-buffer
+  "R" #'rename-buffer
+  "s" #'basic-save-buffer
+  "S" #'evil-write-all)
+
+(defvar-keymap my/leader-code-map
+  :doc "Code commands."
+  "a" #'eglot-code-actions
+  "c" #'compile
+  "C" #'recompile
+  "r" #'eglot-rename
+  "w" #'delete-trailing-whitespace)
+
+(defvar-keymap my/leader-files-map
+  :doc "File commands."
+  "f" #'find-file
+  "l" #'locate
+  "r" #'recentf-open-files
+  "s" #'basic-save-buffer
+  "S" #'write-file)
+
+(defvar-keymap my/leader-git-map
+  :doc "Git commands."
+  "R" #'vc-revert)
+
+(defvar-keymap my/leader-insert-map
+  :doc "Insert commands."
+  "e" #'emoji-search
+  "r" #'evil-show-registers
+  "u" #'insert-char)
+
+(defvar-keymap my/leader-notes-map
+  :doc "Notes and Org commands."
+  "a" #'org-agenda
+  "C" #'org-clock-cancel
+  "l" #'org-store-link
+  "m" #'org-tags-view
+  "n" #'org-capture
+  "o" #'org-clock-goto
+  "t" #'org-todo-list
+  "v" #'org-search-view)
+
+(defvar-keymap my/leader-open-agenda-map
+  :doc "Open Org agenda commands."
+  "a" #'org-agenda
+  "t" #'org-todo-list
+  "m" #'org-tags-view
+  "v" #'org-search-view)
+
+(defvar-keymap my/leader-open-map
+  :doc "Open commands."
+  "-" #'dired-jump
+  "A" #'org-agenda
+  "a" my/leader-open-agenda-map
+  "b" #'browse-url-of-file
+  "f" #'make-frame
+  "F" #'select-frame-by-name)
+
+(defvar-keymap my/leader-search-map
+  :doc "Search and jump commands."
+  "B" #'consult-line-multi
+  "f" #'locate
+  "i" #'imenu
+  "I" #'consult-imenu-multi
+  "L" #'ffap-menu
+  "j" #'evil-show-jumps
+  "m" #'bookmark-jump
+  "r" #'evil-show-marks)
+
+(defvar-keymap my/leader-toggle-map
+  :doc "Toggle commands."
+  "c" #'global-display-fill-column-indicator-mode
+  "f" #'flymake-mode
+  "F" #'toggle-frame-fullscreen
+  "r" #'read-only-mode
+  "v" #'visible-mode
+  "w" #'visual-line-mode)
+
+(defvar-keymap my/leader-map
+  :doc "Global leader keymap."
+  "." #'find-file
+  "," #'switch-to-buffer
+  "<" #'switch-to-buffer
+  "`" #'evil-switch-to-windows-last-buffer
+  ":" #'execute-extended-command
+  ";" #'pp-eval-expression
+  "u" #'universal-argument
+  "w" #'evil-window-map
+  "b" my/leader-buffers-map
+  "c" my/leader-code-map
+  "f" my/leader-files-map
+  "g" my/leader-git-map
+  "i" my/leader-insert-map
+  "n" my/leader-notes-map
+  "o" my/leader-open-map
+  "s" my/leader-search-map
+  "t" my/leader-toggle-map)
+
+;;; Evil non-leader bindings
+(with-eval-after-load 'evil
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map)
+ "j" #'evil-next-visual-line)
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map)
+ "k" #'evil-previous-visual-line)
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map)
+ "<down>" #'evil-next-visual-line)
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map)
+ "<up>" #'evil-previous-visual-line)
+(keymap-set evil-insert-state-map "<down>" #'evil-next-visual-line)
+(keymap-set evil-insert-state-map "<up>" #'evil-previous-visual-line)
+(keymap-set evil-normal-state-map "Y" #'evil-yank-line)
+(keymap-set evil-visual-state-map "Y" #'evil-yank)
+(keymap-set evil-normal-state-map "C-a" #'mark-whole-buffer)
+(keymap-set evil-insert-state-map "C-a" #'mark-whole-buffer)
+(keymap-set evil-normal-state-map "C-c" #'evil-yank-line)
+(keymap-set evil-visual-state-map "C-c" #'clipboard-kill-ring-save)
+(keymap-set evil-visual-state-map "C-<insert>" #'clipboard-kill-ring-save)
+(keymap-set evil-insert-state-map "C-v" #'clipboard-yank)
+(keymap-set evil-visual-state-map "C-v" #'evil-visual-paste)
+(keymap-set evil-insert-state-map "S-<insert>" #'clipboard-yank)
+(keymap-unset evil-normal-state-map "C-x" t)
+(keymap-unset evil-insert-state-map "C-x" t)
+(keymap-set evil-visual-state-map "C-x" #'clipboard-kill-region)
+(keymap-set evil-normal-state-map "S-<delete>" #'evil-delete-line)
+(keymap-set evil-visual-state-map "S-<delete>" #'clipboard-kill-region)
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map evil-insert-state-map)
+ "C-s" #'evil-save)
+(keymap-set evil-visual-state-map "<backspace>" #'evil-delete)
+(keymap-set evil-insert-state-map "C-h" #'evil-delete-backward-word)
+(keymap-set evil-normal-state-map "C-j" #'evil-window-down)
+(keymap-set evil-normal-state-map "C-k" #'evil-window-up)
+(keymap-set evil-normal-state-map "C-h" #'evil-window-left)
+(keymap-set evil-normal-state-map "C-l" #'evil-window-right)
+(keymap-set evil-normal-state-map "-" #'dired-jump)
+
+;;; Evil leader bindings
+(my/keymap-set-many
+ (list evil-normal-state-map evil-visual-state-map evil-motion-state-map)
+ "SPC" my/leader-map)
+
+;;; Org localleader keymaps
+(defvar-keymap my/org-attachments-map
+  :doc "Org attachment commands."
+  "a" #'org-attach
+  "d" #'org-attach-delete-one
+  "D" #'org-attach-delete-all
+  "n" #'org-attach-new
+  "o" #'org-attach-open
+  "O" #'org-attach-open-in-emacs
+  "r" #'org-attach-reveal
+  "R" #'org-attach-reveal-in-emacs
+  "u" #'org-attach-url
+  "s" #'org-attach-set-directory
+  "S" #'org-attach-sync)
+
+(defvar-keymap my/org-tables-delete-map
+  :doc "Org table delete commands."
+  "c" #'org-table-delete-column
+  "r" #'org-table-kill-row)
+
+(defvar-keymap my/org-tables-insert-map
+  :doc "Org table insert commands."
+  "c" #'org-table-insert-column
+  "h" #'org-table-insert-hline
+  "r" #'org-table-insert-row
+  "H" #'org-table-hline-and-move)
+
+(defvar-keymap my/org-tables-toggle-map
+  :doc "Org table toggle commands."
+  "f" #'org-table-toggle-formula-debugger
+  "o" #'org-table-toggle-coordinate-overlays)
+
+(defvar-keymap my/org-tables-map
+  :doc "Org table commands."
+  "-" #'org-table-insert-hline
+  "a" #'org-table-align
+  "b" #'org-table-blank-field
+  "c" #'org-table-create-or-convert-from-region
+  "e" #'org-table-edit-field
+  "f" #'org-table-edit-formulas
+  "h" #'org-table-field-info
+  "s" #'org-table-sort-lines
+  "r" #'org-table-recalculate
+  "R" #'org-table-recalculate-buffer-tables
+  "d" my/org-tables-delete-map
+  "i" my/org-tables-insert-map
+  "t" my/org-tables-toggle-map)
+
+(defvar-keymap my/org-clock-map
+  :doc "Org clock commands."
+  "c" #'org-clock-cancel
+  "e" #'org-clock-modify-effort-estimate
+  "E" #'org-set-effort
+  "g" #'org-clock-goto
+  "G" #'org-clock-goto
+  "i" #'org-clock-in
+  "I" #'org-clock-in-last
+  "o" #'org-clock-out
+  "r" #'org-resolve-clocks
+  "R" #'org-clock-report
+  "t" #'org-evaluate-time-range)
+
+(defvar-keymap my/org-date-map
+  :doc "Org date and scheduling commands."
+  "d" #'org-deadline
+  "s" #'org-schedule
+  "t" #'org-time-stamp
+  "T" #'org-time-stamp-inactive)
+
+(defvar-keymap my/org-goto-map
+  :doc "Org goto commands."
+  "g" #'consult-org-heading
+  "G" #'consult-org-agenda
+  "c" #'org-clock-goto
+  "C" #'org-clock-goto
+  "i" #'org-id-goto
+  "r" #'org-refile-goto-last-stored)
+
+(defvar-keymap my/org-links-map
+  :doc "Org link commands."
+  "i" #'org-id-store-link
+  "l" #'org-insert-link
+  "L" #'org-insert-all-links
+  "s" #'org-store-link
+  "S" #'org-insert-last-stored-link
+  "t" #'org-toggle-link-display)
+
+(defvar-keymap my/org-publish-map
+  :doc "Org publish commands."
+  "a" #'org-publish-all
+  "f" #'org-publish-current-file
+  "p" #'org-publish
+  "P" #'org-publish-current-project)
+
+(defvar-keymap my/org-refile-map
+  :doc "Org refile commands."
+  "r" #'org-refile
+  "R" #'org-refile-reverse)
+
+(defvar-keymap my/org-subtree-map
+  :doc "Org tree and subtree commands."
+  "a" #'org-toggle-archive-tag
+  "b" #'org-tree-to-indirect-buffer
+  "c" #'org-clone-subtree-with-time-shift
+  "d" #'org-cut-subtree
+  "h" #'org-promote-subtree
+  "j" #'org-move-subtree-down
+  "k" #'org-move-subtree-up
+  "l" #'org-demote-subtree
+  "n" #'org-narrow-to-subtree
+  "r" #'org-refile
+  "s" #'org-sparse-tree
+  "A" #'org-archive-subtree-default
+  "N" #'widen
+  "S" #'org-sort)
+
+(defvar-keymap my/org-priority-map
+  :doc "Org priority commands."
+  "d" #'org-priority-down
+  "p" #'org-priority
+  "u" #'org-priority-up)
+
+(defvar-keymap my/org-localleader-map
+  :doc "Org commands."
+  "#" #'org-update-statistics-cookies
+  "'" #'org-edit-special
+  "*" #'org-ctrl-c-star
+  "-" #'org-ctrl-c-minus
+  "," #'org-switchb
+  "." #'consult-org-heading
+  "/" #'consult-org-agenda
+  "@" #'org-cite-insert
+  "A" #'org-archive-subtree-default
+  "e" #'org-export-dispatch
+  "f" #'org-footnote-action
+  "h" #'org-toggle-heading
+  "i" #'org-toggle-item
+  "I" #'org-id-get-create
+  "k" #'org-babel-remove-result
+  "n" #'org-store-link
+  "o" #'org-set-property
+  "q" #'org-set-tags-command
+  "t" #'org-todo
+  "T" #'org-todo-list
+  "x" #'org-toggle-checkbox
+  "a" my/org-attachments-map
+  "b" my/org-tables-map
+  "c" my/org-clock-map
+  "d" my/org-date-map
+  "g" my/org-goto-map
+  "l" my/org-links-map
+  "P" my/org-publish-map
+  "r" my/org-refile-map
+  "s" my/org-subtree-map
+  "p" my/org-priority-map)
+
+;;; Org localleader bindings
+(defun my/org-evil-local-bindings ()
+  "Set buffer-local Evil bindings for Org buffers."
+  (evil-local-set-key 'normal (kbd "] l") #'org-next-link)
+  (evil-local-set-key 'normal (kbd "[ l") #'org-previous-link))
+
+(with-eval-after-load 'org
+  (add-hook 'org-mode-hook #'my/org-evil-local-bindings)
+  (evil-define-key 'insert org-mode-map
+    (kbd "C-M-<return>") #'org-insert-subheading)
+  (evil-define-key '(normal visual motion) org-mode-map
+    (kbd "\\") my/org-localleader-map
+    (kbd "C-M-<return>") #'org-insert-subheading
+    (kbd "] h") #'org-forward-heading-same-level
+    (kbd "[ h") #'org-backward-heading-same-level
+    (kbd "] l") #'org-next-link
+    (kbd "[ l") #'org-previous-link
+    (kbd "] c") #'org-babel-next-src-block
+    (kbd "[ c") #'org-babel-previous-src-block
+    (kbd "z A") #'org-shifttab
+    (kbd "z C") #'outline-hide-subtree
+    (kbd "z n") #'org-tree-to-indirect-buffer
+    (kbd "z O") #'outline-show-subtree
+    (kbd "z i") #'org-toggle-inline-images)))

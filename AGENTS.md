@@ -92,6 +92,16 @@ unrelated generated or external-format files can add noise.
   Use `C-h v` or `C-h f` in Emacs to find the source file. Do not create a
   catch-all `use-package emacs` block.
 
+## Emacs Keybinding Conventions
+
+- When adding, removing, or changing an Emacs keybinding, update
+  `dotfiles/emacs/doom-remix-bindings.org` in the same change.
+- If the keybinding is implemented in `dotfiles/emacs/init.el`, keep the
+  `Implemented` column in `dotfiles/emacs/doom-remix-bindings.org` accurate.
+- For Evil, leader, localleader, Org, or which-key-related bindings, update
+  `tools/emacs-container/check-evil-bindings.el` and run the dedicated
+  container keybinding test.
+
 ## Repository Signing Key Conventions
 
 When adding a DNF/YUM repository that uses a remote RPM signing key:

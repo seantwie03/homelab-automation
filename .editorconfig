@@ -25,3 +25,9 @@ insert_final_newline = unset
 
 [*.md]
 indent_size = 1
+trim_trailing_whitespace = false
+
+[*.org]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
