@@ -413,3 +413,16 @@
 ;;; Startup cleanup
 ;; Undo early-init.el setting
 (setq gc-cons-threshold (or my--initial-gc-threshold 800000))
+
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
+  :config
+  (evil-mode 1))
+
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init))
