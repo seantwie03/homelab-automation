@@ -7,3 +7,5 @@ RUN dnf -y install \
         git \
         ripgrep \
     && dnf clean all
+
+RUN mkdir -p /root/u/org

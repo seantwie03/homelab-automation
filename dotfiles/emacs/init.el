@@ -52,7 +52,7 @@
   (recentf-auto-cleanup 'never)
   :bind
   ("C-c r" . recentf-open)
-  :config
+  :init
   (recentf-mode 1))
 
 ;;; UI
@@ -204,8 +204,6 @@
 
 (use-package marginalia
   :ensure t
-  :custom
-  (marginalia-field-width 160)
   :config
   (marginalia-mode 1))
 
@@ -283,13 +281,18 @@
   (org-agenda-files
    (directory-files-recursively "~/u/org" "\\.org$"))
 
-  (org-agneda-skip-scheduled-if-done nil)
-  (org-agneda-skip-deadline-if-done nil)
-  (org-agneda-skip-timestamp-if-done nil)
+  (org-agenda-skip-scheduled-if-done nil)
+  (org-agenda-skip-deadline-if-done nil)
+  (org-agenda-skip-timestamp-if-done nil)
 
   (org-log-done 'time)
   (org-log-repeat 'time)
   (org-log-into-drawer "LOGBOOK")
+
+  (org-capture-templates
+   '(("t" "Task" entry
+      (file "~/u/org/inbox.org")
+      "* TODO %?\n:LOGBOOK:\n- Created: %U\n:END:\n")))
 
   ;; TODO workflow:
   ;; TODO      = known work, but not currently active/actionable
@@ -347,6 +350,65 @@
 
   :config
   (require 'org-habit))
+
+(use-package org-download
+  :ensure t
+  :after org
+  :init
+  (defun my/org-move-to-entry-append-position ()
+    "Move point to the append position for the current Org entry body."
+    (when (derived-mode-p 'org-mode)
+      (org-back-to-heading t)
+      (goto-char (org-entry-end-position))
+      (unless (eobp)
+        (open-line 1))))
+
+  (defun my/org-move-past-image-link-for-file (buffer file)
+    "In BUFFER, move point below the Org image link for FILE."
+    (when (and (buffer-live-p buffer)
+               file)
+      (with-current-buffer buffer
+        (let ((filename (file-name-nondirectory file)))
+          (goto-char (point-min))
+          (when (search-forward filename nil t)
+            (end-of-line)
+            (forward-line)
+            (unless (looking-at-p "\\(?:[ \t]*$\\)")
+              (open-line 1)))))))
+
+  (defun my/org-download-clipboard ()
+    "Attach an image from the clipboard to the current Org entry."
+    (interactive)
+    (my/org-move-to-entry-append-position)
+    (let ((buffer (current-buffer)))
+      (org-download-clipboard)
+      (my/org-move-past-image-link-for-file buffer org-download-path-last-file)
+      (run-at-time 0 nil #'my/org-move-past-image-link-for-file
+                   buffer org-download-path-last-file)))
+
+  (defun my/org-download-file-format (filename)
+    "Format org-download FILENAME with timestamp and current Org heading."
+    (let* ((heading (if (derived-mode-p 'org-mode)
+                        (org-get-heading t t t t)
+                      "image"))
+           (slug (downcase
+                  (replace-regexp-in-string "[^[:alnum:]]+" "-" heading))))
+      (setq slug (replace-regexp-in-string "\\`-+\\|-+\\'" "" slug))
+      (format "%s%s_%s"
+              (format-time-string "%Y-%m-%d_%H-%M-%S_")
+              (if (string-empty-p slug) "image" slug)
+              filename)))
+  :custom
+  (org-download-method 'attach)
+  :config
+  (setq org-download-file-format-function #'my/org-download-file-format)
+  (setq org-attach-commands
+        (seq-remove (lambda (command)
+                      (member ?i (car command)))
+                    org-attach-commands))
+  (add-to-list 'org-attach-commands
+               '((?i) my/org-download-clipboard
+                 "Attach an image from the clipboard.")))
 
 ;;; Startup cleanup
 ;; Undo early-init.el setting
