@@ -99,8 +99,8 @@ unrelated generated or external-format files can add noise.
 - If the keybinding is implemented in `dotfiles/emacs/init.el`, keep the
   `Implemented` column in `dotfiles/emacs/doom-remix-bindings.org` accurate.
 - For Evil, leader, localleader, Org, or which-key-related bindings, update
-  `tools/emacs-container/check-evil-bindings.el` and run the dedicated
-  container keybinding test.
+  `.agents/skills/test-emacs-config/check-evil-bindings.el` and run the
+  dedicated container keybinding test.
 
 ## Repository Signing Key Conventions
 

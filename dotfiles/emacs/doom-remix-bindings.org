@@ -124,7 +124,8 @@ Use this structure:
 | =C-x=       | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
 | =S-Del=     | normal                 | cut current line                                     | =evil-delete-line=                      | Y         | Y           |
 | =S-Del=     | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
-| =C-s=       | normal, visual, insert | save buffer                                          | =save-buffer=                           | Y         | Y           |
+| =C-s=       | normal, visual         | save buffer                                          | =save-buffer=                           | Y         | Y           |
+| =C-s=       | insert                 | enter normal state, then save buffer                 | =my/evil-normal-state-and-save=         | Y         | Y           |
 | =C-r=       | normal                 | redo with =undo-redo= backend                       | =evil-redo=                             | Y         | Y           |
 | =Backspace= | visual                 | delete selection without yanking                     | =evil-delete=                           | Y         | Y           |
 | =C-h=       | insert                 | delete word before cursor                            | =evil-delete-backward-word=             | Y         | Y           |
@@ -599,5 +600,5 @@ Use this structure:
 - =SPC= is the global leader.
 - =\= is the localleader, replacing Doom's default =SPC m=.
 - Any update to this document should trigger a matching review of
-    =tools/emacs-container/check-evil-bindings.el=. If a binding row changes and
-    the binding is implemented, update the test in the same change.
+  =.agents/skills/test-emacs-config/check-evil-bindings.el=. If a binding row
+  changes and the binding is implemented, update the test in the same change.

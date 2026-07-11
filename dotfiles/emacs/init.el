@@ -442,6 +442,12 @@
   (dolist (keymap keymaps)
     (keymap-set keymap key command)))
 
+(defun my/evil-normal-state-and-save ()
+  "Enter Evil normal state and save the current buffer."
+  (interactive)
+  (evil-normal-state)
+  (save-buffer))
+
 ;;; Evil leader keymaps
 (defvar-keymap my/leader-buffers-map
   :doc "Buffer commands."
@@ -602,8 +608,9 @@
   (keymap-set evil-normal-state-map "S-<delete>" #'evil-delete-line)
   (keymap-set evil-visual-state-map "S-<delete>" #'clipboard-kill-region)
   (my/keymap-set-many
-   (list evil-normal-state-map evil-visual-state-map evil-insert-state-map)
+   (list evil-normal-state-map evil-visual-state-map)
    "C-s" #'save-buffer)
+  (keymap-set evil-insert-state-map "C-s" #'my/evil-normal-state-and-save)
   (evil-ex-define-cmd "q[uit]" #'evil-delete-buffer)
   (evil-ex-define-cmd "qa[ll]" #'evil-quit-all)
   (keymap-set evil-visual-state-map "<backspace>" #'evil-delete)

@@ -48,6 +48,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 repo_root="$(git rev-parse --show-toplevel)"
+skill_dir="$repo_root/.agents/skills/test-emacs-config"
 fedora_version="$(
     . /etc/os-release
     printf '%s' "${VERSION_ID:?}"
@@ -60,13 +61,13 @@ if "$rebuild_image" || ! podman image exists "$image_name"; then
         --quiet \
         --tag "$image_name" \
         --build-arg "FEDORA_VERSION=$fedora_version" \
-        --file "$repo_root/tools/emacs-container/Containerfile" \
-        "$repo_root/tools/emacs-container"
+        --file "$skill_dir/Containerfile" \
+        "$skill_dir"
 fi
 
 podman_mounts=(
     --tmpfs /root/.config/emacs
-    --mount type=bind,source="$repo_root/tools/emacs-container",destination=/workspace/tools/emacs-container,readonly
+    --mount type=bind,source="$skill_dir",destination=/workspace/test-emacs-config,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly
 )

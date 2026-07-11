@@ -40,7 +40,8 @@ new `use-package :ensure t` dependency can install into an empty ELPA directory:
 .agents/skills/test-emacs-config/scripts/emacs-container --fresh --eval '(princ "ok\n")'
 ```
 
-Use `--rebuild-image` after changing `tools/emacs-container/Containerfile`.
+Use `--rebuild-image` after changing
+`.agents/skills/test-emacs-config/Containerfile`.
 
 ## Evil keybinding validation
 
@@ -49,7 +50,7 @@ run the dedicated keybinding test:
 
 ```sh
 .agents/skills/test-emacs-config/scripts/emacs-container \
-    --load /workspace/tools/emacs-container/check-evil-bindings.el
+    --load /workspace/test-emacs-config/check-evil-bindings.el
 ```
 
 This test verifies implemented rows from
@@ -60,7 +61,7 @@ which-key discoverability metadata.
 If a keybinding is intentionally added, removed, or changed, update both:
 
 - `dotfiles/emacs/doom-remix-bindings.org`
-- `tools/emacs-container/check-evil-bindings.el`
+- `.agents/skills/test-emacs-config/check-evil-bindings.el`
 
 Then rerun the keybinding test and the basic smoke test:
 
