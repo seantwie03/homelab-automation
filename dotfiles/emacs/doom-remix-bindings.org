@@ -113,7 +113,7 @@ Use this structure:
 | =Y=         | visual                 | yank to end of line                                  | =evil-yank=                             | Y         | Y           |
 | =C-a=       | normal                 | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
 | =C-a=       | insert                 | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
-| =C-c=       | normal                 | copy current line                                    | =evil-yank-line=                        | Y         | Y           |
+| =C-c=       | normal                 | preserve Emacs =C-c= prefix                         |                                         | Y         | Y           |
 | =C-c=       | visual                 | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
 | =C-Insert=  | visual                 | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
 | =C-v=       | insert                 | paste from system clipboard                          | =clipboard-yank=                        | Y         | Y           |

@@ -114,7 +114,7 @@
 (my/assert-key evil-visual-state-map "Y" #'evil-yank)
 (my/assert-key evil-normal-state-map "C-a" #'mark-whole-buffer)
 (my/assert-key evil-insert-state-map "C-a" #'mark-whole-buffer)
-(my/assert-key evil-normal-state-map "C-c" #'evil-yank-line)
+(my/assert-unbound evil-normal-state-map "C-c")
 (my/assert-key evil-visual-state-map "C-c" #'clipboard-kill-ring-save)
 (my/assert-key evil-visual-state-map "C-<insert>" #'clipboard-kill-ring-save)
 (my/assert-key evil-insert-state-map "C-v" #'clipboard-yank)

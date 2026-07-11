@@ -596,7 +596,6 @@
   (keymap-set evil-visual-state-map "Y" #'evil-yank)
   (keymap-set evil-normal-state-map "C-a" #'mark-whole-buffer)
   (keymap-set evil-insert-state-map "C-a" #'mark-whole-buffer)
-  (keymap-set evil-normal-state-map "C-c" #'evil-yank-line)
   (keymap-set evil-visual-state-map "C-c" #'clipboard-kill-ring-save)
   (keymap-set evil-visual-state-map "C-<insert>" #'clipboard-kill-ring-save)
   (keymap-set evil-insert-state-map "C-v" #'clipboard-yank)
