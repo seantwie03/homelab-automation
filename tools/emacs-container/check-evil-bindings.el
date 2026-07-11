@@ -64,11 +64,19 @@
         (error "Expected effective %S in %S to be %S, got %S"
                key mode expected actual)))))
 
+(defun my/evil-ex-command (command)
+  "Return COMMAND's resolved Evil Ex command."
+  (let ((target (cdr (assoc command evil-ex-commands))))
+    (while (stringp target)
+      (setq target (cdr (assoc target evil-ex-commands))))
+    target))
+
 (dolist (symbol '(my/leader-map
                   my/leader-buffers-map
                   my/leader-code-map
                   my/leader-files-map
                   my/leader-git-map
+                  my/leader-help-map
                   my/leader-insert-map
                   my/leader-notes-map
                   my/leader-open-agenda-map
@@ -118,7 +126,19 @@
 (my/assert-key evil-normal-state-map "S-<delete>" #'evil-delete-line)
 (my/assert-key evil-visual-state-map "S-<delete>" #'clipboard-kill-region)
 (dolist (keymap (list evil-normal-state-map evil-visual-state-map evil-insert-state-map))
-  (my/assert-key keymap "C-s" #'evil-save))
+  (my/assert-key keymap "C-s" #'save-buffer))
+(unless (eq evil-undo-system 'undo-redo)
+  (error "Expected evil-undo-system to be undo-redo, got %S"
+         evil-undo-system))
+(my/assert-key evil-normal-state-map "C-r" #'evil-redo)
+(unless (eq (my/evil-ex-command "q") #'evil-delete-buffer)
+  (error "Expected :q to resolve to evil-delete-buffer"))
+(unless (eq (my/evil-ex-command "quit") #'evil-delete-buffer)
+  (error "Expected :quit to resolve to evil-delete-buffer"))
+(unless (eq (my/evil-ex-command "qa") #'evil-quit-all)
+  (error "Expected :qa to resolve to evil-quit-all"))
+(unless (eq (my/evil-ex-command "qall") #'evil-quit-all)
+  (error "Expected :qall to resolve to evil-quit-all"))
 (my/assert-key evil-visual-state-map "<backspace>" #'evil-delete)
 (my/assert-key evil-insert-state-map "C-h" #'evil-delete-backward-word)
 (my/assert-key evil-normal-state-map "C-j" #'evil-window-down)
@@ -143,6 +163,7 @@
 (my/assert-prefix-keymap my/leader-map "c" 'my/leader-code-map)
 (my/assert-prefix-keymap my/leader-map "f" 'my/leader-files-map)
 (my/assert-prefix-keymap my/leader-map "g" 'my/leader-git-map)
+(my/assert-prefix-keymap my/leader-map "h" 'my/leader-help-map)
 (my/assert-prefix-keymap my/leader-map "i" 'my/leader-insert-map)
 (my/assert-prefix-keymap my/leader-map "n" 'my/leader-notes-map)
 (my/assert-prefix-keymap my/leader-map "o" 'my/leader-open-map)
@@ -159,7 +180,7 @@
                  ("p" . previous-buffer)
                  ("r" . revert-buffer)
                  ("R" . rename-buffer)
-                 ("s" . basic-save-buffer)
+                 ("s" . write-file)
                  ("S" . evil-write-all)))
   (my/assert-key my/leader-buffers-map (car entry) (cdr entry)))
 
@@ -173,11 +194,28 @@
 (dolist (entry '(("f" . find-file)
                  ("l" . locate)
                  ("r" . recentf-open-files)
-                 ("s" . basic-save-buffer)
+                 ("s" . write-file)
                  ("S" . write-file)))
   (my/assert-key my/leader-files-map (car entry) (cdr entry)))
 
 (my/assert-key my/leader-git-map "R" #'vc-revert)
+
+(dolist (entry '(("." . helpful-at-point)
+                 ("a" . apropos-command)
+                 ("b" . describe-bindings)
+                 ("d" . apropos-documentation)
+                 ("f" . helpful-callable)
+                 ("i" . info)
+                 ("k" . helpful-key)
+                 ("m" . describe-mode)
+                 ("o" . describe-symbol)
+                 ("p" . describe-package)
+                 ("r" . info-emacs-manual)
+                 ("u" . apropos-user-option)
+                 ("v" . helpful-variable)
+                 ("w" . where-is)
+                 ("x" . helpful-command)))
+  (my/assert-key my/leader-help-map (car entry) (cdr entry)))
 
 (dolist (entry '(("e" . emoji-search)
                  ("r" . evil-show-registers)

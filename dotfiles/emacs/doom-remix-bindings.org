@@ -124,7 +124,8 @@ Use this structure:
 | =C-x=       | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
 | =S-Del=     | normal                 | cut current line                                     | =evil-delete-line=                      | Y         | Y           |
 | =S-Del=     | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
-| =C-s=       | normal, visual, insert | save buffer                                          | =evil-save=                             | Y         | Y           |
+| =C-s=       | normal, visual, insert | save buffer                                          | =save-buffer=                           | Y         | Y           |
+| =C-r=       | normal                 | redo with =undo-redo= backend                       | =evil-redo=                             | Y         | Y           |
 | =Backspace= | visual                 | delete selection without yanking                     | =evil-delete=                           | Y         | Y           |
 | =C-h=       | insert                 | delete word before cursor                            | =evil-delete-backward-word=             | Y         | Y           |
 | =C-Del=     | normal, visual         | delete word ahead without yanking                    | =my/evil-delete-word-no-yank=           | N         | N           |
@@ -141,6 +142,15 @@ Use this structure:
 | =}=         | normal                 | next paragraph and recenter                          | =my/evil-forward-paragraph-and-center=  | N         | N           |
 | =-=         | normal                 | open directory browser / dired jump                  | =dired-jump=                            | Y         | Y           |
 
+* Evil Ex commands
+
+| Command      | Binding                    | Doom function        | Available | Implemented |
+|--------------+----------------------------+----------------------+-----------+-------------|
+| =:q=         | close current buffer       | =evil-delete-buffer= | Y         | Y           |
+| =:quit=      | close current buffer       | =evil-delete-buffer= | Y         | Y           |
+| =:qa=        | quit Emacs, asking to save | =evil-quit-all=      | Y         | Y           |
+| =:qall=      | quit Emacs, asking to save | =evil-quit-all=      | Y         | Y           |
+
 * Doom-style global leader
 
 | Key     | Binding                                     | Doom function                                 | Available | Implemented |
@@ -154,9 +164,29 @@ Use this structure:
 | =SPC := | execute command                             | =execute-extended-command=                    | Y         | Y           |
 | =SPC ;= | eval expression                             | =pp-eval-expression=                          | Y         | Y           |
 | =SPC u= | universal argument                          | =universal-argument=                          | Y         | Y           |
-| =SPC h= | help prefix                                 | =help-map=                                    | N         | N           |
+| =SPC h= | help prefix                                 | =help-map=                                    | Y         | Y           |
 | =SPC w= | window prefix                               | =evil-window-map=                             | Y         | Y           |
 | =SPC x= | scratch buffer                              | =doom/toggle-scratch-buffer=                  | N         | N           |
+
+* Help: =SPC h=
+
+| Key       | Binding                       | Doom function           | Available | Implemented |
+|-----------+-------------------------------+-------------------------+-----------+-------------|
+| =SPC h .= | help at point                 | =helpful-at-point=      | Y         | Y           |
+| =SPC h a= | apropos command               | =apropos-command=       | Y         | Y           |
+| =SPC h b= | describe bindings            | =describe-bindings=     | Y         | Y           |
+| =SPC h d= | apropos documentation         | =apropos-documentation= | Y         | Y           |
+| =SPC h f= | describe function or callable | =helpful-callable=      | Y         | Y           |
+| =SPC h i= | info                          | =info=                  | Y         | Y           |
+| =SPC h k= | describe key                  | =helpful-key=           | Y         | Y           |
+| =SPC h m= | describe mode                 | =describe-mode=         | Y         | Y           |
+| =SPC h o= | describe symbol               | =describe-symbol=       | Y         | Y           |
+| =SPC h p= | describe package              | =describe-package=      | Y         | Y           |
+| =SPC h r= | Emacs manual                  | =info-emacs-manual=     | Y         | Y           |
+| =SPC h u= | apropos user option           | =apropos-user-option=   | Y         | Y           |
+| =SPC h v= | describe variable             | =helpful-variable=      | Y         | Y           |
+| =SPC h w= | where is command              | =where-is=              | Y         | Y           |
+| =SPC h x= | describe command              | =helpful-command=       | Y         | Y           |
 
 * Buffers: =SPC b=
 
@@ -172,7 +202,7 @@ Use this structure:
 | =SPC b p= | previous buffer                     | =previous-buffer=                    | Y         | Y           |
 | =SPC b r= | revert buffer                       | =revert-buffer=                      | Y         | Y           |
 | =SPC b R= | rename buffer                       | =rename-buffer=                      | Y         | Y           |
-| =SPC b s= | save buffer                         | =basic-save-buffer=                  | Y         | Y           |
+| =SPC b s= | save buffer as file                 | =write-file=                         | Y         | Y           |
 | =SPC b S= | save all buffers                    | =evil-write-all=                     | Y         | Y           |
 | =SPC b x= | open scratch buffer                 | =doom/open-scratch-buffer=           | N         | N           |
 | =SPC b X= | switch to scratch buffer            | =doom/switch-to-scratch-buffer=      | N         | N           |
@@ -210,7 +240,7 @@ Use this structure:
 | =SPC f l= | locate file                        | =locate=                                        | Y         | Y           |
 | =SPC f r= | recent files                       | =recentf-open-files=                            | Y         | Y           |
 | =SPC f R= | rename/move current file           | =doom/move-this-file=                           | N         | N           |
-| =SPC f s= | save file                          | =basic-save-buffer=                             | Y         | Y           |
+| =SPC f s= | save file as                       | =write-file=                                    | Y         | Y           |
 | =SPC f S= | save file as                       | =write-file=                                    | Y         | Y           |
 | =SPC f y= | yank file path                     | =+default/yank-buffer-path=                     | N         | N           |
 | =SPC f Y= | yank file path relative to project | =+default/yank-buffer-path-relative-to-project= | N         | N           |
