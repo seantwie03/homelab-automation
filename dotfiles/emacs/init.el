@@ -514,7 +514,7 @@ unsupported because the exported text must be available immediately."
   :doc "File commands."
   "f" #'find-file
   "l" #'locate
-  "r" #'recentf-open-files
+  "r" #'recentf-open
   "s" #'write-file
   "S" #'write-file)
 
