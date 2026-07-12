@@ -74,6 +74,15 @@
   :config
   (blink-cursor-mode -1))
 
+(use-package term/xterm
+  :ensure nil
+  :custom
+  (xterm-extra-capabilities '(setSelection))
+  :config
+  ;; The initial terminal frame is initialized before init.el is loaded.
+  (unless (or (daemonp) (display-graphic-p))
+    (xterm--init-activate-set-selection)))
+
 ;;; Mode line
 (column-number-mode 1)
 (line-number-mode 1)
