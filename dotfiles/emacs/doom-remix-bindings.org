@@ -386,6 +386,7 @@ Use this structure:
 | =\ @= | insert citation           | =org-cite-insert=               | Y         | Y           |
 | =\ A= | archive subtree           | =org-archive-subtree-default=   | Y         | Y           |
 | =\ e= | export dispatch           | =org-export-dispatch=           | Y         | Y           |
+| =\ e g c= | export GFM to clipboard  | =my/org-gfm-export-to-clipboard= | Y         | Y           |
 | =\ f= | footnote action           | =org-footnote-action=           | Y         | Y           |
 | =\ h= | toggle heading            | =org-toggle-heading=            | Y         | Y           |
 | =\ i= | toggle item               | =org-toggle-item=               | Y         | Y           |

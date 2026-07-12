@@ -291,6 +291,7 @@
   (org-agenda-skip-scheduled-if-done nil)
   (org-agenda-skip-deadline-if-done nil)
   (org-agenda-skip-timestamp-if-done nil)
+  (org-export-with-toc nil)
 
   (org-log-done 'time)
   (org-log-repeat 'time)
@@ -357,6 +358,36 @@
 
   :config
   (require 'org-habit))
+
+(use-package ox-gfm
+  :ensure t
+  :after org
+  :config
+  (defun my/org-gfm-export-to-clipboard
+      (async subtreep visible-only body-only)
+    "Export Org content as GFM and copy it to the clipboard.
+
+SUBTREEP, VISIBLE-ONLY, and BODY-ONLY are Org export options.  ASYNC is
+unsupported because the exported text must be available immediately."
+    (interactive (list nil nil nil nil))
+    (when async
+      (user-error "Clipboard export cannot run asynchronously"))
+    (kill-new (org-export-as 'gfm subtreep visible-only body-only))
+    (message "GFM export copied to clipboard"))
+
+  (defun my/org-gfm-add-clipboard-export ()
+    "Add a clipboard action to the GFM export dispatcher menu."
+    (let* ((backend (org-export-get-backend 'gfm))
+           (menu (org-export-backend-menu backend))
+           (actions (assq-delete-all ?c (copy-tree (nth 2 menu)))))
+      (setf (org-export-backend-menu backend)
+            (list (nth 0 menu)
+                  (nth 1 menu)
+                  (append actions
+                          (list (list ?c "To clipboard"
+                                      #'my/org-gfm-export-to-clipboard)))))))
+
+  (my/org-gfm-add-clipboard-export))
 
 (use-package org-download
   :ensure t
