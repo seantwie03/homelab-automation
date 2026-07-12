@@ -380,12 +380,10 @@ unsupported because the exported text must be available immediately."
     (let* ((backend (org-export-get-backend 'gfm))
            (menu (org-export-backend-menu backend))
            (actions (assq-delete-all ?c (copy-tree (nth 2 menu)))))
-      (setf (org-export-backend-menu backend)
-            (list (nth 0 menu)
-                  (nth 1 menu)
-                  (append actions
-                          (list (list ?c "To clipboard"
-                                      #'my/org-gfm-export-to-clipboard)))))))
+      (setf (nth 2 menu)
+            (append actions
+                    (list (list ?c "To clipboard"
+                                #'my/org-gfm-export-to-clipboard))))))
 
   (my/org-gfm-add-clipboard-export))
 
