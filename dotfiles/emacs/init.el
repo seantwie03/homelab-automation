@@ -56,6 +56,7 @@
   (recentf-mode 1))
 
 ;;; UI
+(set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 140)
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
@@ -366,6 +367,11 @@
       todo "NEXT")))
 
   :config
+  (set-face-attribute 'org-level-1 nil :height 1.25)
+  (set-face-attribute 'org-level-2 nil :height 1.20)
+  (set-face-attribute 'org-level-3 nil :height 1.15)
+  (set-face-attribute 'org-level-4 nil :height 1.10)
+  (set-face-attribute 'org-level-5 nil :height 1.05)
   (require 'org-habit))
 
 (use-package ox-gfm
