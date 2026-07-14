@@ -27,7 +27,7 @@ Leader prefixes should use named keymaps:
 (defvar-keymap my/leader-files-map
     :doc "File commands."
     "f" #'find-file
-    "r" #'recentf-open-files
+    "r" #'recentf-open
     "s" #'basic-save-buffer)
 
 (defvar-keymap my/leader-map
@@ -38,6 +38,15 @@ Leader prefixes should use named keymaps:
 (keymap-set evil-normal-state-map "SPC" my/leader-map)
 (keymap-set evil-visual-state-map "SPC" my/leader-map)
 (keymap-set evil-motion-state-map "SPC" my/leader-map)
+#+end_src
+
+Add explicit =which-key= labels to nested prefix maps. Keep the child keymap in
+the replacement so adding its label does not replace its bindings:
+
+#+begin_src emacs-lisp
+(which-key-add-keymap-based-replacements
+    my/leader-map
+    "f" (cons "files" my/leader-files-map))
 #+end_src
 
 Org localleader bindings should be attached after Org loads:
@@ -239,7 +248,7 @@ Use this structure:
 | =SPC f f= | find file                          | =find-file=                                     | Y         | Y           |
 | =SPC f F= | find file from current directory   | =+default/find-file-under-here=                 | N         | N           |
 | =SPC f l= | locate file                        | =locate=                                        | Y         | Y           |
-| =SPC f r= | recent files                       | =recentf-open-files=                            | Y         | Y           |
+| =SPC f r= | recent files                       | =recentf-open=                                  | Y         | Y           |
 | =SPC f R= | rename/move current file           | =doom/move-this-file=                           | N         | N           |
 | =SPC f s= | save file as                       | =write-file=                                    | Y         | Y           |
 | =SPC f S= | save file as                       | =write-file=                                    | Y         | Y           |

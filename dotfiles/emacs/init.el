@@ -287,29 +287,32 @@
    (org-mode . visual-line-mode))
 
   :custom
+  ;;; File Structure
+  (org-directory "~/u/org")
+  (org-default-notes-file
+   (expand-file-name "inbox.org" org-directory))
+  (org-agenda-files
+   (directory-files-recursively org-directory "\\.org$"))
+
+  ;;; Display
   (org-blank-before-new-entry
    '((heading . t)
      (plain-list-item . auto)))
 
+  ;;; Editing
   (org-support-shift-select t)
 
-  ;; Recursively include all .org files under ~/u/org in the agenda.
-  ;; Files ending in .org_archive will not match this regex.
-  (org-agenda-files
-   (directory-files-recursively "~/u/org" "\\.org$"))
-
-  (org-agenda-skip-scheduled-if-done nil)
-  (org-agenda-skip-deadline-if-done nil)
-  (org-agenda-skip-timestamp-if-done nil)
+  ;;; Export
   (org-export-with-toc nil)
 
+  ;;; Capture
   (org-log-done 'time)
   (org-log-repeat 'time)
   (org-log-into-drawer "LOGBOOK")
 
   (org-capture-templates
    '(("t" "Task" entry
-      (file "~/u/org/inbox.org")
+      (file ,(expand-file-name "inbox.org" org-directory))
       "* TODO %?\n:LOGBOOK:\n- Created: %U\n:END:\n")))
 
   ;; TODO workflow:
@@ -327,7 +330,7 @@
       "DONE(d!)"
       "CANCELLED(c!)")))
 
-  ;; Tags:
+  ;;; Tags:
   ;; Place: choose one of home/computer/device/away
   ;; Effort: choose one of short/medium/long
   ;; Mode: optionally add menial and/or physical
@@ -348,6 +351,13 @@
      ("menial" . ?n) ;; Can listen to book/podcast while preforming this action
      ("physical" . ?p))) ;; Requires movement
 
+  ;;; Agenda
+  ;; Continue showing DONE items on the Agenda
+  ;; It is rewarding to see what you've accomplished
+  (org-agenda-skip-scheduled-if-done nil)
+  (org-agenda-skip-deadline-if-done nil)
+  (org-agenda-skip-timestamp-if-done nil)
+
   ;; Custom agenda commands:
   ;;
   ;; C-c a d = daily dashboard
@@ -367,6 +377,7 @@
       todo "NEXT")))
 
   :config
+  ;; Display
   (set-face-attribute 'org-level-1 nil :height 1.25)
   (set-face-attribute 'org-level-2 nil :height 1.20)
   (set-face-attribute 'org-level-3 nil :height 1.15)
@@ -399,7 +410,6 @@ unsupported because the exported text must be available immediately."
             (append actions
                     (list (list ?c "To clipboard"
                                 #'my/org-gfm-export-to-clipboard))))))
-
   (my/org-gfm-add-clipboard-export))
 
 (use-package org-download
@@ -619,6 +629,20 @@ unsupported because the exported text must be available immediately."
   "o" my/leader-open-map
   "s" my/leader-search-map
   "t" my/leader-toggle-map)
+
+(which-key-add-keymap-based-replacements
+  my/leader-map
+  "b" (cons "buffers" my/leader-buffers-map)
+  "c" (cons "code" my/leader-code-map)
+  "f" (cons "files" my/leader-files-map)
+  "g" (cons "git" my/leader-git-map)
+  "h" (cons "help" my/leader-help-map)
+  "i" (cons "insert" my/leader-insert-map)
+  "n" (cons "notes" my/leader-notes-map)
+  "o" (cons "open" my/leader-open-map)
+  "s" (cons "search" my/leader-search-map)
+  "t" (cons "toggle" my/leader-toggle-map)
+  "w" (cons "windows" evil-window-map))
 
 ;;; Evil non-leader bindings
 (with-eval-after-load 'evil

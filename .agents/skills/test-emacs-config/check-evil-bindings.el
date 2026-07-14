@@ -50,9 +50,16 @@
   "Assert KEY in PARENT resolves to CHILD-SYMBOL's keymap."
   (let ((actual (my/test-key parent key))
         (expected (symbol-value child-symbol)))
-    (unless (eq actual expected)
+    (unless (equal actual expected)
       (error "Expected prefix %S to be %S, got %S"
              key child-symbol actual))))
+
+(defun my/assert-which-key-label (keymap key expected)
+  "Assert which-key describes KEY in KEYMAP as EXPECTED."
+  (let ((actual (cdr (assoc key (which-key--get-keymap-bindings keymap)))))
+    (unless (equal actual (concat "group:" expected))
+      (error "Expected which-key label for %S to be %S, got %S"
+             key expected actual))))
 
 (defun my/assert-effective-key (mode key expected)
   "Assert KEY resolves to EXPECTED in a temporary buffer using MODE."
@@ -168,7 +175,7 @@
 (my/assert-key my/leader-map ":" #'execute-extended-command)
 (my/assert-key my/leader-map ";" #'pp-eval-expression)
 (my/assert-key my/leader-map "u" #'universal-argument)
-(my/assert-key my/leader-map "w" #'evil-window-map)
+(my/assert-prefix-keymap my/leader-map "w" 'evil-window-map)
 (my/assert-prefix-keymap my/leader-map "b" 'my/leader-buffers-map)
 (my/assert-prefix-keymap my/leader-map "c" 'my/leader-code-map)
 (my/assert-prefix-keymap my/leader-map "f" 'my/leader-files-map)
@@ -179,6 +186,19 @@
 (my/assert-prefix-keymap my/leader-map "o" 'my/leader-open-map)
 (my/assert-prefix-keymap my/leader-map "s" 'my/leader-search-map)
 (my/assert-prefix-keymap my/leader-map "t" 'my/leader-toggle-map)
+
+(dolist (entry '(("b" . "buffers")
+                 ("c" . "code")
+                 ("f" . "files")
+                 ("g" . "git")
+                 ("h" . "help")
+                 ("i" . "insert")
+                 ("n" . "notes")
+                 ("o" . "open")
+                 ("s" . "search")
+                 ("t" . "toggle")
+                 ("w" . "windows")))
+  (my/assert-which-key-label my/leader-map (car entry) (cdr entry)))
 
 (dolist (entry '(("b" . switch-to-buffer)
                  ("B" . switch-to-buffer)
@@ -203,7 +223,7 @@
 
 (dolist (entry '(("f" . find-file)
                  ("l" . locate)
-                 ("r" . recentf-open-files)
+                 ("r" . recentf-open)
                  ("s" . write-file)
                  ("S" . write-file)))
   (my/assert-key my/leader-files-map (car entry) (cdr entry)))
