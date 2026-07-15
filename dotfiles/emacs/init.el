@@ -181,6 +181,7 @@
 (use-package dired
   :ensure nil
   :custom
+  (delete-by-moving-to-trash t)
   (dired-kill-when-opening-new-dired-buffer t))
 
 ;;; Completion and navigation
@@ -471,10 +472,6 @@ unsupported because the exported text must be available immediately."
                '((?i) my/org-download-clipboard
                  "Attach an image from the clipboard.")))
 
-;;; Startup cleanup
-;; Undo early-init.el setting
-(setq gc-cons-threshold (or my--initial-gc-threshold 800000))
-
 (use-package evil
   :ensure t
   :init
@@ -612,6 +609,7 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-map
   :doc "Global leader keymap."
   "." #'find-file
+  "/" #'consult-ripgrep
   "," #'switch-to-buffer
   "<" #'switch-to-buffer
   "`" #'evil-switch-to-windows-last-buffer

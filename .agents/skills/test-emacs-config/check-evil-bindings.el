@@ -169,6 +169,7 @@
   (my/assert-key keymap "SPC" my/leader-map))
 
 (my/assert-key my/leader-map "." #'find-file)
+(my/assert-key my/leader-map "/" #'consult-ripgrep)
 (my/assert-key my/leader-map "," #'switch-to-buffer)
 (my/assert-key my/leader-map "<" #'switch-to-buffer)
 (my/assert-key my/leader-map "`" #'evil-switch-to-windows-last-buffer)

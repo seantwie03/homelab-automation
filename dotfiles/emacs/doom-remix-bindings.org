@@ -169,7 +169,7 @@ Use this structure:
 | =SPC ,= | switch buffer                               | =switch-to-buffer=                            | Y         | Y           |
 | =SPC <= | switch buffer across all buffers/workspaces | =switch-to-buffer=                            | Y         | Y           |
 | =SPC `= | switch to last buffer                       | =evil-switch-to-windows-last-buffer=          | Y         | Y           |
-| =SPC /= | search project                              | =+default/search-project=                     | N         | N           |
+| =SPC /= | search project                              | =consult-ripgrep=                             | Y         | Y           |
 | =SPC *= | search project for symbol at point          | =+default/search-project-for-symbol-at-point= | N         | N           |
 | =SPC := | execute command                             | =execute-extended-command=                    | Y         | Y           |
 | =SPC ;= | eval expression                             | =pp-eval-expression=                          | Y         | Y           |
