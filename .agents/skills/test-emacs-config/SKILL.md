@@ -12,7 +12,8 @@ The wrapper builds a small Fedora image with `emacs-nox` using the same Fedora
 major version as the host from `/etc/os-release`. It mounts only
 `dotfiles/emacs/early-init.el` and `dotfiles/emacs/init.el` into a disposable
 container home, and keeps ELPA packages in the named Podman volume
-`homelab-emacs-elpa`.
+`homelab-emacs-elpa`. The container drops all Linux capabilities and enables
+`no-new-privileges`.
 
 Run commands through the wrapper instead of host `emacs`:
 

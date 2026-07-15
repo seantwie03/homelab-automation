@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Neovim Config"
+  short_description: "Validate Neovim config in an isolated container"
+  default_prompt: "Use $test-neovim-config to validate my Neovim configuration changes."

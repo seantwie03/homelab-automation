@@ -176,6 +176,7 @@
 (my/assert-key my/leader-map ":" #'execute-extended-command)
 (my/assert-key my/leader-map ";" #'pp-eval-expression)
 (my/assert-key my/leader-map "u" #'universal-argument)
+(my/assert-key my/leader-map "x" #'scratch-buffer)
 (my/assert-prefix-keymap my/leader-map "w" 'evil-window-map)
 (my/assert-prefix-keymap my/leader-map "b" 'my/leader-buffers-map)
 (my/assert-prefix-keymap my/leader-map "c" 'my/leader-code-map)

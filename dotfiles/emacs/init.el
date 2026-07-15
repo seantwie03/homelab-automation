@@ -616,6 +616,7 @@ unsupported because the exported text must be available immediately."
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
   "u" #'universal-argument
+  "x" #'scratch-buffer
   "w" #'evil-window-map
   "b" my/leader-buffers-map
   "c" my/leader-code-map

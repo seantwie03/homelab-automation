@@ -29,7 +29,7 @@ return {
             "<Cmd>Telescope buffers show_all_buffers=true<CR>",
             desc = "Telescope buffers show_all_buffers=true",
         },
-        { "<Leader>:",  "<Cmd>Telescope command_history<CR>",     desc = "Telescope command_history" },
+        { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },
         -- [F]ind stuff
@@ -54,7 +54,6 @@ return {
         { "<Leader>flm", "<Cmd>Telescope man_pages<CR>",    desc = "Telescope man pages" },
         -- [F]ind [V]im stuff
         { "<Leader>fva", "<Cmd>Telescope autocommands<CR>", desc = "Telescope autocommands" },
-        { "<Leader>fvc", "<Cmd>Telescope commands<CR>",     desc = "Telescope commands" },
         { "<Leader>fvC", "<Cmd>Telescope highlights<CR>",   desc = "Telescope highlights (colors)" },
         { "<Leader>fvh", "<Cmd>Telescope help_tags<CR>",    desc = "Telescope help_tags" },
         { "<Leader>fvk", "<Cmd>Telescope keymaps<CR>",      desc = "Telescope keymaps" },

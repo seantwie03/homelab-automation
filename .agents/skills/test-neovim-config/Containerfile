@@ -1,0 +1,15 @@
+ARG FEDORA_VERSION
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION}
+
+RUN dnf -y install \
+        curl \
+        fd-find \
+        gcc \
+        git \
+        gzip \
+        make \
+        neovim \
+        ripgrep \
+        tar \
+        unzip \
+    && dnf clean all

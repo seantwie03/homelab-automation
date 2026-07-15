@@ -109,48 +109,50 @@ Use this structure:
 
 * Non-leader bindings
 
-| Key         | Mode                   | Binding                                              | Doom function                           | Available | Implemented |
-|-------------+------------------------+------------------------------------------------------+-----------------------------------------+-----------+-------------|
-| =j=         | normal, visual         | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
-| =k=         | normal, visual         | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
-| =<Down>=    | normal, visual         | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
-| =<Up>=      | normal, visual         | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
-| =<Down>=    | insert                 | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
-| =<Up>=      | insert                 | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
-| =0=         | normal                 | first press to indentation, second press to column 0 | =my/evil-smart-beginning-of-line=       | N         | N           |
-| =Y=         | normal                 | yank to end of line                                  | =evil-yank-line=                        | Y         | Y           |
-| =Y=         | visual                 | yank to end of line                                  | =evil-yank=                             | Y         | Y           |
-| =C-a=       | normal                 | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
-| =C-a=       | insert                 | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
-| =C-c=       | normal                 | preserve Emacs =C-c= prefix                         |                                         | Y         | Y           |
-| =C-c=       | visual                 | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
-| =C-Insert=  | visual                 | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
-| =C-v=       | insert                 | paste from system clipboard                          | =clipboard-yank=                        | Y         | Y           |
-| =C-v=       | visual                 | paste over selection without replacing clipboard     | =evil-visual-paste=                     | Y         | Y           |
-| =S-Insert=  | insert                 | paste from system clipboard                          | =clipboard-yank=                        | Y         | Y           |
-| =C-x=       | normal                 | removed; preserve Emacs =C-x= prefix                 | =undefined=                             | Y         | Y           |
-| =C-x=       | insert                 | removed; preserve Emacs =C-x= prefix                 | =undefined=                             | Y         | Y           |
-| =C-x=       | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
-| =S-Del=     | normal                 | cut current line                                     | =evil-delete-line=                      | Y         | Y           |
-| =S-Del=     | visual                 | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
-| =C-s=       | normal, visual         | save buffer                                          | =save-buffer=                           | Y         | Y           |
-| =C-s=       | insert                 | enter normal state, then save buffer                 | =my/evil-normal-state-and-save=         | Y         | Y           |
-| =C-r=       | normal                 | redo with =undo-redo= backend                       | =evil-redo=                             | Y         | Y           |
-| =Backspace= | visual                 | delete selection without yanking                     | =evil-delete=                           | Y         | Y           |
-| =C-h=       | insert                 | delete word before cursor                            | =evil-delete-backward-word=             | Y         | Y           |
-| =C-Del=     | normal, visual         | delete word ahead without yanking                    | =my/evil-delete-word-no-yank=           | N         | N           |
-| =C-Del=     | insert                 | delete word ahead without yanking                    | =my/evil-delete-word-no-yank=           | N         | N           |
-| =C-j=       | normal                 | move to window below                                 | =evil-window-down=                      | Y         | Y           |
-| =C-k=       | normal                 | move to window above                                 | =evil-window-up=                        | Y         | Y           |
-| =C-h=       | normal                 | move to window left                                  | =evil-window-left=                      | Y         | Y           |
-| =C-l=       | normal                 | move to window right                                 | =evil-window-right=                     | Y         | Y           |
-| =C-d=       | normal                 | half-page down and recenter                          | =my/evil-scroll-down-and-center=        | N         | N           |
-| =C-u=       | normal                 | half-page up and recenter                            | =my/evil-scroll-up-and-center=          | N         | N           |
-| =n=         | normal                 | next search match and recenter                       | =my/evil-search-next-and-center=        | N         | N           |
-| =N=         | normal                 | previous search match and recenter                   | =my/evil-search-previous-and-center=    | N         | N           |
-| ={=         | normal                 | previous paragraph and recenter                      | =my/evil-backward-paragraph-and-center= | N         | N           |
-| =}=         | normal                 | next paragraph and recenter                          | =my/evil-forward-paragraph-and-center=  | N         | N           |
-| =-=         | normal                 | open directory browser / dired jump                  | =dired-jump=                            | Y         | Y           |
+| Key         | Mode           | Binding                                              | Doom function                           | Available | Implemented |
+|-------------+----------------+------------------------------------------------------+-----------------------------------------+-----------+-------------|
+| =j=         | normal, visual | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
+| =k=         | normal, visual | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
+| =<Down>=    | normal, visual | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
+| =<Up>=      | normal, visual | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
+| =<Down>=    | insert         | visual-line down                                     | =evil-next-visual-line=                 | Y         | Y           |
+| =<Up>=      | insert         | visual-line up                                       | =evil-previous-visual-line=             | Y         | Y           |
+| =0=         | normal         | first press to indentation, second press to column 0 | =my/evil-smart-beginning-of-line=       | N         | N           |
+| =Y=         | normal         | yank to end of line                                  | =evil-yank-line=                        | Y         | Y           |
+| =Y=         | visual         | yank to end of line                                  | =evil-yank=                             | Y         | Y           |
+| =C-a=       | normal         | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
+| =C-a=       | insert         | select all                                           | =mark-whole-buffer=                     | Y         | Y           |
+| =C-c=       | normal         | removed; preserve Emacs =C-c= prefix                 | =undefined=                             | Y         | Y           |
+| =C-c=       | insert         | removed; preserve Emacs =C-c= prefix                 | =undefined=                             | Y         | Y           |
+| =C-c=       | visual         | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
+| =C-Insert=  | visual         | copy selection to system clipboard                   | =clipboard-kill-ring-save=              | Y         | Y           |
+| =C-v=       | insert         | paste from system clipboard                          | =clipboard-yank=                        | Y         | Y           |
+| =C-v=       | visual         | paste over selection without replacing clipboard     | =evil-visual-paste=                     | Y         | Y           |
+| =S-Insert=  | insert         | paste from system clipboard                          | =clipboard-yank=                        | Y         | Y           |
+| =C-x=       | normal         | removed; preserve Emacs =C-x= prefix                 | =undefined=                             | Y         | Y           |
+| =C-x=       | insert         | removed; preserve Emacs =C-x= prefix                 | =undefined=                             | Y         | Y           |
+| =C-x=       | visual         | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
+| =S-Del=     | normal         | cut current line                                     | =evil-delete-line=                      | Y         | Y           |
+| =S-Del=     | visual         | cut selection                                        | =clipboard-kill-region=                 | Y         | Y           |
+| =C-s=       | normal, visual | save buffer                                          | =save-buffer=                           | Y         | Y           |
+| =C-s=       | insert         | enter normal state, then save buffer                 | =my/evil-normal-state-and-save=         | Y         | Y           |
+| =C-r=       | normal         | redo with =undo-redo= backend                        | =evil-redo=                             | Y         | Y           |
+| =Backspace= | visual         | delete selection without yanking                     | =evil-delete=                           | Y         | Y           |
+| =C-h=       | insert         | delete word before cursor                            | =evil-delete-backward-word=             | Y         | Y           |
+| =C-Del=     | normal, visual | delete word ahead without yanking                    | =my/evil-delete-word-no-yank=           | N         | N           |
+| =C-Del=     | insert         | delete word ahead without yanking                    | =my/evil-delete-word-no-yank=           | N         | N           |
+| =C-j=       | normal         | move to window below                                 | =evil-window-down=                      | Y         | Y           |
+| =C-k=       | normal         | move to window above                                 | =evil-window-up=                        | Y         | Y           |
+| =C-h=       | normal         | move to window left                                  | =evil-window-left=                      | Y         | Y           |
+| =C-l=       | normal         | move to window right                                 | =evil-window-right=                     | Y         | Y           |
+| =C-d=       | normal         | half-page down and recenter                          | =my/evil-scroll-down-and-center=        | N         | N           |
+| =C-u=       | normal         | half-page up and recenter                            | =my/evil-scroll-up-and-center=          | N         | N           |
+| =n=         | normal         | next search match and recenter                       | =my/evil-search-next-and-center=        | N         | N           |
+| =N=         | normal         | previous search match and recenter                   | =my/evil-search-previous-and-center=    | N         | N           |
+| ={=         | normal         | previous paragraph and recenter                      | =my/evil-backward-paragraph-and-center= | N         | N           |
+| =}=         | normal         | next paragraph and recenter                          | =my/evil-forward-paragraph-and-center=  | N         | N           |
+| =-=         | normal         | open directory browser / dired jump                  | =dired-jump=                            | Y         | Y           |
+| =C-Space=   | all            |                                                      |                                         |           |             |
 
 * Evil Ex commands
 
@@ -176,7 +178,7 @@ Use this structure:
 | =SPC u= | universal argument                          | =universal-argument=                          | Y         | Y           |
 | =SPC h= | help prefix                                 | =help-map=                                    | Y         | Y           |
 | =SPC w= | window prefix                               | =evil-window-map=                             | Y         | Y           |
-| =SPC x= | scratch buffer                              | =doom/toggle-scratch-buffer=                  | N         | N           |
+| =SPC x= | scratch buffer                              | =scratch-buffer=                              | Y         | Y           |
 
 * Help: =SPC h=
 
@@ -184,7 +186,7 @@ Use this structure:
 |-----------+-------------------------------+-------------------------+-----------+-------------|
 | =SPC h .= | help at point                 | =helpful-at-point=      | Y         | Y           |
 | =SPC h a= | apropos command               | =apropos-command=       | Y         | Y           |
-| =SPC h b= | describe bindings            | =describe-bindings=     | Y         | Y           |
+| =SPC h b= | describe bindings             | =describe-bindings=     | Y         | Y           |
 | =SPC h d= | apropos documentation         | =apropos-documentation= | Y         | Y           |
 | =SPC h f= | describe function or callable | =helpful-callable=      | Y         | Y           |
 | =SPC h i= | info                          | =info=                  | Y         | Y           |

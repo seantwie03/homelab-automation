@@ -1,5 +1,17 @@
 -- keymap
 --------------------------------------------------------------------------------
+local function open_scratch_buffer()
+    local name = '[Scratch]'
+    local buffer = vim.fn.bufnr(name)
+
+    if buffer == -1 then
+        buffer = vim.api.nvim_create_buf(true, true)
+        vim.api.nvim_buf_set_name(buffer, name)
+    end
+
+    vim.api.nvim_set_current_buf(buffer)
+end
+
 -- Navigate visual lines
 vim.keymap.set({ 'n', 'x' }, 'j', 'gj', { desc = 'Navigate down (visual line)' })
 vim.keymap.set({ 'n', 'x' }, 'k', 'gk', { desc = 'Navigate up (visual line)' })
@@ -11,10 +23,9 @@ vim.keymap.set('i', '<Up>', '<C-\\><C-o>gk', { desc = 'Navigate up (visual line)
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Quickly source current file / execute Lua code
-vim.keymap.set('n', '<leader>xx', '<Cmd>source %<CR>', { desc = 'Source current file' })
-vim.keymap.set('n', '<leader>x', '<Cmd>:.lua<CR>', { desc = 'Lua: execute current line' })
-vim.keymap.set('v', '<leader>x', '<Cmd>:lua<CR>', { desc = 'Lua: execute current selection' })
+-- Evaluate code and open the scratch buffer
+vim.keymap.set('n', '<leader>;', ':lua =', { desc = 'Evaluate Lua expression' })
+vim.keymap.set('n', '<leader>x', open_scratch_buffer, { desc = 'Open scratch buffer' })
 
 -- mswin.vim
 -- The next several bindings are translated from mswin.vim with slight modifications.

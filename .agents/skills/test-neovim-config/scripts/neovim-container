@@ -8,13 +8,13 @@ fi
 
 usage() {
     cat <<'EOF'
-usage: emacs-container [--fresh] [--rebuild-image] [--help] [-- EMACS_ARGS...]
+usage: neovim-container [--fresh] [--rebuild-image] [--help] [-- NVIM_ARGS...]
 
-Run this repository's Emacs config in an isolated Fedora container.
+Run this repository's Neovim config in an isolated Fedora container.
 
 Options:
-    --fresh          Use a disposable ELPA directory for this run. This tests
-                    first-run package installation instead of the cached volume.
+    --fresh          Use disposable Neovim data for this run. This tests
+                    first-run lazy.nvim and plugin installation.
     --rebuild-image  Rebuild the Fedora image even if the matching tag exists.
     --help           Show this help text.
 EOF
@@ -48,12 +48,12 @@ while [ "$#" -gt 0 ]; do
 done
 
 repo_root="$(git rev-parse --show-toplevel)"
-skill_dir="$repo_root/.agents/skills/test-emacs-config"
+skill_dir="$repo_root/.agents/skills/test-neovim-config"
 fedora_version="$(
     . /etc/os-release
     printf '%s' "${VERSION_ID:?}"
 )"
-image_name="homelab-emacs-test:fedora-${fedora_version}"
+image_name="homelab-neovim-test:fedora-${fedora_version}"
 
 if "$rebuild_image" || ! podman image exists "$image_name"; then
     echo "building $image_name" >&2
@@ -66,15 +66,16 @@ if "$rebuild_image" || ! podman image exists "$image_name"; then
 fi
 
 podman_mounts=(
-    --tmpfs /root/.config/emacs
-    --mount type=bind,source="$skill_dir",destination=/workspace/test-emacs-config,readonly
-    --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly
-    --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly
+    --tmpfs /root/.config/nvim
+    --tmpfs /root/.cache/nvim
+    --tmpfs /root/.local/state/nvim
+    --mount type=bind,source="$skill_dir",destination=/workspace/test-neovim-config,readonly
+    --mount type=bind,source="$repo_root/dotfiles/nvim",destination=/workspace/nvim-config,readonly
 )
 
 if ! "$fresh"; then
     podman_mounts+=(
-        --mount type=volume,source=homelab-emacs-elpa,destination=/root/.config/emacs/elpa
+        --mount type=volume,source=homelab-neovim-data,destination=/root/.local/share/nvim
     )
 fi
 
@@ -84,11 +85,8 @@ podman run \
     --pull=never \
     --security-opt label=disable \
     --security-opt no-new-privileges \
+    --workdir /workspace/test-neovim-config \
     "${podman_mounts[@]}" \
     "$image_name" \
-    emacs --batch \
-        --init-directory /root/.config/emacs \
-        --load /root/.config/emacs/early-init.el \
-        --eval "(package-initialize)" \
-        --load /root/.config/emacs/init.el \
-        "$@"
+    sh -c 'cp -R /workspace/nvim-config/. /root/.config/nvim/ && exec nvim --headless "$@" "+lua if vim.v.errmsg ~= \"\" then io.stderr:write(vim.v.errmsg .. \"\\n\"); vim.cmd(\"cquit 1\") end" +qa!' \
+    sh "$@"
