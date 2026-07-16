@@ -26,9 +26,12 @@ return {
         },
         {
             "<Leader>,",
-            "<Cmd>Telescope buffers show_all_buffers=true<CR>",
-            desc = "Telescope buffers show_all_buffers=true",
+            function()
+                require("telescope.builtin").buffers({ cwd_only = true })
+            end,
+            desc = "Find project buffers",
         },
+        { "<Leader>.",  "<Cmd>Telescope find_files<CR>",          desc = "Find project files" },
         { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },

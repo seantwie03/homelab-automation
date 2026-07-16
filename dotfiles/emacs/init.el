@@ -608,10 +608,9 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-map
   :doc "Global leader keymap."
-  "." #'find-file
-  "/" #'consult-ripgrep
-  "," #'switch-to-buffer
-  "<" #'switch-to-buffer
+  "." #'project-find-file
+  "/" #'consult-line
+  "," #'project-switch-to-buffer
   "`" #'evil-switch-to-windows-last-buffer
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
