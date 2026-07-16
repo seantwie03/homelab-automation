@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/emacs"
+
+exec emacs --batch \
+    --init-directory "$config_dir" \
+    --load "$config_dir/early-init.el" \
+    --eval '(package-initialize)' \
+    --load "$config_dir/init.el" \
+    --load "$config_dir/tests/init-test.el" \
+    --funcall ert-run-tests-batch-and-exit

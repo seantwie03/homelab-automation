@@ -20,7 +20,7 @@
     group: "{{ user }}"
     mode: 0755
 
-- name: emacs config files are symlinked
+- name: emacs config files and test support are symlinked
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/emacs/{{ item }}"
     dest: /home/{{ user }}/.config/emacs/{{ item }}
@@ -31,3 +31,5 @@
   loop:
     - early-init.el
     - init.el
+    - scripts
+    - tests

@@ -53,6 +53,16 @@ expected command, callback, or description:
     '+lua local m = vim.fn.maparg("<leader>x", "n", false, true); assert(m.desc == "Open scratch buffer", vim.inspect(m))'
 ```
 
+## Custom action unit tests
+
+Run the MiniTest unit tests stored with the Neovim configuration through the
+container wrapper:
+
+```sh
+.agents/skills/test-neovim-config/scripts/neovim-container \
+    '+luafile /root/.config/nvim/scripts/minitest.lua'
+```
+
 Use the wrapper for:
 
 - verifying the config loads without errors

@@ -35,41 +35,8 @@ return {
         { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },
-        -- [F]ind stuff
-        { "<Leader>fb", "<Cmd>Telescope buffers<CR>",             desc = "Telescope buffers" },
-        { "<Leader>fd", "<Cmd>Telescope diagnostics bufnr=0<CR>", desc = "Telescope diagnostics bufnr=0" },
-        {
-            "<Leader>fD",
-            "<Cmd>Telescope diagnostics<CR>",
-            desc = "Telescope diagnostics (workspace)",
-        },
-        { "<Leader>ff", "<Cmd>Telescope find_files<CR>", desc = "Telescope find_files" },
-        { "<Leader>fr", "<Cmd>Telescope oldfiles<CR>",   desc = "Telescope oldfiles (recent)" },
-        { "<Leader>fR", "<Cmd>Telescope resume<CR>",     desc = "Telescope resume" },
-        { "<Leader>ft", "<Cmd>Telescope live_grep<CR>",  desc = "Telescope live_grep (text)" },
-        { "<Leader>fw", "<Cmd>Telescope grep_string<CR>",  desc = "Telescope grep_string (word)" },
-        -- [F]ind [G]it stuff
-        { "<Leader>fgb", "<Cmd>Telescope git_branches<CR>",  desc = "Telescope git_branches" },
-        { "<Leader>fgc", "<Cmd>Telescope git_branches<CR>",  desc = "Telescope git_branches" },
-        { "<Leader>fgh", "<Cmd>Telescope git_bcommits<CR>",  desc = "Telescope git_bcommits (buffer history)" },
-        { "<Leader>fgs", "<Cmd>Telescope git_status<CR>",   desc = "Telescope git_status" },
-        -- [F]ind [L]inux stuff
-        { "<Leader>flm", "<Cmd>Telescope man_pages<CR>",    desc = "Telescope man pages" },
-        -- [F]ind [V]im stuff
-        { "<Leader>fva", "<Cmd>Telescope autocommands<CR>", desc = "Telescope autocommands" },
-        { "<Leader>fvC", "<Cmd>Telescope highlights<CR>",   desc = "Telescope highlights (colors)" },
-        { "<Leader>fvh", "<Cmd>Telescope help_tags<CR>",    desc = "Telescope help_tags" },
-        { "<Leader>fvk", "<Cmd>Telescope keymaps<CR>",      desc = "Telescope keymaps" },
-        { "<Leader>fvl", "<Cmd>Telescope loclist<CR>",      desc = "Telescope loclist" },
-        { "<Leader>fvo", "<Cmd>Telescope vim_options<CR>",  desc = "Telescope vim_options" },
-        { "<Leader>fvq", "<Cmd>Telescope quickfix<CR>",      desc = "Telescope quickfix" },
-        {
-            "<Leader>fvs",
-            function()
-                require("telescope.builtin").find_files({ cwd = "~/.config/nvim" })
-            end,
-            desc = "Find vim settings",
-        },
+        -- File actions
+        { "<Leader>ff", "<Cmd>Telescope oldfiles<CR>", desc = "Find recent files" },
     },
     opts = {
         defaults = {

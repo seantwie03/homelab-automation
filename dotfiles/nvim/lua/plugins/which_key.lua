@@ -2,15 +2,11 @@ return {
     "folke/which-key.nvim",
     event = "VeryLazy",
     opts = {
-        defaults = {
-            mode = { "n", "v" },
-            ["<Leader>c"] = { name = "+code" },
-            ["<Leader>f"] = { name = "+find" },
-            ["<Leader>fg"] = { name = "+git" },
-            ["<Leader>fl"] = { name = "+linux" },
-            ["<Leader>fv"] = { name = "+vim" },
-            ["<Leader>p"] = { name = "+paste" },
-            ["<Leader>t"] = { name = "+toggle" },
+        spec = {
+            { "<Leader>c", group = "code" },
+            { "<Leader>f", group = "files" },
+            { "<Leader>p", group = "paste" },
+            { "<Leader>t", group = "toggle" },
         },
     },
     keys = {

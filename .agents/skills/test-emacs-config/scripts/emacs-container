@@ -68,6 +68,7 @@ fi
 podman_mounts=(
     --tmpfs /root/.config/emacs
     --mount type=bind,source="$skill_dir",destination=/workspace/test-emacs-config,readonly
+    --mount type=bind,source="$repo_root/dotfiles/emacs/tests",destination=/workspace/emacs-tests,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/early-init.el",destination=/root/.config/emacs/early-init.el,readonly
     --mount type=bind,source="$repo_root/dotfiles/emacs/init.el",destination=/root/.config/emacs/init.el,readonly
 )

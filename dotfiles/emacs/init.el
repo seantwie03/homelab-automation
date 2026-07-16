@@ -262,7 +262,16 @@
 (use-package project
   :ensure nil
   :custom
-  (project-vc-extra-root-markers '(".project")))
+  (project-vc-extra-root-markers '(".project"))
+  :config
+  (defun my/copy-file-name ()
+    "Copy the current buffer's file name to the kill ring."
+    (interactive)
+    (unless buffer-file-name
+      (user-error "Current buffer is not visiting a file"))
+    (let ((name (file-name-nondirectory buffer-file-name)))
+      (kill-new name)
+      (message "Copied file name: %s" name))))
 
 (use-package ghostel
   :ensure t
@@ -525,11 +534,8 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-files-map
   :doc "File commands."
-  "f" #'find-file
-  "l" #'locate
-  "r" #'recentf-open
-  "s" #'write-file
-  "S" #'write-file)
+  "f" #'recentf-open
+  "y" #'my/copy-file-name)
 
 (defvar-keymap my/leader-git-map
   :doc "Git commands."

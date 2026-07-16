@@ -1,0 +1,70 @@
+local file_actions = require('config.actions.files')
+local eq = MiniTest.expect.equality
+local new_set = MiniTest.new_set
+
+local original_buffer
+local original_notify
+local original_setreg
+local notifications
+local registers
+local test_buffer
+
+local T = new_set({
+    hooks = {
+        pre_case = function()
+            original_buffer = vim.api.nvim_get_current_buf()
+            test_buffer = vim.api.nvim_create_buf(true, false)
+            vim.api.nvim_set_current_buf(test_buffer)
+
+            notifications = {}
+            registers = {}
+            original_notify = vim.notify
+            original_setreg = vim.fn.setreg
+
+            vim.notify = function(...)
+                table.insert(notifications, { ... })
+            end
+            vim.fn.setreg = function(...)
+                table.insert(registers, { ... })
+            end
+        end,
+        post_case = function()
+            vim.notify = original_notify
+            vim.fn.setreg = original_setreg
+
+            if vim.api.nvim_buf_is_valid(original_buffer) then
+                vim.api.nvim_set_current_buf(original_buffer)
+            else
+                vim.api.nvim_set_current_buf(vim.api.nvim_create_buf(true, false))
+            end
+
+            if vim.api.nvim_buf_is_valid(test_buffer) then
+                vim.api.nvim_buf_delete(test_buffer, { force = true })
+            end
+        end,
+    },
+})
+
+T['copy_file_name()'] = new_set()
+
+T['copy_file_name()']['copies only the current file name'] = function()
+    vim.api.nvim_buf_set_name(test_buffer, '/tmp/project/archive.tar.gz')
+
+    local name = file_actions.copy_file_name()
+
+    eq(name, 'archive.tar.gz')
+    eq(registers, { { '+', 'archive.tar.gz' } })
+    eq(notifications, { { 'Copied file name: archive.tar.gz' } })
+end
+
+T['copy_file_name()']['reports an error for a buffer without a file'] = function()
+    local name = file_actions.copy_file_name()
+
+    eq(name, nil)
+    eq(registers, {})
+    eq(notifications, {
+        { 'Current buffer is not visiting a file', vim.log.levels.ERROR },
+    })
+end
+
+return T

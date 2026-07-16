@@ -58,3 +58,17 @@ return {
 Mason Tool Installer will install the package. Neovim will enable the LSP when a matching filetype is opened.
 
 Use `:checkhealth vim.lsp` to verify that the executable is installed and the configuration is valid.
+
+## Tests
+
+Run the [mini.test](https://github.com/nvim-mini/mini.test) unit tests through the configured Neovim installation:
+
+```sh
+nvim --headless "+luafile $HOME/.config/nvim/scripts/minitest.lua"
+```
+
+To run the same test suite from within Neovim:
+
+```vim
+:luafile ~/.config/nvim/scripts/minitest.lua
+```

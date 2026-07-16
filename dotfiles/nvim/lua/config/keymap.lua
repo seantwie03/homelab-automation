@@ -1,16 +1,7 @@
 -- keymap
 --------------------------------------------------------------------------------
-local function open_scratch_buffer()
-    local name = '[Scratch]'
-    local buffer = vim.fn.bufnr(name)
-
-    if buffer == -1 then
-        buffer = vim.api.nvim_create_buf(true, true)
-        vim.api.nvim_buf_set_name(buffer, name)
-    end
-
-    vim.api.nvim_set_current_buf(buffer)
-end
+local buffer_actions = require('config.actions.buffers')
+local file_actions = require('config.actions.files')
 
 -- Navigate visual lines
 vim.keymap.set({ 'n', 'x' }, 'j', 'gj', { desc = 'Navigate down (visual line)' })
@@ -25,7 +16,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Evaluate code and open the scratch buffer
 vim.keymap.set('n', '<leader>;', ':lua =', { desc = 'Evaluate Lua expression' })
-vim.keymap.set('n', '<leader>x', open_scratch_buffer, { desc = 'Open scratch buffer' })
+vim.keymap.set('n', '<leader>x', buffer_actions.open_scratch_buffer, { desc = 'Open scratch buffer' })
+
+-- File actions
+vim.keymap.set('n', '<leader>fy', file_actions.copy_file_name, { desc = 'Copy file name' })
 
 -- mswin.vim
 -- The next several bindings are translated from mswin.vim with slight modifications.

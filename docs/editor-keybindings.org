@@ -68,9 +68,21 @@ In Emacs, the current project is the =project.el= project associated with the cu
 | SPC : | normal | builtin        | execute-extended-command           | telescope.nvim | telescope.builtin.commands                  |
 | SPC ; | normal | builtin        | pp-eval-expression                 | builtin        | :lua =                                      |
 | SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                         |
+| SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                 |
 | SPC h | normal | custom         | my/leader-help-map                 | N/I            | N/I                                         |
 | SPC w | normal | evil           | evil-window-map                    | N/I            | N/I                                         |
-| SPC x | normal | builtin        | scratch-buffer                     | custom         | open_scratch_buffer                         |
+| SPC x | normal | builtin        | scratch-buffer                     | custom         | buffer_actions.open_scratch_buffer          |
+
+* Files (=SPC f=) mappings
+
+=SPC f Y= and =SPC f s= have not been implemented yet.
+
+| Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                   |
+|---------+--------+----------------+------------------------------------+----------------+---------------------------------|
+| SPC f f | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles      |
+| SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name     |
+| SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
+| SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                         |
 
 * Legend
 

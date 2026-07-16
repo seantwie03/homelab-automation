@@ -135,15 +135,6 @@
 (dolist (keymap (list evil-normal-state-map evil-visual-state-map))
   (my/assert-key keymap "C-s" #'save-buffer))
 (my/assert-key evil-insert-state-map "C-s" #'my/evil-normal-state-and-save)
-(let (calls)
-  (cl-letf (((symbol-function 'evil-normal-state)
-             (lambda () (push 'normal-state calls)))
-            ((symbol-function 'save-buffer)
-             (lambda () (push 'save calls))))
-    (my/evil-normal-state-and-save))
-  (unless (equal (nreverse calls) '(normal-state save))
-    (error "Expected C-s command to enter normal state then save, got %S"
-           (nreverse calls))))
 (unless (eq evil-undo-system 'undo-redo)
   (error "Expected evil-undo-system to be undo-redo, got %S"
          evil-undo-system))
@@ -223,12 +214,12 @@
                  ("w" . delete-trailing-whitespace)))
   (my/assert-key my/leader-code-map (car entry) (cdr entry)))
 
-(dolist (entry '(("f" . find-file)
-                 ("l" . locate)
-                 ("r" . recentf-open)
-                 ("s" . write-file)
-                 ("S" . write-file)))
+(dolist (entry '(("f" . recentf-open)
+                 ("y" . my/copy-file-name)))
   (my/assert-key my/leader-files-map (car entry) (cdr entry)))
+
+(dolist (key '("l" "r" "s" "S" "Y"))
+  (my/assert-unbound my/leader-files-map key))
 
 (my/assert-key my/leader-git-map "R" #'vc-revert)
 

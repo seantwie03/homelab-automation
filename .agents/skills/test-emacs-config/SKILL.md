@@ -9,9 +9,10 @@ Use `.agents/skills/test-emacs-config/scripts/emacs-container` for Emacs
 validation in this repository.
 
 The wrapper builds a small Fedora image with `emacs-nox` using the same Fedora
-major version as the host from `/etc/os-release`. It mounts only
+major version as the host from `/etc/os-release`. It mounts
 `dotfiles/emacs/early-init.el` and `dotfiles/emacs/init.el` into a disposable
-container home, and keeps ELPA packages in the named Podman volume
+container home, mounts `dotfiles/emacs/tests` read-only at
+`/workspace/emacs-tests`, and keeps ELPA packages in the named Podman volume
 `homelab-emacs-elpa`. The container drops all Linux capabilities and enables
 `no-new-privileges`.
 
@@ -43,6 +44,19 @@ new `use-package :ensure t` dependency can install into an empty ELPA directory:
 
 Use `--rebuild-image` after changing
 `.agents/skills/test-emacs-config/Containerfile`.
+
+## Custom function tests
+
+Run the ERT tests for custom functions defined in `dotfiles/emacs/init.el`:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --load /workspace/emacs-tests/init-test.el \
+    --funcall ert-run-tests-batch-and-exit
+```
+
+These tests call the functions directly. Keep keymap assertions in
+`check-evil-bindings.el` instead of testing bindings through ERT.
 
 ## Evil keybinding validation
 

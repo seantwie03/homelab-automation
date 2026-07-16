@@ -1,7 +1,7 @@
 # emacs
 
 Installs Fedora's default Emacs package, creates `~/.config/emacs`, and
-symlinks `dotfiles/emacs/init.el` and `dotfiles/emacs/early-init.el` into that
-directory. Emacs-generated package, cache, and history files stay outside the
-repository in the regular `~/.config/emacs` directory.
-
+symlinks the tracked startup files, test runner, and tests from
+`dotfiles/emacs` into that directory. Emacs-generated package, cache, and
+history files stay outside the repository in the regular `~/.config/emacs`
+directory.
