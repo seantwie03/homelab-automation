@@ -15,6 +15,18 @@ indent_size = 2
 [*.{el,el.j2}]
 indent_size = unset
 
+[*.md]
+indent_size = unset
+trim_trailing_whitespace = false
+
+[*.org]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+[*-lock.json]
+indent_size = unset
+
 [*.vil]
 charset = unset
 end_of_line = unset
@@ -23,11 +35,3 @@ indent_size = unset
 trim_trailing_whitespace = unset
 insert_final_newline = unset
 
-[*.md]
-indent_size = 1
-trim_trailing_whitespace = false
-
-[*.org]
-indent_style = space
-indent_size = 2
-trim_trailing_whitespace = false

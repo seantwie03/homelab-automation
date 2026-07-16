@@ -77,12 +77,12 @@ In Emacs, the current project is the =project.el= project associated with the cu
 
 =SPC f Y= and =SPC f s= have not been implemented yet.
 
-| Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                   |
-|---------+--------+----------------+------------------------------------+----------------+---------------------------------|
-| SPC f f | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles      |
-| SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name     |
+| Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                |
+|---------+--------+----------------+------------------------------------+----------------+----------------------------------------------|
+| SPC f f | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles                   |
+| SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name                  |
 | SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
-| SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                         |
+| SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                                      |
 
 * Legend
 

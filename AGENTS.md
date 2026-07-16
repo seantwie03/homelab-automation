@@ -91,6 +91,8 @@ unrelated generated or external-format files can add noise.
   `use-package` block for the file where the variable or function is defined.
   Use `C-h v` or `C-h f` in Emacs to find the source file. Do not create a
   catch-all `use-package emacs` block.
+- When adding a custom function to the Emacs or Neovim configuration, add tests
+  that cover it to `dotfiles/emacs/tests` or `dotfiles/nvim/tests`, respectively.
 
 ## Emacs Keybinding Conventions
 
