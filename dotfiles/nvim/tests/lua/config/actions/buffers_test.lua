@@ -34,7 +34,7 @@ T['open_scratch_buffer()'] = new_set()
 T['open_scratch_buffer()']['creates and selects a scratch buffer'] = function()
     buffer_actions.open_scratch_buffer()
 
-    eq(vim.api.nvim_buf_get_name(0):match('%[Scratch%]$') ~= nil, true)
+    eq(vim.api.nvim_buf_get_name(0), vim.fs.joinpath(vim.uv.os_tmpdir(), '[Scratch]'))
     eq(vim.bo.buftype, 'nofile')
 end
 

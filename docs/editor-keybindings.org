@@ -61,19 +61,33 @@ In Emacs, the current project is the =project.el= project associated with the
 current buffer. In Neovim, it is the nearest ancestor of the current file that
 contains a =.git= directory or =.project= marker.
 
-| Key   | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                               |
-|-------+--------+----------------+------------------------------------+----------------+---------------------------------------------|
-| SPC . | normal | builtin        | project-find-file                  | telescope.nvim | telescope.builtin.find_files                |
-| SPC , | normal | builtin        | project-switch-to-buffer           | telescope.nvim | telescope.builtin.buffers (cwd_only)        |
-| SPC ` | normal | evil           | evil-switch-to-windows-last-buffer | telescope.nvim | telescope.builtin.marks                     |
-| SPC / | normal | consult        | consult-line                       | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find |
-| SPC : | normal | builtin        | execute-extended-command           | telescope.nvim | telescope.builtin.commands                  |
-| SPC ; | normal | builtin        | pp-eval-expression                 | builtin        | :lua =                                      |
-| SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                         |
-| SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                 |
-| SPC h | normal | custom         | my/leader-help-map                 | N/I            | N/I                                         |
-| SPC w | normal | evil           | evil-window-map                    | N/I            | N/I                                         |
-| SPC x | normal | builtin        | scratch-buffer                     | custom         | buffer_actions.open_scratch_buffer          |
+| Key   | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                        |
+|-------+--------+----------------+------------------------------------+----------------+------------------------------------------------------|
+| SPC . | normal | builtin        | project-find-file                  | telescope.nvim | telescope.builtin.find_files                         |
+| SPC , | normal | builtin        | project-switch-to-buffer           | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root) |
+| SPC ` | normal | evil           | evil-switch-to-windows-last-buffer | telescope.nvim | telescope.builtin.marks                              |
+| SPC / | normal | consult        | consult-line                       | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find          |
+| SPC : | normal | builtin        | execute-extended-command           | telescope.nvim | telescope.builtin.commands                           |
+| SPC ; | normal | builtin        | pp-eval-expression                 | builtin        | :lua =                                               |
+| SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                                  |
+| SPC b | normal | custom         | my/leader-buffers-map              | which-key.nvim | buffers group                                        |
+| SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                          |
+| SPC h | normal | custom         | my/leader-help-map                 | N/I            | N/I                                                  |
+| SPC w | normal | evil           | evil-window-map                    | N/I            | N/I                                                  |
+
+* Buffers (=SPC b=) mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                     |
+|---------+--------+----------------+------------------------------------+----------------+---------------------------------------------------|
+| SPC b b | normal | builtin        | switch-to-buffer                   | telescope.nvim | telescope.builtin.buffers (show_all_buffers=true) |
+| SPC b d | normal | builtin        | kill-current-buffer                | builtin        | :bdelete                                          |
+| SPC b l | normal | evil           | evil-switch-to-windows-last-buffer | builtin        | <C-^>                                             |
+| SPC b n | normal | builtin        | next-buffer                        | builtin        | :bnext                                            |
+| SPC b p | normal | builtin        | previous-buffer                    | builtin        | :bprevious                                        |
+| SPC b r | normal | builtin        | revert-buffer                      | builtin        | :edit!                                            |
+| SPC b s | normal | builtin        | write-file                         | builtin        | :saveas                                           |
+| SPC b S | normal | evil           | evil-write-all                     | builtin        | :wall                                             |
+| SPC b x | normal | builtin        | scratch-buffer                     | custom         | buffer_actions.open_scratch_buffer                |
 
 * Files (=SPC f=) mappings
 

@@ -67,9 +67,20 @@ return {
         {
             "<Leader>,",
             function()
-                require("telescope.builtin").buffers({ cwd_only = true })
+                require('telescope.builtin').buffers({
+                    cwd = project.current_root(),
+                })
             end,
             desc = "Find project buffers",
+        },
+        {
+            "<Leader>bb",
+            function()
+                require('telescope.builtin').buffers({
+                    show_all_buffers = true,
+                })
+            end,
+            desc = "Find all buffers",
         },
         { "<Leader>.",  find_project_files,                        desc = "Find project files" },
         { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },

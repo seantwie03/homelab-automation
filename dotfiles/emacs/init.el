@@ -525,17 +525,14 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-buffers-map
   :doc "Buffer commands."
   "b" #'switch-to-buffer
-  "B" #'switch-to-buffer
   "d" #'kill-current-buffer
-  "k" #'kill-current-buffer
-  "i" #'ibuffer
   "l" #'evil-switch-to-windows-last-buffer
   "n" #'next-buffer
   "p" #'previous-buffer
   "r" #'revert-buffer
-  "R" #'rename-buffer
   "s" #'write-file
-  "S" #'evil-write-all)
+  "S" #'evil-write-all
+  "x" #'scratch-buffer)
 
 (defvar-keymap my/leader-code-map
   :doc "Code commands."
@@ -637,7 +634,6 @@ unsupported because the exported text must be available immediately."
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
   "u" #'universal-argument
-  "x" #'scratch-buffer
   "w" #'evil-window-map
   "b" my/leader-buffers-map
   "c" my/leader-code-map

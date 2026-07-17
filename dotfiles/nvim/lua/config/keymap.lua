@@ -14,9 +14,18 @@ vim.keymap.set('i', '<Up>', '<C-\\><C-o>gk', { desc = 'Navigate up (visual line)
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Evaluate code and open the scratch buffer
+-- Evaluate code
 vim.keymap.set('n', '<leader>;', ':lua =', { desc = 'Evaluate Lua expression' })
-vim.keymap.set('n', '<leader>x', buffer_actions.open_scratch_buffer, { desc = 'Open scratch buffer' })
+
+-- Buffer actions
+vim.keymap.set('n', '<leader>bd', '<Cmd>bdelete<CR>', { desc = 'Delete buffer' })
+vim.keymap.set('n', '<leader>bl', '<C-^>', { desc = 'Switch to last buffer' })
+vim.keymap.set('n', '<leader>bn', '<Cmd>bnext<CR>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bp', '<Cmd>bprevious<CR>', { desc = 'Previous buffer' })
+vim.keymap.set('n', '<leader>br', '<Cmd>edit!<CR>', { desc = 'Revert buffer' })
+vim.keymap.set('n', '<leader>bs', ':saveas ', { desc = 'Save buffer as file' })
+vim.keymap.set('n', '<leader>bS', '<Cmd>wall<CR>', { desc = 'Save all buffers' })
+vim.keymap.set('n', '<leader>bx', buffer_actions.open_scratch_buffer, { desc = 'Open scratch buffer' })
 
 -- File actions
 vim.keymap.set('n', '<leader>fs', ':saveas ', { desc = 'Save file as' })
