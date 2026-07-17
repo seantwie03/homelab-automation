@@ -255,7 +255,7 @@ Use this structure:
 | =SPC f s= | save file as                       | =write-file=                                    | Y         | Y           |
 | =SPC f S= | save file as                       | =write-file=                                    | Y         | Y           |
 | =SPC f y= | yank file path                     | =+default/yank-buffer-path=                     | N         | N           |
-| =SPC f Y= | yank file path relative to project | =+default/yank-buffer-path-relative-to-project= | N         | N           |
+| =SPC f Y= | yank file path relative to project | =+default/yank-buffer-path-relative-to-project= | N         | Y           |
 
 * Git: =SPC g=
 

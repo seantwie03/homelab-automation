@@ -4,6 +4,7 @@ local new_set = MiniTest.new_set
 
 local original_buffer
 local original_notify
+local original_root
 local original_setreg
 local notifications
 local registers
@@ -19,6 +20,7 @@ local T = new_set({
             notifications = {}
             registers = {}
             original_notify = vim.notify
+            original_root = vim.fs.root
             original_setreg = vim.fn.setreg
 
             vim.notify = function(...)
@@ -30,6 +32,7 @@ local T = new_set({
         end,
         post_case = function()
             vim.notify = original_notify
+            vim.fs.root = original_root
             vim.fn.setreg = original_setreg
 
             if vim.api.nvim_buf_is_valid(original_buffer) then
@@ -61,6 +64,44 @@ T['copy_file_name()']['reports an error for a buffer without a file'] = function
     local name = file_actions.copy_file_name()
 
     eq(name, nil)
+    eq(registers, {})
+    eq(notifications, {
+        { 'Current buffer is not visiting a file', vim.log.levels.ERROR },
+    })
+end
+
+T['copy_project_relative_file_path()'] = new_set()
+
+T['copy_project_relative_file_path()']['copies a path relative to the project root'] = function()
+    vim.api.nvim_buf_set_name(test_buffer, '/tmp/project/src/main.lua')
+    vim.fs.root = function()
+        return '/tmp/project'
+    end
+
+    local path = file_actions.copy_project_relative_file_path()
+
+    eq(path, 'src/main.lua')
+    eq(registers, { { '+', 'src/main.lua' } })
+    eq(notifications, { { 'Copied file path: src/main.lua' } })
+end
+
+T['copy_project_relative_file_path()']['copies the absolute path outside a project'] = function()
+    vim.api.nvim_buf_set_name(test_buffer, '/tmp/notes/todo.md')
+    vim.fs.root = function()
+        return nil
+    end
+
+    local path = file_actions.copy_project_relative_file_path()
+
+    eq(path, '/tmp/notes/todo.md')
+    eq(registers, { { '+', '/tmp/notes/todo.md' } })
+    eq(notifications, { { 'Copied file path: /tmp/notes/todo.md' } })
+end
+
+T['copy_project_relative_file_path()']['reports an error for a buffer without a file'] = function()
+    local path = file_actions.copy_project_relative_file_path()
+
+    eq(path, nil)
     eq(registers, {})
     eq(notifications, {
         { 'Current buffer is not visiting a file', vim.log.levels.ERROR },

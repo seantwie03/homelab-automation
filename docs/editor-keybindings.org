@@ -57,7 +57,9 @@
 
 * Global leader mappings
 
-In Emacs, the current project is the =project.el= project associated with the current buffer. In Neovim, it is the current working directory.
+In Emacs, the current project is the =project.el= project associated with the
+current buffer. In Neovim, it is the nearest ancestor of the current file that
+contains a =.git= directory or =.project= marker.
 
 | Key   | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                               |
 |-------+--------+----------------+------------------------------------+----------------+---------------------------------------------|
@@ -75,11 +77,12 @@ In Emacs, the current project is the =project.el= project associated with the cu
 
 * Files (=SPC f=) mappings
 
-=SPC f Y= and =SPC f s= have not been implemented yet.
+=SPC f s= has not been implemented yet.
 
 | Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                |
 |---------+--------+----------------+------------------------------------+----------------+----------------------------------------------|
-| SPC f f | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles                   |
+| SPC f f | normal | builtin        | find-file                          | custom         | locate_with_telescope                        |
+| SPC f r | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles                   |
 | SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name                  |
 | SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
 | SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                                      |

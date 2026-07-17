@@ -1,3 +1,33 @@
+local function locate_with_telescope()
+    local config = require("telescope.config").values
+    local finders = require("telescope.finders")
+    local make_entry = require("telescope.make_entry")
+    local options = {
+        cwd = "/",
+        path_display = { "absolute" },
+    }
+
+    require("telescope.pickers").new(options, {
+        finder = finders.new_job(function(prompt)
+            if prompt == "" then
+                return nil
+            end
+
+            return {
+                "locate",
+                "--existing",
+                "--ignore-case",
+                "--limit",
+                "1000",
+                prompt,
+            }
+        end, make_entry.gen_from_file(options), 1000, "/"),
+        previewer = config.file_previewer(options),
+        prompt_title = "Locate files (Telescope)",
+        sorter = config.file_sorter(options),
+    }):find()
+end
+
 return {
     'nvim-telescope/telescope.nvim',
     -- version = '*',
@@ -36,7 +66,8 @@ return {
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },
         -- File actions
-        { "<Leader>ff", "<Cmd>Telescope oldfiles<CR>", desc = "Find recent files" },
+        { "<Leader>ff", locate_with_telescope, desc = "Locate file with Telescope" },
+        { "<Leader>fr", "<Cmd>Telescope oldfiles<CR>", desc = "Find recent files" },
     },
     opts = {
         defaults = {

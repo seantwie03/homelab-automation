@@ -214,11 +214,13 @@
                  ("w" . delete-trailing-whitespace)))
   (my/assert-key my/leader-code-map (car entry) (cdr entry)))
 
-(dolist (entry '(("f" . recentf-open)
-                 ("y" . my/copy-file-name)))
+(dolist (entry '(("f" . find-file)
+                 ("r" . recentf-open)
+                 ("y" . my/copy-file-name)
+                 ("Y" . my/copy-project-relative-file-path)))
   (my/assert-key my/leader-files-map (car entry) (cdr entry)))
 
-(dolist (key '("l" "r" "s" "S" "Y"))
+(dolist (key '("l" "s" "S"))
   (my/assert-unbound my/leader-files-map key))
 
 (my/assert-key my/leader-git-map "R" #'vc-revert)

@@ -20,6 +20,7 @@ vim.keymap.set('n', '<leader>x', buffer_actions.open_scratch_buffer, { desc = 'O
 
 -- File actions
 vim.keymap.set('n', '<leader>fy', file_actions.copy_file_name, { desc = 'Copy file name' })
+vim.keymap.set('n', '<leader>fY', file_actions.copy_project_relative_file_path, { desc = 'Copy file path' })
 
 -- mswin.vim
 -- The next several bindings are translated from mswin.vim with slight modifications.

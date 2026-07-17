@@ -48,6 +48,10 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.inccommand = 'split'
 
+-- Command-line completion
+vim.opt.wildmode = { 'full' }
+vim.opt.wildoptions = { 'pum', 'tagfile', 'fuzzy' }
+
 -- Show whitespace characters
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }

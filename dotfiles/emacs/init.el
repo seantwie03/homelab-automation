@@ -271,7 +271,22 @@
       (user-error "Current buffer is not visiting a file"))
     (let ((name (file-name-nondirectory buffer-file-name)))
       (kill-new name)
-      (message "Copied file name: %s" name))))
+      (message "Copied file name: %s" name)))
+
+  (defun my/copy-project-relative-file-path ()
+    "Copy the current file's project-relative path to the kill ring.
+Copy the absolute path when the file is not in a project."
+    (interactive)
+    (unless buffer-file-name
+      (user-error "Current buffer is not visiting a file"))
+    (let* ((project (project-current nil
+                                     (file-name-directory buffer-file-name)))
+           (path (if project
+                     (file-relative-name buffer-file-name
+                                         (project-root project))
+                   (expand-file-name buffer-file-name))))
+      (kill-new path)
+      (message "Copied file path: %s" path))))
 
 (use-package ghostel
   :ensure t
@@ -534,8 +549,10 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-files-map
   :doc "File commands."
-  "f" #'recentf-open
-  "y" #'my/copy-file-name)
+  "f" #'find-file
+  "r" #'recentf-open
+  "y" #'my/copy-file-name
+  "Y" #'my/copy-project-relative-file-path)
 
 (defvar-keymap my/leader-git-map
   :doc "Git commands."
