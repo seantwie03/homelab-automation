@@ -324,6 +324,25 @@ Copy the absolute path when the file is not in a project."
   ((org-mode . org-indent-mode)
    (org-mode . visual-line-mode))
 
+  :init
+  (defun my/org-find-file-in-notes ()
+    "Find a file beneath `org-directory'."
+    (interactive)
+    (require 'org)
+    (project-find-file-in nil (list org-directory) nil t))
+
+  (defun my/org-browse-notes ()
+    "Open `org-directory' in Dired."
+    (interactive)
+    (require 'org)
+    (dired org-directory))
+
+  (defun my/org-search-notes ()
+    "Search for text beneath `org-directory'."
+    (interactive)
+    (require 'org)
+    (consult-ripgrep org-directory))
+
   :custom
   ;;; File Structure
   (org-directory "~/u/org")
@@ -449,6 +468,25 @@ unsupported because the exported text must be available immediately."
                     (list (list ?c "To clipboard"
                                 #'my/org-gfm-export-to-clipboard))))))
   (my/org-gfm-add-clipboard-export))
+
+(use-package ox-html
+  :ensure nil
+  :after org
+  :init
+  (defun my/org-export-to-clipboard-as-rich-text ()
+    "Export the active Org region or buffer as rich text."
+    (interactive)
+    (require 'ox-ascii)
+    (require 'ox-html)
+    (let* ((html (org-export-as 'html nil nil t))
+           (plain (org-export-as 'ascii nil nil t))
+           (selection (copy-sequence plain)))
+      (add-text-properties 0 (length selection)
+                           (list 'text/html html)
+                           selection)
+      (kill-new plain)
+      (gui-set-selection 'CLIPBOARD selection)
+      (message "Rich-text export copied to clipboard"))))
 
 (use-package org-download
   :ensure t
@@ -615,14 +653,17 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-notes-map
   :doc "Notes and Org commands."
+  "-" #'my/org-browse-notes
   "a" #'org-agenda
-  "C" #'org-clock-cancel
+  "f" #'my/org-find-file-in-notes
   "l" #'org-store-link
   "m" #'org-tags-view
   "n" #'org-capture
-  "o" #'org-clock-goto
+  "N" #'org-capture-goto-target
+  "s" #'my/org-search-notes
   "t" #'org-todo-list
-  "v" #'org-search-view)
+  "y" #'my/org-gfm-export-to-clipboard
+  "Y" #'my/org-export-to-clipboard-as-rich-text)
 
 (defvar-keymap my/leader-open-agenda-map
   :doc "Open Org agenda commands."

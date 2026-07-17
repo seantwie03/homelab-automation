@@ -76,6 +76,7 @@ contains a =.git= directory or =.project= marker.
 | SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                                      |
 | SPC h | normal | custom         | my/leader-help-map                 | which-key.nvim | help group                                                       |
 | SPC j | normal | evil           | evil-show-jumps                    | telescope.nvim | telescope.builtin.jumplist                                       |
+| SPC n | normal | custom         | my/leader-notes-map                | N/A            | N/A                                                              |
 | SPC s | normal | custom         | my/leader-search-map               | which-key.nvim | search group                                                     |
 | SPC w | normal | custom         | my/leader-windows-map              | which-key.nvim | windows group                                                    |
 
@@ -122,6 +123,22 @@ contains a =.git= directory or =.project= marker.
 | SPC h v | normal | helpful        | helpful-variable      | N/A            | N/A                              |
 | SPC h w | normal | builtin        | where-is              | telescope.nvim | telescope.builtin.keymaps        |
 | SPC h x | normal | helpful        | helpful-command       | telescope.nvim | telescope.builtin.commands       |
+
+* Notes (=SPC n=) mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function                          | Nvim Provider | Nvim Function |
+|---------+--------+----------------+-----------------------------------------+---------------+---------------|
+| SPC n - | normal | custom         | my/org-browse-notes                     | N/A           | N/A           |
+| SPC n a | normal | builtin        | org-agenda                              | N/A           | N/A           |
+| SPC n f | normal | custom         | my/org-find-file-in-notes               | N/A           | N/A           |
+| SPC n l | normal | builtin        | org-store-link                          | N/A           | N/A           |
+| SPC n m | normal | builtin        | org-tags-view                           | N/A           | N/A           |
+| SPC n n | normal | builtin        | org-capture                             | N/A           | N/A           |
+| SPC n N | normal | builtin        | org-capture-goto-target                 | N/A           | N/A           |
+| SPC n s | normal | custom         | my/org-search-notes                     | N/A           | N/A           |
+| SPC n t | normal | builtin        | org-todo-list                           | N/A           | N/A           |
+| SPC n y | normal | custom         | my/org-gfm-export-to-clipboard          | N/A           | N/A           |
+| SPC n Y | normal | custom         | my/org-export-to-clipboard-as-rich-text | N/A           | N/A           |
 
 * Search (=SPC s=) mappings
 
