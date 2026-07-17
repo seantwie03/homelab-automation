@@ -7,6 +7,7 @@ return {
             { "<Leader>c", group = "code" },
             { "<Leader>f", group = "files" },
             { "<Leader>p", group = "paste" },
+            { "<Leader>s", group = "search" },
             { "<Leader>t", group = "toggle" },
             { "<Leader>w", group = "windows" },
         },

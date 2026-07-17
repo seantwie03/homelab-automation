@@ -56,4 +56,45 @@
   (with-temp-buffer
     (should-error (my/copy-project-relative-file-path) :type 'user-error)))
 
+(ert-deftest my/search-symbol-at-point-starts-with-the-current-symbol ()
+  (with-temp-buffer
+    (insert "alpha beta")
+    (goto-char (point-min))
+    (let (initial)
+      (cl-letf (((symbol-function 'consult-line)
+                 (lambda (value &optional _start)
+                   (setq initial value))))
+        (my/search-symbol-at-point))
+      (should (equal initial "alpha")))))
+
+(ert-deftest my/search-symbol-at-point-allows-no-current-symbol ()
+  (with-temp-buffer
+    (let ((initial 'not-called))
+      (cl-letf (((symbol-function 'consult-line)
+                 (lambda (value &optional _start)
+                   (setq initial value))))
+        (my/search-symbol-at-point))
+      (should-not initial))))
+
+(ert-deftest my/search-open-buffers-searches-all-buffers ()
+  (let (query)
+    (cl-letf (((symbol-function 'consult-line-multi)
+               (lambda (value &optional _initial)
+                 (setq query value))))
+      (my/search-open-buffers))
+    (should query)))
+
+(ert-deftest my/search-project-symbol-at-point-starts-with-the-current-symbol ()
+  (with-temp-buffer
+    (insert "alpha beta")
+    (goto-char (point-min))
+    (let (directory initial)
+      (cl-letf (((symbol-function 'consult-ripgrep)
+                 (lambda (dir value)
+                   (setq directory dir
+                         initial value))))
+        (my/search-project-symbol-at-point))
+      (should-not directory)
+      (should (equal initial "alpha")))))
+
 ;;; init-test.el ends here

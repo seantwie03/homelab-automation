@@ -1,0 +1,165 @@
+#+title: Using AI to Learn and Customize Emacs
+#+subtitle: Giving an AI agent reliable context and a safe place to experiment
+
+I have been using an AI coding agent to learn and customize Emacs. Emacs turns
+out to be unusually well suited to this. The qualities that make it useful to
+humans, especially its documentation and introspection, also give an agent ways
+to answer questions from the editor itself instead of guessing.
+
+The most useful improvement was not a better prompt. It was giving the agent two
+different environments with two different trust models:
+
+1. A constrained, read-oriented connection to my running Emacs.
+2. A disposable container where it can load my configuration and run tests.
+
+Together they create a practical loop: inspect the real environment, make a
+small change, test it somewhere disposable, and only then use it in my normal
+editor.
+
+* Query the Editor That Is Actually Running
+
+An agent can often explain standard Emacs behavior from its training data, but
+my questions are rarely about an abstract, default installation. They are about
+my installed version of Emacs, my packages, my configuration, and the state of
+the buffer in front of me.
+
+Without access to that information, the agent has to make assumptions. Is a
+function installed? Which package defines it? What value does a buffer-local
+variable have? Which command does a key invoke after all active maps are taken
+into account? Those assumptions can make otherwise reasonable advice useless.
+
+I created a =query-running-emacs= agent skill to answer those questions through
+=emacsclient=. For example, the agent can inspect basic runtime information:
+
+#+begin_src sh
+.agents/skills/query-running-emacs/scripts/query-emacs-eval.sh \
+    '(list :emacs-version emacs-version
+           :user-emacs-directory user-emacs-directory)'
+#+end_src
+
+It can also ask Emacs what a key currently does:
+
+#+begin_src sh
+.agents/skills/query-running-emacs/scripts/query-emacs-eval.sh \
+    '(key-binding (kbd "C-x C-f"))'
+#+end_src
+
+This is much more reliable than asking the agent to infer the answer from one
+configuration file. Emacs key resolution can involve global maps, major and
+minor modes, emulation maps, package loading, and buffer-local state. The
+running editor is the authoritative source.
+
+The skill does not give the agent unrestricted access to evaluate Lisp in my
+live Emacs. A wrapper script checks the expression against an allowlist of
+read-oriented starting forms and a blocklist of forms associated with mutation,
+file operations, process creation, loading, networking, and arbitrary
+evaluation. Queries such as =documentation=, =symbol-value=, =key-binding=, and
+=symbol-file= are allowed; operations such as =setq=, =load=, =write-file=, and
+=shell-command= are rejected.
+
+This wrapper is a useful guardrail, not a security proof. Emacs Lisp is dynamic,
+and syntactic allowlists and blocklists are not a complete sandbox. An allowed
+operation might still expose sensitive information, and indirect behavior is
+hard to rule out. I treat the interface as a deliberately narrow inspection
+tool, review changes to its policy carefully, and keep experimentation out of
+my live editor.
+
+* Give the Agent Somewhere Disposable to Experiment
+
+Inspection answers questions, but configuration work also requires executing
+new code. For that I created a second skill, =test-emacs-config=, which starts a
+Fedora container with Emacs and my configuration mounted into it.
+
+The container uses the same Fedora release as the host and installs Emacs along
+with a few tools used by my configuration. The configuration and test files are
+mounted read-only. The container is removed after each run, drops Linux
+capabilities, and runs with =no-new-privileges=. Unlike the live-query wrapper,
+the test environment permits arbitrary Elisp because damage is confined to the
+disposable Emacs process and its container.
+
+The simplest test checks that the configuration loads without an error:
+
+#+begin_src sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --eval '(princ "ok\n")'
+#+end_src
+
+That smoke test catches a surprising number of mistakes: malformed Lisp,
+misspelled functions, incorrect package setup, and configuration evaluated in
+the wrong order.
+
+I also use more focused tests. One file asserts that Evil and leader bindings
+resolve to the intended commands:
+
+#+begin_src sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --load /workspace/test-emacs-config/check-evil-bindings.el
+#+end_src
+
+Custom functions have ERT tests that exercise their behavior rather than merely
+checking whether a key points at them:
+
+#+begin_src sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --load /workspace/emacs-tests/init-test.el \
+    --funcall ert-run-tests-batch-and-exit
+#+end_src
+
+Normal test runs reuse a named package cache so that every invocation does not
+download all dependencies again. A =--fresh= option omits that cache when I want
+to verify a clean package bootstrap. That gives me fast feedback most of the
+time without losing the ability to reproduce a first installation.
+
+The container is a stronger boundary than the live query filter, but it is
+still not magic. Its mounts, network access, package cache, and runtime options
+are part of the threat model and need to be understood. The important design
+choice is that the agent performs broad experiments in an expendable
+environment, not in the Emacs session containing my actual work.
+
+* The Working Loop
+
+With both skills available, a typical customization now looks like this:
+
+1. I describe the behavior I want, usually in terms of the workflow rather than
+   a particular Emacs function.
+2. The agent queries my running Emacs for relevant documentation, active key
+   bindings, package versions, variables, and source locations.
+3. It reads the configuration and proposes or implements a small change.
+4. It loads the complete configuration in the container.
+5. It runs focused assertions for keymaps or ERT tests for custom logic.
+6. I review the change and try it in my normal Emacs.
+
+This division is important. The live editor supplies accurate context, while
+the container supplies freedom to fail. Neither environment has to serve both
+purposes.
+
+Tests also make later customization safer. A keybinding configuration can
+quietly change when a package loads in a different order or defines a more
+specific map. An assertion that asks Emacs what command actually wins will catch
+that. A custom function can remain correctly bound while its implementation is
+broken, which is why its logic needs a separate ERT test.
+
+* AI as an Interface to Emacs, Not a Replacement for Learning It
+
+I started using Emacs after watching Bash Bunni's Doom Emacs video, so I am
+still early in the process. The agent has not removed the need to learn Emacs or
+Emacs Lisp. It has shortened the distance between a question and the relevant
+documentation, and it can explain that documentation in the context of my
+actual setup.
+
+I still decide what behavior I want, review the diff, and judge whether the
+result feels right in daily use. When the agent writes a custom function, tests
+help establish what it does, but I still need to understand why it belongs in
+my configuration. The goal is not to delegate ownership of the editor. It is to
+make exploration faster and mistakes cheaper.
+
+The larger lesson applies beyond Emacs. An AI agent becomes much more useful
+when it has a narrow way to inspect the real system and a separate disposable
+place to experiment. Emacs simply makes this pattern especially effective
+because so much of the editor can already describe itself.
+
+* A Note on This Article
+
+The original Reddit post was written without AI. This expanded draft was
+created from that post with the same kind of AI coding agent and tooling
+described above.

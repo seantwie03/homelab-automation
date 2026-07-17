@@ -1,0 +1,89 @@
+#+title: Using AI to Learn and Customize Emacs
+#+property: PROMO_POST_TEXT Emacs is unusually friendly to AI agents: it can describe its own functions, variables, and active keybindings. I gave an agent constrained access to inspect my running editor and a disposable container for testing changes. Here is the workflow, its safeguards, and its limits: [POST_URL]
+
+I have been using an AI coding agent to learn and customize Emacs. Emacs turns
+out to be unusually well suited to this: the documentation and introspection
+that help humans also let an agent answer questions from the editor itself
+instead of guessing.
+
+The biggest improvement was giving the agent two environments with different
+trust models:
+
+1. A constrained, read-oriented connection to my running Emacs.
+2. A disposable container where it can load my configuration and run tests.
+
+* Inspect the Real Editor
+
+Most of my questions are not about default Emacs. They are about my installed
+packages, active modes, buffer-local variables, and keymaps. A configuration
+file alone may not reveal which command ultimately wins after all active maps
+are considered.
+
+I created a =query-running-emacs= agent skill that uses =emacsclient= to ask the
+running editor directly:
+
+#+begin_src sh
+.agents/skills/query-running-emacs/scripts/query-emacs-eval.sh \
+    '(key-binding (kbd "C-x C-f"))'
+#+end_src
+
+The wrapper does not permit unrestricted Elisp. It requires a read-oriented
+starting form and blocks forms associated with mutation, file writes, process
+creation, loading, networking, and arbitrary evaluation. The agent can inspect
+documentation, values, bindings, and source locations without being allowed to
+run =setq=, =load=, or =shell-command= in my live editor.
+
+This is a guardrail, not a complete security boundary. Emacs Lisp is dynamic,
+and syntactic allowlists and blocklists cannot prove that an expression is
+harmless. I keep the interface narrow and reserve experimentation for a separate
+environment.
+
+* Test Somewhere Disposable
+
+My =test-emacs-config= skill starts a Fedora container using the same Fedora
+release as the host. It installs Emacs, mounts my configuration and tests
+read-only, drops Linux capabilities, and removes the container after the run.
+
+The first test is simply loading the complete configuration:
+
+#+begin_src sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --eval '(princ "ok\n")'
+#+end_src
+
+That catches malformed Lisp, missing functions, package setup errors, and
+incorrect load order. I also have assertions for Evil and leader keymaps, plus
+ERT tests for the behavior of custom functions. The container allows arbitrary
+Elisp because failures happen in a disposable Emacs rather than the session
+containing my work.
+
+Normal runs reuse a package cache for speed. A =--fresh= option verifies that a
+clean package bootstrap still works. The container is a much stronger boundary
+than the query wrapper, although its mounts, network access, and persistent
+package cache still need to be treated as part of the threat model.
+
+* The Workflow
+
+A typical change now follows a short loop:
+
+1. I describe the behavior I want.
+2. The agent queries my running Emacs for the relevant facts and documentation.
+3. It makes a small configuration change.
+4. It loads the config and runs focused tests in the container.
+5. I review the diff and try the result in my normal editor.
+
+The live editor supplies accurate context; the container supplies freedom to
+fail. AI has not replaced learning Emacs or reviewing code. It has shortened the
+distance between a question and the relevant documentation, while making
+experiments cheaper and less risky.
+
+This pattern is useful beyond Emacs: give an agent a narrow way to inspect the
+real system and a separate disposable place to experiment. Emacs makes the
+approach especially effective because so much of the editor can describe
+itself.
+
+* A Note on This Article
+
+The original Reddit post was written without AI. This expanded draft was
+created from that post with the kind of AI coding agent and tooling it
+describes.

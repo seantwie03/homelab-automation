@@ -1,4 +1,5 @@
 local project = require('config.project')
+local search_actions = require('config.actions.search')
 
 local function find_project_files()
     require('telescope.builtin').find_files({
@@ -65,6 +66,15 @@ return {
             desc = "Telescope current_buffer_fuzzy_find",
         },
         {
+            '<Leader>*',
+            function()
+                require('telescope.builtin').current_buffer_fuzzy_find({
+                    default_text = vim.fn.expand('<cword>'),
+                })
+            end,
+            desc = 'Search symbol in current buffer',
+        },
+        {
             "<Leader>,",
             function()
                 require('telescope.builtin').buffers({
@@ -84,8 +94,40 @@ return {
         },
         { "<Leader>.",  find_project_files,                        desc = "Find project files" },
         { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },
+        { "<Leader>'",  "<Cmd>Telescope marks<CR>",               desc = "Search marks" },
+        { "<Leader>`",  "<C-^>",                                  desc = "Switch to last buffer" },
+        { "<Leader>j",  "<Cmd>Telescope jumplist<CR>",            desc = "Search jump list" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
-        { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },
+        -- Search actions
+        {
+            '<Leader>s*',
+            function()
+                require('telescope.builtin').current_buffer_fuzzy_find({
+                    default_text = vim.fn.expand('<cword>'),
+                })
+            end,
+            desc = 'Search symbol in current buffer',
+        },
+        { "<Leader>s'", "<Cmd>Telescope marks<CR>", desc = "Search marks" },
+        { '<Leader>sb', search_actions.search_open_buffers, desc = 'Search open buffers' },
+        { '<Leader>sj', '<Cmd>Telescope jumplist<CR>', desc = 'Search jump list' },
+        {
+            '<Leader>st',
+            function()
+                require('telescope.builtin').live_grep({ cwd = project.current_root() })
+            end,
+            desc = 'Search project text',
+        },
+        {
+            '<Leader>ss',
+            function()
+                require('telescope.builtin').grep_string({
+                    cwd = project.current_root(),
+                    search = vim.fn.expand('<cword>'),
+                })
+            end,
+            desc = 'Search project for symbol',
+        },
         -- File actions
         { "<Leader>ff", locate_with_telescope, desc = "Locate file with Telescope" },
         { "<Leader>fr", "<Cmd>Telescope oldfiles<CR>", desc = "Find recent files" },

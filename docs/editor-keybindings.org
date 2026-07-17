@@ -130,11 +130,10 @@ contains a =.git= directory or =.project= marker.
 | SPC s * | normal | custom         | my/search-symbol-at-point         | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
 | SPC s ' | normal | evil           | evil-show-marks                   | telescope.nvim | telescope.builtin.marks                                          |
 | SPC s b | normal | custom         | my/search-open-buffers            | custom         | search_actions.search_open_buffers                               |
-| SPC s i | normal | consult        | consult-imenu-multi               | custom         | search_actions.search_open_buffer_symbols                        |
 | SPC s j | normal | evil           | evil-show-jumps                   | telescope.nvim | telescope.builtin.jumplist                                       |
 | SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                              |
-| SPC s p | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)           |
 | SPC s s | normal | custom         | my/search-project-symbol-at-point | telescope.nvim | telescope.builtin.grep_string (cwd=project.current_root)         |
+| SPC s t | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)           |
 | SPC s u | normal | vundo          | vundo (N/I)                       | undotree       | :UndotreeToggle (N/I)                                            |
 
 * Windows (=SPC w=) mappings

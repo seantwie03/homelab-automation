@@ -231,7 +231,22 @@
    ("C-c g" . consult-ripgrep)
    ("C-c f" . consult-find)
    ("C-c i" . consult-imenu)
-   ("M-y" . consult-yank-pop)))
+   ("M-y" . consult-yank-pop))
+  :init
+  (defun my/search-symbol-at-point ()
+    "Search the current buffer for the symbol at point."
+    (interactive)
+    (consult-line (thing-at-point 'symbol t)))
+
+  (defun my/search-open-buffers ()
+    "Search text across all open buffers."
+    (interactive)
+    (consult-line-multi t))
+
+  (defun my/search-project-symbol-at-point ()
+    "Search the current project for the symbol at point."
+    (interactive)
+    (consult-ripgrep nil (thing-at-point 'symbol t))))
 
 ;;; Help and discovery
 (use-package which-key
@@ -627,14 +642,13 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-search-map
   :doc "Search and jump commands."
-  "B" #'consult-line-multi
-  "f" #'locate
-  "i" #'imenu
-  "I" #'consult-imenu-multi
-  "L" #'ffap-menu
+  "*" #'my/search-symbol-at-point
+  "'" #'evil-show-marks
+  "b" #'my/search-open-buffers
   "j" #'evil-show-jumps
   "m" #'bookmark-jump
-  "r" #'evil-show-marks)
+  "s" #'my/search-project-symbol-at-point
+  "t" #'consult-ripgrep)
 
 (defvar-keymap my/leader-toggle-map
   :doc "Toggle commands."
@@ -648,11 +662,14 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-map
   :doc "Global leader keymap."
   "." #'project-find-file
+  "*" #'my/search-symbol-at-point
   "/" #'consult-line
   "," #'project-switch-to-buffer
+  "'" #'evil-show-marks
   "`" #'evil-switch-to-windows-last-buffer
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
+  "j" #'evil-show-jumps
   "u" #'universal-argument
   "w" my/leader-windows-map
   "b" my/leader-buffers-map

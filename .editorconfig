@@ -20,8 +20,7 @@ indent_size = unset
 trim_trailing_whitespace = false
 
 [*.org]
-indent_style = space
-indent_size = 2
+indent_size = unset
 trim_trailing_whitespace = false
 
 [*-lock.json]
@@ -34,4 +33,3 @@ indent_style = unset
 indent_size = unset
 trim_trailing_whitespace = unset
 insert_final_newline = unset
-
