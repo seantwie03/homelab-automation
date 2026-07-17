@@ -550,6 +550,26 @@ unsupported because the exported text must be available immediately."
   "y" #'my/copy-file-name
   "Y" #'my/copy-project-relative-file-path)
 
+(defvar-keymap my/leader-windows-map
+  :doc "Window commands."
+  "s" #'evil-window-split
+  "v" #'evil-window-vsplit
+  "n" #'evil-window-new
+  "p" #'evil-window-mru
+  "q" #'evil-quit
+  "o" #'delete-other-windows
+  "=" #'balance-windows
+  "+" #'evil-window-increase-height
+  "-" #'evil-window-decrease-height
+  "<" #'evil-window-decrease-width
+  ">" #'evil-window-increase-width
+  "f" #'ffap-other-window
+  "T" #'tab-window-detach
+  "h" #'evil-window-move-far-left
+  "j" #'evil-window-move-very-bottom
+  "k" #'evil-window-move-very-top
+  "l" #'evil-window-move-far-right)
+
 (defvar-keymap my/leader-git-map
   :doc "Git commands."
   "R" #'vc-revert)
@@ -634,7 +654,7 @@ unsupported because the exported text must be available immediately."
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
   "u" #'universal-argument
-  "w" #'evil-window-map
+  "w" my/leader-windows-map
   "b" my/leader-buffers-map
   "c" my/leader-code-map
   "f" my/leader-files-map
@@ -658,7 +678,7 @@ unsupported because the exported text must be available immediately."
   "o" (cons "open" my/leader-open-map)
   "s" (cons "search" my/leader-search-map)
   "t" (cons "toggle" my/leader-toggle-map)
-  "w" (cons "windows" evil-window-map))
+  "w" (cons "windows" my/leader-windows-map))
 
 ;;; Evil non-leader bindings
 (with-eval-after-load 'evil

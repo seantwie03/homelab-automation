@@ -73,7 +73,7 @@ contains a =.git= directory or =.project= marker.
 | SPC b | normal | custom         | my/leader-buffers-map              | which-key.nvim | buffers group                                        |
 | SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                          |
 | SPC h | normal | custom         | my/leader-help-map                 | N/I            | N/I                                                  |
-| SPC w | normal | evil           | evil-window-map                    | N/I            | N/I                                                  |
+| SPC w | normal | custom         | my/leader-windows-map              | which-key.nvim | windows group                                        |
 
 * Buffers (=SPC b=) mappings
 
@@ -98,6 +98,28 @@ contains a =.git= directory or =.project= marker.
 | SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name                  |
 | SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
 | SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                                      |
+
+* Windows (=SPC w=) mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function                 | Nvim Provider | Nvim Function |
+|---------+--------+----------------+--------------------------------+---------------+---------------|
+| SPC w s | normal | evil           | evil-window-split              | builtin       | <C-w>s        |
+| SPC w v | normal | evil           | evil-window-vsplit             | builtin       | <C-w>v        |
+| SPC w n | normal | evil           | evil-window-new                | builtin       | <C-w>n        |
+| SPC w p | normal | evil           | evil-window-mru                | builtin       | <C-w>p        |
+| SPC w q | normal | evil           | evil-quit                      | builtin       | <C-w>q        |
+| SPC w o | normal | builtin        | delete-other-windows           | builtin       | <C-w>o        |
+| SPC w = | normal | builtin        | balance-windows                | builtin       | <C-w>=        |
+| SPC w + | normal | evil           | evil-window-increase-height    | builtin       | <C-w>+        |
+| SPC w - | normal | evil           | evil-window-decrease-height    | builtin       | <C-w>-        |
+| SPC w < | normal | evil           | evil-window-decrease-width     | builtin       | <C-w><        |
+| SPC w > | normal | evil           | evil-window-increase-width     | builtin       | <C-w>>        |
+| SPC w f | normal | builtin        | ffap-other-window              | builtin       | <C-w>f        |
+| SPC w T | normal | builtin        | tab-window-detach              | builtin       | <C-w>T        |
+| SPC w h | normal | evil           | evil-window-move-far-left      | builtin       | <C-w>H        |
+| SPC w j | normal | evil           | evil-window-move-very-bottom   | builtin       | <C-w>J        |
+| SPC w k | normal | evil           | evil-window-move-very-top      | builtin       | <C-w>K        |
+| SPC w l | normal | evil           | evil-window-move-far-right     | builtin       | <C-w>L        |
 
 * Legend
 

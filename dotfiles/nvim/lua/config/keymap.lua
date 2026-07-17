@@ -32,6 +32,25 @@ vim.keymap.set('n', '<leader>fs', ':saveas ', { desc = 'Save file as' })
 vim.keymap.set('n', '<leader>fy', file_actions.copy_file_name, { desc = 'Copy file name' })
 vim.keymap.set('n', '<leader>fY', file_actions.copy_project_relative_file_path, { desc = 'Copy file path' })
 
+-- Window actions
+vim.keymap.set('n', '<leader>ws', '<C-w>s', { desc = 'Split window horizontally' })
+vim.keymap.set('n', '<leader>wv', '<C-w>v', { desc = 'Split window vertically' })
+vim.keymap.set('n', '<leader>wn', '<C-w>n', { desc = 'Open new window' })
+vim.keymap.set('n', '<leader>wp', '<C-w>p', { desc = 'Switch to previous window' })
+vim.keymap.set('n', '<leader>wq', '<C-w>q', { desc = 'Quit window' })
+vim.keymap.set('n', '<leader>wo', '<C-w>o', { desc = 'Close other windows' })
+vim.keymap.set('n', '<leader>w=', '<C-w>=', { desc = 'Balance windows' })
+vim.keymap.set('n', '<leader>w+', '<C-w>+', { desc = 'Increase window height' })
+vim.keymap.set('n', '<leader>w-', '<C-w>-', { desc = 'Decrease window height' })
+vim.keymap.set('n', '<leader>w<', '<C-w><', { desc = 'Decrease window width' })
+vim.keymap.set('n', '<leader>w>', '<C-w>>', { desc = 'Increase window width' })
+vim.keymap.set('n', '<leader>wf', '<C-w>f', { desc = 'Open file under cursor in split' })
+vim.keymap.set('n', '<leader>wT', '<C-w>T', { desc = 'Move window to new tab' })
+vim.keymap.set('n', '<leader>wh', '<C-w>H', { desc = 'Move window left' })
+vim.keymap.set('n', '<leader>wj', '<C-w>J', { desc = 'Move window down' })
+vim.keymap.set('n', '<leader>wk', '<C-w>K', { desc = 'Move window up' })
+vim.keymap.set('n', '<leader>wl', '<C-w>L', { desc = 'Move window right' })
+
 -- mswin.vim
 -- The next several bindings are translated from mswin.vim with slight modifications.
 -- These mappings make CTRL-a, CTRL-c, CTRL-s, CTRL-v, CTRL-x, etc. act more like other editors.

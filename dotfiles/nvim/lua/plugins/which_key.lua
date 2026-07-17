@@ -8,6 +8,7 @@ return {
             { "<Leader>f", group = "files" },
             { "<Leader>p", group = "paste" },
             { "<Leader>t", group = "toggle" },
+            { "<Leader>w", group = "windows" },
         },
     },
     keys = {

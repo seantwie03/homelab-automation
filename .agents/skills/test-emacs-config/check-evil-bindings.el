@@ -90,6 +90,7 @@
                   my/leader-open-map
                   my/leader-search-map
                   my/leader-toggle-map
+                  my/leader-windows-map
                   my/org-localleader-map
                   my/org-attachments-map
                   my/org-tables-map
@@ -168,7 +169,7 @@
 (my/assert-key my/leader-map ";" #'pp-eval-expression)
 (my/assert-key my/leader-map "u" #'universal-argument)
 (my/assert-unbound my/leader-map "x")
-(my/assert-prefix-keymap my/leader-map "w" 'evil-window-map)
+(my/assert-prefix-keymap my/leader-map "w" 'my/leader-windows-map)
 (my/assert-prefix-keymap my/leader-map "b" 'my/leader-buffers-map)
 (my/assert-prefix-keymap my/leader-map "c" 'my/leader-code-map)
 (my/assert-prefix-keymap my/leader-map "f" 'my/leader-files-map)
@@ -223,6 +224,25 @@
 
 (dolist (key '("l" "S"))
   (my/assert-unbound my/leader-files-map key))
+
+(dolist (entry '(("s" . evil-window-split)
+                 ("v" . evil-window-vsplit)
+                 ("n" . evil-window-new)
+                 ("p" . evil-window-mru)
+                 ("q" . evil-quit)
+                 ("o" . delete-other-windows)
+                 ("=" . balance-windows)
+                 ("+" . evil-window-increase-height)
+                 ("-" . evil-window-decrease-height)
+                 ("<" . evil-window-decrease-width)
+                 (">" . evil-window-increase-width)
+                 ("f" . ffap-other-window)
+                 ("T" . tab-window-detach)
+                 ("h" . evil-window-move-far-left)
+                 ("j" . evil-window-move-very-bottom)
+                 ("k" . evil-window-move-very-top)
+                 ("l" . evil-window-move-far-right)))
+  (my/assert-key my/leader-windows-map (car entry) (cdr entry)))
 
 (my/assert-key my/leader-git-map "R" #'vc-revert)
 
