@@ -50,8 +50,6 @@
   :custom
   (recentf-max-saved-items 200)
   (recentf-auto-cleanup 'never)
-  :bind
-  ("C-c r" . recentf-open)
   :init
   (recentf-mode 1))
 
