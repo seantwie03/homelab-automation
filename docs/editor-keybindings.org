@@ -77,8 +77,6 @@ contains a =.git= directory or =.project= marker.
 
 * Files (=SPC f=) mappings
 
-=SPC f s= has not been implemented yet.
-
 | Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                |
 |---------+--------+----------------+------------------------------------+----------------+----------------------------------------------|
 | SPC f f | normal | builtin        | find-file                          | custom         | locate_with_telescope                        |

@@ -551,6 +551,7 @@ unsupported because the exported text must be available immediately."
   :doc "File commands."
   "f" #'find-file
   "r" #'recentf-open
+  "s" #'write-file
   "y" #'my/copy-file-name
   "Y" #'my/copy-project-relative-file-path)
 

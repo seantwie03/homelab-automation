@@ -19,6 +19,7 @@ vim.keymap.set('n', '<leader>;', ':lua =', { desc = 'Evaluate Lua expression' })
 vim.keymap.set('n', '<leader>x', buffer_actions.open_scratch_buffer, { desc = 'Open scratch buffer' })
 
 -- File actions
+vim.keymap.set('n', '<leader>fs', ':saveas ', { desc = 'Save file as' })
 vim.keymap.set('n', '<leader>fy', file_actions.copy_file_name, { desc = 'Copy file name' })
 vim.keymap.set('n', '<leader>fY', file_actions.copy_project_relative_file_path, { desc = 'Copy file path' })
 

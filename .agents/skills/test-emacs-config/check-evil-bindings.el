@@ -216,11 +216,12 @@
 
 (dolist (entry '(("f" . find-file)
                  ("r" . recentf-open)
+                 ("s" . write-file)
                  ("y" . my/copy-file-name)
                  ("Y" . my/copy-project-relative-file-path)))
   (my/assert-key my/leader-files-map (car entry) (cdr entry)))
 
-(dolist (key '("l" "s" "S"))
+(dolist (key '("l" "S"))
   (my/assert-unbound my/leader-files-map key))
 
 (my/assert-key my/leader-git-map "R" #'vc-revert)
