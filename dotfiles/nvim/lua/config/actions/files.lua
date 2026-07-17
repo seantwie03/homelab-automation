@@ -1,4 +1,5 @@
 local M = {}
+local project = require('config.project')
 
 function M.copy_file_name()
     local path = vim.api.nvim_buf_get_name(0)
@@ -23,7 +24,7 @@ function M.copy_project_relative_file_path()
         return
     end
 
-    local root = vim.fs.root(path, { '.git', '.project' })
+    local root = project.find_root(path)
     local copied_path = root and vim.fs.relpath(root, path) or path
     vim.fn.setreg('+', copied_path)
     vim.notify('Copied file path: ' .. copied_path)

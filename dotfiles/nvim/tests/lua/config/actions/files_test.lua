@@ -1,10 +1,11 @@
 local file_actions = require('config.actions.files')
+local project = require('config.project')
 local eq = MiniTest.expect.equality
 local new_set = MiniTest.new_set
 
 local original_buffer
 local original_notify
-local original_root
+local original_find_root
 local original_setreg
 local notifications
 local registers
@@ -20,7 +21,7 @@ local T = new_set({
             notifications = {}
             registers = {}
             original_notify = vim.notify
-            original_root = vim.fs.root
+            original_find_root = project.find_root
             original_setreg = vim.fn.setreg
 
             vim.notify = function(...)
@@ -32,7 +33,7 @@ local T = new_set({
         end,
         post_case = function()
             vim.notify = original_notify
-            vim.fs.root = original_root
+            project.find_root = original_find_root
             vim.fn.setreg = original_setreg
 
             if vim.api.nvim_buf_is_valid(original_buffer) then
@@ -74,7 +75,7 @@ T['copy_project_relative_file_path()'] = new_set()
 
 T['copy_project_relative_file_path()']['copies a path relative to the project root'] = function()
     vim.api.nvim_buf_set_name(test_buffer, '/tmp/project/src/main.lua')
-    vim.fs.root = function()
+    project.find_root = function()
         return '/tmp/project'
     end
 
@@ -87,7 +88,7 @@ end
 
 T['copy_project_relative_file_path()']['copies the absolute path outside a project'] = function()
     vim.api.nvim_buf_set_name(test_buffer, '/tmp/notes/todo.md')
-    vim.fs.root = function()
+    project.find_root = function()
         return nil
     end
 

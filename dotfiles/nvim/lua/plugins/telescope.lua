@@ -1,3 +1,13 @@
+local project = require('config.project')
+
+local function find_project_files()
+    require('telescope.builtin').find_files({
+        cwd = project.current_root(),
+        hidden = true,
+        no_ignore = false,
+    })
+end
+
 local function locate_with_telescope()
     local config = require("telescope.config").values
     local finders = require("telescope.finders")
@@ -61,7 +71,7 @@ return {
             end,
             desc = "Find project buffers",
         },
-        { "<Leader>.",  "<Cmd>Telescope find_files<CR>",          desc = "Find project files" },
+        { "<Leader>.",  find_project_files,                        desc = "Find project files" },
         { "<Leader>:",  "<Cmd>Telescope commands<CR>",            desc = "Telescope commands" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         { "<Leader>`",  "<Cmd>Telescope marks<CR>",               desc = "Telescope marks" },
