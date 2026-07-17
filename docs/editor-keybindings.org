@@ -72,7 +72,7 @@ contains a =.git= directory or =.project= marker.
 | SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                                  |
 | SPC b | normal | custom         | my/leader-buffers-map              | which-key.nvim | buffers group                                        |
 | SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                          |
-| SPC h | normal | custom         | my/leader-help-map                 | N/I            | N/I                                                  |
+| SPC h | normal | custom         | my/leader-help-map                 | which-key.nvim | help group                                           |
 | SPC w | normal | custom         | my/leader-windows-map              | which-key.nvim | windows group                                        |
 
 * Buffers (=SPC b=) mappings
@@ -98,6 +98,26 @@ contains a =.git= directory or =.project= marker.
 | SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name                  |
 | SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
 | SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                                      |
+
+* Help (=SPC h=) mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function        | Nvim Provider  | Nvim Function                    |
+|---------+--------+----------------+-----------------------+----------------+----------------------------------|
+| SPC h . | normal | helpful        | helpful-at-point      | builtin        | K                                |
+| SPC h a | normal | builtin        | apropos-command       | telescope.nvim | telescope.builtin.commands       |
+| SPC h b | normal | builtin        | describe-bindings     | telescope.nvim | telescope.builtin.keymaps        |
+| SPC h d | normal | builtin        | apropos-documentation | telescope.nvim | telescope.builtin.help_tags      |
+| SPC h f | normal | helpful        | helpful-callable      | N/A            | N/A                              |
+| SPC h i | normal | builtin        | info                  | N/A            | N/A                              |
+| SPC h k | normal | helpful        | helpful-key           | telescope.nvim | telescope.builtin.keymaps        |
+| SPC h m | normal | builtin        | describe-mode         | builtin        | :checkhealth                     |
+| SPC h o | normal | builtin        | describe-symbol       | builtin        | K                                |
+| SPC h p | normal | builtin        | describe-package      | lazy.nvim      | :Lazy                            |
+| SPC h r | normal | builtin        | info-emacs-manual     | builtin        | :help                            |
+| SPC h u | normal | builtin        | apropos-user-option   | telescope.nvim | telescope.builtin.vim_options    |
+| SPC h v | normal | helpful        | helpful-variable      | N/A            | N/A                              |
+| SPC h w | normal | builtin        | where-is              | telescope.nvim | telescope.builtin.keymaps        |
+| SPC h x | normal | helpful        | helpful-command       | telescope.nvim | telescope.builtin.commands       |
 
 * Windows (=SPC w=) mappings
 

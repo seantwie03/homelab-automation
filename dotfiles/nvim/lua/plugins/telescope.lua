@@ -89,6 +89,14 @@ return {
         -- File actions
         { "<Leader>ff", locate_with_telescope, desc = "Locate file with Telescope" },
         { "<Leader>fr", "<Cmd>Telescope oldfiles<CR>", desc = "Find recent files" },
+        -- Help actions
+        { "<Leader>ha", "<Cmd>Telescope commands<CR>", desc = "Search commands" },
+        { "<Leader>hb", "<Cmd>Telescope keymaps<CR>", desc = "Describe bindings" },
+        { "<Leader>hd", "<Cmd>Telescope help_tags<CR>", desc = "Search documentation" },
+        { "<Leader>hk", "<Cmd>Telescope keymaps<CR>", desc = "Describe key" },
+        { "<Leader>hu", "<Cmd>Telescope vim_options<CR>", desc = "Search options" },
+        { "<Leader>hw", "<Cmd>Telescope keymaps<CR>", desc = "Find command keymap" },
+        { "<Leader>hx", "<Cmd>Telescope commands<CR>", desc = "Describe command" },
     },
     opts = {
         defaults = {

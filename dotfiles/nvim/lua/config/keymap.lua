@@ -32,6 +32,13 @@ vim.keymap.set('n', '<leader>fs', ':saveas ', { desc = 'Save file as' })
 vim.keymap.set('n', '<leader>fy', file_actions.copy_file_name, { desc = 'Copy file name' })
 vim.keymap.set('n', '<leader>fY', file_actions.copy_project_relative_file_path, { desc = 'Copy file path' })
 
+-- Help actions
+vim.keymap.set('n', '<leader>h.', 'K', { desc = 'Help at point', remap = true })
+vim.keymap.set('n', '<leader>hm', '<Cmd>checkhealth<CR>', { desc = 'Check health' })
+vim.keymap.set('n', '<leader>ho', 'K', { desc = 'Describe symbol', remap = true })
+vim.keymap.set('n', '<leader>hp', '<Cmd>Lazy<CR>', { desc = 'Describe packages' })
+vim.keymap.set('n', '<leader>hr', '<Cmd>help<CR>', { desc = 'Open Neovim manual' })
+
 -- Window actions
 vim.keymap.set('n', '<leader>ws', '<C-w>s', { desc = 'Split window horizontally' })
 vim.keymap.set('n', '<leader>wv', '<C-w>v', { desc = 'Split window vertically' })
