@@ -1,0 +1,273 @@
+#+title: Building a Personal Development Environment With an AI Agent
+#+subtitle: Using Doom Emacs as a catalog, not a finished keybinding scheme
+
+* Introduction
+
+I use both Emacs and Neovim. That is not unusual, but it created a surprisingly
+expensive problem: the same task often required a different keybinding in each
+editor.
+
+For example, I might use =SPC /= to search in Emacs, then open Neovim and reach
+for =SPC f t= because that was how I had configured Telescope. Both commands
+performed a project-wide text search, but the difference was enough to interrupt
+muscle memory.
+
+I did not want to make Emacs behave exactly like Neovim or make Neovim emulate
+every detail of Doom Emacs. I wanted a personal development environment with a
+shared vocabulary:
+
+- =SPC b= contains buffer operations.
+- =SPC f= contains file operations.
+- =SPC h= contains help operations.
+- =SPC s= contains search operations.
+- =SPC w= contains window operations.
+
+The same key should describe the same intent in both editors, even when the
+underlying implementations are different.
+
+I used an AI coding agent to help build this environment. The useful part was
+not asking it to "make a good editor configuration." The useful part was giving
+it a constrained process: inventory, document, review, implement, and test.
+
+* Doom Emacs as a source of ideas
+
+Doom Emacs already has a large and carefully organized leader-key hierarchy. It
+was a good starting point, but it was designed for a large audience. That leads
+to aliases such as a short binding for experienced users and a longer mnemonic
+binding for discoverability.
+
+That tradeoff makes sense for a distribution. It makes less sense for one
+person. I do not need three ways to open the same picker. I will learn one and
+use it consistently.
+
+My first step was therefore not to install Doom. I asked the agent to inspect
+Doom's source code and extract its bindings into an Org table. When a binding
+delegated to another keymap, the agent followed that reference too. For example,
+Doom binds =SPC w= to Evil's window map, so understanding it required reading
+both Doom and Evil source.
+
+This turned Doom from an opaque configuration into a catalog of capabilities. I
+could review "search current buffer," "search another project," or "show undo
+history" as individual ideas without accepting Doom's entire configuration.
+
+* A shared specification before implementation
+
+The inventory eventually became =docs/editor-keybindings.org=. Each row records
+the shared key, its mode, and the provider and function used by each editor:
+
+| Key | Mode | Emacs Provider | Emacs Function | Nvim Provider | Nvim Function |
+|-----+------+----------------+----------------+---------------+---------------|
+| SPC . | normal | builtin | project-find-file | telescope.nvim | telescope.builtin.find_files |
+| SPC b x | normal | builtin | scratch-buffer | custom | buffer_actions.open_scratch_buffer |
+| SPC h d | normal | builtin | apropos-documentation | telescope.nvim | telescope.builtin.help_tags |
+
+The provider columns are important. They make the document more than a cheat
+sheet. It is also an implementation plan.
+
+I use two explicit markers:
+
+- =N/I= means the capability applies to the editor but has not been implemented.
+- =N/A= means the capability does not meaningfully apply to that editor.
+
+For example, Emacs Info and the concept of describing a major mode do not map
+cleanly onto Neovim. I do not need to invent a weak imitation just to fill every
+cell.
+
+I also removed Org's inline verbatim markers from the key and function columns.
+They were technically correct, but a table in which almost every cell was
+surrounded by punctuation was harder to scan. This is a personal document, so
+readability wins.
+
+* The human decides the semantics
+
+The agent could find commands, but it could not decide what my editor should
+mean. Several apparently simple words needed explicit definitions.
+
+** Project, workspace, and current directory
+
+Neovim is often launched with =nvim .= from a project directory. Emacs is more
+often launched once and left running while buffers from many directories and
+projects come and go.
+
+That made "current project" a semantic question rather than a naming question.
+I decided that:
+
+- In Emacs, the current project is the =project.el= project associated with the
+  active buffer.
+- In Neovim, the current project is the nearest ancestor of the current file
+  containing a root marker such as =.git= or =.project=.
+- Current-directory search and current-project search remain different
+  operations.
+
+This decision changed the implementation of several pickers. A Telescope call
+could not blindly use Neovim's process working directory. It needed a shared
+=project.current_root()= helper so =SPC .= could find files from the active
+buffer's project even when that project was not the process CWD.
+
+** Short bindings and mnemonic prefixes
+
+I kept short global bindings for frequent actions:
+
+- =SPC ,= selects a buffer from the current project.
+- =SPC .= finds a file in the current project.
+- =SPC /= searches the current buffer with an interactive result list and
+  preview.
+
+Longer prefixes organize related operations:
+
+- =SPC b b= selects from all buffers.
+- =SPC f r= selects a recent file.
+- =SPC f y= copies the current filename.
+- =SPC f Y= copies the path relative to the project root.
+
+The prefix is part of the user interface. If I know I want to do something with
+a file, I can press =SPC f= and let which-key show the available file actions.
+
+** Preserve native muscle memory where it helps
+
+For window operations, Neovim's default =C-w= map and Evil's window map are
+already very similar. I selected the useful subset and exposed it under =SPC w=
+in both editors.
+
+I kept =C-h=, =C-j=, =C-k=, and =C-l= for selecting adjacent windows. That freed
+=SPC w h/j/k/l= to move the current window left, down, up, or right. In Neovim,
+those leader bindings delegate to the uppercase =C-w H/J/K/L= commands.
+
+* Determining providers and functions
+
+Once I selected a capability, I asked the agent to identify the most appropriate
+provider in each editor.
+
+Some translations were direct:
+
+- Emacs =project-find-file= maps to Telescope =find_files= with the project root.
+- Emacs =consult-line= maps to Telescope =current_buffer_fuzzy_find=.
+- Emacs =imenu= maps conceptually to Telescope's document-symbol picker.
+- Emacs =balance-windows= maps to Neovim's =C-w ==.
+
+Others needed closer inspection. The agent used the isolated test configurations
+to query Emacs documentation and Neovim help. When a command belonged to Doom,
+it inspected Doom's source and replaced the private wrapper with a standard
+package function or a planned custom action.
+
+This exposed details that names alone hide. For example,
+=consult-line-multi= searches current-project buffers by default, not literally
+every open buffer. =consult-imenu-multi= searches buffers in the same project
+and with the same major mode. Those distinctions matter when the table is meant
+to be a behavioral specification.
+
+* Custom actions belong outside keymap files
+
+Direct mappings stay in the keymap configuration. Custom logic does not.
+
+The Neovim configuration uses modules such as:
+
+#+begin_src text
+lua/config/actions/buffers.lua
+lua/config/actions/files.lua
+lua/config/project.lua
+#+end_src
+
+The keymap file requires those modules and binds their public functions. This
+keeps it possible to scan the keymap without reading implementations inline.
+
+The same principle applies in Emacs. Custom commands use the =my/= namespace,
+while private implementation details use =my--=. Prefix maps such as
+=my/leader-files-map= and =my/leader-windows-map= describe structure without
+becoming a catch-all location for unrelated behavior.
+
+One custom Neovim example is the scratch-buffer action. It creates the scratch
+buffer once and switches back to the existing buffer on later calls. Because I
+use =C-s= to leave insert mode and save, the buffer is named under =/tmp=. An
+accidental save therefore cannot create a file named =[Scratch]= in the current
+project.
+
+* Testing the behavior, not only the key
+
+The agent was also responsible for tests, but I specified what those tests
+should prove.
+
+A test that only checks whether =SPC f y= points to a Lua function has limited
+value. The important questions are whether the function copies the basename,
+whether the relative-path function uses the correct project root, and what it
+does when the file is outside a project.
+
+Custom Emacs functions are tested with ERT. Custom Neovim functions are tested
+with MiniTest. I deliberately avoided starting new tests on Plenary because it
+was scheduled for archival. Test paths mirror source paths so it is obvious
+which file they cover.
+
+Both editor configurations run inside isolated Podman-based test environments:
+
+#+begin_src sh
+.agents/skills/test-emacs-config/scripts/emacs-container \
+    --load /workspace/emacs-tests/init-test.el \
+    --funcall ert-run-tests-batch-and-exit
+
+.agents/skills/test-neovim-config/scripts/neovim-container \
+    '+luafile /root/.config/nvim/scripts/minitest.lua'
+#+end_src
+
+There are separate integration checks for resolved keymaps and which-key group
+labels. This caught an issue that a simple string comparison would have missed:
+=SPC h .= and =SPC h o= initially expanded non-recursively to =K= in Neovim.
+That bypassed buffer-local =K= mappings, including LSP hover. Allowing the alias
+to remap preserved the context-sensitive behavior.
+
+Testing also affected production behavior in a small but useful way. Headless
+Neovim test runs were triggering installation of every Tree-sitter parser. The
+configuration still installs all parsers for interactive Neovim, but skips that
+work when no UI is attached.
+
+* The review loop matters more than generation
+
+The agent made the process faster, but it did not remove the need for review.
+Several useful changes came from rejecting the first answer:
+
+- I removed duplicate aliases that made sense for Doom's broad audience but not
+  for my personal configuration.
+- I corrected project pickers that accidentally treated the process CWD as the
+  active buffer's project root.
+- I distinguished project buffers from all buffers.
+- I rejected an elaborate Neovim variable-inspection command because Neovim's
+  process lifetime made it much less useful to me than Emacs variable help.
+- I reduced scratch-buffer work after deciding it was not an important workflow.
+
+This is the central lesson of the project. The agent is effective at source-code
+archaeology, cross-editor API discovery, repetitive implementation, and test
+generation. The human still owns vocabulary, frequency, consistency, and the
+decision that a feature is not worth having.
+
+* A repeatable workflow
+
+The process for each prefix is now predictable:
+
+1. Extract the relevant Doom bindings from source.
+2. Put every capability into the shared Org table.
+3. Explain unfamiliar commands before selecting them.
+4. Remove aliases and capabilities I will not use.
+5. Define ambiguous scopes such as buffer, directory, project, or all projects.
+6. Identify the Emacs and Neovim provider for each remaining capability.
+7. Mark editor-specific concepts as =N/A= instead of forcing equivalence.
+8. Implement direct mappings and isolate custom behavior in action modules.
+9. Test custom logic directly and verify resolved keymaps separately.
+10. Run both editor configurations in clean test containers and review the
+    resulting behavior.
+
+This is slower than asking an agent to generate an entire configuration in one
+prompt. It is much faster than discovering months later that the configuration
+contains overlapping commands, unclear project semantics, and custom functions
+that were never tested.
+
+* Conclusion
+
+The result is not "Doom bindings in Neovim" or "Vim bindings in Emacs." It is a
+small editor interface designed around how I work.
+
+Doom supplied a mature catalog. Emacs and Neovim supplied different primitives.
+The AI agent connected source code, documentation, and tests. I decided which
+ideas survived.
+
+That division of labor produced something more valuable than a generated
+dotfile: a documented development environment whose behavior I understand and
+can continue refining one prefix at a time.

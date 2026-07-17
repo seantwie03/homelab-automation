@@ -1,0 +1,114 @@
+#+title: One Set of Keybindings for Emacs and Neovim
+#+property: PROMO_POST_TEXT Org Mode pulled me from Neovim toward Emacs. Then I caught myself pressing M-w and C-y in every other app. So I used an AI agent to design and test one keybinding vocabulary for both editors. Here's how it worked, and where human review mattered: [POST_URL]
+
+I am a long-time Neovim user, but Org Mode drew me toward Emacs. Like many new
+Emacs users, I followed the common advice to learn the standard Emacs
+keybindings before changing anything.
+
+Then I started pressing =M-w= and =C-y= in applications that were not Emacs.
+
+Instead of bringing familiar shortcuts into Emacs, I was training myself to use
+Emacs-specific shortcuts everywhere else. That frustration turned me away from
+standard Emacs bindings.
+
+I also realized that I will probably never stop using Vim completely. It will
+still appear on servers, in terminal sessions, and in existing workflows. I
+wanted to know whether Emacs and Neovim could share one consistent set of
+keybindings.
+
+It turns out they can.
+
+* Start with a shared vocabulary
+
+The goal was not to make the editors identical. It was to use the same key for
+the same intent:
+
+- =SPC b= for buffers
+- =SPC f= for files
+- =SPC h= for help
+- =SPC s= for search
+- =SPC w= for windows
+
+This also makes which-key useful. If I want a file operation, I can press
+=SPC f= and inspect the available choices without remembering which editor or
+plugin provides them.
+
+* Use Doom Emacs as a catalog
+
+Doom Emacs already has a mature leader-key hierarchy. Rather than adopt all of
+Doom, I asked an AI coding agent to inspect its source and extract the bindings
+into an Org table. When Doom delegated a prefix to Evil, the agent followed that
+reference too.
+
+I reviewed the resulting capabilities one at a time and removed aliases I would
+not use. Doom serves many people, so multiple ways to perform an action are
+reasonable. My configuration serves one person. I would rather learn one way
+and use it consistently.
+
+* Document before implementing
+
+The selected bindings live in =docs/editor-keybindings.org=. Each row records
+the key and the provider and function used by both editors:
+
+| Key | Emacs Function | Neovim Function |
+|-----+----------------+------------------|
+| SPC . | project-find-file | telescope.builtin.find_files |
+| SPC b x | scratch-buffer | buffer_actions.open_scratch_buffer |
+| SPC h d | apropos-documentation | telescope.builtin.help_tags |
+
+The table is both a reference and an implementation plan. =N/I= means a
+capability has not been implemented; =N/A= means it does not meaningfully apply
+to that editor.
+
+Writing the specification first forced me to define ambiguous words. In Emacs,
+the current project is the =project.el= project associated with the active
+buffer. In Neovim, it is found by walking upward from the current file to a
+project marker such as =.git=. Current-directory search and project-root search
+remain different operations.
+
+* Find equivalent providers
+
+After I selected a capability, the agent queried Emacs documentation, read
+Neovim help, and searched Doom source to identify an implementation for each
+editor.
+
+Some translations were direct. Emacs =consult-line= and Telescope's
+=current_buffer_fuzzy_find= both provide interactive current-buffer search.
+Others exposed important differences. =consult-line-multi= searches project
+buffers by default, not every open buffer. Those details had to be reviewed
+before implementation.
+
+Custom behavior stays outside the keymap files. Neovim actions live in modules
+such as =lua/config/actions/files.lua=. Emacs commands use the =my/= namespace.
+The keymaps remain readable because they describe bindings instead of containing
+their implementations.
+
+* Test behavior, not only mappings
+
+Custom Emacs functions are tested with ERT, and Neovim functions with MiniTest.
+Both configurations run in isolated Podman containers. Separate integration
+checks verify resolved mappings and which-key labels.
+
+The tests caught practical mistakes. A Neovim help alias initially bypassed
+buffer-local =K= mappings, including LSP hover. The scratch-buffer tests also
+helped ensure that the same buffer is reused and named under =/tmp=, where an
+accidental save cannot create =[Scratch]= inside a project.
+
+* What the agent did, and what I did
+
+The agent accelerated source-code archaeology, provider research,
+implementation, and testing. It did not decide what my editor should feel like.
+
+I still had to remove duplicates, define project semantics, reject features I
+would not use, and try the bindings in real work. The effective process was:
+
+1. Inventory the available ideas.
+2. Select and document the desired behavior.
+3. Find an implementation in each editor.
+4. Isolate and test custom logic.
+5. Use the bindings and revise them.
+
+The result is not Doom inside Neovim or Vim inside Emacs. It is a small shared
+interface above two different editors. Org Mode can remain a reason to use
+Emacs, and Neovim can remain part of my workflow, without requiring a complete
+change of muscle memory every time I switch between them.

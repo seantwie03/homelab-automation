@@ -61,19 +61,23 @@ In Emacs, the current project is the =project.el= project associated with the
 current buffer. In Neovim, it is the nearest ancestor of the current file that
 contains a =.git= directory or =.project= marker.
 
-| Key   | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                        |
-|-------+--------+----------------+------------------------------------+----------------+------------------------------------------------------|
-| SPC . | normal | builtin        | project-find-file                  | telescope.nvim | telescope.builtin.find_files                         |
-| SPC , | normal | builtin        | project-switch-to-buffer           | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root) |
-| SPC ` | normal | evil           | evil-switch-to-windows-last-buffer | telescope.nvim | telescope.builtin.marks                              |
-| SPC / | normal | consult        | consult-line                       | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find          |
-| SPC : | normal | builtin        | execute-extended-command           | telescope.nvim | telescope.builtin.commands                           |
-| SPC ; | normal | builtin        | pp-eval-expression                 | builtin        | :lua =                                               |
-| SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                                  |
-| SPC b | normal | custom         | my/leader-buffers-map              | which-key.nvim | buffers group                                        |
-| SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                          |
-| SPC h | normal | custom         | my/leader-help-map                 | which-key.nvim | help group                                           |
-| SPC w | normal | custom         | my/leader-windows-map              | which-key.nvim | windows group                                        |
+| Key   | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                                    |
+|-------+--------+----------------+------------------------------------+----------------+------------------------------------------------------------------|
+| SPC . | normal | builtin        | project-find-file                  | telescope.nvim | telescope.builtin.find_files                                     |
+| SPC * | normal | custom         | my/search-symbol-at-point          | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
+| SPC , | normal | builtin        | project-switch-to-buffer           | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root)             |
+| SPC ' | normal | evil           | evil-show-marks                    | telescope.nvim | telescope.builtin.marks                                          |
+| SPC ` | normal | evil           | evil-switch-to-windows-last-buffer | builtin        | <C-^>                                                            |
+| SPC / | normal | consult        | consult-line                       | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find                      |
+| SPC : | normal | builtin        | execute-extended-command           | telescope.nvim | telescope.builtin.commands                                       |
+| SPC ; | normal | builtin        | pp-eval-expression                 | builtin        | :lua =                                                           |
+| SPC u | normal | builtin        | universal-argument                 | N/I            | N/I                                                              |
+| SPC b | normal | custom         | my/leader-buffers-map              | which-key.nvim | buffers group                                                    |
+| SPC f | normal | custom         | my/leader-files-map                | which-key.nvim | files group                                                      |
+| SPC h | normal | custom         | my/leader-help-map                 | which-key.nvim | help group                                                       |
+| SPC j | normal | evil           | evil-show-jumps                    | telescope.nvim | telescope.builtin.jumplist                                       |
+| SPC s | normal | custom         | my/leader-search-map               | which-key.nvim | search group                                                     |
+| SPC w | normal | custom         | my/leader-windows-map              | which-key.nvim | windows group                                                    |
 
 * Buffers (=SPC b=) mappings
 
@@ -118,6 +122,20 @@ contains a =.git= directory or =.project= marker.
 | SPC h v | normal | helpful        | helpful-variable      | N/A            | N/A                              |
 | SPC h w | normal | builtin        | where-is              | telescope.nvim | telescope.builtin.keymaps        |
 | SPC h x | normal | helpful        | helpful-command       | telescope.nvim | telescope.builtin.commands       |
+
+* Search (=SPC s=) mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function                    | Nvim Provider  | Nvim Function                                                    |
+|---------+--------+----------------+-----------------------------------+----------------+------------------------------------------------------------------|
+| SPC s * | normal | custom         | my/search-symbol-at-point         | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
+| SPC s ' | normal | evil           | evil-show-marks                   | telescope.nvim | telescope.builtin.marks                                          |
+| SPC s b | normal | custom         | my/search-open-buffers            | custom         | search_actions.search_open_buffers                               |
+| SPC s i | normal | consult        | consult-imenu-multi               | custom         | search_actions.search_open_buffer_symbols                        |
+| SPC s j | normal | evil           | evil-show-jumps                   | telescope.nvim | telescope.builtin.jumplist                                       |
+| SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                              |
+| SPC s p | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)           |
+| SPC s s | normal | custom         | my/search-project-symbol-at-point | telescope.nvim | telescope.builtin.grep_string (cwd=project.current_root)         |
+| SPC s u | normal | vundo          | vundo (N/I)                       | undotree       | :UndotreeToggle (N/I)                                            |
 
 * Windows (=SPC w=) mappings
 
