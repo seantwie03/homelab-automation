@@ -105,8 +105,10 @@
                (lambda (&rest values)
                  (setq arguments values))))
       (my/org-find-file-in-notes))
-    (should (equal arguments
-                   '(nil ("/tmp/notes") nil t)))))
+    (should (equal (nth 0 arguments) nil))
+    (should (equal (nth 1 arguments) '("/tmp/notes/")))
+    (should (equal (project-root (nth 2 arguments)) "/tmp/notes/"))
+    (should (equal (nth 3 arguments) t))))
 
 (ert-deftest my/org-browse-notes-opens-org-directory ()
   (let ((org-directory "/tmp/notes")
@@ -125,6 +127,78 @@
                  (setq directory value))))
       (my/org-search-notes))
     (should (equal directory "/tmp/notes"))))
+
+(ert-deftest my/org-command-and-enter-insert-state-runs-in-order ()
+  (let (calls)
+    (cl-letf (((symbol-function 'call-interactively)
+               (lambda (command &optional _record-flag _keys)
+                 (push command calls)))
+              ((symbol-function 'evil-insert-state)
+               (lambda (&optional _count)
+                 (push 'insert-state calls))))
+      (my/org-command-and-enter-insert-state #'org-insert-subheading))
+    (should (equal (nreverse calls)
+                   '(org-insert-subheading insert-state)))))
+
+(ert-deftest my/org-meta-return-appends-a-list-item-and-starts-editing ()
+  (with-temp-buffer
+    (org-mode)
+    (insert "- [ ] Existing task")
+    (evil-normal-state)
+    (search-backward "Existing")
+    (my/org-meta-return)
+    (should (equal (buffer-string)
+                   "- [ ] Existing task\n- "))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/org-meta-shift-return-appends-a-todo-item-and-starts-editing ()
+  (with-temp-buffer
+    (org-mode)
+    (insert "- [ ] Existing task")
+    (evil-normal-state)
+    (search-backward "Existing")
+    (my/org-insert-todo-heading)
+    (should (equal (buffer-string)
+                   "- [ ] Existing task\n- [ ] "))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/org-task-capture-targets-the-inbox-file ()
+  (require 'org-capture)
+  (let* ((template (assoc "t" org-capture-templates))
+         (target (nth 3 template)))
+    (should (equal target
+                   `(file ,(expand-file-name "inbox.org" org-directory))))))
+
+(ert-deftest my/org-task-capture-separates-top-level-headings ()
+  (require 'org-capture)
+  (let* ((file (make-temp-file "org-capture-spacing-" nil ".org"
+                               "* TODO Existing\n"))
+         (template (copy-tree (assoc "t" org-capture-templates)))
+         (org-capture-templates (list template)))
+    (unwind-protect
+        (progn
+          (setf (nth 3 template) `(file ,file))
+          (org-capture-string "" "t")
+          (when (org-capture-get :buffer)
+            (org-capture-finalize))
+          (with-temp-buffer
+            (insert-file-contents file)
+            (should (string-match-p
+                     "\\* TODO Existing\n\n\\* TODO"
+                     (buffer-string)))))
+      (ignore-errors (org-capture-kill))
+      (delete-file file))))
+
+(ert-deftest my/org-capture-starts-in-evil-insert-state ()
+  (require 'org-capture)
+  (should (memq #'evil-insert-state org-capture-mode-hook))
+  (let ((org-capture-mode-hook '(evil-insert-state))
+        called)
+    (cl-letf (((symbol-function 'evil-insert-state)
+               (lambda (&optional _count)
+                 (setq called t))))
+      (run-hooks 'org-capture-mode-hook))
+    (should called)))
 
 (ert-deftest my/org-rich-text-export-uses-the-active-region ()
   (let (clipboard kill-ring-text)

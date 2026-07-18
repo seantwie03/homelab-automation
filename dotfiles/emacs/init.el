@@ -329,7 +329,10 @@ Copy the absolute path when the file is not in a project."
     "Find a file beneath `org-directory'."
     (interactive)
     (require 'org)
-    (project-find-file-in nil (list org-directory) nil t))
+    (let* ((root (file-name-as-directory
+                  (expand-file-name org-directory)))
+           (project (cons 'transient root)))
+      (project-find-file-in nil (list root) project t)))
 
   (defun my/org-browse-notes ()
     "Open `org-directory' in Dired."
@@ -342,6 +345,47 @@ Copy the absolute path when the file is not in a project."
     (interactive)
     (require 'org)
     (consult-ripgrep org-directory))
+
+  (defun my/org-command-and-enter-insert-state (command)
+    "Call COMMAND interactively, then enter Evil insert state."
+    (call-interactively command)
+    (evil-insert-state))
+
+  (defun my/org-insert-heading-respect-content ()
+    "Insert an Org heading after the current subtree and start editing."
+    (interactive)
+    (my/org-command-and-enter-insert-state
+     #'org-insert-heading-respect-content))
+
+  (defun my/org-meta-return ()
+    "Append an Org item in Evil normal state and start editing it."
+    (interactive)
+    (when (evil-normal-state-p)
+      (end-of-line))
+    (my/org-command-and-enter-insert-state #'org-meta-return))
+
+  (defun my/org-insert-subheading ()
+    "Insert an Org subheading and enter Evil insert state."
+    (interactive)
+    (my/org-command-and-enter-insert-state #'org-insert-subheading))
+
+  (defun my/org-table-copy-down ()
+    "Run `org-table-copy-down' and enter Evil insert state."
+    (interactive)
+    (my/org-command-and-enter-insert-state #'org-table-copy-down))
+
+  (defun my/org-insert-todo-heading-respect-content ()
+    "Insert a TODO heading after the current subtree and start editing."
+    (interactive)
+    (my/org-command-and-enter-insert-state
+     #'org-insert-todo-heading-respect-content))
+
+  (defun my/org-insert-todo-heading ()
+    "Append an Org TODO item in Evil normal state and start editing it."
+    (interactive)
+    (when (evil-normal-state-p)
+      (end-of-line))
+    (my/org-command-and-enter-insert-state #'org-insert-todo-heading))
 
   :custom
   ;;; File Structure
@@ -362,15 +406,10 @@ Copy the absolute path when the file is not in a project."
   ;;; Export
   (org-export-with-toc nil)
 
-  ;;; Capture
+  ;;; Logging
   (org-log-done 'time)
   (org-log-repeat 'time)
   (org-log-into-drawer "LOGBOOK")
-
-  (org-capture-templates
-   '(("t" "Task" entry
-      (file ,(expand-file-name "inbox.org" org-directory))
-      "* TODO %?\n:LOGBOOK:\n- Created: %U\n:END:\n")))
 
   ;; TODO workflow:
   ;; TODO      = known work, but not currently active/actionable
@@ -441,6 +480,18 @@ Copy the absolute path when the file is not in a project."
   (set-face-attribute 'org-level-4 nil :height 1.10)
   (set-face-attribute 'org-level-5 nil :height 1.05)
   (require 'org-habit))
+
+(use-package org-capture
+  :ensure nil
+  :after (org evil)
+  :custom
+  (org-capture-templates
+   `(("t" "Task" entry
+      (file ,(expand-file-name "inbox.org" org-directory))
+      "* TODO %?\n:LOGBOOK:\n- Created: %U\n:END:\n"
+      :empty-lines-before 1)))
+  :hook
+  (org-capture-mode . evil-insert-state))
 
 (use-package ox-gfm
   :ensure t
@@ -659,7 +710,7 @@ unsupported because the exported text must be available immediately."
   "l" #'org-store-link
   "m" #'org-tags-view
   "n" #'org-capture
-  "N" #'org-capture-goto-target
+  "N" #'org-capture-goto-last-stored
   "s" #'my/org-search-notes
   "t" #'org-todo-list
   "y" #'my/org-gfm-export-to-clipboard
@@ -955,7 +1006,12 @@ unsupported because the exported text must be available immediately."
       (kbd "C-M-<return>") #'org-insert-subheading)
     (evil-define-key '(normal visual motion) org-mode-map
       (kbd "\\") my/org-localleader-map
-      (kbd "C-M-<return>") #'org-insert-subheading
+      (kbd "C-<return>") #'my/org-insert-heading-respect-content
+      (kbd "M-<return>") #'my/org-meta-return
+      (kbd "C-M-<return>") #'my/org-insert-subheading
+      (kbd "S-<return>") #'my/org-table-copy-down
+      (kbd "C-S-<return>") #'my/org-insert-todo-heading-respect-content
+      (kbd "M-S-<return>") #'my/org-insert-todo-heading
       (kbd "] h") #'org-forward-heading-same-level
       (kbd "[ h") #'org-backward-heading-same-level
       (kbd "] l") #'org-next-link
