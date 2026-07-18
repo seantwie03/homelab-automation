@@ -387,6 +387,42 @@ Copy the absolute path when the file is not in a project."
       (end-of-line))
     (my/org-command-and-enter-insert-state #'org-insert-todo-heading))
 
+  (defun my/org-open-fold ()
+    "Open the current Org fold while leaving nested folds closed."
+    (interactive)
+    (save-excursion
+      (org-back-to-heading t)
+      (org-fold-show-entry)
+      (org-fold-show-children)))
+
+  (defun my--org-visible-fold-level ()
+    "Return the deepest folded Org heading level in the visible window."
+    (let ((level 1))
+      (save-restriction
+        (narrow-to-region (window-start) (window-end))
+        (save-excursion
+          (goto-char (point-min))
+          (while (not (eobp))
+            (org-next-visible-heading 1)
+            (when (memq (get-char-property (line-end-position) 'invisible)
+                        '(outline org-fold-outline))
+              (setq level (max level (org-outline-level)))))))
+      level))
+
+  (defun my/org-hide-next-fold-level (&optional count)
+    "Hide COUNT additional Org outline levels in the visible window."
+    (interactive "p")
+    (let ((level (max 1 (- (my--org-visible-fold-level) (or count 1)))))
+      (outline-hide-sublevels level)
+      (message "Folded to level %s" level)))
+
+  (defun my/org-show-next-fold-level (&optional count)
+    "Show COUNT additional Org outline levels in the visible window."
+    (interactive "p")
+    (let ((level (+ (my--org-visible-fold-level) (or count 1))))
+      (outline-hide-sublevels level)
+      (message "Folded to level %s" level)))
+
   :custom
   ;;; File Structure
   (org-directory "~/u/org")
@@ -1018,8 +1054,15 @@ unsupported because the exported text must be available immediately."
       (kbd "[ l") #'org-previous-link
       (kbd "] c") #'org-babel-next-src-block
       (kbd "[ c") #'org-babel-previous-src-block
+      (kbd "z a") #'org-cycle
       (kbd "z A") #'org-shifttab
+      (kbd "z c") #'outline-hide-subtree
       (kbd "z C") #'outline-hide-subtree
+      (kbd "z m") #'my/org-hide-next-fold-level
+      (kbd "z M") #'org-overview
       (kbd "z n") #'org-tree-to-indirect-buffer
+      (kbd "z o") #'my/org-open-fold
       (kbd "z O") #'outline-show-subtree
+      (kbd "z r") #'my/org-show-next-fold-level
+      (kbd "z R") #'outline-show-all
       (kbd "z i") #'org-toggle-inline-images)))
