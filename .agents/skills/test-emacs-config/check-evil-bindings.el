@@ -154,6 +154,14 @@
 (my/assert-key evil-normal-state-map "C-k" #'evil-window-up)
 (my/assert-key evil-normal-state-map "C-h" #'evil-window-left)
 (my/assert-key evil-normal-state-map "C-l" #'evil-window-right)
+(my/assert-key evil-normal-state-map "C-d" #'my/evil-scroll-down-and-center)
+(my/assert-key evil-normal-state-map "C-u" #'my/evil-scroll-up-and-center)
+(my/assert-key evil-normal-state-map "n" #'my/evil-search-next-and-center)
+(my/assert-key evil-normal-state-map "N" #'my/evil-search-previous-and-center)
+(my/assert-key evil-normal-state-map
+               "{" #'my/evil-backward-paragraph-and-center)
+(my/assert-key evil-normal-state-map
+               "}" #'my/evil-forward-paragraph-and-center)
 (my/assert-key evil-normal-state-map "-" #'dired-jump)
 
 ;;; Leader bindings

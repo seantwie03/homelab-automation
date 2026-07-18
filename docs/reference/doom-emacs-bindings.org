@@ -1,0 +1,503 @@
+#+title: Doom Emacs Bindings Reference
+
+* Non-leader bindings
+
+| Key         | Mode           | Binding                                              | Doom function |
+|-------------+----------------+------------------------------------------------------+-----------------------------------------|
+| =j=         | normal, visual | visual-line down                                     | =evil-next-visual-line= |
+| =k=         | normal, visual | visual-line up                                       | =evil-previous-visual-line= |
+| =<Down>=    | normal, visual | visual-line down                                     | =evil-next-visual-line= |
+| =<Up>=      | normal, visual | visual-line up                                       | =evil-previous-visual-line= |
+| =<Down>=    | insert         | visual-line down                                     | =evil-next-visual-line= |
+| =<Up>=      | insert         | visual-line up                                       | =evil-previous-visual-line= |
+| =0=         | normal         | first press to indentation, second press to column 0 | =my/evil-smart-beginning-of-line= |
+| =Y=         | normal         | yank to end of line                                  | =evil-yank-line= |
+| =Y=         | visual         | yank to end of line                                  | =evil-yank= |
+| =C-a=       | normal         | select all                                           | =mark-whole-buffer= |
+| =C-a=       | insert         | select all                                           | =mark-whole-buffer= |
+| =C-c=       | normal         | removed; preserve Emacs =C-c= prefix                 | =undefined= |
+| =C-c=       | insert         | removed; preserve Emacs =C-c= prefix                 | =undefined= |
+| =C-c=       | visual         | copy selection to system clipboard                   | =clipboard-kill-ring-save= |
+| =C-Insert=  | visual         | copy selection to system clipboard                   | =clipboard-kill-ring-save= |
+| =C-v=       | insert         | paste from system clipboard                          | =clipboard-yank= |
+| =C-v=       | visual         | paste over selection without replacing clipboard     | =evil-visual-paste= |
+| =S-Insert=  | insert         | paste from system clipboard                          | =clipboard-yank= |
+| =C-x=       | normal         | removed; preserve Emacs =C-x= prefix                 | =undefined= |
+| =C-x=       | insert         | removed; preserve Emacs =C-x= prefix                 | =undefined= |
+| =C-x=       | visual         | cut selection                                        | =clipboard-kill-region= |
+| =S-Del=     | normal         | cut current line                                     | =evil-delete-line= |
+| =S-Del=     | visual         | cut selection                                        | =clipboard-kill-region= |
+| =C-s=       | normal, visual | save buffer                                          | =save-buffer= |
+| =C-s=       | insert         | enter normal state, then save buffer                 | =my/evil-normal-state-and-save= |
+| =C-r=       | normal         | redo with =undo-redo= backend                        | =evil-redo= |
+| =Backspace= | visual         | delete selection without yanking                     | =evil-delete= |
+| =C-h=       | insert         | delete word before cursor                            | =evil-delete-backward-word= |
+| =C-Del=     | normal, visual | delete word ahead without yanking                    | =my/evil-delete-word-no-yank= |
+| =C-Del=     | insert         | delete word ahead without yanking                    | =my/evil-delete-word-no-yank= |
+| =C-j=       | normal         | move to window below                                 | =evil-window-down= |
+| =C-k=       | normal         | move to window above                                 | =evil-window-up= |
+| =C-h=       | normal         | move to window left                                  | =evil-window-left= |
+| =C-l=       | normal         | move to window right                                 | =evil-window-right= |
+| =C-d=       | normal         | half-page down and recenter                          | =my/evil-scroll-down-and-center= |
+| =C-u=       | normal         | half-page up and recenter                            | =my/evil-scroll-up-and-center= |
+| =n=         | normal         | next search match and recenter                       | =my/evil-search-next-and-center= |
+| =N=         | normal         | previous search match and recenter                   | =my/evil-search-previous-and-center= |
+| ={=         | normal         | previous paragraph and recenter                      | =my/evil-backward-paragraph-and-center= |
+| =}=         | normal         | next paragraph and recenter                          | =my/evil-forward-paragraph-and-center= |
+| =-=         | normal         | open directory browser / dired jump                  | =dired-jump= |
+| =C-Space=   | all            |                                                      | |
+
+* Evil Ex commands
+
+| Command      | Binding                    | Doom function |
+|--------------+----------------------------+----------------------|
+| =:q=         | close current buffer       | =evil-delete-buffer= |
+| =:quit=      | close current buffer       | =evil-delete-buffer= |
+| =:qa=        | quit Emacs, asking to save | =evil-quit-all= |
+| =:qall=      | quit Emacs, asking to save | =evil-quit-all= |
+
+* Doom-style global leader
+
+| Key     | Binding                                     | Doom function |
+|---------+---------------------------------------------+-----------------------------------------------|
+| =SPC .= | find file                                   | =find-file= |
+| =SPC ,= | switch buffer                               | =switch-to-buffer= |
+| =SPC <= | switch buffer across all buffers/workspaces | =switch-to-buffer= |
+| =SPC `= | switch to last buffer                       | =evil-switch-to-windows-last-buffer= |
+| =SPC /= | search project                              | =consult-ripgrep= |
+| =SPC *= | search project for symbol at point          | =+default/search-project-for-symbol-at-point= |
+| =SPC := | execute command                             | =execute-extended-command= |
+| =SPC ;= | eval expression                             | =pp-eval-expression= |
+| =SPC u= | universal argument                          | =universal-argument= |
+| =SPC h= | help prefix                                 | =help-map= |
+| =SPC w= | window prefix                               | =evil-window-map= |
+| =SPC x= | scratch buffer                              | =scratch-buffer= |
+
+* Help: =SPC h=
+
+| Key       | Binding                       | Doom function |
+|-----------+-------------------------------+-------------------------|
+| =SPC h .= | help at point                 | =helpful-at-point= |
+| =SPC h a= | apropos command               | =apropos-command= |
+| =SPC h b= | describe bindings             | =describe-bindings= |
+| =SPC h d= | apropos documentation         | =apropos-documentation= |
+| =SPC h f= | describe function or callable | =helpful-callable= |
+| =SPC h i= | info                          | =info= |
+| =SPC h k= | describe key                  | =helpful-key= |
+| =SPC h m= | describe mode                 | =describe-mode= |
+| =SPC h o= | describe symbol               | =describe-symbol= |
+| =SPC h p= | describe package              | =describe-package= |
+| =SPC h r= | Emacs manual                  | =info-emacs-manual= |
+| =SPC h u= | apropos user option           | =apropos-user-option= |
+| =SPC h v= | describe variable             | =helpful-variable= |
+| =SPC h w= | where is command              | =where-is= |
+| =SPC h x= | describe command              | =helpful-command= |
+
+* Buffers: =SPC b=
+
+| Key       | Binding                             | Doom function |
+|-----------+-------------------------------------+--------------------------------------|
+| =SPC b b= | switch buffer                       | =switch-to-buffer= |
+| =SPC b B= | switch buffer including all buffers | =switch-to-buffer= |
+| =SPC b d= | kill buffer                         | =kill-current-buffer= |
+| =SPC b k= | kill buffer                         | =kill-current-buffer= |
+| =SPC b i= | ibuffer                             | =ibuffer= |
+| =SPC b l= | switch to last buffer               | =evil-switch-to-windows-last-buffer= |
+| =SPC b n= | next buffer                         | =next-buffer= |
+| =SPC b p= | previous buffer                     | =previous-buffer= |
+| =SPC b r= | revert buffer                       | =revert-buffer= |
+| =SPC b R= | rename buffer                       | =rename-buffer= |
+| =SPC b s= | save buffer as file                 | =write-file= |
+| =SPC b S= | save all buffers                    | =evil-write-all= |
+| =SPC b x= | open scratch buffer                 | =doom/open-scratch-buffer= |
+| =SPC b X= | switch to scratch buffer            | =doom/switch-to-scratch-buffer= |
+| =SPC b y= | yank buffer contents                | =+default/yank-buffer-contents= |
+
+* Code: =SPC c=
+
+| Key       | Binding                     | Doom function |
+|-----------+-----------------------------+----------------------------------|
+| =SPC c a= | code action                 | =eglot-code-actions= |
+| =SPC c c= | compile                     | =compile= |
+| =SPC c C= | recompile                   | =recompile= |
+| =SPC c d= | jump to definition          | =+lookup/definition= |
+| =SPC c D= | jump to references          | =+lookup/references= |
+| =SPC c e= | evaluate buffer/region      | =+eval/buffer-or-region= |
+| =SPC c E= | evaluate and replace region | =+eval:replace-region= |
+| =SPC c f= | format buffer/region        | =+format/region-or-buffer= |
+| =SPC c i= | find implementations        | =+lookup/implementations= |
+| =SPC c k= | jump to documentation       | =+lookup/documentation= |
+| =SPC c r= | rename symbol               | =eglot-rename= |
+| =SPC c s= | send buffer/region to REPL  | =+eval/buffer-or-region-in-repl= |
+| =SPC c t= | find type definition        | =+lookup/type-definition= |
+| =SPC c w= | delete trailing whitespace  | =delete-trailing-whitespace= |
+| =SPC c x= | list diagnostics/errors     | =+default/diagnostics= |
+
+* Files: =SPC f=
+
+| Key       | Binding                            | Doom function |
+|-----------+------------------------------------+-------------------------------------------------|
+| =SPC f C= | copy current file                  | =doom/copy-this-file= |
+| =SPC f d= | find directory / dired             | =+default/dired= |
+| =SPC f D= | delete current file                | =doom/delete-this-file= |
+| =SPC f f= | find file                          | =find-file= |
+| =SPC f F= | find file from current directory   | =+default/find-file-under-here= |
+| =SPC f l= | locate file                        | =locate= |
+| =SPC f r= | recent files                       | =recentf-open= |
+| =SPC f R= | rename/move current file           | =doom/move-this-file= |
+| =SPC f s= | save file as                       | =write-file= |
+| =SPC f S= | save file as                       | =write-file= |
+| =SPC f y= | yank file path                     | =+default/yank-buffer-path= |
+| =SPC f Y= | yank file path relative to project | =+default/yank-buffer-path-relative-to-project= |
+
+* Git: =SPC g=
+
+| Key         | Binding                        | Doom function |
+|-------------+--------------------------------+--------------------------------------|
+| =SPC g g=   | git status / Magit status      | =magit-status= |
+| =SPC g R=   | revert file                    | =vc-revert= |
+| =SPC g y=   | copy remote link               | =+vc/browse-at-remote-kill= |
+| =SPC g Y=   | copy remote homepage link      | =+vc/browse-at-remote-kill-homepage= |
+| =SPC g t=   | git time machine               | =git-timemachine-toggle= |
+| =SPC g r=   | revert hunk                    | =+vc-gutter/save-and-revert-hunk= |
+| =SPC g c c= | commit                         | =magit-commit-create= |
+| =SPC g c b= | branch / checkout              | =magit-branch-and-checkout= |
+| =SPC g c R= | clone repository               | =magit-clone= |
+| =SPC g l r= | list repositories              | =magit-list-repositories= |
+| =SPC g o o= | browse file or region remotely | =+vc/browse-at-remote= |
+| =SPC g o h= | browse remote homepage         | =+vc/browse-at-remote-homepage= |
+
+* Insert: =SPC i=
+
+| Key       | Binding                          | Doom function |
+|-----------+----------------------------------+-----------------------------|
+| =SPC i e= | insert emoji                     | =emoji-search= |
+| =SPC i f= | insert current file name         | =+default/insert-file-path= |
+| =SPC i F= | insert current file path         | =+default/insert-file-path= |
+| =SPC i r= | insert from Evil register        | =evil-show-registers= |
+| =SPC i s= | insert snippet                   | =yas-insert-snippet= |
+| =SPC i u= | insert Unicode character         | =insert-char= |
+| =SPC i y= | insert from clipboard / yank-pop | =+default/yank-pop= |
+
+* Notes / Org global: =SPC n=
+
+| Key       | Binding                              | Doom function |
+|-----------+--------------------------------------+-----------------------------------------|
+| =SPC n a= | org agenda                           | =org-agenda= |
+| =SPC n c= | toggle last org clock                | =+org/toggle-last-clock= |
+| =SPC n C= | cancel current org clock             | =org-clock-cancel= |
+| =SPC n f= | find file in notes                   | =+default/find-in-notes= |
+| =SPC n F= | browse notes                         | =+default/browse-notes= |
+| =SPC n l= | org store link                       | =org-store-link= |
+| =SPC n m= | org tags search                      | =org-tags-view= |
+| =SPC n n= | org capture                          | =org-capture= |
+| =SPC n N= | go to last org capture               | =org-capture-goto-target= |
+| =SPC n o= | go to current org clock              | =org-clock-goto= |
+| =SPC n s= | search notes                         | =+default/org-notes-search= |
+| =SPC n S= | search org agenda headings           | =+default/org-notes-headlines= |
+| =SPC n t= | org todo list                        | =org-todo-list= |
+| =SPC n v= | org search view                      | =org-search-view= |
+| =SPC n y= | export org to clipboard              | =+org/export-to-clipboard= |
+| =SPC n Y= | export org to clipboard as rich text | =+org/export-to-clipboard-as-rich-text= |
+
+* Open: =SPC o=
+
+| Key         | Binding                              | Doom function |
+|-------------+--------------------------------------+--------------------------------|
+| =SPC o -=   | dired jump                           | =dired-jump= |
+| =SPC o A=   | org agenda                           | =org-agenda= |
+| =SPC o a a= | org agenda                           | =org-agenda= |
+| =SPC o a t= | org todo list                        | =org-todo-list= |
+| =SPC o a m= | org tags search                      | =org-tags-view= |
+| =SPC o a v= | org search view                      | =org-search-view= |
+| =SPC o b=   | browse current file in browser       | =browse-url-of-file= |
+| =SPC o d=   | start debugger                       | =+debugger/start= |
+| =SPC o f=   | new frame                            | =make-frame= |
+| =SPC o F=   | select frame                         | =select-frame-by-name= |
+| =SPC o r=   | open REPL other window               | =+eval/open-repl-other-window= |
+| =SPC o R=   | open REPL same window                | =+eval/open-repl-same-window= |
+| =SPC o t=   | toggle terminal/shell popup          | =+vterm/toggle= |
+| =SPC o T=   | open terminal/shell here             | =+vterm/here= |
+| =SPC o p=   | project sidebar                      | =+treemacs/toggle= |
+| =SPC o P=   | find current file in project sidebar | =treemacs-find-file= |
+
+* Project: =SPC p=
+
+| Key       | Binding                                 | Doom function |
+|-----------+-----------------------------------------+----------------------------------------------|
+| =SPC p .= | browse project                          | =+default/browse-project= |
+| =SPC p >= | browse other project                    | =doom/browse-in-other-project= |
+| =SPC p != | run shell command in project root       | =projectile-run-shell-command-in-root= |
+| =SPC p &= | run async shell command in project root | =projectile-run-async-shell-command-in-root= |
+| =SPC p f= | find file in project                    | =projectile-find-file= |
+| =SPC p p= | switch/open project                     | =projectile-switch-project= |
+| =SPC p r= | recent project files                    | =projectile-recentf= |
+| =SPC p s= | save project files                      | =projectile-save-project-buffers= |
+| =SPC p t= | project todo/search tasks               | =magit-todos-list= |
+
+* Search: =SPC s=
+
+| Key       | Binding                        | Doom function |
+|-----------+--------------------------------+-----------------------------------|
+| =SPC s b= | search current buffer          | =+default/search-buffer= |
+| =SPC s B= | search all open buffers        | =consult-line-multi= |
+| =SPC s d= | search current directory       | =+default/search-cwd= |
+| =SPC s D= | search another directory       | =+default/search-other-cwd= |
+| =SPC s f= | locate file                    | =locate= |
+| =SPC s i= | jump to symbol                 | =imenu= |
+| =SPC s I= | jump to symbol in open buffers | =consult-imenu-multi= |
+| =SPC s l= | jump to visible link           | =link-hint-open-link= |
+| =SPC s L= | jump to link                   | =ffap-menu= |
+| =SPC s j= | jump list                      | =evil-show-jumps= |
+| =SPC s m= | jump to bookmark               | =bookmark-jump= |
+| =SPC s o= | look up online                 | =+lookup/online= |
+| =SPC s O= | look up online with prompt     | =+lookup/online-select= |
+| =SPC s p= | search project                 | =+default/search-project= |
+| =SPC s P= | search other project           | =+default/search-other-project= |
+| =SPC s r= | jump to mark                   | =evil-show-marks= |
+| =SPC s s= | search buffer                  | =+default/search-buffer= |
+| =SPC s S= | search symbol at point         | =+vertico/search-symbol-at-point= |
+| =SPC s u= | undo history                   | =vundo= |
+
+* Toggle: =SPC t=
+
+| Key       | Binding                      | Doom function |
+|-----------+------------------------------+---------------------------------------------|
+| =SPC t b= | big font / presentation mode | =doom-big-font-mode= |
+| =SPC t c= | fill column indicator        | =global-display-fill-column-indicator-mode= |
+| =SPC t d= | diff highlights              | =diff-hl-mode= |
+| =SPC t f= | syntax checker               | =flymake-mode= |
+| =SPC t F= | frame fullscreen             | =toggle-frame-fullscreen= |
+| =SPC t g= | Evil goggles                 | =evil-goggles-mode= |
+| =SPC t i= | indent guides                | =indent-bars-mode= |
+| =SPC t I= | indent style                 | =doom/toggle-indent-style= |
+| =SPC t l= | line numbers                 | =doom/toggle-line-numbers= |
+| =SPC t r= | read-only mode               | =read-only-mode= |
+| =SPC t v= | visible mode                 | =visible-mode= |
+| =SPC t w= | soft line wrapping           | =visual-line-mode= |
+
+* Org localleader: =\=
+
+| Key   | Binding                   | Doom function |
+|-------+---------------------------+---------------------------------|
+| =\ #= | update statistics cookies | =org-update-statistics-cookies= |
+| =\ '= | edit source/special block | =org-edit-special= |
+| =\ *= | org ctrl-c star           | =org-ctrl-c-star= |
+| =\ -= | org ctrl-c minus          | =org-ctrl-c-minus= |
+| =\ ,= | switch org buffer         | =org-switchb= |
+| =\ .= | goto heading              | =consult-org-heading= |
+| =\ /= | search agenda/headings    | =consult-org-agenda= |
+| =\ @= | insert citation           | =org-cite-insert= |
+| =\ A= | archive subtree           | =org-archive-subtree-default= |
+| =\ e= | export dispatch           | =org-export-dispatch= |
+| =\ e g c= | export GFM to clipboard  | =my/org-gfm-export-to-clipboard= |
+| =\ f= | footnote action           | =org-footnote-action= |
+| =\ h= | toggle heading            | =org-toggle-heading= |
+| =\ i= | toggle item               | =org-toggle-item= |
+| =\ I= | create/get org id         | =org-id-get-create= |
+| =\ k= | remove babel result       | =org-babel-remove-result= |
+| =\ K= | remove result blocks      | =+org/remove-result-blocks= |
+| =\ n= | store link                | =org-store-link= |
+| =\ o= | set property              | =org-set-property= |
+| =\ q= | set tags                  | =org-set-tags-command= |
+| =\ t= | todo                      | =org-todo= |
+| =\ T= | todo list                 | =org-todo-list= |
+| =\ x= | toggle checkbox           | =org-toggle-checkbox= |
+
+* Org localleader prefixes
+
+| Prefix | Binding group          | Doom function |
+|--------+------------------------+---------------|
+| =\ a=  | attachments            | prefix |
+| =\ b=  | tables                 | prefix |
+| =\ c=  | clock                  | prefix |
+| =\ d=  | date/deadline/schedule | prefix |
+| =\ g=  | goto                   | prefix |
+| =\ l=  | links                  | prefix |
+| =\ P=  | publish                | prefix |
+| =\ r=  | refile                 | prefix |
+| =\ s=  | tree/subtree           | prefix |
+| =\ p=  | priority               | prefix |
+
+* Org attachments: =\ a=
+
+| Key     | Binding                     | Doom function |
+|---------+-----------------------------+------------------------------------|
+| =\ a a= | attach                      | =org-attach= |
+| =\ a d= | delete one attachment       | =org-attach-delete-one= |
+| =\ a D= | delete all attachments      | =org-attach-delete-all= |
+| =\ a f= | find file in attachments    | =+org/find-file-in-attachments= |
+| =\ a l= | attach file and insert link | =+org/attach-file-and-insert-link= |
+| =\ a n= | new attachment              | =org-attach-new= |
+| =\ a o= | open attachment             | =org-attach-open= |
+| =\ a O= | open attachment in Emacs    | =org-attach-open-in-emacs= |
+| =\ a r= | reveal attachment           | =org-attach-reveal= |
+| =\ a R= | reveal attachment in Emacs  | =org-attach-reveal-in-emacs= |
+| =\ a u= | attach URL                  | =org-attach-url= |
+| =\ a s= | set attachment directory    | =org-attach-set-directory= |
+| =\ a S= | sync attachments            | =org-attach-sync= |
+
+* Org tables: =\ b=
+
+| Key       | Binding                          | Doom function |
+|-----------+----------------------------------+-------------------------------------------|
+| =\ b -=   | insert hline                     | =org-table-insert-hline= |
+| =\ b a=   | align table                      | =org-table-align= |
+| =\ b b=   | blank field                      | =org-table-blank-field= |
+| =\ b c=   | create/convert table from region | =org-table-create-or-convert-from-region= |
+| =\ b e=   | edit field                       | =org-table-edit-field= |
+| =\ b f=   | edit formulas                    | =org-table-edit-formulas= |
+| =\ b h=   | field info                       | =org-table-field-info= |
+| =\ b s=   | sort lines                       | =org-table-sort-lines= |
+| =\ b r=   | recalculate table                | =org-table-recalculate= |
+| =\ b R=   | recalculate buffer tables        | =org-table-recalculate-buffer-tables= |
+| =\ b d c= | delete column                    | =org-table-delete-column= |
+| =\ b d r= | delete row                       | =org-table-kill-row= |
+| =\ b i c= | insert column                    | =org-table-insert-column= |
+| =\ b i h= | insert hline                     | =org-table-insert-hline= |
+| =\ b i r= | insert row                       | =org-table-insert-row= |
+| =\ b i H= | hline and move                   | =org-table-hline-and-move= |
+| =\ b t f= | toggle formula debugger          | =org-table-toggle-formula-debugger= |
+| =\ b t o= | toggle coordinate overlays       | =org-table-toggle-coordinate-overlays= |
+
+* Org clock: =\ c=
+
+| Key     | Binding                | Doom function |
+|---------+------------------------+------------------------------------|
+| =\ c c= | cancel clock           | =org-clock-cancel= |
+| =\ c d= | mark default task      | =org-clock-mark-default-task= |
+| =\ c e= | modify effort estimate | =org-clock-modify-effort-estimate= |
+| =\ c E= | set effort             | =org-set-effort= |
+| =\ c g= | clock goto             | =org-clock-goto= |
+| =\ c G= | clock goto select      | =org-clock-goto= |
+| =\ c l= | toggle last clock      | =+org/toggle-last-clock= |
+| =\ c i= | clock in               | =org-clock-in= |
+| =\ c I= | clock in last          | =org-clock-in-last= |
+| =\ c o= | clock out              | =org-clock-out= |
+| =\ c r= | resolve clocks         | =org-resolve-clocks= |
+| =\ c R= | clock report           | =org-clock-report= |
+| =\ c t= | evaluate time range    | =org-evaluate-time-range= |
+| =\ c == | timestamps up          | =org-clock-timestamps-up= |
+| =\ c -= | timestamps down        | =org-clock-timestamps-down= |
+
+* Org date/deadline: =\ d=
+
+| Key     | Binding            | Doom function |
+|---------+--------------------+---------------------------|
+| =\ d d= | deadline           | =org-deadline= |
+| =\ d s= | schedule           | =org-schedule= |
+| =\ d t= | active timestamp   | =org-time-stamp= |
+| =\ d T= | inactive timestamp | =org-time-stamp-inactive= |
+
+* Org goto: =\ g=
+
+| Key     | Binding                  | Doom function |
+|---------+--------------------------+--------------------------------|
+| =\ g g= | goto heading             | =consult-org-heading= |
+| =\ g G= | goto agenda heading      | =consult-org-agenda= |
+| =\ g c= | clock goto               | =org-clock-goto= |
+| =\ g C= | clock goto select        | =org-clock-goto= |
+| =\ g i= | org id goto              | =org-id-goto= |
+| =\ g r= | refile goto last stored  | =org-refile-goto-last-stored= |
+| =\ g v= | goto visible             | =+org/goto-visible= |
+| =\ g x= | capture goto last stored | =org-capture-goto-last-stored= |
+
+* Org links: =\ l=
+
+| Key     | Binding                 | Doom function |
+|---------+-------------------------+-------------------------------|
+| =\ l c= | cliplink                | =org-cliplink= |
+| =\ l d= | remove link             | =+org/remove-link= |
+| =\ l i= | store ID link           | =org-id-store-link= |
+| =\ l l= | insert link             | =org-insert-link= |
+| =\ l L= | insert all links        | =org-insert-all-links= |
+| =\ l s= | store link              | =org-store-link= |
+| =\ l S= | insert last stored link | =org-insert-last-stored-link= |
+| =\ l t= | toggle link display     | =org-toggle-link-display= |
+| =\ l y= | yank link               | =+org/yank-link= |
+
+* Org publish: =\ P=
+
+| Key     | Binding                 | Doom function |
+|---------+-------------------------+-------------------------------|
+| =\ P a= | publish all             | =org-publish-all= |
+| =\ P f= | publish current file    | =org-publish-current-file= |
+| =\ P p= | publish                 | =org-publish= |
+| =\ P P= | publish current project | =org-publish-current-project= |
+| =\ P s= | publish sitemap         | =org-publish-sitemap= |
+
+* Org refile: =\ r=
+
+| Key     | Binding                 | Doom function |
+|---------+-------------------------+--------------------------------|
+| =\ r .= | refile to current file  | =+org/refile-to-current-file= |
+| =\ r c= | refile to running clock | =+org/refile-to-running-clock= |
+| =\ r l= | refile to last location | =+org/refile-to-last-location= |
+| =\ r f= | refile to file          | =+org/refile-to-file= |
+| =\ r o= | refile to other window  | =+org/refile-to-other-window= |
+| =\ r O= | refile to other buffer  | =+org/refile-to-other-buffer= |
+| =\ r v= | refile to visible       | =+org/refile-to-visible= |
+| =\ r r= | refile                  | =org-refile= |
+| =\ r R= | refile reverse          | =org-refile-reverse= |
+
+* Org tree/subtree: =\ s=
+
+| Key     | Binding                       | Doom function |
+|---------+-------------------------------+-------------------------------------|
+| =\ s a= | toggle archive tag            | =org-toggle-archive-tag= |
+| =\ s b= | tree to indirect buffer       | =org-tree-to-indirect-buffer= |
+| =\ s c= | clone subtree with time shift | =org-clone-subtree-with-time-shift= |
+| =\ s d= | cut subtree                   | =org-cut-subtree= |
+| =\ s h= | promote subtree               | =org-promote-subtree= |
+| =\ s j= | move subtree down             | =org-move-subtree-down= |
+| =\ s k= | move subtree up               | =org-move-subtree-up= |
+| =\ s l= | demote subtree                | =org-demote-subtree= |
+| =\ s n= | narrow to subtree             | =org-narrow-to-subtree= |
+| =\ s r= | refile                        | =org-refile= |
+| =\ s s= | sparse tree                   | =org-sparse-tree= |
+| =\ s A= | archive subtree               | =org-archive-subtree-default= |
+| =\ s N= | widen                         | =widen= |
+| =\ s S= | sort                          | =org-sort= |
+
+* Org priority: =\ p=
+
+| Key     | Binding       | Doom function |
+|---------+---------------+---------------------|
+| =\ p d= | priority down | =org-priority-down= |
+| =\ p p= | priority      | =org-priority= |
+| =\ p u= | priority up   | =org-priority-up= |
+
+* Org Evil motion / folding
+
+| Key       | Mode          | Binding                       | Doom function |
+|-----------+---------------+-------------------------------+-----------------------------------|
+| =RET=     | normal/motion | org DWIM at point             | =+org/dwim-at-point= |
+| =RET=     | insert        | org return                    | =+org/return= |
+| =S-RET=   | insert        | org shift-return              | =+org/shift-return= |
+| =C-RET=   | normal/insert | insert item below             | =+org/insert-item-below= |
+| =C-S-RET= | normal/insert | insert item above             | =+org/insert-item-above= |
+| =C-M-RET= | normal/insert | insert subheading             | =org-insert-subheading= |
+| =]h=      | motion        | next heading same level       | =org-forward-heading-same-level= |
+| =[h=      | motion        | previous heading same level   | =org-backward-heading-same-level= |
+| =]l=      | motion        | next link                     | =org-next-link= |
+| =[l=      | motion        | previous link                 | =org-previous-link= |
+| =]c=      | motion        | next source block             | =org-babel-next-src-block= |
+| =[c=      | motion        | previous source block         | =org-babel-previous-src-block= |
+| =gQ=      | normal        | reformat org element at point | =+org/reformat-at-point= |
+| =za=      | normal        | toggle fold                   | =+org/toggle-fold= |
+| =zA=      | normal        | global org fold cycle         | =org-shifttab= |
+| =zc=      | normal        | close fold                    | =+org/close-fold= |
+| =zC=      | normal        | close subtree                 | =outline-hide-subtree= |
+| =zm=      | normal        | hide next fold level          | =+org/hide-next-fold-level= |
+| =zM=      | normal        | close all folds               | =+org/close-all-folds= |
+| =zn=      | normal        | tree to indirect buffer       | =org-tree-to-indirect-buffer= |
+| =zo=      | normal        | open fold                     | =+org/open-fold= |
+| =zO=      | normal        | show subtree                  | =outline-show-subtree= |
+| =zr=      | normal        | show next fold level          | =+org/show-next-fold-level= |
+| =zR=      | normal        | open all folds                | =+org/open-all-folds= |
+| =zi=      | normal        | toggle inline images          | =org-toggle-inline-images= |
+
+* Notes
+
+- =SPC= is the global leader.
+- =\= is the localleader, replacing Doom's default =SPC m=.

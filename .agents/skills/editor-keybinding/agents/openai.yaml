@@ -1,0 +1,4 @@
+interface:
+  display_name: "Editor Keybinding"
+  short_description: "Plan, document, implement, and test editor keys"
+  default_prompt: "Use $editor-keybinding to plan and implement a consistent Emacs and Neovim keybinding."

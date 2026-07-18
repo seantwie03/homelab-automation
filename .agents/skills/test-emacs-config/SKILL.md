@@ -68,14 +68,12 @@ run the dedicated keybinding test:
     --load /workspace/test-emacs-config/check-evil-bindings.el
 ```
 
-This test verifies implemented rows from
-`dotfiles/emacs/doom-remix-bindings.org`, including Evil state maps, `SPC`
-leader maps, Org `\` localleader maps, selected Org motion bindings, and
-which-key discoverability metadata.
+This test verifies Evil state maps, `SPC` leader maps, Org `\` localleader maps,
+selected Org motion bindings, and which-key discoverability metadata.
 
 If a keybinding is intentionally added, removed, or changed, update both:
 
-- `dotfiles/emacs/doom-remix-bindings.org`
+- `docs/editor-keybindings.org`
 - `.agents/skills/test-emacs-config/check-evil-bindings.el`
 
 Then rerun the keybinding test and the basic smoke test:

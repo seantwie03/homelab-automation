@@ -2,58 +2,58 @@
 
 * Non-leader mappings
 
-| Key           | Mode   | Emacs Provider | Emacs Function                | Nvim Provider | Nvim Function                                |
-|---------------+--------+----------------+-------------------------------+---------------+----------------------------------------------|
-| j             | normal | evil           | evil-next-visual-line         | builtin       | gj                                           |
-| j             | visual | evil           | evil-next-visual-line         | builtin       | gj                                           |
-| k             | normal | evil           | evil-previous-visual-line     | builtin       | gk                                           |
-| k             | visual | evil           | evil-previous-visual-line     | builtin       | gk                                           |
-| <Down>        | normal | evil           | evil-next-visual-line         | builtin       | gj                                           |
-| <Down>        | visual | evil           | evil-next-visual-line         | builtin       | gj                                           |
-| <Up>          | normal | evil           | evil-previous-visual-line     | builtin       | gk                                           |
-| <Up>          | visual | evil           | evil-previous-visual-line     | builtin       | gk                                           |
-| <Down>        | insert | evil           | evil-next-visual-line         | builtin       | <C-\><C-o>gj                                 |
-| <Up>          | insert | evil           | evil-previous-visual-line     | builtin       | <C-\><C-o>gk                                 |
-| 0             | normal | N/I            | N/I                           | custom        | 0/^ expression                               |
-| Y             | normal | evil           | evil-yank-line                | builtin       | y$                                           |
-| Y             | visual | evil           | evil-yank                     | builtin       | $y                                           |
-| C-a           | normal | builtin        | mark-whole-buffer             | builtin       | ggVG                                         |
-| C-a           | insert | builtin        | mark-whole-buffer             | builtin       | <C-o>gg<C-o>gH<C-o>G                         |
-| C-c           | normal | builtin        | mode-specific-command-prefix  | builtin       | yy                                           |
-| C-c           | insert | builtin        | mode-specific-command-prefix  | builtin       | i_CTRL-C                                     |
-| C-c           | visual | builtin        | clipboard-kill-ring-save      | builtin       | "+y                                          |
-| C-Insert      | visual | builtin        | clipboard-kill-ring-save      | builtin       | "+y                                          |
-| C-v           | insert | builtin        | clipboard-yank                | builtin       | <Cmd>set paste<CR><C-r>+<Cmd>set nopaste<CR> |
-| C-v           | visual | evil           | evil-visual-paste             | builtin       | P                                            |
-| S-Insert      | insert | builtin        | clipboard-yank                | builtin       | <Cmd>set paste<CR><C-r>+<Cmd>set nopaste<CR> |
-| C-x           | normal | builtin        | Control-X-prefix              | builtin       | dd                                           |
-| C-x           | insert | builtin        | Control-X-prefix              | builtin       | i_CTRL-X                                     |
-| C-x           | visual | builtin        | clipboard-kill-region         | builtin       | "+x                                          |
-| S-Del         | normal | evil           | evil-delete-line              | builtin       | dd                                           |
-| S-Del         | visual | builtin        | clipboard-kill-region         | builtin       | "+x                                          |
-| C-s           | normal | builtin        | save-buffer                   | builtin       | <Esc>:update                                 |
-| C-s           | visual | builtin        | save-buffer                   | builtin       | <Esc>:update                                 |
-| C-s           | insert | custom         | my/evil-normal-state-and-save | builtin       | <Esc>:update                                 |
-| C-r           | normal | evil           | evil-redo                     | builtin       | <C-r>                                        |
-| Backspace     | visual | evil           | evil-delete                   | builtin       | "_d                                          |
-| C-h (C-Bkspc) | insert | evil           | evil-delete-backward-word     | builtin       | <C-o>"_db                                    |
-| C-Del         | normal | N/I            | N/I                           | builtin       | "_de                                         |
-| C-Del         | visual | N/I            | N/I                           | builtin       | "_de                                         |
-| C-Del         | insert | N/I            | N/I                           | builtin       | <C-o>"_de                                    |
-| C-j           | normal | evil           | evil-window-down              | builtin       | <C-w><C-j>                                   |
-| C-k           | normal | evil           | evil-window-up                | builtin       | <C-w><C-k>                                   |
-| C-h           | normal | evil           | evil-window-left              | builtin       | <C-w><C-h>                                   |
-| C-l           | normal | evil           | evil-window-right             | builtin       | <C-w><C-l>                                   |
-| C-d           | normal | N/I            | N/I                           | builtin       | <C-d>zz                                      |
-| C-u           | normal | N/I            | N/I                           | builtin       | <C-u>zz                                      |
-| n             | normal | N/I            | N/I                           | builtin       | nzz                                          |
-| N             | normal | N/I            | N/I                           | builtin       | Nzz                                          |
-| {             | normal | N/I            | N/I                           | builtin       | {zz                                          |
-| }             | normal | N/I            | N/I                           | builtin       | }zz                                          |
-| -             | normal | builtin        | dired-jump                    | oil.nvim      | :Oil                                         |
-| C-Space       | normal | builtin        | set-mark-command              | N/A           | N/A                                          |
-| C-Space       | visual | builtin        | set-mark-command              | N/A           | N/A                                          |
-| C-Space       | insert | builtin        | set-mark-command              | builtin       | vim.lsp.completion.get                       |
+| Key           | Mode   | Emacs Provider | Emacs Function                        | Nvim Provider | Nvim Function                                |
+|---------------+--------+----------------+---------------------------------------+---------------+----------------------------------------------|
+| j             | normal | evil           | evil-next-visual-line                 | builtin       | gj                                           |
+| j             | visual | evil           | evil-next-visual-line                 | builtin       | gj                                           |
+| k             | normal | evil           | evil-previous-visual-line             | builtin       | gk                                           |
+| k             | visual | evil           | evil-previous-visual-line             | builtin       | gk                                           |
+| <Down>        | normal | evil           | evil-next-visual-line                 | builtin       | gj                                           |
+| <Down>        | visual | evil           | evil-next-visual-line                 | builtin       | gj                                           |
+| <Up>          | normal | evil           | evil-previous-visual-line             | builtin       | gk                                           |
+| <Up>          | visual | evil           | evil-previous-visual-line             | builtin       | gk                                           |
+| <Down>        | insert | evil           | evil-next-visual-line                 | builtin       | <C-\><C-o>gj                                 |
+| <Up>          | insert | evil           | evil-previous-visual-line             | builtin       | <C-\><C-o>gk                                 |
+| 0             | normal | N/I            | N/I                                   | custom        | 0/^ expression                               |
+| Y             | normal | evil           | evil-yank-line                        | builtin       | y$                                           |
+| Y             | visual | evil           | evil-yank                             | builtin       | $y                                           |
+| C-a           | normal | builtin        | mark-whole-buffer                     | builtin       | ggVG                                         |
+| C-a           | insert | builtin        | mark-whole-buffer                     | builtin       | <C-o>gg<C-o>gH<C-o>G                         |
+| C-c           | normal | builtin        | mode-specific-command-prefix          | builtin       | yy                                           |
+| C-c           | insert | builtin        | mode-specific-command-prefix          | builtin       | i_CTRL-C                                     |
+| C-c           | visual | builtin        | clipboard-kill-ring-save              | builtin       | "+y                                          |
+| C-Insert      | visual | builtin        | clipboard-kill-ring-save              | builtin       | "+y                                          |
+| C-v           | insert | builtin        | clipboard-yank                        | builtin       | <Cmd>set paste<CR><C-r>+<Cmd>set nopaste<CR> |
+| C-v           | visual | evil           | evil-visual-paste                     | builtin       | P                                            |
+| S-Insert      | insert | builtin        | clipboard-yank                        | builtin       | <Cmd>set paste<CR><C-r>+<Cmd>set nopaste<CR> |
+| C-x           | normal | builtin        | Control-X-prefix                      | builtin       | dd                                           |
+| C-x           | insert | builtin        | Control-X-prefix                      | builtin       | i_CTRL-X                                     |
+| C-x           | visual | builtin        | clipboard-kill-region                 | builtin       | "+x                                          |
+| S-Del         | normal | evil           | evil-delete-line                      | builtin       | dd                                           |
+| S-Del         | visual | builtin        | clipboard-kill-region                 | builtin       | "+x                                          |
+| C-s           | normal | builtin        | save-buffer                           | builtin       | <Esc>:update                                 |
+| C-s           | visual | builtin        | save-buffer                           | builtin       | <Esc>:update                                 |
+| C-s           | insert | custom         | my/evil-normal-state-and-save         | builtin       | <Esc>:update                                 |
+| C-r           | normal | evil           | evil-redo                             | builtin       | <C-r>                                        |
+| Backspace     | visual | evil           | evil-delete                           | builtin       | "_d                                          |
+| C-h (C-Bkspc) | insert | evil           | evil-delete-backward-word             | builtin       | <C-o>"_db                                    |
+| C-Del         | normal | N/I            | N/I                                   | builtin       | "_de                                         |
+| C-Del         | visual | N/I            | N/I                                   | builtin       | "_de                                         |
+| C-Del         | insert | N/I            | N/I                                   | builtin       | <C-o>"_de                                    |
+| C-j           | normal | evil           | evil-window-down                      | builtin       | <C-w><C-j>                                   |
+| C-k           | normal | evil           | evil-window-up                        | builtin       | <C-w><C-k>                                   |
+| C-h           | normal | evil           | evil-window-left                      | builtin       | <C-w><C-h>                                   |
+| C-l           | normal | evil           | evil-window-right                     | builtin       | <C-w><C-l>                                   |
+| C-d           | normal | custom         | my/evil-scroll-down-and-center        | builtin       | <C-d>zz                                      |
+| C-u           | normal | custom         | my/evil-scroll-up-and-center          | builtin       | <C-u>zz                                      |
+| n             | normal | custom         | my/evil-search-next-and-center        | builtin       | nzz                                          |
+| N             | normal | custom         | my/evil-search-previous-and-center    | builtin       | Nzz                                          |
+| {             | normal | custom         | my/evil-backward-paragraph-and-center | builtin       | {zz                                          |
+| }             | normal | custom         | my/evil-forward-paragraph-and-center  | builtin       | }zz                                          |
+| -             | normal | builtin        | dired-jump                            | oil.nvim      | :Oil                                         |
+| C-Space       | normal | builtin        | set-mark-command                      | N/A           | N/A                                          |
+| C-Space       | visual | builtin        | set-mark-command                      | N/A           | N/A                                          |
+| C-Space       | insert | builtin        | set-mark-command                      | builtin       | vim.lsp.completion.get                       |
 
 * Global leader mappings
 

@@ -661,6 +661,41 @@ unsupported because the exported text must be available immediately."
   (evil-normal-state)
   (save-buffer))
 
+(defun my/evil-command-and-recenter (command)
+  "Call COMMAND interactively, then center point in the window."
+  (call-interactively command)
+  (recenter))
+
+(defun my/evil-scroll-down-and-center ()
+  "Scroll down half a page and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-scroll-down))
+
+(defun my/evil-scroll-up-and-center ()
+  "Scroll up half a page and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-scroll-up))
+
+(defun my/evil-search-next-and-center ()
+  "Repeat the last search and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-search-next))
+
+(defun my/evil-search-previous-and-center ()
+  "Repeat the last search backward and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-search-previous))
+
+(defun my/evil-backward-paragraph-and-center ()
+  "Move backward by a paragraph and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-backward-paragraph))
+
+(defun my/evil-forward-paragraph-and-center ()
+  "Move forward by a paragraph and center point in the window."
+  (interactive)
+  (my/evil-command-and-recenter #'evil-forward-paragraph))
+
 ;;; Evil leader keymaps
 (defvar-keymap my/leader-buffers-map
   :doc "Buffer commands."
@@ -867,6 +902,12 @@ unsupported because the exported text must be available immediately."
   (keymap-set evil-normal-state-map "C-k" #'evil-window-up)
   (keymap-set evil-normal-state-map "C-h" #'evil-window-left)
   (keymap-set evil-normal-state-map "C-l" #'evil-window-right)
+  (keymap-set evil-normal-state-map "C-d" #'my/evil-scroll-down-and-center)
+  (keymap-set evil-normal-state-map "C-u" #'my/evil-scroll-up-and-center)
+  (keymap-set evil-normal-state-map "n" #'my/evil-search-next-and-center)
+  (keymap-set evil-normal-state-map "N" #'my/evil-search-previous-and-center)
+  (keymap-set evil-normal-state-map "{" #'my/evil-backward-paragraph-and-center)
+  (keymap-set evil-normal-state-map "}" #'my/evil-forward-paragraph-and-center)
   (keymap-set evil-normal-state-map "-" #'dired-jump)
 
 ;;; Evil leader bindings

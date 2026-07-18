@@ -97,9 +97,7 @@ unrelated generated or external-format files can add noise.
 ## Emacs Keybinding Conventions
 
 - When adding, removing, or changing an Emacs keybinding, update
-  `dotfiles/emacs/doom-remix-bindings.org` in the same change.
-- If the keybinding is implemented in `dotfiles/emacs/init.el`, keep the
-  `Implemented` column in `dotfiles/emacs/doom-remix-bindings.org` accurate.
+  `docs/editor-keybindings.org` in the same change.
 - For Evil, leader, localleader, Org, or which-key-related bindings, update
   `.agents/skills/test-emacs-config/check-evil-bindings.el` and run the
   dedicated container keybinding test.

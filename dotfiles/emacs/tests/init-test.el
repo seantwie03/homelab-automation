@@ -13,6 +13,33 @@
       (my/evil-normal-state-and-save))
     (should (equal (nreverse calls) '(normal-state save)))))
 
+(ert-deftest my/evil-command-and-recenter-runs-in-order ()
+  (let (calls)
+    (cl-letf (((symbol-function 'call-interactively)
+               (lambda (command &optional _record-flag _keys)
+                 (push command calls)))
+              ((symbol-function 'recenter)
+               (lambda (&optional _redisplay)
+                 (push 'recenter calls))))
+      (my/evil-command-and-recenter #'evil-scroll-down))
+    (should (equal (nreverse calls) '(evil-scroll-down recenter)))))
+
+(ert-deftest my/evil-centered-motion-wrappers-dispatch-to-evil-commands ()
+  (dolist (entry '((my/evil-scroll-down-and-center . evil-scroll-down)
+                   (my/evil-scroll-up-and-center . evil-scroll-up)
+                   (my/evil-search-next-and-center . evil-search-next)
+                   (my/evil-search-previous-and-center . evil-search-previous)
+                   (my/evil-backward-paragraph-and-center
+                    . evil-backward-paragraph)
+                   (my/evil-forward-paragraph-and-center
+                    . evil-forward-paragraph)))
+    (let (command)
+      (cl-letf (((symbol-function 'my/evil-command-and-recenter)
+                 (lambda (value)
+                   (setq command value))))
+        (funcall (car entry)))
+      (should (eq command (cdr entry))))))
+
 (ert-deftest my/copy-file-name-copies-the-basename ()
   (with-temp-buffer
     (setq buffer-file-name "/tmp/project/archive.tar.gz")
