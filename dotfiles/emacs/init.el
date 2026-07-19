@@ -190,6 +190,12 @@
 (setopt completions-sort 'historical)
 (minibuffer-depth-indicate-mode 1)
 
+(use-package minibuffer
+  :ensure nil
+  :config
+  (keymap-set minibuffer-local-map "C-h" #'backward-kill-word)
+  (keymap-set minibuffer-local-map "C-v" #'clipboard-yank))
+
 (use-package icomplete
   :ensure nil
   :custom
@@ -225,13 +231,6 @@
 
 (use-package consult
   :ensure t
-  :bind
-  (("C-x b" . consult-buffer)
-   ("C-s" . consult-line)
-   ("C-c g" . consult-ripgrep)
-   ("C-c f" . consult-find)
-   ("C-c i" . consult-imenu)
-   ("M-y" . consult-yank-pop))
   :init
   (defun my/search-symbol-at-point ()
     "Search the current buffer for the symbol at point."
@@ -257,12 +256,7 @@
   (which-key-mode 1))
 
 (use-package helpful
-  :ensure t
-  :bind
-  (("C-h f" . helpful-callable)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h x" . helpful-command)))
+  :ensure t)
 
 (use-package keycast
   :ensure t
@@ -650,6 +644,18 @@ unsupported because the exported text must be available immediately."
   (evil-normal-state)
   (save-buffer))
 
+(defun my/evil-open-line-above-and-stay-normal (count)
+  "Open COUNT lines above point and return to Evil normal state."
+  (interactive "p")
+  (evil-open-above count)
+  (evil-normal-state))
+
+(defun my/evil-open-line-below-and-stay-normal (count)
+  "Open COUNT lines below point and return to Evil normal state."
+  (interactive "p")
+  (evil-open-below count)
+  (evil-normal-state))
+
 (defun my/evil-command-and-recenter (command)
   "Call COMMAND interactively, then center point in the window."
   (call-interactively command)
@@ -697,14 +703,6 @@ unsupported because the exported text must be available immediately."
   "s" #'write-file
   "S" #'evil-write-all
   "x" #'scratch-buffer)
-
-(defvar-keymap my/leader-code-map
-  :doc "Code commands."
-  "a" #'eglot-code-actions
-  "c" #'compile
-  "C" #'recompile
-  "r" #'eglot-rename
-  "w" #'delete-trailing-whitespace)
 
 (defvar-keymap my/leader-files-map
   :doc "File commands."
@@ -759,7 +757,7 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-insert-map
   :doc "Insert commands."
   "e" #'emoji-search
-  "r" #'evil-show-registers
+  "i" #'my/org-download-clipboard
   "u" #'insert-char)
 
 (defvar-keymap my/leader-notes-map
@@ -775,22 +773,6 @@ unsupported because the exported text must be available immediately."
   "t" #'org-todo-list
   "y" #'my/org-gfm-export-to-clipboard
   "Y" #'my/org-export-to-clipboard-as-rich-text)
-
-(defvar-keymap my/leader-open-agenda-map
-  :doc "Open Org agenda commands."
-  "a" #'org-agenda
-  "t" #'org-todo-list
-  "m" #'org-tags-view
-  "v" #'org-search-view)
-
-(defvar-keymap my/leader-open-map
-  :doc "Open commands."
-  "-" #'dired-jump
-  "A" #'org-agenda
-  "a" my/leader-open-agenda-map
-  "b" #'browse-url-of-file
-  "f" #'make-frame
-  "F" #'select-frame-by-name)
 
 (defvar-keymap my/leader-search-map
   :doc "Search and jump commands."
@@ -813,6 +795,7 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-map
   :doc "Global leader keymap."
+  "\"" #'evil-show-registers
   "." #'project-find-file
   "*" #'my/search-symbol-at-point
   "/" #'consult-line
@@ -821,30 +804,28 @@ unsupported because the exported text must be available immediately."
   "`" #'evil-switch-to-windows-last-buffer
   ":" #'execute-extended-command
   ";" #'pp-eval-expression
+  "O" #'my/evil-open-line-above-and-stay-normal
   "j" #'evil-show-jumps
+  "o" #'my/evil-open-line-below-and-stay-normal
   "u" #'universal-argument
   "w" my/leader-windows-map
   "b" my/leader-buffers-map
-  "c" my/leader-code-map
   "f" my/leader-files-map
   "g" my/leader-git-map
   "h" my/leader-help-map
   "i" my/leader-insert-map
   "n" my/leader-notes-map
-  "o" my/leader-open-map
   "s" my/leader-search-map
   "t" my/leader-toggle-map)
 
 (which-key-add-keymap-based-replacements
   my/leader-map
   "b" (cons "buffers" my/leader-buffers-map)
-  "c" (cons "code" my/leader-code-map)
   "f" (cons "files" my/leader-files-map)
   "g" (cons "git" my/leader-git-map)
   "h" (cons "help" my/leader-help-map)
   "i" (cons "insert" my/leader-insert-map)
   "n" (cons "notes" my/leader-notes-map)
-  "o" (cons "open" my/leader-open-map)
   "s" (cons "search" my/leader-search-map)
   "t" (cons "toggle" my/leader-toggle-map)
   "w" (cons "windows" my/leader-windows-map))
@@ -1061,13 +1042,7 @@ unsupported because the exported text must be available immediately."
     "p" my/org-priority-map)
 
 ;;; Org localleader bindings
-  (defun my/org-evil-local-bindings ()
-    "Set buffer-local Evil bindings for Org buffers."
-    (evil-local-set-key 'normal (kbd "] l") #'org-next-link)
-    (evil-local-set-key 'normal (kbd "[ l") #'org-previous-link))
-
   (with-eval-after-load 'org
-    (add-hook 'org-mode-hook #'my/org-evil-local-bindings)
     (evil-define-key 'insert org-mode-map
       (kbd "C-M-<return>") #'org-insert-subheading)
     (evil-define-key '(normal visual motion) org-mode-map

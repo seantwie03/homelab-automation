@@ -1,5 +1,4 @@
 {
-  "codediff.nvim": { "branch": "main", "commit": "7608f3b436ce1f84a4888f75e53079caa981a2e9" },
   "diffview-plus.nvim": { "branch": "main", "commit": "c65ddb4724cc772a77e9eca1478bff451867b2e2" },
   "fidget.nvim": { "branch": "main", "commit": "82404b196e73a00b1727a91903beef5ddc319d22" },
   "gitsigns.nvim": { "branch": "main", "commit": "25050e4ed39e628282831d4cbecb1850454ce915" },

@@ -6,7 +6,7 @@ return {
             { "<Leader>b", group = "buffers" },
             { "<Leader>c", group = "code" },
             { "<Leader>f", group = "files" },
-            { "<Leader>p", group = "paste" },
+            { "<Leader>i", group = "insert" },
             { "<Leader>s", group = "search" },
             { "<Leader>t", group = "toggle" },
             { "<Leader>w", group = "windows" },

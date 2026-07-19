@@ -13,6 +13,22 @@
       (my/evil-normal-state-and-save))
     (should (equal (nreverse calls) '(normal-state save)))))
 
+(ert-deftest my/evil-open-line-and-stay-normal-commands-dispatch-in-order ()
+  (dolist (entry '((my/evil-open-line-above-and-stay-normal
+                    . evil-open-above)
+                   (my/evil-open-line-below-and-stay-normal
+                    . evil-open-below)))
+    (let (calls)
+      (cl-letf (((symbol-function (cdr entry))
+                 (lambda (count)
+                   (push (list (cdr entry) count) calls)))
+                ((symbol-function 'evil-normal-state)
+                 (lambda (&optional _count)
+                   (push 'normal-state calls))))
+        (funcall (car entry) 2))
+      (should (equal (nreverse calls)
+                     (list (list (cdr entry) 2) 'normal-state))))))
+
 (ert-deftest my/evil-command-and-recenter-runs-in-order ()
   (let (calls)
     (cl-letf (((symbol-function 'call-interactively)

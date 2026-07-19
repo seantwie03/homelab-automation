@@ -15,6 +15,6 @@ return {
         },
     },
     keys = {
-        { "<Leader>pi", "<Cmd>PasteImage<CR>", desc = "PasteImage" },
+        { "<Leader>ii", "<Cmd>PasteImage<CR>", desc = "Paste image" },
     },
 }
