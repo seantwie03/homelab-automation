@@ -247,6 +247,9 @@
     (interactive)
     (consult-ripgrep nil (thing-at-point 'symbol t))))
 
+(use-package vundo
+  :ensure t)
+
 ;;; Help and discovery
 (use-package which-key
   :ensure nil
@@ -656,6 +659,17 @@ unsupported because the exported text must be available immediately."
   (evil-open-below count)
   (evil-normal-state))
 
+(defun my/evil-smart-beginning-of-line ()
+  "Toggle between indentation and the beginning of the current line."
+  (interactive)
+  (let ((first-nonblank-position
+         (save-excursion
+           (evil-first-non-blank)
+           (point))))
+    (if (= (point) first-nonblank-position)
+        (evil-beginning-of-line)
+      (evil-first-non-blank))))
+
 (defun my/evil-command-and-recenter (command)
   "Call COMMAND interactively, then center point in the window."
   (call-interactively command)
@@ -782,7 +796,8 @@ unsupported because the exported text must be available immediately."
   "j" #'evil-show-jumps
   "m" #'bookmark-jump
   "s" #'my/search-project-symbol-at-point
-  "t" #'consult-ripgrep)
+  "t" #'consult-ripgrep
+  "u" #'vundo)
 
 (defvar-keymap my/leader-toggle-map
   :doc "Toggle commands."
@@ -846,6 +861,7 @@ unsupported because the exported text must be available immediately."
    "<up>" #'evil-previous-visual-line)
   (keymap-set evil-insert-state-map "<down>" #'evil-next-visual-line)
   (keymap-set evil-insert-state-map "<up>" #'evil-previous-visual-line)
+  (keymap-set evil-normal-state-map "0" #'my/evil-smart-beginning-of-line)
   (keymap-set evil-normal-state-map "Y" #'evil-yank-line)
   (keymap-set evil-visual-state-map "Y" #'evil-yank)
   (keymap-set evil-normal-state-map "C-a" #'mark-whole-buffer)

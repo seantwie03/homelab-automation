@@ -7,7 +7,7 @@
 | -             | normal  | builtin        | dired-jump                            | oil.nvim      | :Oil                                         |
 | {             | normal  | custom         | my/evil-backward-paragraph-and-center | builtin       | {zz                                          |
 | }             | normal  | custom         | my/evil-forward-paragraph-and-center  | builtin       | }zz                                          |
-| 0             | normal  | N/I            | N/I                                   | custom        | 0/^ expression                               |
+| 0             | normal  | custom         | my/evil-smart-beginning-of-line       | custom        | 0/^ expression                               |
 | Backspace     | visual  | evil           | evil-delete                           | builtin       | "_d                                          |
 | C-a           | normal  | builtin        | mark-whole-buffer                     | builtin       | ggVG                                         |
 | C-a           | insert  | builtin        | mark-whole-buffer                     | builtin       | <C-o>gg<C-o>gH<C-o>G                         |
@@ -208,7 +208,7 @@ contains a =.git= directory or =.project= marker.
 | SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                              |
 | SPC s s | normal | custom         | my/search-project-symbol-at-point | telescope.nvim | telescope.builtin.grep_string (cwd=project.current_root)         |
 | SPC s t | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)           |
-| SPC s u | normal | vundo          | vundo (N/I)                       | undotree       | :UndotreeToggle (N/I)                                            |
+| SPC s u | normal | vundo          | vundo                             | undotree       | :UndotreeToggle (N/I)                                            |
 
 ** Toggle (=SPC t=) mappings
 

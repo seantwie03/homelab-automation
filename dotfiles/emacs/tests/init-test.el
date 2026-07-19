@@ -29,6 +29,17 @@
       (should (equal (nreverse calls)
                      (list (list (cdr entry) 2) 'normal-state))))))
 
+(ert-deftest my/evil-smart-beginning-of-line-toggles-indentation-and-column-zero ()
+  (with-temp-buffer
+    (insert "  alpha\n")
+    (goto-char 5)
+    (my/evil-smart-beginning-of-line)
+    (should (= (point) 3))
+    (my/evil-smart-beginning-of-line)
+    (should (= (point) 1))
+    (my/evil-smart-beginning-of-line)
+    (should (= (point) 3))))
+
 (ert-deftest my/evil-command-and-recenter-runs-in-order ()
   (let (calls)
     (cl-letf (((symbol-function 'call-interactively)
