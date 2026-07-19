@@ -56,31 +56,22 @@ Run the ERT tests for custom functions defined in `dotfiles/emacs/init.el`:
 ```
 
 These tests call the functions directly. Keep keymap assertions in
-`check-evil-bindings.el` instead of testing bindings through ERT.
+focused tests only when a binding requires behavior beyond loading the
+configuration successfully.
 
-## Evil keybinding validation
+## Keybinding validation
 
-When changing Evil, leader, localleader, Org, or which-key-related bindings,
-run the dedicated keybinding test:
+When changing a keybinding, update `docs/editor-keybindings.org` and run the
+configuration smoke test:
 
 ```sh
 .agents/skills/test-emacs-config/scripts/emacs-container \
-    --load /workspace/test-emacs-config/check-evil-bindings.el
+    --eval '(princ "ok\n")'
 ```
 
-This test verifies Evil state maps, `SPC` leader maps, Org `\` localleader maps,
-selected Org motion bindings, and which-key discoverability metadata.
-
-If a keybinding is intentionally added, removed, or changed, update both:
-
-- `docs/editor-keybindings.org`
-- `.agents/skills/test-emacs-config/check-evil-bindings.el`
-
-Then rerun the keybinding test and the basic smoke test:
-
-```sh
-.agents/skills/test-emacs-config/scripts/emacs-container --eval '(princ "ok\n")'
-```
+There is no maintained assertion file that duplicates every documented
+keybinding. Inspect a focused binding with `key-binding`, `keymap-lookup`, or
+the relevant Evil API when a change needs more direct verification.
 
 Use this for:
 

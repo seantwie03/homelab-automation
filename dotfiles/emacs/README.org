@@ -1,0 +1,18 @@
+#+title: Emacs Configuration
+
+* Tests
+
+Run the custom function tests against the installed configuration:
+
+#+begin_src sh
+~/.config/emacs/scripts/test
+#+end_src
+
+To run the tests from within Emacs:
+
+1. Run =M-x load-file= and select =~/.config/emacs/tests/init-test.el=.
+2. Run =M-x ert=, enter =t= for the test selector, and press =RET=.
+
+The tests use ERT and call the custom functions directly. Keybindings are
+documented in =docs/editor-keybindings.org= and are not duplicated in a
+separate assertion file.

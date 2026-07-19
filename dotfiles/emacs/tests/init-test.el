@@ -282,6 +282,43 @@
       (run-hooks 'org-capture-mode-hook))
     (should called)))
 
+(ert-deftest my/org-gfm-export-uses-the-whole-buffer ()
+  (let (clipboard-text)
+    (cl-letf (((symbol-function 'kill-new)
+               (lambda (text &optional _replace)
+                 (setq clipboard-text text))))
+      (with-temp-buffer
+        (org-mode)
+        (insert "* Heading\nText with *bold* and a [[https://example.com][link]].\n")
+        (my/org-gfm-export-to-clipboard nil nil nil nil)))
+    (should (string-match-p "^# Heading" clipboard-text))
+    (should (string-match-p "\\*\\*bold\\*\\*" clipboard-text))
+    (should (string-match-p
+             "\\[link\\](https://example.com)"
+             clipboard-text))))
+
+(ert-deftest my/org-gfm-export-uses-the-active-region ()
+  (let (clipboard-text)
+    (cl-letf (((symbol-function 'kill-new)
+               (lambda (text &optional _replace)
+                 (setq clipboard-text text))))
+      (with-temp-buffer
+        (org-mode)
+        (transient-mark-mode 1)
+        (insert "* First\nSelected text.\n\n* Second\nExcluded text.\n")
+        (goto-char (point-min))
+        (set-mark (save-excursion
+                    (search-forward "* Second")
+                    (line-beginning-position)))
+        (activate-mark)
+        (my/org-gfm-export-to-clipboard nil nil nil nil)))
+    (should (string-match-p "Selected text" clipboard-text))
+    (should-not (string-match-p "Excluded text" clipboard-text))))
+
+(ert-deftest my/org-gfm-export-rejects-asynchronous-export ()
+  (should-error (my/org-gfm-export-to-clipboard t nil nil nil)
+                :type 'user-error))
+
 (ert-deftest my/org-rich-text-export-uses-the-active-region ()
   (let (clipboard kill-ring-text)
     (cl-letf (((symbol-function 'kill-new)

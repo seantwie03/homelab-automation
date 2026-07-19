@@ -98,9 +98,9 @@ unrelated generated or external-format files can add noise.
 
 - When adding, removing, or changing an Emacs keybinding, update
   `docs/editor-keybindings.org` in the same change.
-- For Evil, leader, localleader, Org, or which-key-related bindings, update
-  `.agents/skills/test-emacs-config/check-evil-bindings.el` and run the
-  dedicated container keybinding test.
+- After changing an Emacs keybinding, use the `test-emacs-config` skill to run
+  the configuration smoke test. Add ERT coverage when the binding introduces
+  or changes custom function behavior.
 
 ## Repository Signing Key Conventions
 

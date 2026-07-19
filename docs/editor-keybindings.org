@@ -55,6 +55,18 @@
 | C-Space       | visual | builtin        | set-mark-command                      | N/A           | N/A                                          |
 | C-Space       | insert | builtin        | set-mark-command                      | builtin       | vim.lsp.completion.get                       |
 
+* Evil Ex commands
+:PROPERTIES:
+:EMACS_TEST: evil-ex
+:END:
+
+| Key   | Mode    | Emacs Provider | Emacs Function     | Nvim Provider | Nvim Function |
+|-------+---------+----------------+--------------------+---------------+---------------|
+| :q    | command | evil           | evil-delete-buffer | N/A           | N/A           |
+| :quit | command | evil           | evil-delete-buffer | N/A           | N/A           |
+| :qa   | command | evil           | evil-quit-all      | N/A           | N/A           |
+| :qall | command | evil           | evil-quit-all      | N/A           | N/A           |
+
 * Global leader mappings
 
 In Emacs, the current project is the =project.el= project associated with the
@@ -215,7 +227,9 @@ contains a =.git= directory or =.project= marker.
 * Legend
 
 - *Key*: Key combination used in both Emacs and Neovim.
-- *Mode*: The single Neovim mode in which the row applies. Bindings shared by multiple modes have one row per mode.
+- *Mode*: The single modal context in which the row applies, such as normal,
+  visual, insert, or command. Bindings shared by multiple modes have one row
+  per mode.
 - *Emacs Provider*: Package that provides the Emacs function. =builtin= means the function ships with Emacs, and =custom= means it is defined in this configuration.
 - *Emacs Function*: Emacs function or prefix map invoked by the key.
 - *Nvim Provider*: Package that provides the Neovim function or command. =builtin= means it ships with Neovim, and =custom= means it is defined in this configuration.

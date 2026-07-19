@@ -543,18 +543,7 @@ unsupported because the exported text must be available immediately."
     (when async
       (user-error "Clipboard export cannot run asynchronously"))
     (kill-new (org-export-as 'gfm subtreep visible-only body-only))
-    (message "GFM export copied to clipboard"))
-
-  (defun my/org-gfm-add-clipboard-export ()
-    "Add a clipboard action to the GFM export dispatcher menu."
-    (let* ((backend (org-export-get-backend 'gfm))
-           (menu (org-export-backend-menu backend))
-           (actions (assq-delete-all ?c (copy-tree (nth 2 menu)))))
-      (setf (nth 2 menu)
-            (append actions
-                    (list (list ?c "To clipboard"
-                                #'my/org-gfm-export-to-clipboard))))))
-  (my/org-gfm-add-clipboard-export))
+    (message "GFM export copied to clipboard")))
 
 (use-package ox-html
   :ensure nil

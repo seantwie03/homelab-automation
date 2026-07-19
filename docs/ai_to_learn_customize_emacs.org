@@ -88,14 +88,6 @@ That smoke test catches a surprising number of mistakes: malformed Lisp,
 misspelled functions, incorrect package setup, and configuration evaluated in
 the wrong order.
 
-I also use more focused tests. One file asserts that Evil and leader bindings
-resolve to the intended commands:
-
-#+begin_src sh
-.agents/skills/test-emacs-config/scripts/emacs-container \
-    --load /workspace/test-emacs-config/check-evil-bindings.el
-#+end_src
-
 Custom functions have ERT tests that exercise their behavior rather than merely
 checking whether a key points at them:
 
@@ -104,6 +96,9 @@ checking whether a key points at them:
     --load /workspace/emacs-tests/init-test.el \
     --funcall ert-run-tests-batch-and-exit
 #+end_src
+
+Keybindings are documented in =docs/editor-keybindings.org=. I do not maintain
+a second assertion file containing a duplicate list of every binding.
 
 Normal test runs reuse a named package cache so that every invocation does not
 download all dependencies again. A =--fresh= option omits that cache when I want

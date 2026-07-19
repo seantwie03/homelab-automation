@@ -94,13 +94,12 @@ to implement the binding as approval without asking again.
    or stability justifies extracting a module.
 7. Follow repository naming conventions: `my/` for commands, `my--` for private
    helpers, predicate names ending in `-p`, and `#'` for function references.
-8. Add or update effective binding assertions in
-   `.agents/skills/test-emacs-config/check-evil-bindings.el` for Evil, leader,
-   localleader, Org, or which-key changes.
-9. Add ERT tests in `dotfiles/emacs/tests/init-test.el` for every custom function.
+8. Add ERT tests in `dotfiles/emacs/tests/init-test.el` for every custom function.
    Test its behavior directly; do not use ERT merely to retest the key mapping.
-10. Use the `test-emacs-config` skill. Run the ERT suite, the dedicated Evil
-    binding check when applicable, and a configuration smoke test.
+9. Use the `test-emacs-config` skill. Run the ERT suite when custom behavior
+   changed and always run a configuration smoke test. Use a focused read-only
+   key lookup when direct mapping verification is valuable; do not maintain a
+   separate assertion list that duplicates `docs/editor-keybindings.org`.
 
 ## Implement In Neovim
 

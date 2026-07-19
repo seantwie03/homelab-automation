@@ -290,7 +290,6 @@
 | =\ @= | insert citation           | =org-cite-insert= |
 | =\ A= | archive subtree           | =org-archive-subtree-default= |
 | =\ e= | export dispatch           | =org-export-dispatch= |
-| =\ e g c= | export GFM to clipboard  | =my/org-gfm-export-to-clipboard= |
 | =\ f= | footnote action           | =org-footnote-action= |
 | =\ h= | toggle heading            | =org-toggle-heading= |
 | =\ i= | toggle item               | =org-toggle-item= |
