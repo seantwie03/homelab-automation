@@ -54,6 +54,10 @@ nmcli dev wifi connect "YourSSID" --ask
 
 Since this repository is going to be cloned on every host (via ansible-pull) I add [my dotfiles](./dotfiles) in this repository. Then each role will symlink the relevant dotfiles subdirectory to the correct location on the system (usually ~/.config/...). The benefit to this approach is that I can see my changes right away. If I want to edit my neovim configuration, I can edit ~/.config/nvim/init.lua like normal. Any changes I make will be instantly applied like normal. Once I have tested the change I can cd to my /opt/homelab_automation and commit the changes. Then, those changes will be applied to every host in my homelab next time the ansible-pull service runs.
 
+## Public Documentation
+
+The checked-in [`docs/`](./docs) directory contains public homelab documentation. Keep private documentation outside this repository. The `h d` commands open this directory.
+
 ## The `h` Management Script
 
 The `ansible_pull` role installs a script called `h` (for "homelab") that wraps common management tasks. It has two top-level commands, each with short aliases:
@@ -79,8 +83,8 @@ The `ansible_pull` role installs a script called `h` (for "homelab") that wraps 
 
 | Subcommand | Description |
 |---|---|
-| `e` / `edit` | Open `$EDITOR` in the homelab documentation directory |
-| `i` / `inbox` | Open `inbox.md` in the homelab documentation directory |
+| `e` / `edit` | Open `$EDITOR` in the public homelab documentation directory |
+| `i` / `inbox` | Open `inbox.md` in the public homelab documentation directory |
 
 ## YAML Code Formatting
 
@@ -104,4 +108,3 @@ When specifying file modes use octal notation without quotes.
 - Bad: 755
 
 Prefer generic modules like `package` and `service` instead of specific modules like `dnf` and `systemd`.
-

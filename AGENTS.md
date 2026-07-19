@@ -56,6 +56,15 @@ unrelated generated or external-format files can add noise.
     group: "{{ user }}"
 ```
 
+## Documentation
+
+The checked-in `docs/` directory contains this repository's public homelab
+documentation. Keep private documentation outside this repository. The `h d`
+commands open `/opt/homelab-automation/docs`.
+
+When modifying a role, review its `README.md` and `MONITORING.md`, when present,
+and update any content made inaccurate by the change.
+
 **Collections used:** `ansible.posix`, `community.general`, `community.docker` pinned in `collections/requirements.yml`.
 
 ## YAML and Task Conventions
