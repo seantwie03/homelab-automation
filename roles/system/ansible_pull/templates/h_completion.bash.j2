@@ -7,73 +7,35 @@ _h() {
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     local AUTOMATION_DIR="{{ playbook_path }}"
-
-    # Main commands - removed single-letter aliases
-    local main_commands="automation documentation help"
-
-    # Automation subcommands - removed single-letter aliases
-    local automation_subcommands="edit commit git logs run test job help"
-
-    # Documentation subcommands - removed single-letter aliases
-    local documentation_subcommands="edit inbox help"
+    local subcommands="edit commit git logs run test job help"
 
     case ${COMP_CWORD} in
         1)
-            # Completing the first argument (main command)
-            COMPREPLY=( $(compgen -W "${main_commands}" -- "${cur}") )
+            COMPREPLY=( $(compgen -W "${subcommands}" -- "${cur}") )
             ;;
         2)
-            # Completing the second argument (subcommand)
             case "${prev}" in
-                a|automation) # Still check for 'a' as an input, but only suggest full words
-                    COMPREPLY=( $(compgen -W "${automation_subcommands}" -- "${cur}") )
-                    ;;
-                d|documentation) # Still check for 'd' as an input, but only suggest full words
-                    COMPREPLY=( $(compgen -W "${documentation_subcommands}" -- "${cur}") )
-                    ;;
-                *)
-                    # No completion for other main commands or if prev is not a recognized command
-                    ;;
-            esac
-            ;;
-        3)
-            # Completing the third argument (arguments to subcommands)
-            case "${COMP_WORDS[1]}" in # Check the main command
-                a|automation)
-                    case "${prev}" in # Check the subcommand
-                        t|test)
-                            # Suggest .yml and .yaml files in the automation directory
-                            if [ -d "${AUTOMATION_DIR}" ]; then
-                                local yaml_files=()
-                                # Find all .yml and .yaml files in the automation directory (excluding hidden files)
-                                while IFS= read -r -d '' file; do
-                                    yaml_files+=("$(basename "$file")")
-                                done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
+                t|test)
+                    if [ -d "${AUTOMATION_DIR}" ]; then
+                        local yaml_files=()
+                        while IFS= read -r -d '' file; do
+                            yaml_files+=("$(basename "$file")")
+                        done < <(find "${AUTOMATION_DIR}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
 
-                                {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
-                                    COMPREPLY=( $(compgen -W "${yaml_files[*]}" -- "${cur}") )
-                            fi
-                            fi
-                            ;;
-                        j|job)
-                            # Suggest 'enable' or 'disable' for 'job' subcommand
-                            local job_actions="enable disable"
-                            COMPREPLY=( $(compgen -W "${job_actions}" -- "${cur}") )
-                            ;;
-                        g|git)
-                            # Suggest common git subcommands for completion
-                            local git_subcommands="add commit push pull status log diff branch checkout reset fetch merge rebase tag remote stash show config"
-                            COMPREPLY=( $(compgen -W "${git_subcommands}" -- "${cur}") )
-                            ;;
-                    esac
+                        {% raw %}if [ ${#yaml_files[@]} -gt 0 ]; then{% endraw %}
+                            COMPREPLY=( $(compgen -W "${yaml_files[*]}" -- "${cur}") )
+                        fi
+                    fi
                     ;;
-                *)
-                    # No completion for other commands or subcommands at this level
+                j|job)
+                    local job_actions="enable disable"
+                    COMPREPLY=( $(compgen -W "${job_actions}" -- "${cur}") )
+                    ;;
+                g|git)
+                    local git_subcommands="add commit push pull status log diff branch checkout reset fetch merge rebase tag remote stash show config"
+                    COMPREPLY=( $(compgen -W "${git_subcommands}" -- "${cur}") )
                     ;;
             esac
-            ;;
-        *)
-            # No further completion beyond the third argument for now
             ;;
     esac
 

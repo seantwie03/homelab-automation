@@ -26,10 +26,10 @@ sudo ansible-pull \
     $(hostname --short).yml
 
 # Run local testing through the h management script
-h a test
+h test
 
 # Run local testing with an explicit playbook
-h a test desktop25.yml
+h test desktop25.yml
 ```
 
 No build or test framework exists; this is declarative Ansible configuration.
@@ -59,8 +59,7 @@ unrelated generated or external-format files can add noise.
 ## Documentation
 
 The checked-in `docs/` directory contains this repository's public homelab
-documentation. Keep private documentation outside this repository. The `h d`
-commands open `/opt/homelab-automation/docs`.
+documentation. Keep private documentation outside this repository.
 
 When modifying a role, review its `README.md` and `MONITORING.md`, when present,
 and update any content made inaccurate by the change.

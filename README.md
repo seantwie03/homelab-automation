@@ -56,35 +56,25 @@ Since this repository is going to be cloned on every host (via ansible-pull) I a
 
 ## Public Documentation
 
-The checked-in [`docs/`](./docs) directory contains public homelab documentation. Keep private documentation outside this repository. The `h d` commands open this directory.
+The checked-in [`docs/`](./docs) directory contains public homelab documentation. Keep private documentation outside this repository.
 
 ## The `h` Management Script
 
-The `ansible_pull` role installs a script called `h` (for "homelab") that wraps common management tasks. It has two top-level commands, each with short aliases:
+The `ansible_pull` role installs a script called `h` (for "homelab") that wraps
+common automation tasks. With no subcommand, it shows
+`ansible-pull.service` status.
 
-| Command | Description |
-|---|---|
-| `h a` / `h automation` | Homelab automation subcommands (default: `systemctl status ansible-pull.service`) |
-| `h d` / `h documentation` | Homelab documentation subcommands |
-
-**Automation subcommands (`h a <sub>`):**
+**Subcommands (`h <sub>`):**
 
 | Subcommand | Description |
 |---|---|
 | `e` / `edit` | Open `$EDITOR` in `/opt/homelab-automation` |
 | `c` / `commit` | `git add . && git commit -m <ISO timestamp> && git push` |
 | `g` / `git [args]` | Run any git command in the automation dir (default: `git status`) |
-| `l` / `logs` | `journalctl -u ansible-pull.service` |
+| `l` / `logs [n]` | Open a summary and the last `n` ansible-pull logs (default: 1) |
 | `r` / `run` | `sudo systemctl start ansible-pull.service` |
 | `t` / `test [playbook]` | Run ansible-pull with `--force` (ignores dirty working dir); defaults to `$(hostname --short).yml` |
 | `j` / `job [enable\|disable]` | Enable/disable `ansible-pull.timer`; default shows timer status |
-
-**Documentation subcommands (`h d <sub>`):**
-
-| Subcommand | Description |
-|---|---|
-| `e` / `edit` | Open `$EDITOR` in the public homelab documentation directory |
-| `i` / `inbox` | Open `inbox.md` in the public homelab documentation directory |
 
 ## YAML Code Formatting
 

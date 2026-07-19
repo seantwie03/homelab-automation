@@ -50,8 +50,7 @@ No build or test framework exists — this is declarative Ansible configuration.
 ## Documentation
 
 The checked-in `docs/` directory contains this repository's public homelab
-documentation. Keep private documentation outside this repository. The `h d`
-commands open `/opt/homelab-automation/docs`.
+documentation. Keep private documentation outside this repository.
 
 When modifying a role, review its `README.md` and `MONITORING.md`, when present,
 and update any content made inaccurate by the change.

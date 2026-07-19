@@ -26,7 +26,7 @@ ls -t /var/log/ansible-pull | head -1
 Open the newest log summary:
 
 ```sh
-h a logs
+h logs
 ```
 
 The first `less` buffer shows the final play recap and changed tasks.

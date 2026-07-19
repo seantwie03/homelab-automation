@@ -102,7 +102,7 @@ Then validate and apply the playbook:
 
 ```bash
 ansible-lint
-h a test odroidh3plus.yml
+h test odroidh3plus.yml
 btrbk -c /etc/btrbk/btrbk.conf config print
 btrbk -c /etc/btrbk/btrbk.conf dryrun
 ```

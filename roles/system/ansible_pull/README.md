@@ -14,9 +14,6 @@ The Systemd Service name is `ansible-pull`. It is hardcoded in several places.
 
 `homelab_ansible_repo_git`: SSH URL to remote repository.
 
-`homelab_docs_dir`: Path to checked-in public documentation used by `h` script
-for `documentation` subcommands
-
 `playbook_path`: Do not change this. Default is: `/opt/homelab-automation`
 
 `ansible_pip_version`: The minimum patch version of the `ansible` pip package to install (e.g. `13.3.0`). The role pins to the minor version using `~=`, so patch updates apply automatically on every run. To adopt a new minor version, bump the `X.Y` portion of this variable.
@@ -72,5 +69,4 @@ Ansible is installed via `pip` instead of `dnf` because the Fedora-packaged `ans
         ansible_pull_path: /usr/local/bin/ansible-pull
         homelab_ansible_repo_url: https://github.com/your_username/your_reponame
         homelab_ansible_repo_git: git@github.com:your_username/your_reponame.git
-        homelab_docs_dir: /opt/homelab-automation/docs
 ```
