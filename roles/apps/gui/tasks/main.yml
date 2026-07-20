@@ -28,6 +28,9 @@
 - name: jetbrains toolbox is installed
   ansible.builtin.include_tasks: jetbrains_toolbox.yml
 
+- name: tldraw offline is installed
+  ansible.builtin.include_tasks: tldraw_offline.yml
+
 - name: printer packages are installed
   ansible.builtin.include_tasks: printer.yml
 

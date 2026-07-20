@@ -98,3 +98,13 @@ running the playbook, start the app once manually to complete installation:
 ```
 
 This creates the desktop entry and sets up `~/.local/share/JetBrains/Toolbox`.
+
+## tldraw Offline Updates
+
+tldraw offline is installed from its upstream x86_64 AppImage. The release
+version and SHA-256 checksum are pinned in `roles/apps/gui/defaults/main.yml`.
+
+To update it, obtain the version and checksum for
+`tldraw-offline-linux-x86_64.AppImage` from the
+[upstream release](https://github.com/tldraw/tldraw-offline/releases), then
+update both `tldraw_offline_version` and `tldraw_offline_checksum`.

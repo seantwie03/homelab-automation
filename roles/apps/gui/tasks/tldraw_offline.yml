@@ -1,0 +1,31 @@
+---
+- name: tldraw offline appimage is installed
+  ansible.builtin.get_url:
+    url: https://github.com/tldraw/tldraw-offline/releases/download/v{{ tldraw_offline_version }}/tldraw-offline-linux-x86_64.AppImage
+    dest: /opt/tldraw-offline.AppImage
+    checksum: "{{ tldraw_offline_checksum }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: tldraw offline command is available
+  ansible.builtin.file:
+    src: /opt/tldraw-offline.AppImage
+    dest: /usr/local/bin/tldraw-offline
+    state: link
+    follow: false
+
+- name: tldraw offline desktop entry is installed
+  ansible.builtin.copy:
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name=tldraw offline
+      Comment=Local whiteboard for you and your agents
+      Exec=/usr/local/bin/tldraw-offline %F
+      Terminal=false
+      Categories=Graphics;Office;
+    dest: /usr/share/applications/tldraw-offline.desktop
+    owner: root
+    group: root
+    mode: 0644

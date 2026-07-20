@@ -1,5 +1,6 @@
 ---
 user: sean
 jetbrains_toolbox_version: 3.4.3.81140
+tldraw_offline_version: 1.11.0
+tldraw_offline_checksum: sha256:094906747633db680e615e57fb201d078c968b5222e731c9e77aa07673440e05
 zoom_version: 7.0.0.1666
-
