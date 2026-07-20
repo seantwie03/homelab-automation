@@ -74,6 +74,21 @@ to implement the binding as approval without asking again.
    non-leader bindings in Evil's global state maps. Use the existing
    `my/keymap-set-many` helper when one binding intentionally applies to several
    state maps.
+   Choose the binding API according to scope:
+   - Use `keymap-set` for global, state-independent bindings and ordinary Emacs
+     mode maps whose behavior does not depend on Evil state.
+   - Use `keymap-set` on `evil-normal-state-map`, `evil-insert-state-map`, or
+     another Evil state map for global bindings specific to that state.
+   - Use `evil-define-key` when a binding requires both a particular major or
+     minor mode and one or more particular Evil states.
+   - Define named leader and localleader prefix maps with `defvar-keymap` and
+     populate those maps normally. Attach a global leader to Evil's global state
+     maps, but attach a mode-local leader with `evil-define-key`.
+   Do not mechanically replace global `keymap-set` calls with
+   `evil-define-key`; the former communicates their global state-map scope more
+   directly. Use `evil-make-intercept-map` or other precedence mechanisms only
+   when a verified higher-priority Evil or minor-mode map prevents the intended
+   mode-specific binding from winning.
 3. Define every leader or localleader prefix as a named `defvar-keymap` with a
    useful `:doc` string. Add explicit labels with
    `which-key-add-keymap-based-replacements`, retaining the child map in the

@@ -2,6 +2,7 @@
 
 (require 'ert)
 (require 'cl-lib)
+(require 'markdown-mode)
 (require 'org)
 
 (ert-deftest my/evil-normal-state-and-save-enters-normal-state-before-saving ()
@@ -151,6 +152,79 @@
         (my/search-project-symbol-at-point))
       (should-not directory)
       (should (equal initial "alpha")))))
+
+(ert-deftest my/markdown-insert-list-item-appends-an-empty-item ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "- Existing item")
+    (evil-normal-state)
+    (search-backward "Existing")
+    (my/markdown-insert-list-item)
+    (should (equal (buffer-string) "- Existing item\n- "))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/markdown-insert-task-item-appends-an-empty-task ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "- [ ] Existing task")
+    (evil-normal-state)
+    (search-backward "Existing")
+    (my/markdown-insert-task-item)
+    (should (equal (buffer-string) "- [ ] Existing task\n- [ ] "))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/markdown-insert-task-item-splits-at-insert-point ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "- Existing task remainder")
+    (search-backward " remainder")
+    (evil-insert-state)
+    (my/markdown-insert-task-item)
+    (should (equal (buffer-string)
+                   "- Existing task\n- [ ] remainder"))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/markdown-insert-heading-respect-content-appends-a-sibling ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "# Parent\n\nBody\n\n## Child\n\nChild body\n\n# Next\n")
+    (goto-char (point-min))
+    (evil-normal-state)
+    (my/markdown-insert-heading-respect-content)
+    (should (equal (buffer-string)
+                   (concat "# Parent\n\nBody\n\n## Child\n\nChild body\n\n"
+                           "# \n\n# Next\n")))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/markdown-insert-subheading-respect-content-appends-a-child ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "## Parent\n\nBody\n\n## Next\n")
+    (goto-char (point-min))
+    (evil-normal-state)
+    (my/markdown-insert-subheading-respect-content)
+    (should (equal (buffer-string)
+                   "## Parent\n\nBody\n\n### \n\n## Next\n"))
+    (should (evil-insert-state-p))))
+
+(ert-deftest my/markdown-insert-subheading-rejects-level-seven ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "###### Parent\n")
+    (goto-char (point-min))
+    (should-error (my/markdown-insert-subheading-respect-content)
+                  :type 'user-error)))
+
+(ert-deftest my/markdown-table-insert-row-below-adds-an-empty-row ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "| A | B |\n|---|---|\n| x | y |\n")
+    (search-backward "x")
+    (evil-normal-state)
+    (my/markdown-table-insert-row-below)
+    (should (equal (buffer-string)
+                   "| A | B |\n|---|---|\n| x | y |\n|   |   |\n"))
+    (should (evil-insert-state-p))))
 
 (ert-deftest my/org-find-file-in-notes-searches-org-directory ()
   (let ((org-directory "/tmp/notes")

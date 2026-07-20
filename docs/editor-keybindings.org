@@ -243,6 +243,42 @@ contains a =.git= directory or =.project= marker.
 | SPC w T | normal | builtin        | tab-window-detach            | builtin       | <C-w>T        |
 | SPC w v | normal | evil           | evil-window-vsplit           | builtin       | <C-w>v        |
 
+* Markdown Mode
+
+** Non-localleader mappings
+
+| Key     | Mode   | Emacs Provider | Emacs Function                                      | Nvim Provider | Nvim Function |
+|---------+--------+----------------+-----------------------------------------------------+---------------+---------------|
+| [ h     | normal | markdown-mode  | markdown-previous-visible-heading                   | N/I           | N/I           |
+| ] h     | normal | markdown-mode  | markdown-next-visible-heading                       | N/I           | N/I           |
+| [ p     | normal | markdown-mode  | markdown-promote                                    | N/I           | N/I           |
+| ] p     | normal | markdown-mode  | markdown-demote                                     | N/I           | N/I           |
+| C-M-RET | normal | custom         | my/markdown-insert-subheading-respect-content       | N/I           | N/I           |
+| C-M-RET | visual | custom         | my/markdown-insert-subheading-respect-content       | N/I           | N/I           |
+| C-M-RET | insert | custom         | my/markdown-insert-subheading-respect-content       | N/I           | N/I           |
+| C-RET   | normal | custom         | my/markdown-insert-heading-respect-content          | N/I           | N/I           |
+| C-RET   | visual | custom         | my/markdown-insert-heading-respect-content          | N/I           | N/I           |
+| C-RET   | insert | custom         | my/markdown-insert-heading-respect-content          | N/I           | N/I           |
+| M-RET   | normal | custom         | my/markdown-insert-list-item                        | N/I           | N/I           |
+| M-RET   | visual | custom         | my/markdown-insert-list-item                        | N/I           | N/I           |
+| M-RET   | insert | markdown-mode  | markdown-insert-list-item                           | N/I           | N/I           |
+| M-S-RET | normal | custom         | my/markdown-insert-task-item                        | N/I           | N/I           |
+| M-S-RET | visual | custom         | my/markdown-insert-task-item                        | N/I           | N/I           |
+| M-S-RET | insert | custom         | my/markdown-insert-task-item                        | N/I           | N/I           |
+| S-RET   | normal | custom         | my/markdown-table-insert-row-below                  | N/I           | N/I           |
+| S-RET   | visual | custom         | my/markdown-table-insert-row-below                  | N/I           | N/I           |
+| S-RET   | insert | custom         | my/markdown-table-insert-row-below                  | N/I           | N/I           |
+| z i     | normal | markdown-mode  | markdown-toggle-inline-images                       | N/I           | N/I           |
+
+** Markdown localleader (=\=) mappings
+
+| Key | Mode   | Emacs Provider | Emacs Function                | Nvim Provider | Nvim Function |
+|-----+--------+----------------+-------------------------------+---------------+---------------|
+| \   | normal | custom         | my/markdown-localleader-map   | N/I           | N/I           |
+| \ e | normal | markdown-mode  | markdown-export               | N/I           | N/I           |
+| \ o | normal | markdown-mode  | markdown-open                 | N/I           | N/I           |
+| \ p | normal | markdown-mode  | markdown-preview              | N/I           | N/I           |
+
 * Org Mode
 
 ** Non-localleader mappings

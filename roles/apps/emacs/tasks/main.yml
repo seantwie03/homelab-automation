@@ -1,7 +1,9 @@
 ---
 - name: emacs packages are installed
   ansible.builtin.package:
-    name: emacs
+    name:
+      - emacs
+      - pandoc
     state: present
 
 - name: emacs config parent directory exists

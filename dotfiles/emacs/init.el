@@ -155,7 +155,134 @@
 
 (use-package markdown-mode
   :ensure t
-  :mode ("\\.md\\'" . markdown-mode))
+  :mode ("\\.md\\'" . gfm-mode)
+  :custom
+  (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
+  (markdown-open-command "xdg-open")
+  (markdown-unordered-list-item-prefix "- ")
+  :config
+  (defun my/markdown-insert-list-item ()
+    "Append a Markdown list item and enter Evil insert state."
+    (interactive)
+    (unless (evil-insert-state-p)
+      (end-of-line))
+    (markdown-insert-list-item)
+    (evil-insert-state))
+
+  (defun my/markdown-insert-task-item ()
+    "Insert a GFM task item and enter Evil insert state."
+    (interactive)
+    (unless (evil-insert-state-p)
+      (end-of-line))
+    (markdown-insert-list-item)
+    (delete-horizontal-space)
+    (insert " [ ] ")
+    (evil-insert-state))
+
+  (defun my--markdown-insert-heading-after-subtree (childp)
+    "Insert a Markdown heading after the current subtree.
+
+When CHILDP is non-nil, make the new heading a child of the current one."
+    (let ((level 1)
+          heading-found)
+      (save-excursion
+        (condition-case nil
+            (progn
+              (markdown-back-to-heading t)
+              (setq heading-found t
+                    level (markdown-outline-level)))
+          (error nil)))
+      (when childp
+        (setq level (1+ level)))
+      (when (> level 6)
+        (user-error "Markdown headings cannot be deeper than level 6"))
+      (if heading-found
+          (markdown-end-of-subtree t)
+        (end-of-line))
+      (end-of-line)
+      (let ((boundary (point)))
+        (skip-chars-forward "\n")
+        (delete-region boundary (point)))
+      (insert "\n\n" (make-string level ?#) " ")
+      (save-excursion
+        (insert "\n\n"))
+      (evil-insert-state)))
+
+  (defun my/markdown-insert-heading-respect-content ()
+    "Insert a same-level Markdown heading after the current subtree."
+    (interactive)
+    (my--markdown-insert-heading-after-subtree nil))
+
+  (defun my/markdown-insert-subheading-respect-content ()
+    "Insert a child Markdown heading after the current subtree."
+    (interactive)
+    (my--markdown-insert-heading-after-subtree t))
+
+  (defun my/markdown-table-insert-row-below ()
+    "Insert a Markdown table row below point and enter insert state."
+    (interactive)
+    (markdown-table-insert-row t)
+    (evil-insert-state))
+
+  (defvar-keymap my/markdown-localleader-map
+    :doc "Markdown commands."
+    "e" #'markdown-export
+    "o" #'markdown-open
+    "p" #'markdown-preview)
+
+  (which-key-add-keymap-based-replacements
+    my/markdown-localleader-map
+    "e" "export"
+    "o" "open"
+    "p" "preview")
+
+  (defun my/markdown-setup-evil-bindings ()
+    "Install mode-specific Evil bindings for Markdown buffers."
+    (evil-define-key 'insert markdown-mode-map
+      (kbd "M-<return>") #'markdown-insert-list-item
+      (kbd "M-S-<return>") #'my/markdown-insert-task-item
+      (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
+      (kbd "C-M-<return>") #'my/markdown-insert-subheading-respect-content
+      (kbd "S-<return>") #'my/markdown-table-insert-row-below)
+    (evil-define-key 'insert gfm-mode-map
+      (kbd "M-<return>") #'markdown-insert-list-item
+      (kbd "M-S-<return>") #'my/markdown-insert-task-item
+      (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
+      (kbd "C-M-<return>") #'my/markdown-insert-subheading-respect-content
+      (kbd "S-<return>") #'my/markdown-table-insert-row-below)
+    (evil-define-key '(normal visual motion) markdown-mode-map
+      (kbd "\\") my/markdown-localleader-map
+      (kbd "M-<return>") #'my/markdown-insert-list-item
+      (kbd "M-S-<return>") #'my/markdown-insert-task-item
+      (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
+      (kbd "C-M-<return>") #'my/markdown-insert-subheading-respect-content
+      (kbd "S-<return>") #'my/markdown-table-insert-row-below
+      (kbd "] h") #'markdown-next-visible-heading
+      (kbd "[ h") #'markdown-previous-visible-heading
+      (kbd "] p") #'markdown-demote
+      (kbd "[ p") #'markdown-promote
+      (kbd "z i") #'markdown-toggle-inline-images)
+    (evil-define-key '(normal visual motion) gfm-mode-map
+      (kbd "\\") my/markdown-localleader-map
+      (kbd "M-<return>") #'my/markdown-insert-list-item
+      (kbd "M-S-<return>") #'my/markdown-insert-task-item
+      (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
+      (kbd "C-M-<return>") #'my/markdown-insert-subheading-respect-content
+      (kbd "S-<return>") #'my/markdown-table-insert-row-below
+      (kbd "] h") #'markdown-next-visible-heading
+      (kbd "[ h") #'markdown-previous-visible-heading
+      (kbd "] p") #'markdown-demote
+      (kbd "[ p") #'markdown-promote
+      (kbd "z i") #'markdown-toggle-inline-images)
+    (dolist (state '(normal visual motion insert))
+      (evil-make-intercept-map markdown-mode-map state t)
+      (evil-make-intercept-map gfm-mode-map state t))
+    (evil-normalize-keymaps))
+
+  (with-eval-after-load 'evil
+    (add-hook 'markdown-mode-hook #'my/markdown-setup-evil-bindings t)
+    (add-hook 'gfm-mode-hook #'my/markdown-setup-evil-bindings t)
+    (my/markdown-setup-evil-bindings)))
 
 ;;; File behavior
 (setopt vc-follow-symlinks t)
