@@ -226,6 +226,14 @@
                    "| A | B |\n|---|---|\n| x | y |\n|   |   |\n"))
     (should (evil-insert-state-p))))
 
+(ert-deftest my/markdown-cut-subtree-kills-the-heading-and-its-children ()
+  (with-temp-buffer
+    (gfm-mode)
+    (insert "# Parent\n\nBody\n\n## Child\n\nChild body\n\n# Next\n")
+    (goto-char (point-min))
+    (my/markdown-cut-subtree)
+    (should (equal (buffer-string) "\n\n# Next\n"))))
+
 (ert-deftest my/org-find-file-in-notes-searches-org-directory ()
   (let ((org-directory "/tmp/notes")
         arguments)

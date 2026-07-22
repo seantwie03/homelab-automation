@@ -224,17 +224,55 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (markdown-table-insert-row t)
     (evil-insert-state))
 
+  (defun my/markdown-cut-subtree ()
+    "Kill the current Markdown heading and its subtree."
+    (interactive)
+    (markdown-mark-subtree)
+    (kill-region (region-beginning) (region-end)))
+
+  (defvar-keymap my/markdown-tables-delete-map
+    :doc "Markdown table deletion commands."
+    "c" #'markdown-table-delete-column
+    "r" #'markdown-table-delete-row)
+
+  (defvar-keymap my/markdown-tables-insert-map
+    :doc "Markdown table insertion commands."
+    "c" #'markdown-table-insert-column
+    "r" #'markdown-table-insert-row)
+
+  (defvar-keymap my/markdown-tables-map
+    :doc "Markdown table commands."
+    "a" #'markdown-table-align
+    "c" #'markdown-table-convert-region
+    "d" my/markdown-tables-delete-map
+    "i" my/markdown-tables-insert-map
+    "s" #'markdown-table-sort-lines)
+
+  (defvar-keymap my/markdown-subtree-map
+    :doc "Markdown heading and subtree commands."
+    "d" #'my/markdown-cut-subtree
+    "h" #'markdown-promote-subtree
+    "j" #'markdown-move-subtree-down
+    "k" #'markdown-move-subtree-up
+    "l" #'markdown-demote-subtree
+    "n" #'markdown-narrow-to-subtree
+    "N" #'widen)
+
   (defvar-keymap my/markdown-localleader-map
     :doc "Markdown commands."
+    "b" my/markdown-tables-map
     "e" #'markdown-export
     "o" #'markdown-open
-    "p" #'markdown-preview)
+    "p" #'markdown-preview
+    "s" my/markdown-subtree-map)
 
   (which-key-add-keymap-based-replacements
     my/markdown-localleader-map
+    "b" (cons "tables" my/markdown-tables-map)
     "e" "export"
     "o" "open"
-    "p" "preview")
+    "p" "preview"
+    "s" (cons "subtree" my/markdown-subtree-map))
 
   (defun my/markdown-setup-evil-bindings ()
     "Install mode-specific Evil bindings for Markdown buffers."
