@@ -234,6 +234,14 @@
     (my/markdown-cut-subtree)
     (should (equal (buffer-string) "\n\n# Next\n"))))
 
+(ert-deftest my/markdown-cycle-global-cycles-all-headings ()
+  (let (argument)
+    (cl-letf (((symbol-function 'markdown-cycle)
+               (lambda (&optional value)
+                 (setq argument value))))
+      (my/markdown-cycle-global))
+    (should (eq argument t))))
+
 (ert-deftest my/org-find-file-in-notes-searches-org-directory ()
   (let ((org-directory "/tmp/notes")
         arguments)

@@ -230,6 +230,11 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (markdown-mark-subtree)
     (kill-region (region-beginning) (region-end)))
 
+  (defun my/markdown-cycle-global ()
+    "Cycle visibility for all Markdown headings."
+    (interactive)
+    (markdown-cycle t))
+
   (defvar-keymap my/markdown-tables-delete-map
     :doc "Markdown table deletion commands."
     "c" #'markdown-table-delete-column
@@ -258,21 +263,34 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     "n" #'markdown-narrow-to-subtree
     "N" #'widen)
 
+  (defvar-keymap my/markdown-links-map
+    :doc "Markdown link commands."
+    "l" #'markdown-insert-link
+    "t" #'markdown-toggle-url-hiding)
+
   (defvar-keymap my/markdown-localleader-map
     :doc "Markdown commands."
+    "." #'consult-outline
     "b" my/markdown-tables-map
     "e" #'markdown-export
+    "f" #'markdown-insert-footnote
+    "l" my/markdown-links-map
     "o" #'markdown-open
     "p" #'markdown-preview
-    "s" my/markdown-subtree-map)
+    "s" my/markdown-subtree-map
+    "x" #'markdown-toggle-gfm-checkbox)
 
   (which-key-add-keymap-based-replacements
     my/markdown-localleader-map
+    "." "headings"
     "b" (cons "tables" my/markdown-tables-map)
     "e" "export"
+    "f" "footnote"
+    "l" (cons "links" my/markdown-links-map)
     "o" "open"
     "p" "preview"
-    "s" (cons "subtree" my/markdown-subtree-map))
+    "s" (cons "subtree" my/markdown-subtree-map)
+    "x" "toggle task")
 
   (defun my/markdown-setup-evil-bindings ()
     "Install mode-specific Evil bindings for Markdown buffers."
@@ -299,6 +317,11 @@ When CHILDP is non-nil, make the new heading a child of the current one."
       (kbd "[ h") #'markdown-previous-visible-heading
       (kbd "] p") #'markdown-demote
       (kbd "[ p") #'markdown-promote
+      (kbd "z a") #'markdown-cycle
+      (kbd "z A") #'my/markdown-cycle-global
+      (kbd "z c") #'outline-hide-subtree
+      (kbd "z o") #'outline-show-subtree
+      (kbd "z R") #'outline-show-all
       (kbd "z i") #'markdown-toggle-inline-images)
     (evil-define-key '(normal visual motion) gfm-mode-map
       (kbd "\\") my/markdown-localleader-map
@@ -311,6 +334,11 @@ When CHILDP is non-nil, make the new heading a child of the current one."
       (kbd "[ h") #'markdown-previous-visible-heading
       (kbd "] p") #'markdown-demote
       (kbd "[ p") #'markdown-promote
+      (kbd "z a") #'markdown-cycle
+      (kbd "z A") #'my/markdown-cycle-global
+      (kbd "z c") #'outline-hide-subtree
+      (kbd "z o") #'outline-show-subtree
+      (kbd "z R") #'outline-show-all
       (kbd "z i") #'markdown-toggle-inline-images)
     (dolist (state '(normal visual motion insert))
       (evil-make-intercept-map markdown-mode-map state t)

@@ -268,18 +268,34 @@ contains a =.git= directory or =.project= marker.
 | S-RET   | normal | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
 | S-RET   | visual | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
 | S-RET   | insert | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
+| z a     | normal | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
+| z A     | normal | custom         | my/markdown-cycle-global                      | N/I           | N/I           |
+| z c     | normal | builtin        | outline-hide-subtree                          | N/I           | N/I           |
 | z i     | normal | markdown-mode  | markdown-toggle-inline-images                 | N/I           | N/I           |
+| z o     | normal | builtin        | outline-show-subtree                          | N/I           | N/I           |
+| z R     | normal | builtin        | outline-show-all                              | N/I           | N/I           |
 
 ** Markdown localleader (=\=) mappings
 
 | Key | Mode   | Emacs Provider | Emacs Function              | Nvim Provider | Nvim Function |
 |-----+--------+----------------+-----------------------------+---------------+---------------|
 | \   | normal | custom         | my/markdown-localleader-map | N/I           | N/I           |
+| \ . | normal | consult        | consult-outline             | N/I           | N/I           |
 | \ b | normal | custom         | my/markdown-tables-map      | N/I           | N/I           |
 | \ e | normal | markdown-mode  | markdown-export             | N/I           | N/I           |
+| \ f | normal | markdown-mode  | markdown-insert-footnote    | N/I           | N/I           |
+| \ l | normal | custom         | my/markdown-links-map       | N/I           | N/I           |
 | \ o | normal | markdown-mode  | markdown-open               | N/I           | N/I           |
 | \ p | normal | markdown-mode  | markdown-preview            | N/I           | N/I           |
 | \ s | normal | custom         | my/markdown-subtree-map     | N/I           | N/I           |
+| \ x | normal | markdown-mode  | markdown-toggle-gfm-checkbox | N/I          | N/I           |
+
+*** Markdown links (=\ l=) mappings
+
+| Key   | Mode   | Emacs Provider | Emacs Function               | Nvim Provider | Nvim Function |
+|-------+--------+----------------+------------------------------+---------------+---------------|
+| \ l l | normal | markdown-mode  | markdown-insert-link         | N/I           | N/I           |
+| \ l t | normal | markdown-mode  | markdown-toggle-url-hiding   | N/I           | N/I           |
 
 *** Markdown tables (=\ b=) mappings
 
