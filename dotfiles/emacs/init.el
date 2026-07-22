@@ -688,65 +688,6 @@ unsupported because the exported text must be available immediately."
       (gui-set-selection 'CLIPBOARD selection)
       (message "Rich-text export copied to clipboard"))))
 
-(use-package org-download
-  :ensure t
-  :after org
-  :init
-  (defun my/org-move-to-entry-append-position ()
-    "Move point to the append position for the current Org entry body."
-    (when (derived-mode-p 'org-mode)
-      (org-back-to-heading t)
-      (goto-char (org-entry-end-position))
-      (unless (eobp)
-        (open-line 1))))
-
-  (defun my/org-move-past-image-link-for-file (buffer file)
-    "In BUFFER, move point below the Org image link for FILE."
-    (when (and (buffer-live-p buffer)
-               file)
-      (with-current-buffer buffer
-        (let ((filename (file-name-nondirectory file)))
-          (goto-char (point-min))
-          (when (search-forward filename nil t)
-            (end-of-line)
-            (forward-line)
-            (unless (looking-at-p "\\(?:[ \t]*$\\)")
-              (open-line 1)))))))
-
-  (defun my/org-download-clipboard ()
-    "Attach an image from the clipboard to the current Org entry."
-    (interactive)
-    (my/org-move-to-entry-append-position)
-    (let ((buffer (current-buffer)))
-      (org-download-clipboard)
-      (my/org-move-past-image-link-for-file buffer org-download-path-last-file)
-      (run-at-time 0 nil #'my/org-move-past-image-link-for-file
-                   buffer org-download-path-last-file)))
-
-  (defun my/org-download-file-format (filename)
-    "Format org-download FILENAME with timestamp and current Org heading."
-    (let* ((heading (if (derived-mode-p 'org-mode)
-                        (org-get-heading t t t t)
-                      "image"))
-           (slug (downcase
-                  (replace-regexp-in-string "[^[:alnum:]]+" "-" heading))))
-      (setq slug (replace-regexp-in-string "\\`-+\\|-+\\'" "" slug))
-      (format "%s%s_%s"
-              (format-time-string "%Y-%m-%d_%H-%M-%S_")
-              (if (string-empty-p slug) "image" slug)
-              filename)))
-  :custom
-  (org-download-method 'attach)
-  :config
-  (setq org-download-file-format-function #'my/org-download-file-format)
-  (setq org-attach-commands
-        (seq-remove (lambda (command)
-                      (member ?i (car command)))
-                    org-attach-commands))
-  (add-to-list 'org-attach-commands
-               '((?i) my/org-download-clipboard
-                 "Attach an image from the clipboard.")))
-
 (use-package evil
   :ensure t
   :init
@@ -898,7 +839,7 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-insert-map
   :doc "Insert commands."
   "e" #'emoji-search
-  "i" #'my/org-download-clipboard
+  "i" #'yank-media
   "u" #'insert-char)
 
 (defvar-keymap my/leader-notes-map

@@ -178,7 +178,7 @@ contains a =.git= directory or =.project= marker.
 | Key     | Mode   | Emacs Provider | Emacs Function      | Nvim Provider | Nvim Function |
 |---------+--------+----------------+---------------------+---------------+---------------|
 | SPC i e | normal | builtin        | emoji-search        | N/I           | N/I           |
-| SPC i i | normal | custom         | my/org-download-clipboard | img-clip.nvim | <Cmd>PasteImage<CR> |
+| SPC i i | normal | builtin        | yank-media                       | img-clip.nvim | <Cmd>PasteImage<CR> |
 | SPC i u | normal | builtin        | insert-char         | N/I           | N/I           |
 
 ** Notes (=SPC n=) mappings
