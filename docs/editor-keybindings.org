@@ -4,7 +4,7 @@
 
 | Key           | Mode    | Emacs Provider | Emacs Function                        | Nvim Provider | Nvim Function                                |
 |---------------+---------+----------------+---------------------------------------+---------------+----------------------------------------------|
-| -             | normal  | builtin        | dired-jump                            | oil.nvim      | :Oil                                         |
+| -             | normal  | builtin        | dired-jump (C)                        | oil.nvim      | :Oil                                         |
 | {             | normal  | custom         | my/evil-backward-paragraph-and-center | builtin       | {zz                                          |
 | }             | normal  | custom         | my/evil-forward-paragraph-and-center  | builtin       | }zz                                          |
 | 0             | normal  | custom         | my/evil-smart-beginning-of-line       | custom        | 0/^ expression                               |
@@ -75,12 +75,12 @@ contains a =.git= directory or =.project= marker.
 
 | Key     | Mode   | Emacs Provider | Emacs Function                          | Nvim Provider  | Nvim Function                                                    |
 |---------+--------+----------------+-----------------------------------------+----------------+------------------------------------------------------------------|
-| SPC "   | normal | evil           | evil-show-registers                     | telescope.nvim | telescope.builtin.registers                                      |
+| SPC "   | normal | evil           | evil-show-registers (C)                 | telescope.nvim | telescope.builtin.registers                                      |
 | SPC '   | normal | evil           | evil-show-marks                         | telescope.nvim | telescope.builtin.marks                                          |
 | SPC *   | normal | custom         | my/search-symbol-at-point               | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
 | SPC ,   | normal | builtin        | project-switch-to-buffer                | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root)             |
-| SPC .   | normal | builtin        | project-find-file                       | telescope.nvim | telescope.builtin.find_files                                     |
-| SPC /   | normal | consult        | consult-line                            | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find                      |
+| SPC .   | normal | builtin        | project-find-file (C)                   | telescope.nvim | telescope.builtin.find_files                                     |
+| SPC /   | normal | consult        | consult-line (C)                        | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find                      |
 | SPC :   | normal | builtin        | execute-extended-command                | telescope.nvim | telescope.builtin.commands                                       |
 | SPC ;   | normal | builtin        | pp-eval-expression                      | builtin        | :lua =                                                           |
 | SPC `   | normal | evil           | evil-switch-to-windows-last-buffer      | builtin        | <C-^>                                                            |
@@ -364,6 +364,26 @@ contains a =.git= directory or =.project= marker.
 | z r     | normal | custom         | my/org-show-next-fold-level                | N/A           | N/A           |
 | z R     | normal | builtin        | outline-show-all                           | N/A           | N/A           |
 
+** Org-srs review (=\ R=) mappings
+
+These bindings are available from the regular Org localleader. Commands that
+rate or modify the current item are useful during an active review session.
+
+| Key   | Mode   | Emacs Provider | Emacs Function            | Nvim Provider | Nvim Function |
+|-------+--------+----------------+---------------------------+---------------+---------------|
+| \ R   | normal | custom         | my/org-srs-map            | N/A           | N/A           |
+| \ R a | normal | org-srs        | org-srs-review-rate-again | N/A           | N/A           |
+| \ R c | normal | org-srs        | org-srs-item-create       | N/A           | N/A           |
+| \ R e | normal | org-srs        | org-srs-review-rate-easy  | N/A           | N/A           |
+| \ R g | normal | org-srs        | org-srs-review-rate-good  | N/A           | N/A           |
+| \ R h | normal | org-srs        | org-srs-review-rate-hard  | N/A           | N/A           |
+| \ R p | normal | org-srs        | org-srs-review-postpone   | N/A           | N/A           |
+| \ R q | normal | org-srs        | org-srs-review-quit       | N/A           | N/A           |
+| \ R r | normal | org-srs        | org-srs-review-start      | N/A           | N/A           |
+| \ R s | normal | org-srs        | org-srs-review-suspend    | N/A           | N/A           |
+| \ R u | normal | org-srs        | org-srs-review-undo       | N/A           | N/A           |
+| \ R U | normal | org-srs        | org-srs-review-undo-redo  | N/A           | N/A           |
+
 ** Org localleader (=\=) mappings
 
 | Key | Mode   | Emacs Provider | Emacs Function                | Nvim Provider | Nvim Function |
@@ -546,3 +566,4 @@ contains a =.git= directory or =.project= marker.
 - Key values and function or command names are intentionally written as plain text instead of Org verbatim text to reduce visual noise in the table.
 - =N/I=: Not implemented in this editor yet.
 - =N/A=: Not applicable to this editor.
+- (C) on a function name indicates a flash card has been created in Spaced-Repetition System

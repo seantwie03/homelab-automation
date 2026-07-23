@@ -361,6 +361,13 @@
       (my/org-show-next-fold-level))
     (should (= hidden-to 4))))
 
+(ert-deftest my/org-disable-line-numbers-turns-off-line-numbers ()
+  (with-temp-buffer
+    (display-line-numbers-mode 1)
+    (my/org-disable-line-numbers)
+    (should-not display-line-numbers-mode)
+    (should-not display-line-numbers)))
+
 (ert-deftest my/org-task-capture-targets-the-inbox-file ()
   (require 'org-capture)
   (let* ((template (assoc "t" org-capture-templates))

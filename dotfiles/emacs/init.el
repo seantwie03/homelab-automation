@@ -111,6 +111,11 @@
 
 (use-package display-line-numbers
   :ensure nil
+  :preface
+  (defun my/org-disable-line-numbers ()
+    "Disable line numbers in the current Org buffer."
+    (display-line-numbers-mode -1))
+
   :custom
   (display-line-numbers-width-start t)
   (display-line-numbers-grow-only t)
@@ -292,6 +297,11 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     "s" (cons "subtree" my/markdown-subtree-map)
     "x" "toggle task")
 
+  (which-key-add-keymap-based-replacements
+    my/markdown-tables-map
+    "d" (cons "delete" my/markdown-tables-delete-map)
+    "i" (cons "insert" my/markdown-tables-insert-map))
+
   (defun my/markdown-setup-evil-bindings ()
     "Install mode-specific Evil bindings for Markdown buffers."
     (evil-define-key 'insert markdown-mode-map
@@ -349,6 +359,14 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (add-hook 'markdown-mode-hook #'my/markdown-setup-evil-bindings t)
     (add-hook 'gfm-mode-hook #'my/markdown-setup-evil-bindings t)
     (my/markdown-setup-evil-bindings)))
+
+(use-package olivetti
+  :ensure t
+  :custom
+  (olivetti-body-width 110)
+  (olivetti-style 'fancy)
+  :hook
+  ((org-mode markdown-mode) . olivetti-mode))
 
 ;;; File behavior
 (setopt vc-follow-symlinks t)
@@ -512,6 +530,7 @@ Copy the absolute path when the file is not in a project."
    ("C-c l" . org-store-link))
   :hook
   ((org-mode . org-indent-mode)
+   (org-mode . my/org-disable-line-numbers)
    (org-mode . visual-line-mode))
 
   :init
@@ -706,6 +725,27 @@ Copy the absolute path when the file is not in a project."
   (set-face-attribute 'org-level-4 nil :height 1.10)
   (set-face-attribute 'org-level-5 nil :height 1.05)
   (require 'org-habit))
+
+(use-package org-srs
+  :ensure t
+  :after org
+  :preface
+  (defvar-keymap my/org-srs-map
+    :doc "Org-srs commands."
+    "c" #'org-srs-item-create
+    "r" #'org-srs-review-start
+    "a" #'org-srs-review-rate-again
+    "e" #'org-srs-review-rate-easy
+    "g" #'org-srs-review-rate-good
+    "h" #'org-srs-review-rate-hard
+    "p" #'org-srs-review-postpone
+    "q" #'org-srs-review-quit
+    "s" #'org-srs-review-suspend
+    "u" #'org-srs-review-undo
+    "U" #'org-srs-review-undo-redo)
+
+  :hook
+  (org-mode . org-srs-embed-overlay-mode))
 
 (use-package org-capture
   :ensure nil
@@ -1187,9 +1227,30 @@ unsupported because the exported text must be available immediately."
     "g" my/org-goto-map
     "l" my/org-links-map
     "P" my/org-publish-map
+    "R" my/org-srs-map
     "r" my/org-refile-map
     "s" my/org-subtree-map
     "p" my/org-priority-map)
+
+  (which-key-add-keymap-based-replacements
+    my/org-localleader-map
+    "a" (cons "attachments" my/org-attachments-map)
+    "b" (cons "tables" my/org-tables-map)
+    "c" (cons "clock" my/org-clock-map)
+    "d" (cons "date" my/org-date-map)
+    "g" (cons "goto" my/org-goto-map)
+    "l" (cons "links" my/org-links-map)
+    "p" (cons "priority" my/org-priority-map)
+    "P" (cons "publish" my/org-publish-map)
+    "R" (cons "review" my/org-srs-map)
+    "r" (cons "refile" my/org-refile-map)
+    "s" (cons "subtree" my/org-subtree-map))
+
+  (which-key-add-keymap-based-replacements
+    my/org-tables-map
+    "d" (cons "delete" my/org-tables-delete-map)
+    "i" (cons "insert" my/org-tables-insert-map)
+    "t" (cons "toggle" my/org-tables-toggle-map))
 
 ;;; Org localleader bindings
   (with-eval-after-load 'org
