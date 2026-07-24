@@ -361,12 +361,26 @@
       (my/org-show-next-fold-level))
     (should (= hidden-to 4))))
 
-(ert-deftest my/org-disable-line-numbers-turns-off-line-numbers ()
+(ert-deftest my/disable-line-numbers-turns-off-line-numbers ()
   (with-temp-buffer
     (display-line-numbers-mode 1)
-    (my/org-disable-line-numbers)
+    (my/disable-line-numbers)
     (should-not display-line-numbers-mode)
     (should-not display-line-numbers)))
+
+(ert-deftest my/delete-trailing-whitespace-on-save-deletes-when-enabled ()
+  (with-temp-buffer
+    (insert "text  \n")
+    (my/delete-trailing-whitespace-on-save)
+    (should (equal (buffer-string) "text\n"))))
+
+(ert-deftest my/disable-delete-trailing-whitespace-on-save-preserves-whitespace ()
+  (with-temp-buffer
+    (insert "text  \n")
+    (my/disable-delete-trailing-whitespace-on-save)
+    (my/delete-trailing-whitespace-on-save)
+    (should-not my--delete-trailing-whitespace-on-save-p)
+    (should (equal (buffer-string) "text  \n"))))
 
 (ert-deftest my/org-task-capture-targets-the-inbox-file ()
   (require 'org-capture)

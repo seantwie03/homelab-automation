@@ -99,6 +99,11 @@ and update any content made inaccurate by the change.
   `use-package` block for the file where the variable or function is defined.
   Use `C-h v` or `C-h f` in Emacs to find the source file. Do not create a
   catch-all `use-package emacs` block.
+- Enable an autoloaded built-in global mode directly with `(MODE 1)` when it has
+  no associated configuration. Use `use-package` when managing package options,
+  hooks, bindings, dependencies, installation, or loading behavior. Retain
+  `use-package` for third-party packages when it provides those benefits, even
+  if the block would otherwise contain only one configuration line.
 - When adding a custom function to the Emacs or Neovim configuration, add tests
   that cover it to `dotfiles/emacs/tests` or `dotfiles/nvim/tests`, respectively.
 

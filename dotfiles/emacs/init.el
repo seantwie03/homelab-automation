@@ -2,16 +2,14 @@
 
 ;;; Guardrail
 (when (< emacs-major-version 30)
-  (error "Emacs Bedrock only works with Emacs 30 and newer; you have version %s" emacs-major-version))
+  (error "This configuration only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
 ;;; Package management
 (use-package package
   :ensure nil
   :custom
-  (package-archives
-   '(("gnu" . "https://elpa.gnu.org/packages/")
-     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-     ("melpa" . "https://melpa.org/packages/"))))
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/") t))
 
 ;;; Generated state
 (use-package cus-edit
@@ -29,49 +27,42 @@
                 (expand-file-name "backups/" user-emacs-directory)
                 (expand-file-name "auto-saves/" user-emacs-directory)))
     (make-directory dir t))
+
   :custom
   (backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory))))
   (auto-save-file-name-transforms
    `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
   (create-lockfiles nil))
 
-(use-package savehist
-  :ensure nil
-  :config
-  (savehist-mode 1))
-
-(use-package saveplace
-  :ensure nil
-  :config
-  (save-place-mode 1))
+(savehist-mode 1)
+(save-place-mode 1)
 
 (use-package recentf
   :ensure nil
   :custom
   (recentf-max-saved-items 200)
   (recentf-auto-cleanup 'never)
-  :init
+  :config
   (recentf-mode 1))
 
 ;;; UI
+(add-to-list 'face-font-family-alternatives
+             '("Iosevka Nerd Font" "Iosevka Curly" "Ubuntu Mono"))
 (set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 140)
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
+(blink-cursor-mode -1)
+(show-paren-mode 1)
 
-(use-package paren
-  :ensure nil
-  :config
-  (show-paren-mode 1))
+;; Scroll like Vim's scrolloff: keep point away from the window edges.
+(setopt scroll-margin 8)
+(setopt scroll-conservatively 101)
+(setopt scroll-step 1)
+(setopt scroll-preserve-screen-position t)
+(setq next-screen-context-lines 8)
 
-(use-package frame
-  :ensure nil
-  :custom
-  (cursor-in-non-selected-windows nil)
-  (cursor-type '(hbar . 5))
-  :config
-  (blink-cursor-mode -1))
 
 (use-package term/xterm
   :ensure nil
@@ -82,7 +73,20 @@
   (unless (or (daemonp) (display-graphic-p))
     (xterm--init-activate-set-selection)))
 
-;;; Mode line
+(use-package display-line-numbers
+  :ensure nil
+  :preface
+  (defun my/disable-line-numbers ()
+    "Disable line numbers in the current buffer."
+    (display-line-numbers-mode -1))
+  :hook
+  ((org-mode markdown-mode) . my/disable-line-numbers)
+  :custom
+  (display-line-numbers-width-start t)
+  (display-line-numbers-grow-only t)
+  :config
+  (global-display-line-numbers-mode 1))
+
 (use-package doom-modeline
   :ensure t
   :custom
@@ -107,66 +111,44 @@
 (setq-default tab-width 4)
 (setq-default show-trailing-whitespace t)
 (setopt sentence-end-double-space nil)
+(editorconfig-mode 1)
+(delete-selection-mode 1)
+(setopt kill-do-not-save-duplicates t)
+(setopt save-interprogram-paste-before-kill 100000)
 
-(use-package display-line-numbers
+(use-package files
   :ensure nil
   :preface
-  (defun my/org-disable-line-numbers ()
-    "Disable line numbers in the current Org buffer."
-    (display-line-numbers-mode -1))
+  (defun my/format-emacs-lisp-buffer ()
+    "Indent the current Emacs Lisp buffer."
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (save-excursion
+        (indent-region (point-min) (point-max)))))
 
-  :custom
-  (display-line-numbers-width-start t)
-  (display-line-numbers-grow-only t)
-  :config
-  (global-display-line-numbers-mode 1))
+  (defvar-local my--delete-trailing-whitespace-on-save-p t
+    "Whether to delete trailing whitespace when saving the current buffer.")
 
-(use-package editorconfig
-  :ensure nil
-  :config
-  (editorconfig-mode 1))
+  (defun my/delete-trailing-whitespace-on-save ()
+    "Delete trailing whitespace when enabled for the current buffer."
+    (when my--delete-trailing-whitespace-on-save-p
+      (delete-trailing-whitespace)))
 
-(use-package delsel
-  :ensure nil
-  :config
-  (delete-selection-mode 1))
+  (defun my/disable-delete-trailing-whitespace-on-save ()
+    "Preserve trailing whitespace when saving the current buffer."
+    (setq-local my--delete-trailing-whitespace-on-save-p nil))
 
-(use-package elec-pair
-  :ensure nil
-  :config
-  (electric-pair-mode 1))
+  :init
+  (add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
+  (add-hook 'before-save-hook #'my/delete-trailing-whitespace-on-save)
 
-(defun my/format-emacs-lisp-buffer ()
-  "Indent the current Emacs Lisp buffer."
-  (when (derived-mode-p 'emacs-lisp-mode)
-    (save-excursion
-      (indent-region (point-min) (point-max)))))
-
-(defun my/delete-trailing-whitespace-maybe ()
-  "Delete trailing whitespace unless the current buffer is in Org mode."
-  (unless (derived-mode-p 'org-mode)
-    (delete-trailing-whitespace)))
-
-(add-hook 'before-save-hook #'my/delete-trailing-whitespace-maybe)
-(add-hook 'before-save-hook #'my/format-emacs-lisp-buffer)
-
-;; Scroll like Vim's scrolloff: keep point away from the window edges.
-(setopt scroll-margin 8)
-(setopt scroll-conservatively 101)
-(setopt scroll-step 1)
-(setopt scroll-preserve-screen-position t)
-(setq next-screen-context-lines 8)
+  :hook
+  ((org-mode markdown-mode) . my/disable-delete-trailing-whitespace-on-save))
 
 (use-package markdown-mode
   :ensure t
   :mode ("\\.md\\'" . gfm-mode)
-  :preface
-  (defun my/markdown-disable-line-numbers ()
-    "Disable line numbers in the current Markdown buffer."
-    (display-line-numbers-mode -1))
   :hook
   (markdown-mode . visual-wrap-prefix-mode)
-  (markdown-mode . my/markdown-disable-line-numbers)
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
   (markdown-open-command "xdg-open")
@@ -536,7 +518,6 @@ Copy the absolute path when the file is not in a project."
    ("C-c l" . org-store-link))
   :hook
   ((org-mode . org-indent-mode)
-   (org-mode . my/org-disable-line-numbers)
    (org-mode . visual-line-mode))
   :init
   (defun my/org-find-file-in-notes ()
