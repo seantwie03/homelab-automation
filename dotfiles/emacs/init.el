@@ -467,6 +467,22 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :custom
   (project-vc-extra-root-markers '(".project"))
   :config
+  ;; On Windows, `project--files-in-directory' invokes the system `find.exe'
+  ;; (a text-search tool, not a file finder), which fails on paths with spaces.
+  ;; Override it with a pure-Elisp impelementation.
+  (when (eq system-type 'windows-nt)
+    (defun project--files-in-directory (dir ignores &optional files)
+      "List files in DIR, ignoring IGNORES patterns.
+Pure-Elisp Windows-safe replacement for the default impeletnation."
+      (let* ((dir (file-name-as-directory (expand-file-name dir)))
+             (all-files (directory-files-recursively dir "" nil nil t))
+             (rel-files (mapcar (lambda (f) (file-relative-name f dir))
+                                all-files)))
+        (seq-filter
+         (lambda (f)
+           (not (seq-some (lambda (ig) (string-match-p ig f)) ignores)))
+         rel-files))))
+
   (defun my/copy-file-name ()
     "Copy the current buffer's file name to the kill ring."
     (interactive)
