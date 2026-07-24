@@ -39,9 +39,24 @@
   (recentf-mode 1))
 
 ;;; UI
-(add-to-list 'face-font-family-alternatives
-             '("Iosevka Nerd Font" "Iosevka Curly" "Ubuntu Mono"))
-(set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 140)
+(use-package faces
+  :ensure nil
+  :config
+  (defun my/apply-default-font ()
+    "Set the default face to the first installed font from a preference list.
+Uses `font-family-list' rather than `fac-efont-family-alternatives' because
+the Windows (GDI) font backend silently substitutes a missing family instead
+of reporting it absent, which defeats the alternatives fallback."
+    (when (display-graphic-p)
+      (when-let ((font (seq-find (lambda (f) (member f (font-family-list)))
+                                 '("Iosevka Nerd Font"
+                                   "Iosevka Curly"
+                                   "Ubuntu Mono"))))
+        (set-face-attribute 'default nil :family font :height 140))))
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'my/apply-default-font)
+    (my/apply-default-font)))
+
 (load-theme 'modus-operandi t)
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
