@@ -285,7 +285,6 @@ contains a =.git= directory or =.project= marker.
 | \ e | normal | markdown-mode  | markdown-export             | N/I           | N/I           |
 | \ f | normal | markdown-mode  | markdown-insert-footnote    | N/I           | N/I           |
 | \ l | normal | custom         | my/markdown-links-map       | N/I           | N/I           |
-| \ o | normal | markdown-mode  | markdown-open               | N/I           | N/I           |
 | \ p | normal | markdown-mode  | markdown-preview            | N/I           | N/I           |
 | \ s | normal | custom         | my/markdown-subtree-map     | N/I           | N/I           |
 | \ x | normal | markdown-mode  | markdown-toggle-gfm-checkbox | N/I          | N/I           |

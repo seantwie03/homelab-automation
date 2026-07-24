@@ -160,7 +160,6 @@ of reporting it absent, which defeats the alternatives fallback."
   (markdown-mode . visual-wrap-prefix-mode)
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
-  (markdown-open-command "xdg-open")
   (markdown-unordered-list-item-prefix "- ")
   :config
   (defun my/markdown-insert-list-item ()
@@ -277,7 +276,6 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     "e" #'markdown-export
     "f" #'markdown-insert-footnote
     "l" my/markdown-links-map
-    "o" #'markdown-open
     "p" #'markdown-preview
     "s" my/markdown-subtree-map
     "x" #'markdown-toggle-gfm-checkbox)
@@ -289,7 +287,6 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     "e" "export"
     "f" "footnote"
     "l" (cons "links" my/markdown-links-map)
-    "o" "open"
     "p" "preview"
     "s" (cons "subtree" my/markdown-subtree-map)
     "x" "toggle task")
