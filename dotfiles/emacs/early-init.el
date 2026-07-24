@@ -1,5 +1,12 @@
 ;;; early-init.el --- Early init file -*- lexical-binding: t -*-
 
+;;; Package management
+;; package.el initializes after early-init.el and before init.el, so third-party
+;; archives must be configured here for first-start package installation.
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
 ;;; Startup
 (setq gc-cons-threshold 32000000
       gc-cons-percentage 0.5)

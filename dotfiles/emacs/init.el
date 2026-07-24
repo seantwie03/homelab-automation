@@ -4,13 +4,6 @@
 (when (< emacs-major-version 30)
   (error "This configuration only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
-;;; Package management
-(use-package package
-  :ensure nil
-  :custom
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/") t))
-
 ;;; Generated state
 (use-package cus-edit
   :ensure nil
