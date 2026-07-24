@@ -48,6 +48,7 @@
 (setopt initial-major-mode 'org-mode)
 (blink-cursor-mode -1)
 (show-paren-mode 1)
+(global-visual-line-mode 1)
 
 ;; Scroll like Vim's scrolloff: keep point away from the window edges.
 (setopt scroll-margin 8)
