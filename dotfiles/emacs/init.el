@@ -527,10 +527,21 @@ Copy the absolute path when the file is not in a project."
    ("s" . ghostel-project))
   :hook
   (ghostel-mode . my/ghostel-disable-trailing-whitespace)
+  ;; :custom
+  ;; (ghostel-shell (or (getenv "SHELL")
+  ;;                    (if (eq system-type 'windows-nt)
+  ;;                        "wsl.exe"
+  ;;                      "/bin/sh")))
   :config
   (defun my/ghostel-disable-trailing-whitespace ()
     "Disable trailing whitespace display in Ghostel buffers."
     (setq-local show-trailing-whitespace nil)))
+
+(use-package evil-ghostel
+  :ensure t
+  :after (ghostel evil)
+  :hook
+  (ghostel-mode . evil-ghostel-mode))
 
 (use-package org
   :ensure nil
