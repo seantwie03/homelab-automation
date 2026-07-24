@@ -83,9 +83,6 @@
     (xterm--init-activate-set-selection)))
 
 ;;; Mode line
-(column-number-mode 1)
-(line-number-mode 1)
-
 (use-package doom-modeline
   :ensure t
   :custom
@@ -94,6 +91,8 @@
   (doom-modeline-battery nil)
   (doom-modeline-time nil)
   :config
+  (column-number-mode 1)
+  (line-number-mode 1)
   (doom-modeline-mode 1)
   (set-face-attribute 'mode-line nil
                       :background "#f2f2f2"
@@ -161,6 +160,13 @@
 (use-package markdown-mode
   :ensure t
   :mode ("\\.md\\'" . gfm-mode)
+  :preface
+  (defun my/markdown-disable-line-numbers ()
+    "Disable line numbers in the current Markdown buffer."
+    (display-line-numbers-mode -1))
+  :hook
+  (markdown-mode . visual-wrap-prefix-mode)
+  (markdown-mode . my/markdown-disable-line-numbers)
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
   (markdown-open-command "xdg-open")
@@ -532,7 +538,6 @@ Copy the absolute path when the file is not in a project."
   ((org-mode . org-indent-mode)
    (org-mode . my/org-disable-line-numbers)
    (org-mode . visual-line-mode))
-
   :init
   (defun my/org-find-file-in-notes ()
     "Find a file beneath `org-directory'."

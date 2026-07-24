@@ -66,15 +66,15 @@ common automation tasks. With no subcommand, it shows
 
 **Subcommands (`h <sub>`):**
 
-| Subcommand | Description |
-|---|---|
-| `e` / `edit` | Open `$EDITOR` in `/opt/homelab-automation` |
-| `c` / `commit` | `git add . && git commit -m <ISO timestamp> && git push` |
-| `g` / `git [args]` | Run any git command in the automation dir (default: `git status`) |
-| `l` / `logs [n]` | Open a summary and the last `n` ansible-pull logs (default: 1) |
-| `r` / `run` | `sudo systemctl start ansible-pull.service` |
-| `t` / `test [playbook]` | Run ansible-pull with `--force` (ignores dirty working dir); defaults to `$(hostname --short).yml` |
-| `j` / `job [enable\|disable]` | Enable/disable `ansible-pull.timer`; default shows timer status |
+| Subcommand                    | Description                                                                                        |
+|-------------------------------|----------------------------------------------------------------------------------------------------|
+| `e` / `edit`                  | Open `$EDITOR` in `/opt/homelab-automation`                                                        |
+| `c` / `commit`                | `git add . && git commit -m <ISO timestamp> && git push`                                           |
+| `g` / `git [args]`            | Run any git command in the automation dir (default: `git status`)                                  |
+| `l` / `logs [n]`              | Open a summary and the last `n` ansible-pull logs (default: 1)                                     |
+| `r` / `run`                   | `sudo systemctl start ansible-pull.service`                                                        |
+| `t` / `test [playbook]`       | Run ansible-pull with `--force` (ignores dirty working dir); defaults to `$(hostname --short).yml` |
+| `j` / `job [enable\|disable]` | Enable/disable `ansible-pull.timer`; default shows timer status                                    |
 
 ## YAML Code Formatting
 
