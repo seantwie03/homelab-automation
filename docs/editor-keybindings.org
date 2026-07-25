@@ -76,9 +76,9 @@ contains a =.git= directory or =.project= marker.
 | Key     | Mode   | Emacs Provider | Emacs Function                          | Nvim Provider  | Nvim Function                                                    |
 |---------+--------+----------------+-----------------------------------------+----------------+------------------------------------------------------------------|
 | SPC "   | normal | evil           | evil-show-registers (C)                 | telescope.nvim | telescope.builtin.registers                                      |
-| SPC '   | normal | evil           | evil-show-marks                         | telescope.nvim | telescope.builtin.marks                                          |
-| SPC *   | normal | custom         | my/search-symbol-at-point               | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
-| SPC ,   | normal | builtin        | project-switch-to-buffer                | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root)             |
+| SPC '   | normal | evil           | evil-show-marks (C)                     | telescope.nvim | telescope.builtin.marks                                          |
+| SPC *   | normal | custom         | my/search-symbol-at-point (C)           | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
+| SPC ,   | normal | builtin        | project-switch-to-buffer (C)            | telescope.nvim | telescope.builtin.buffers (cwd=project.current_root)             |
 | SPC .   | normal | builtin        | project-find-file (C)                   | telescope.nvim | telescope.builtin.find_files                                     |
 | SPC /   | normal | consult        | consult-line (C)                        | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find                      |
 | SPC :   | normal | builtin        | execute-extended-command                | telescope.nvim | telescope.builtin.commands                                       |
@@ -201,8 +201,8 @@ contains a =.git= directory or =.project= marker.
 
 | Key     | Mode   | Emacs Provider | Emacs Function                    | Nvim Provider  | Nvim Function                                                    |
 |---------+--------+----------------+-----------------------------------+----------------+------------------------------------------------------------------|
-| SPC s ' | normal | evil           | evil-show-marks                   | telescope.nvim | telescope.builtin.marks                                          |
-| SPC s * | normal | custom         | my/search-symbol-at-point         | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
+| SPC s ' | normal | evil           | evil-show-marks (C)               | telescope.nvim | telescope.builtin.marks                                          |
+| SPC s * | normal | custom         | my/search-symbol-at-point (C)     | telescope.nvim | telescope.builtin.current_buffer_fuzzy_find (default_text=cword) |
 | SPC s b | normal | custom         | my/search-open-buffers            | custom         | search_actions.search_open_buffers                               |
 | SPC s j | normal | evil           | evil-show-jumps                   | telescope.nvim | telescope.builtin.jumplist                                       |
 | SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                              |

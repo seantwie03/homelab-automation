@@ -207,6 +207,10 @@ nmap <leader>fr <Action>(RecentFiles)
 nmap <leader>fy <Action>(CopyFileName)
 nmap <leader>fY <Action>(CopyPathFromRepositoryRootProvider)
 
+" Leader-h (Help)
+nmap <leader>hp <Action>(WelcomeScreen.Plugins)
+nmap <leader>hr <Action>(HelpTopics)
+
 " Leader-s (Search)
 nnoremap <leader>s' :marks<CR>
 nmap <leader>s* <Action>(FindUsagesInFile)
@@ -215,6 +219,10 @@ nmap <leader>sm <Action>(ShowBookmarks)
 nmap <leader>ss <Action>(FindUsages)
 nmap <leader>st <Action>(FindInPath)
 nmap <leader>su <Action>(LocalHistory.ShowHistory)
+
+" Leader-t (Toggle)
+nmap <leader>tf <Action>(PopupHector)
+nmap <leader>tw <Action>(EditorToggleUseSoftWraps)
 
 " Leader-w (Windows)
 nnoremap <leader>w+ <C-w>+

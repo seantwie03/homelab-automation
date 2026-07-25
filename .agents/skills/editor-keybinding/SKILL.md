@@ -85,8 +85,11 @@ to implement the binding as approval without asking again.
   that map exists, and retain `with-eval-after-load` guards for dependencies such
   as Evil so either package load order remains safe.
 - Let an extension package own its child prefix map and attach that map to the
-  parent package's already-defined localleader during the extension's
-  configuration. Add the corresponding Which-Key label in the extension block.
+  parent package's already-defined localleader in the extension block. Use
+  `:init` for this declarative attachment when an autoloaded command or hook can
+  work without loading the extension's main feature; do not assume its
+  `:config` will run. Add the corresponding Which-Key label beside the
+  attachment.
 - Put custom wrappers with the package that owns their semantics. Define global
   Evil helpers in `use-package evil` under `:preface` when after-load callbacks
   may call them; do not move an Evil state-transition wrapper to another package

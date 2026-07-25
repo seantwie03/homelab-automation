@@ -641,7 +641,8 @@ Copy the absolute path when the file is not in a project."
    ("C-c l" . org-store-link))
   :hook
   ((org-mode . org-indent-mode)
-   (org-mode . visual-line-mode))
+   (org-mode . visual-line-mode)
+   (org-mode . my/org-enable-align-tags-on-save))
   :init
   (defun my/org-find-file-in-notes ()
     "Find a file beneath `org-directory'."
@@ -663,6 +664,14 @@ Copy the absolute path when the file is not in a project."
     (interactive)
     (require 'org)
     (consult-ripgrep org-directory))
+
+  (defun my/org-align-all-tags ()
+    "Align tags on every headline in the current Org buffer."
+    (org-align-tags t))
+
+  (defun my/org-enable-align-tags-on-save ()
+    "Align all Org tags before saving the current buffer."
+    (add-hook 'before-save-hook #'my/org-align-all-tags nil t))
 
   (defun my/org-command-and-enter-insert-state (command)
     "Call COMMAND interactively, then enter Evil insert state."
@@ -1057,13 +1066,14 @@ Copy the absolute path when the file is not in a project."
     "u" #'org-srs-review-undo
     "U" #'org-srs-review-undo-redo)
 
-  :hook
-  (org-mode . org-srs-embed-overlay-mode)
-  :config
+  :init
   (keymap-set my/org-localleader-map "R" my/org-srs-map)
   (which-key-add-keymap-based-replacements
     my/org-localleader-map
-    "R" (cons "review" my/org-srs-map)))
+    "R" (cons "review" my/org-srs-map))
+
+  :hook
+  (org-mode . org-srs-embed-overlay-mode))
 
 (use-package org-capture
   :ensure nil

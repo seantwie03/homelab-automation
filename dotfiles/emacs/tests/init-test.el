@@ -5,6 +5,25 @@
 (require 'markdown-mode)
 (require 'org)
 
+(ert-deftest my/org-srs-localleader-is-attached-before-org-srs-loads ()
+  (should (eq (keymap-lookup my/org-localleader-map "R")
+              my/org-srs-map)))
+
+(ert-deftest my/org-align-all-tags-aligns-every-headline ()
+  (let (all)
+    (cl-letf (((symbol-function 'org-align-tags)
+               (lambda (&optional value)
+                 (setq all value))))
+      (my/org-align-all-tags))
+    (should all)))
+
+(ert-deftest my/org-enable-align-tags-on-save-adds-a-buffer-local-hook ()
+  (with-temp-buffer
+    (setq-local before-save-hook nil)
+    (my/org-enable-align-tags-on-save)
+    (should (local-variable-p 'before-save-hook))
+    (should (memq #'my/org-align-all-tags before-save-hook))))
+
 (ert-deftest my/evil-normal-state-and-save-enters-normal-state-before-saving ()
   (let (calls)
     (cl-letf (((symbol-function 'evil-normal-state)
