@@ -99,18 +99,7 @@ return {
         { "<Leader>j",  "<Cmd>Telescope jumplist<CR>",            desc = "Search jump list" },
         { '<Leader>"',  "<Cmd>Telescope registers<CR>",           desc = "Telescope registers" },
         -- Search actions
-        {
-            '<Leader>s*',
-            function()
-                require('telescope.builtin').current_buffer_fuzzy_find({
-                    default_text = vim.fn.expand('<cword>'),
-                })
-            end,
-            desc = 'Search symbol in current buffer',
-        },
-        { "<Leader>s'", "<Cmd>Telescope marks<CR>", desc = "Search marks" },
         { '<Leader>sb', search_actions.search_open_buffers, desc = 'Search open buffers' },
-        { '<Leader>sj', '<Cmd>Telescope jumplist<CR>', desc = 'Search jump list' },
         {
             '<Leader>st',
             function()

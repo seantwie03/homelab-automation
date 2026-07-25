@@ -1208,10 +1208,7 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-search-map
   :doc "Search and jump commands."
-  "*" #'my/search-symbol-at-point
-  "'" #'evil-show-marks
   "b" #'my/search-open-buffers
-  "j" #'evil-show-jumps
   "m" #'bookmark-jump
   "s" #'my/search-project-symbol-at-point
   "t" #'consult-ripgrep
