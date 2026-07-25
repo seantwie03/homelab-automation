@@ -18,6 +18,28 @@ gstat() {
     git status
 }
 
+locf() {
+    if [ "$#" -eq 0 ]; then
+        echo "usage: locf PATTERN..." >&2
+        return 2
+    fi
+
+    locate -- "$@" |
+        fzf \
+            --scheme=path \
+            --layout=reverse \
+            --height=90% \
+            --border \
+            --prompt='locate> ' \
+            --preview '
+                if [ -d {} ]; then
+                    ls -la -- {}
+                else
+                    bat --color=always --style=numbers --line-range=:200 -- {}
+                fi
+            '
+}
+
 em() {
     emacs -nw "$@"
 }

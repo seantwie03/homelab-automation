@@ -42,17 +42,27 @@ plocate_prunenames:
   - .yarn
   - .zig-cache
   - __pycache__
+  - Bottles
   - bower_components
   - Carthage
   - DerivedData
+  - Games
   - gems
+  - Heroic
+  - heroic
   - htmlcov
+  - Lutris
+  - lutris
   - node_modules
   - Pods
   - site-packages
+  - Steam
+  - steamapps
+  - SteamLibrary
   - target
   - vendor
   - venv
+  - wineprefixes
   - zig-out
 plocate_prunepaths:
   - /home/{{ user }}/.local/share

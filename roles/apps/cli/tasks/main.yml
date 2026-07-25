@@ -20,6 +20,7 @@
     name:
       - git
       - bat
+      - fzf
       - tree
       - bind-utils # nslookup/dig/etc.
     state: present
