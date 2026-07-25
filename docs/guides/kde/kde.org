@@ -1,0 +1,49 @@
+#+TITLE KDE
+
+* Settings
+
+** Input & Output
+
+- Mouse & Touchpad
+  - Screen Edges
+    - Top Left Corner of Monitor: No Action
+    - Corner barrier: unchecked
+    - Edge barrier: 0 px (None)
+- Keyboard
+  - Key repeat: 300ms
+    - Rate: 40
+  - On-Screen Keyboard
+    - Alternate characters: Uncheck show popup when holding a key
+- Display & Monitor
+  - Night Light
+    - Switching times: Sunrise and sunset
+      - Settings
+        - Using custom times
+          - 4am
+          - 7:30pm
+          - 30 minutes transition duration
+  - Screen Edges
+    - Top left of monitor: No action (disables overview)
+    - Trigger quarter tiling in: Outer 10%
+- Animations
+  - One step away from instant
+- Notifications
+  - Do not disturb mode
+    - While a fullscreen application is focused: Uncheck
+- Window Management
+  - Desktop Effects
+    - Mouse Mark: Checked
+      - Clear Mouse Marks: Shift + F2
+      - Clear Last Mouse Marks: Shift + F3
+      - Free Draw: Ctrl + Shift
+      - Arrow Draw: Alt + Shift
+- Screen Locking
+  - Lock screen automatically: Never
+  - Lock after waking from sleep: Uncheck
+- Power Management
+  - Sleep after 30 minutes
+  - When power button pressed: Shut down
+  - Dim automatically: Never
+  - Turn off screen: Never
+- Software Update
+  - Notification fequency: Never

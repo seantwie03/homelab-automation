@@ -1,0 +1,6 @@
+#!/bin/bash
+exec /usr/bin/updatedb \
+    --add-prunenames "{{ plocate_prunenames | join(' ') }}" \
+    --add-prunepaths "{{ plocate_prunepaths | join(' ') }}" \
+    --prune-bind-mounts yes \
+    "$@"

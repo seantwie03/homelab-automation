@@ -4,28 +4,55 @@
     name: plocate
     state: present
 
+- name: updatedb.rpmnew file status is gathered
+  ansible.builtin.stat:
+    path: /etc/updatedb.conf.rpmnew
+  register: updatedb_rpmnew
+
+- name: packaged updatedb configuration replaces prior local configuration
+  ansible.builtin.copy:
+    src: /etc/updatedb.conf.rpmnew
+    dest: /etc/updatedb.conf
+    remote_src: true
+    owner: root
+    group: root
+    mode: 0644
+  when: updatedb_rpmnew.stat.exists
+
+- name: obsolete updatedb.rpmnew file is absent
+  ansible.builtin.file:
+    path: /etc/updatedb.conf.rpmnew
+    state: absent
+  when: updatedb_rpmnew.stat.exists
+
+- name: updatedb wrapper is installed
+  ansible.builtin.template:
+    src: updatedb.j2
+    dest: /usr/local/bin/updatedb
+    owner: root
+    group: root
+    mode: 0755
+
+- name: plocate updatedb service override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/plocate-updatedb.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: plocate updatedb exclusions are configured
+  ansible.builtin.template:
+    src: plocate-updatedb-override.conf.j2
+    dest: /etc/systemd/system/plocate-updatedb.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
+
 - name: systemd daemon is reloaded
   ansible.builtin.systemd:
     daemon_reload: true
   changed_when: false
-
-- name: PRUNENAMES excludes all snapshot directories
-  ansible.builtin.lineinfile:
-    path: /etc/updatedb.conf
-    regexp: '^PRUNENAMES ='
-    line: 'PRUNENAMES = ".snapshots .btrbk_snapshots node-modules"'
-    create: true
-    state: present
-    mode: 0644
-
-- name: PRUNE_BIND_MOUNTS is true
-  ansible.builtin.lineinfile:
-    path: /etc/updatedb.conf
-    regexp: '^PRUNE_BIND_MOUNTS ='
-    line: 'PRUNE_BIND_MOUNTS = "yes"'
-    create: true
-    state: present
-    mode: 0644
 
 - name: plocate-updatedb.timer is enabled and started
   ansible.builtin.service:

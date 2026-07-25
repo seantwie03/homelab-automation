@@ -1,2 +1,62 @@
 ---
 user: sean
+plocate_prunenames:
+  - .angular
+  - .ansible
+  - .astro
+  - .btrbk_snapshots
+  - .bundle
+  - .cache
+  - .cabal-sandbox
+  - .cargo
+  - .dart_tool
+  - .direnv
+  - .eggs
+  - .expo
+  - .git
+  - .gradle
+  - .hg
+  - .idea
+  - .m2
+  - .mypy_cache
+  - .next
+  - .nox
+  - .nuxt
+  - .parcel-cache
+  - .pnpm-store
+  - .pub-cache
+  - .pytest_cache
+  - .ruff_cache
+  - .snapshots
+  - .stack-work
+  - .svelte-kit
+  - .svn
+  - .swiftpm
+  - .terraform
+  - .tmp
+  - .tox
+  - .turbo
+  - .venv
+  - .vite
+  - .vscode
+  - .yarn
+  - .zig-cache
+  - __pycache__
+  - bower_components
+  - Carthage
+  - DerivedData
+  - gems
+  - htmlcov
+  - node_modules
+  - Pods
+  - site-packages
+  - target
+  - vendor
+  - venv
+  - zig-out
+plocate_prunepaths:
+  - /home/{{ user }}/.local/share
+  - /home/{{ user }}/.local/src
+  - /home/{{ user }}/.var/app
+  - /var/lib/containers
+  - /var/lib/flatpak
