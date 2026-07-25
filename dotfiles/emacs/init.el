@@ -127,6 +127,79 @@ of reporting it absent, which defeats the alternatives fallback."
 
 (use-package evil
   :ensure t
+  :preface
+  ;; Binding helper
+  (defun my/keymap-set-many (keymaps key command)
+    "Bind KEY to COMMAND in each keymap in KEYMAPS."
+    (dolist (keymap keymaps)
+      (keymap-set keymap key command)))
+
+  ;; Editing commands
+  (defun my/evil-normal-state-and-save ()
+    "Enter Evil normal state and save the current buffer."
+    (interactive)
+    (evil-normal-state)
+    (save-buffer))
+
+  (defun my/evil-open-line-above-and-stay-normal (count)
+    "Open COUNT lines above point and return to Evil normal state."
+    (interactive "p")
+    (evil-open-above count)
+    (evil-normal-state))
+
+  (defun my/evil-open-line-below-and-stay-normal (count)
+    "Open COUNT lines below point and return to Evil normal state."
+    (interactive "p")
+    (evil-open-below count)
+    (evil-normal-state))
+
+  ;; Motion commands
+  (defun my/evil-smart-beginning-of-line ()
+    "Toggle between indentation and the beginning of the current line."
+    (interactive)
+    (let ((first-nonblank-position
+           (save-excursion
+             (evil-first-non-blank)
+             (point))))
+      (if (= (point) first-nonblank-position)
+          (evil-beginning-of-line)
+        (evil-first-non-blank))))
+
+  (defun my/evil-command-and-recenter (command)
+    "Call COMMAND interactively, then center point in the window."
+    (call-interactively command)
+    (recenter))
+
+  (defun my/evil-scroll-down-and-center ()
+    "Scroll down half a page and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-scroll-down))
+
+  (defun my/evil-scroll-up-and-center ()
+    "Scroll up half a page and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-scroll-up))
+
+  (defun my/evil-search-next-and-center ()
+    "Repeat the last search and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-search-next))
+
+  (defun my/evil-search-previous-and-center ()
+    "Repeat the last search backward and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-search-previous))
+
+  (defun my/evil-backward-paragraph-and-center ()
+    "Move backward by a paragraph and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-backward-paragraph))
+
+  (defun my/evil-forward-paragraph-and-center ()
+    "Move forward by a paragraph and center point in the window."
+    (interactive)
+    (my/evil-command-and-recenter #'evil-forward-paragraph))
+
   :init
   (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
   (setq evil-respect-visual-line-mode t)
@@ -1040,76 +1113,7 @@ unsupported because the exported text must be available immediately."
       (message "Rich-text export copied to clipboard"))))
 
 ;;; Evil keybindings
-(defun my/keymap-set-many (keymaps key command)
-  "Bind KEY to COMMAND in each keymap in KEYMAPS."
-  (dolist (keymap keymaps)
-    (keymap-set keymap key command)))
-
-(defun my/evil-normal-state-and-save ()
-  "Enter Evil normal state and save the current buffer."
-  (interactive)
-  (evil-normal-state)
-  (save-buffer))
-
-(defun my/evil-open-line-above-and-stay-normal (count)
-  "Open COUNT lines above point and return to Evil normal state."
-  (interactive "p")
-  (evil-open-above count)
-  (evil-normal-state))
-
-(defun my/evil-open-line-below-and-stay-normal (count)
-  "Open COUNT lines below point and return to Evil normal state."
-  (interactive "p")
-  (evil-open-below count)
-  (evil-normal-state))
-
-(defun my/evil-smart-beginning-of-line ()
-  "Toggle between indentation and the beginning of the current line."
-  (interactive)
-  (let ((first-nonblank-position
-         (save-excursion
-           (evil-first-non-blank)
-           (point))))
-    (if (= (point) first-nonblank-position)
-        (evil-beginning-of-line)
-      (evil-first-non-blank))))
-
-(defun my/evil-command-and-recenter (command)
-  "Call COMMAND interactively, then center point in the window."
-  (call-interactively command)
-  (recenter))
-
-(defun my/evil-scroll-down-and-center ()
-  "Scroll down half a page and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-scroll-down))
-
-(defun my/evil-scroll-up-and-center ()
-  "Scroll up half a page and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-scroll-up))
-
-(defun my/evil-search-next-and-center ()
-  "Repeat the last search and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-search-next))
-
-(defun my/evil-search-previous-and-center ()
-  "Repeat the last search backward and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-search-previous))
-
-(defun my/evil-backward-paragraph-and-center ()
-  "Move backward by a paragraph and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-backward-paragraph))
-
-(defun my/evil-forward-paragraph-and-center ()
-  "Move forward by a paragraph and center point in the window."
-  (interactive)
-  (my/evil-command-and-recenter #'evil-forward-paragraph))
-
-;;; Evil leader keymaps
+;;;; Leader keymaps
 (defvar-keymap my/leader-buffers-map
   :doc "Buffer commands."
   "b" #'switch-to-buffer
@@ -1249,7 +1253,7 @@ unsupported because the exported text must be available immediately."
   "t" (cons "toggle" my/leader-toggle-map)
   "w" (cons "windows" my/leader-windows-map))
 
-;;; Evil non-leader bindings
+;;;; Non-leader bindings
 (with-eval-after-load 'evil
   (my/keymap-set-many
    (list evil-normal-state-map evil-visual-state-map)
@@ -1298,9 +1302,10 @@ unsupported because the exported text must be available immediately."
   (keymap-set evil-normal-state-map "N" #'my/evil-search-previous-and-center)
   (keymap-set evil-normal-state-map "{" #'my/evil-backward-paragraph-and-center)
   (keymap-set evil-normal-state-map "}" #'my/evil-forward-paragraph-and-center)
-  (keymap-set evil-normal-state-map "-" #'dired-jump)
+  (keymap-set evil-normal-state-map "-" #'dired-jump))
 
-;;; Evil leader bindings
+;;;; Leader binding
+(with-eval-after-load 'evil
   (my/keymap-set-many
    (list evil-normal-state-map evil-visual-state-map evil-motion-state-map)
    "SPC" my/leader-map))

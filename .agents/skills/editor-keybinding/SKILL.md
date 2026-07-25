@@ -67,6 +67,31 @@ to implement the binding as approval without asking again.
 
 ## Implement In Emacs
 
+### Organize Emacs Bindings
+
+- Choose a binding's location by the scope and keymap it modifies, not by the
+  package that provides its command. Keep a binding on a global Evil state map
+  in the central Evil section even when its command comes from another package;
+  for example, keep `dired-jump` on `evil-normal-state-map` there rather than
+  under `use-package dired`.
+- Keep the central Evil keybinding section limited to global Evil state
+  bindings, Evil Ex commands, global leader maps, and the global leader
+  attachment. Use subordinate headings for those groups.
+- Put bindings that require a particular major or minor mode in that mode's
+  `use-package` block. Keep its localleader maps, Which-Key labels, custom
+  commands, and mode-specific Evil bindings together.
+- Define prefix maps during `:preface` or `:init` when later configuration must
+  reference them. Install bindings on a package's mode map during `:config`, when
+  that map exists, and retain `with-eval-after-load` guards for dependencies such
+  as Evil so either package load order remains safe.
+- Let an extension package own its child prefix map and attach that map to the
+  parent package's already-defined localleader during the extension's
+  configuration. Add the corresponding Which-Key label in the extension block.
+- Put custom wrappers with the package that owns their semantics. Define global
+  Evil helpers in `use-package evil` under `:preface` when after-load callbacks
+  may call them; do not move an Evil state-transition wrapper to another package
+  merely because it eventually calls a command such as `save-buffer`.
+
 1. Read the relevant `use-package` block and the current keymap definitions in
    `dotfiles/emacs/init.el` before editing.
 2. Use native `keymap-set`, `keymap-unset`, and `defvar-keymap`; do not add
