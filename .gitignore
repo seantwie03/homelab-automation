@@ -3,6 +3,7 @@
 *.vault
 collections/*
 !collections/requirements.yml
+.idea
 
 # Installer logs
 pip-log.txt

@@ -75,3 +75,11 @@
   become_user: "{{ orbit_user }}"
   environment:
     XDG_RUNTIME_DIR: /run/user/{{ orbit_uid }}
+
+- name: 8787 is allowed through the firewall
+  ansible.posix.firewalld:
+    port: 8787/tcp
+    permanent: true
+    immediate: true
+    state: enabled
+
