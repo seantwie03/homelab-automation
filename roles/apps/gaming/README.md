@@ -2,6 +2,5 @@
 
 Install gaming launchers
 
-- Steam
+- Steam, configured to start silently with the graphical session
 - [Heroic Games Launcher](https://heroicgameslauncher.com/)
-

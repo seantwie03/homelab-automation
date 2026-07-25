@@ -16,8 +16,23 @@
     name: steam
     state: present
 
+- name: autostart directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.config/autostart
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: steam autostarts
+  ansible.builtin.copy:
+    src: steam.desktop
+    dest: /home/{{ user }}/.config/autostart/steam.desktop
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
 - name: kernel-modules-extra is installed for controller support
   ansible.builtin.package:
     name: kernel-modules-extra
     state: present
-
