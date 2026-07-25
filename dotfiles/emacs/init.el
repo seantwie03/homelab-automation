@@ -668,6 +668,180 @@ Copy the absolute path when the file is not in a project."
       (outline-hide-sublevels level)
       (message "Folded to level %s" level)))
 
+  (defvar-keymap my/org-attachments-map
+    :doc "Org attachment commands."
+    "a" #'org-attach
+    "d" #'org-attach-delete-one
+    "D" #'org-attach-delete-all
+    "n" #'org-attach-new
+    "o" #'org-attach-open
+    "O" #'org-attach-open-in-emacs
+    "r" #'org-attach-reveal
+    "R" #'org-attach-reveal-in-emacs
+    "u" #'org-attach-url
+    "s" #'org-attach-set-directory
+    "S" #'org-attach-sync)
+
+  (defvar-keymap my/org-tables-delete-map
+    :doc "Org table delete commands."
+    "c" #'org-table-delete-column
+    "r" #'org-table-kill-row)
+
+  (defvar-keymap my/org-tables-insert-map
+    :doc "Org table insert commands."
+    "c" #'org-table-insert-column
+    "h" #'org-table-insert-hline
+    "r" #'org-table-insert-row
+    "H" #'org-table-hline-and-move)
+
+  (defvar-keymap my/org-tables-toggle-map
+    :doc "Org table toggle commands."
+    "f" #'org-table-toggle-formula-debugger
+    "o" #'org-table-toggle-coordinate-overlays)
+
+  (defvar-keymap my/org-tables-map
+    :doc "Org table commands."
+    "-" #'org-table-insert-hline
+    "a" #'org-table-align
+    "b" #'org-table-blank-field
+    "c" #'org-table-create-or-convert-from-region
+    "e" #'org-table-edit-field
+    "f" #'org-table-edit-formulas
+    "h" #'org-table-field-info
+    "s" #'org-table-sort-lines
+    "r" #'org-table-recalculate
+    "R" #'org-table-recalculate-buffer-tables
+    "d" my/org-tables-delete-map
+    "i" my/org-tables-insert-map
+    "t" my/org-tables-toggle-map)
+
+  (defvar-keymap my/org-clock-map
+    :doc "Org clock commands."
+    "c" #'org-clock-cancel
+    "e" #'org-clock-modify-effort-estimate
+    "E" #'org-set-effort
+    "g" #'org-clock-goto
+    "G" #'org-clock-goto
+    "i" #'org-clock-in
+    "I" #'org-clock-in-last
+    "o" #'org-clock-out
+    "r" #'org-resolve-clocks
+    "R" #'org-clock-report
+    "t" #'org-evaluate-time-range)
+
+  (defvar-keymap my/org-date-map
+    :doc "Org date and scheduling commands."
+    "d" #'org-deadline
+    "s" #'org-schedule
+    "t" #'org-time-stamp
+    "T" #'org-time-stamp-inactive)
+
+  (defvar-keymap my/org-goto-map
+    :doc "Org goto commands."
+    "g" #'consult-org-heading
+    "G" #'consult-org-agenda
+    "c" #'org-clock-goto
+    "C" #'org-clock-goto
+    "i" #'org-id-goto
+    "r" #'org-refile-goto-last-stored)
+
+  (defvar-keymap my/org-links-map
+    :doc "Org link commands."
+    "i" #'org-id-store-link
+    "l" #'org-insert-link
+    "L" #'org-insert-all-links
+    "s" #'org-store-link
+    "S" #'org-insert-last-stored-link
+    "t" #'org-toggle-link-display)
+
+  (defvar-keymap my/org-publish-map
+    :doc "Org publish commands."
+    "a" #'org-publish-all
+    "f" #'org-publish-current-file
+    "p" #'org-publish
+    "P" #'org-publish-current-project)
+
+  (defvar-keymap my/org-refile-map
+    :doc "Org refile commands."
+    "r" #'org-refile
+    "R" #'org-refile-reverse)
+
+  (defvar-keymap my/org-subtree-map
+    :doc "Org tree and subtree commands."
+    "a" #'org-toggle-archive-tag
+    "b" #'org-tree-to-indirect-buffer
+    "c" #'org-clone-subtree-with-time-shift
+    "d" #'org-cut-subtree
+    "h" #'org-promote-subtree
+    "j" #'org-move-subtree-down
+    "k" #'org-move-subtree-up
+    "l" #'org-demote-subtree
+    "n" #'org-narrow-to-subtree
+    "r" #'org-refile
+    "s" #'org-sparse-tree
+    "A" #'org-archive-subtree-default
+    "N" #'widen
+    "S" #'org-sort)
+
+  (defvar-keymap my/org-priority-map
+    :doc "Org priority commands."
+    "d" #'org-priority-down
+    "p" #'org-priority
+    "u" #'org-priority-up)
+
+  (defvar-keymap my/org-localleader-map
+    :doc "Org commands."
+    "#" #'org-update-statistics-cookies
+    "'" #'org-edit-special
+    "*" #'org-ctrl-c-star
+    "-" #'org-ctrl-c-minus
+    "," #'org-switchb
+    "." #'consult-org-heading
+    "/" #'consult-org-agenda
+    "@" #'org-cite-insert
+    "A" #'org-archive-subtree-default
+    "e" #'org-export-dispatch
+    "f" #'org-footnote-action
+    "h" #'org-toggle-heading
+    "i" #'org-toggle-item
+    "I" #'org-id-get-create
+    "k" #'org-babel-remove-result
+    "n" #'org-store-link
+    "o" #'org-set-property
+    "q" #'org-set-tags-command
+    "t" #'org-todo
+    "T" #'org-todo-list
+    "x" #'org-toggle-checkbox
+    "a" my/org-attachments-map
+    "b" my/org-tables-map
+    "c" my/org-clock-map
+    "d" my/org-date-map
+    "g" my/org-goto-map
+    "l" my/org-links-map
+    "P" my/org-publish-map
+    "r" my/org-refile-map
+    "s" my/org-subtree-map
+    "p" my/org-priority-map)
+
+  (which-key-add-keymap-based-replacements
+    my/org-localleader-map
+    "a" (cons "attachments" my/org-attachments-map)
+    "b" (cons "tables" my/org-tables-map)
+    "c" (cons "clock" my/org-clock-map)
+    "d" (cons "date" my/org-date-map)
+    "g" (cons "goto" my/org-goto-map)
+    "l" (cons "links" my/org-links-map)
+    "p" (cons "priority" my/org-priority-map)
+    "P" (cons "publish" my/org-publish-map)
+    "r" (cons "refile" my/org-refile-map)
+    "s" (cons "subtree" my/org-subtree-map))
+
+  (which-key-add-keymap-based-replacements
+    my/org-tables-map
+    "d" (cons "delete" my/org-tables-delete-map)
+    "i" (cons "insert" my/org-tables-insert-map)
+    "t" (cons "toggle" my/org-tables-toggle-map))
+
   :custom
   ;;; File Structure
   (org-directory "~/u/org")
@@ -692,7 +866,7 @@ Copy the absolute path when the file is not in a project."
   (org-log-repeat 'time)
   (org-log-into-drawer "LOGBOOK")
 
-  ;; TODO workflow:
+  ;;; TODO workflow:
   ;; TODO      = known work, but not currently active/actionable
   ;; NEXT      = active/actionable, including in-progress work
   ;; WAITING   = blocked
@@ -760,7 +934,37 @@ Copy the absolute path when the file is not in a project."
   (set-face-attribute 'org-level-3 nil :height 1.15)
   (set-face-attribute 'org-level-4 nil :height 1.10)
   (set-face-attribute 'org-level-5 nil :height 1.05)
-  (require 'org-habit))
+  (require 'org-habit)
+
+  (with-eval-after-load 'evil
+    (evil-define-key 'insert org-mode-map
+      (kbd "C-M-<return>") #'org-insert-subheading)
+    (evil-define-key '(normal visual motion) org-mode-map
+      (kbd "\\") my/org-localleader-map
+      (kbd "C-<return>") #'my/org-insert-heading-respect-content
+      (kbd "M-<return>") #'my/org-meta-return
+      (kbd "C-M-<return>") #'my/org-insert-subheading
+      (kbd "S-<return>") #'my/org-table-copy-down
+      (kbd "C-S-<return>") #'my/org-insert-todo-heading-respect-content
+      (kbd "M-S-<return>") #'my/org-insert-todo-heading
+      (kbd "] h") #'org-forward-heading-same-level
+      (kbd "[ h") #'org-backward-heading-same-level
+      (kbd "] l") #'org-next-link
+      (kbd "[ l") #'org-previous-link
+      (kbd "] c") #'org-babel-next-src-block
+      (kbd "[ c") #'org-babel-previous-src-block
+      (kbd "z a") #'org-cycle
+      (kbd "z A") #'org-shifttab
+      (kbd "z c") #'outline-hide-subtree
+      (kbd "z C") #'outline-hide-subtree
+      (kbd "z m") #'my/org-hide-next-fold-level
+      (kbd "z M") #'org-overview
+      (kbd "z n") #'org-tree-to-indirect-buffer
+      (kbd "z o") #'my/org-open-fold
+      (kbd "z O") #'outline-show-subtree
+      (kbd "z r") #'my/org-show-next-fold-level
+      (kbd "z R") #'outline-show-all
+      (kbd "z i") #'org-toggle-inline-images)))
 
 (use-package org-srs
   :ensure t
@@ -781,7 +985,12 @@ Copy the absolute path when the file is not in a project."
     "U" #'org-srs-review-undo-redo)
 
   :hook
-  (org-mode . org-srs-embed-overlay-mode))
+  (org-mode . org-srs-embed-overlay-mode)
+  :config
+  (keymap-set my/org-localleader-map "R" my/org-srs-map)
+  (which-key-add-keymap-based-replacements
+    my/org-localleader-map
+    "R" (cons "review" my/org-srs-map)))
 
 (use-package org-capture
   :ensure nil
@@ -1094,212 +1303,4 @@ unsupported because the exported text must be available immediately."
 ;;; Evil leader bindings
   (my/keymap-set-many
    (list evil-normal-state-map evil-visual-state-map evil-motion-state-map)
-   "SPC" my/leader-map)
-
-;;; Org localleader keymaps
-  (defvar-keymap my/org-attachments-map
-    :doc "Org attachment commands."
-    "a" #'org-attach
-    "d" #'org-attach-delete-one
-    "D" #'org-attach-delete-all
-    "n" #'org-attach-new
-    "o" #'org-attach-open
-    "O" #'org-attach-open-in-emacs
-    "r" #'org-attach-reveal
-    "R" #'org-attach-reveal-in-emacs
-    "u" #'org-attach-url
-    "s" #'org-attach-set-directory
-    "S" #'org-attach-sync)
-
-  (defvar-keymap my/org-tables-delete-map
-    :doc "Org table delete commands."
-    "c" #'org-table-delete-column
-    "r" #'org-table-kill-row)
-
-  (defvar-keymap my/org-tables-insert-map
-    :doc "Org table insert commands."
-    "c" #'org-table-insert-column
-    "h" #'org-table-insert-hline
-    "r" #'org-table-insert-row
-    "H" #'org-table-hline-and-move)
-
-  (defvar-keymap my/org-tables-toggle-map
-    :doc "Org table toggle commands."
-    "f" #'org-table-toggle-formula-debugger
-    "o" #'org-table-toggle-coordinate-overlays)
-
-  (defvar-keymap my/org-tables-map
-    :doc "Org table commands."
-    "-" #'org-table-insert-hline
-    "a" #'org-table-align
-    "b" #'org-table-blank-field
-    "c" #'org-table-create-or-convert-from-region
-    "e" #'org-table-edit-field
-    "f" #'org-table-edit-formulas
-    "h" #'org-table-field-info
-    "s" #'org-table-sort-lines
-    "r" #'org-table-recalculate
-    "R" #'org-table-recalculate-buffer-tables
-    "d" my/org-tables-delete-map
-    "i" my/org-tables-insert-map
-    "t" my/org-tables-toggle-map)
-
-  (defvar-keymap my/org-clock-map
-    :doc "Org clock commands."
-    "c" #'org-clock-cancel
-    "e" #'org-clock-modify-effort-estimate
-    "E" #'org-set-effort
-    "g" #'org-clock-goto
-    "G" #'org-clock-goto
-    "i" #'org-clock-in
-    "I" #'org-clock-in-last
-    "o" #'org-clock-out
-    "r" #'org-resolve-clocks
-    "R" #'org-clock-report
-    "t" #'org-evaluate-time-range)
-
-  (defvar-keymap my/org-date-map
-    :doc "Org date and scheduling commands."
-    "d" #'org-deadline
-    "s" #'org-schedule
-    "t" #'org-time-stamp
-    "T" #'org-time-stamp-inactive)
-
-  (defvar-keymap my/org-goto-map
-    :doc "Org goto commands."
-    "g" #'consult-org-heading
-    "G" #'consult-org-agenda
-    "c" #'org-clock-goto
-    "C" #'org-clock-goto
-    "i" #'org-id-goto
-    "r" #'org-refile-goto-last-stored)
-
-  (defvar-keymap my/org-links-map
-    :doc "Org link commands."
-    "i" #'org-id-store-link
-    "l" #'org-insert-link
-    "L" #'org-insert-all-links
-    "s" #'org-store-link
-    "S" #'org-insert-last-stored-link
-    "t" #'org-toggle-link-display)
-
-  (defvar-keymap my/org-publish-map
-    :doc "Org publish commands."
-    "a" #'org-publish-all
-    "f" #'org-publish-current-file
-    "p" #'org-publish
-    "P" #'org-publish-current-project)
-
-  (defvar-keymap my/org-refile-map
-    :doc "Org refile commands."
-    "r" #'org-refile
-    "R" #'org-refile-reverse)
-
-  (defvar-keymap my/org-subtree-map
-    :doc "Org tree and subtree commands."
-    "a" #'org-toggle-archive-tag
-    "b" #'org-tree-to-indirect-buffer
-    "c" #'org-clone-subtree-with-time-shift
-    "d" #'org-cut-subtree
-    "h" #'org-promote-subtree
-    "j" #'org-move-subtree-down
-    "k" #'org-move-subtree-up
-    "l" #'org-demote-subtree
-    "n" #'org-narrow-to-subtree
-    "r" #'org-refile
-    "s" #'org-sparse-tree
-    "A" #'org-archive-subtree-default
-    "N" #'widen
-    "S" #'org-sort)
-
-  (defvar-keymap my/org-priority-map
-    :doc "Org priority commands."
-    "d" #'org-priority-down
-    "p" #'org-priority
-    "u" #'org-priority-up)
-
-  (defvar-keymap my/org-localleader-map
-    :doc "Org commands."
-    "#" #'org-update-statistics-cookies
-    "'" #'org-edit-special
-    "*" #'org-ctrl-c-star
-    "-" #'org-ctrl-c-minus
-    "," #'org-switchb
-    "." #'consult-org-heading
-    "/" #'consult-org-agenda
-    "@" #'org-cite-insert
-    "A" #'org-archive-subtree-default
-    "e" #'org-export-dispatch
-    "f" #'org-footnote-action
-    "h" #'org-toggle-heading
-    "i" #'org-toggle-item
-    "I" #'org-id-get-create
-    "k" #'org-babel-remove-result
-    "n" #'org-store-link
-    "o" #'org-set-property
-    "q" #'org-set-tags-command
-    "t" #'org-todo
-    "T" #'org-todo-list
-    "x" #'org-toggle-checkbox
-    "a" my/org-attachments-map
-    "b" my/org-tables-map
-    "c" my/org-clock-map
-    "d" my/org-date-map
-    "g" my/org-goto-map
-    "l" my/org-links-map
-    "P" my/org-publish-map
-    "R" my/org-srs-map
-    "r" my/org-refile-map
-    "s" my/org-subtree-map
-    "p" my/org-priority-map)
-
-  (which-key-add-keymap-based-replacements
-    my/org-localleader-map
-    "a" (cons "attachments" my/org-attachments-map)
-    "b" (cons "tables" my/org-tables-map)
-    "c" (cons "clock" my/org-clock-map)
-    "d" (cons "date" my/org-date-map)
-    "g" (cons "goto" my/org-goto-map)
-    "l" (cons "links" my/org-links-map)
-    "p" (cons "priority" my/org-priority-map)
-    "P" (cons "publish" my/org-publish-map)
-    "R" (cons "review" my/org-srs-map)
-    "r" (cons "refile" my/org-refile-map)
-    "s" (cons "subtree" my/org-subtree-map))
-
-  (which-key-add-keymap-based-replacements
-    my/org-tables-map
-    "d" (cons "delete" my/org-tables-delete-map)
-    "i" (cons "insert" my/org-tables-insert-map)
-    "t" (cons "toggle" my/org-tables-toggle-map))
-
-;;; Org localleader bindings
-  (with-eval-after-load 'org
-    (evil-define-key 'insert org-mode-map
-      (kbd "C-M-<return>") #'org-insert-subheading)
-    (evil-define-key '(normal visual motion) org-mode-map
-      (kbd "\\") my/org-localleader-map
-      (kbd "C-<return>") #'my/org-insert-heading-respect-content
-      (kbd "M-<return>") #'my/org-meta-return
-      (kbd "C-M-<return>") #'my/org-insert-subheading
-      (kbd "S-<return>") #'my/org-table-copy-down
-      (kbd "C-S-<return>") #'my/org-insert-todo-heading-respect-content
-      (kbd "M-S-<return>") #'my/org-insert-todo-heading
-      (kbd "] h") #'org-forward-heading-same-level
-      (kbd "[ h") #'org-backward-heading-same-level
-      (kbd "] l") #'org-next-link
-      (kbd "[ l") #'org-previous-link
-      (kbd "] c") #'org-babel-next-src-block
-      (kbd "[ c") #'org-babel-previous-src-block
-      (kbd "z a") #'org-cycle
-      (kbd "z A") #'org-shifttab
-      (kbd "z c") #'outline-hide-subtree
-      (kbd "z C") #'outline-hide-subtree
-      (kbd "z m") #'my/org-hide-next-fold-level
-      (kbd "z M") #'org-overview
-      (kbd "z n") #'org-tree-to-indirect-buffer
-      (kbd "z o") #'my/org-open-fold
-      (kbd "z O") #'outline-show-subtree
-      (kbd "z r") #'my/org-show-next-fold-level
-      (kbd "z R") #'outline-show-all
-      (kbd "z i") #'org-toggle-inline-images)))
+   "SPC" my/leader-map))
