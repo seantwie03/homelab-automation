@@ -125,6 +125,21 @@ of reporting it absent, which defeats the alternatives fallback."
 (setopt kill-do-not-save-duplicates t)
 (setopt save-interprogram-paste-before-kill 100000)
 
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-undo-system 'undo-redo)
+  :config
+  (evil-mode 1))
+
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init))
+
 (use-package files
   :ensure nil
   :preface
@@ -152,6 +167,9 @@ of reporting it absent, which defeats the alternatives fallback."
 
   :hook
   ((org-mode markdown-mode) . my/disable-delete-trailing-whitespace-on-save))
+
+(use-package vundo
+  :ensure t)
 
 (use-package markdown-mode
   :ensure t
@@ -452,28 +470,6 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (interactive)
     (consult-ripgrep nil (thing-at-point 'symbol t))))
 
-(use-package vundo
-  :ensure t)
-
-;;; Help and discovery
-(use-package which-key
-  :ensure nil
-  :custom
-  (which-key-idle-delay 0.5)
-  :config
-  (which-key-mode 1))
-
-(use-package helpful
-  :ensure t)
-
-(use-package keycast
-  :ensure t
-  :config
-  (setopt keycast-mode-line-format "%1s%K%c%r")
-  (add-hook 'post-command-hook #'keycast--update t)
-  (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
-  (add-to-list 'global-mode-string '("" keycast-mode-line)))
-
 (use-package project
   :ensure nil
   :custom
@@ -519,6 +515,26 @@ Copy the absolute path when the file is not in a project."
       (kill-new path)
       (message "Copied file path: %s" path))))
 
+;;; Help and discovery
+(use-package which-key
+  :ensure nil
+  :custom
+  (which-key-idle-delay 0.5)
+  :config
+  (which-key-mode 1))
+
+(use-package helpful
+  :ensure t)
+
+(use-package keycast
+  :ensure t
+  :config
+  (setopt keycast-mode-line-format "%1s%K%c%r")
+  (add-hook 'post-command-hook #'keycast--update t)
+  (add-hook 'minibuffer-exit-hook #'keycast--minibuffer-exit t)
+  (add-to-list 'global-mode-string '("" keycast-mode-line)))
+
+;;; Terminal
 (use-package ghostel
   :ensure t
   :bind
@@ -543,6 +559,7 @@ Copy the absolute path when the file is not in a project."
   :hook
   (ghostel-mode . evil-ghostel-mode))
 
+;;; Org mode
 (use-package org
   :ensure nil
   :bind
@@ -812,21 +829,6 @@ unsupported because the exported text must be available immediately."
       (kill-new plain)
       (gui-set-selection 'CLIPBOARD selection)
       (message "Rich-text export copied to clipboard"))))
-
-(use-package evil
-  :ensure t
-  :init
-  (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
-  (setq evil-respect-visual-line-mode t)
-  (setq evil-undo-system 'undo-redo)
-  :config
-  (evil-mode 1))
-
-(use-package evil-collection
-  :ensure t
-  :after evil
-  :config
-  (evil-collection-init))
 
 ;;; Evil keybindings
 (defun my/keymap-set-many (keymaps key command)
