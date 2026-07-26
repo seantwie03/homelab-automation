@@ -476,6 +476,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :ensure nil
   :custom
   (delete-by-moving-to-trash t)
+  (dired-recursive-copies 'always)
   (dired-kill-when-opening-new-dired-buffer t))
 
 ;;; Completion and navigation

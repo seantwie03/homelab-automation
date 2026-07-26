@@ -29,7 +29,8 @@ systemctl --user list-timers dnf-makecache.timer --all
 | `dnf5-automatic.timer` | Tuesday at 23:00, no random delay |
 
 The user timer exists so package metadata remains available to unprivileged DNF
-commands.
+commands. Both services force a refresh on every run, so repository-specific
+expiration times cannot leave metadata stale between timer activations.
 
 ## Metadata Refresh
 
@@ -45,8 +46,10 @@ journalctl --user -u dnf-makecache.service \
 Expected:
 
 - The last result is successful.
-- The system service reports `Metadata cache created.`
-- The user service completes its DNS pre-check and metadata refresh.
+- Both services check every enabled repository and report `Metadata cache
+  created.`
+- The user service completes its DNS pre-check before refreshing metadata.
+- `systemctl cat` shows `dnf5 makecache --refresh` for both services.
 
 Oneshot services are normally inactive between runs.
 
@@ -80,4 +83,3 @@ snapper -c root list | grep dnf5-automatic
 Recent completed runs should have matching `Before dnf5-automatic` and `After
 dnf5-automatic` snapshots using the `number` cleanup algorithm. The snapshots
 wrap the service, so a run with no package changes may still create a pair.
-

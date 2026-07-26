@@ -1,10 +1,13 @@
 # Node.js
 
-Install [Node.js](https://nodejs.org/en), [npm](https://www.npmjs.com/), and [pnpm](https://pnpm.io/).
+Install [Node.js](https://nodejs.org/en), [npm](https://www.npmjs.com/),
+[pnpm](https://pnpm.io/), and [Bun](https://bun.sh/).
 
 ## Role Variables
 
 `node_version`: The node version to install. Example `22.x`
+
+`bun_version`: The exact Bun version to install. Example `1.3.14`
 
 The NodeSource RPM signing key is checked into this role and deployed to `/etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource`.
 The DNF repository uses that local key file instead of the upstream key URL so unattended updates cannot automatically trust a rotated remote key.

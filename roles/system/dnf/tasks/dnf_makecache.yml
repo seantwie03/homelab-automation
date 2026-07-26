@@ -33,6 +33,7 @@
         owner: root
         group: root
         mode: 0644
+      notify: restart dnf-makecache timer
 
     - name: systemd daemon is reloaded
       ansible.builtin.systemd:
@@ -62,6 +63,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
         mode: 0644
+      notify: restart user dnf-makecache timer
 
     - name: user dnf-makecache.timer exists
       ansible.builtin.copy:

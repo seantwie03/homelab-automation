@@ -45,3 +45,10 @@
     name: pnpm
     global: true
     state: present
+
+- name: bun is installed
+  community.general.npm:
+    name: bun
+    version: "{{ bun_version }}"
+    global: true
+    state: present
