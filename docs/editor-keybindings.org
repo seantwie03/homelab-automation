@@ -265,6 +265,10 @@ contains a =.git= directory or =.project= marker.
 | S-RET   | normal | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
 | S-RET   | visual | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
 | S-RET   | insert | custom         | my/markdown-table-insert-row-below            | N/I           | N/I           |
+| TAB     | normal | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
+| TAB     | visual | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
+| TAB     | motion | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
+| TAB     | insert | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
 | z a     | normal | markdown-mode  | markdown-cycle                                | N/I           | N/I           |
 | z A     | normal | custom         | my/markdown-cycle-global                      | N/I           | N/I           |
 | z c     | normal | builtin        | outline-hide-subtree                          | N/I           | N/I           |

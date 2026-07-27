@@ -251,6 +251,8 @@ of reporting it absent, which defeats the alternatives fallback."
   (markdown-mode . visual-wrap-prefix-mode)
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
+  (markdown-header-scaling t)
+  (markdown-header-scaling-values '(1.25 1.20 1.15 1.10 1.05 1.0))
   (markdown-unordered-list-item-prefix "- ")
   :config
   (defun my/markdown-insert-list-item ()
@@ -390,12 +392,14 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   (defun my/markdown-setup-evil-bindings ()
     "Install mode-specific Evil bindings for Markdown buffers."
     (evil-define-key 'insert markdown-mode-map
+      (kbd "TAB") #'markdown-cycle
       (kbd "M-<return>") #'markdown-insert-list-item
       (kbd "M-S-<return>") #'my/markdown-insert-task-item
       (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
       (kbd "C-M-<return>") #'my/markdown-insert-subheading-respect-content
       (kbd "S-<return>") #'my/markdown-table-insert-row-below)
     (evil-define-key 'insert gfm-mode-map
+      (kbd "TAB") #'markdown-cycle
       (kbd "M-<return>") #'markdown-insert-list-item
       (kbd "M-S-<return>") #'my/markdown-insert-task-item
       (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
@@ -403,6 +407,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
       (kbd "S-<return>") #'my/markdown-table-insert-row-below)
     (evil-define-key '(normal visual motion) markdown-mode-map
       (kbd "\\") my/markdown-localleader-map
+      (kbd "TAB") #'markdown-cycle
       (kbd "M-<return>") #'my/markdown-insert-list-item
       (kbd "M-S-<return>") #'my/markdown-insert-task-item
       (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
@@ -420,6 +425,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
       (kbd "z i") #'markdown-toggle-inline-images)
     (evil-define-key '(normal visual motion) gfm-mode-map
       (kbd "\\") my/markdown-localleader-map
+      (kbd "TAB") #'markdown-cycle
       (kbd "M-<return>") #'my/markdown-insert-list-item
       (kbd "M-S-<return>") #'my/markdown-insert-task-item
       (kbd "C-<return>") #'my/markdown-insert-heading-respect-content
