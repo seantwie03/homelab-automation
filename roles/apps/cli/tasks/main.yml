@@ -23,6 +23,7 @@
       - fzf
       - tree
       - bind-utils # nslookup/dig/etc.
+      - abduco # attach/detach workflow from tmux
     state: present
 
 - name: neovim is installed and configured
