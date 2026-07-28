@@ -57,7 +57,22 @@ of reporting it absent, which defeats the alternatives fallback."
       (add-hook 'server-after-make-frame-hook #'my/apply-default-font)
     (my/apply-default-font)))
 
-(load-theme 'modus-operandi t)
+(use-package modus-themes
+  :ensure nil
+  :no-require t
+  :custom
+  (modus-operandi-palette-overrides
+   '((bg-mode-line-active fringe)))
+  (modus-vivendi-palette-overrides
+   '((bg-mode-line-active fringe))))
+
+(use-package auto-dark
+  :ensure t
+  :custom
+  (auto-dark-themes '((modus-vivendi) (modus-operandi)))
+  :config
+  (auto-dark-mode 1))
+
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
@@ -107,9 +122,7 @@ of reporting it absent, which defeats the alternatives fallback."
   (column-number-mode 1)
   (line-number-mode 1)
   (doom-modeline-mode 1)
-  (set-face-attribute 'mode-line nil
-                      :background "#f2f2f2"
-                      :height 130)
+  (set-face-attribute 'mode-line nil :height 130)
   (doom-modeline-remove-segment 'misc-info 'main)
   (doom-modeline-add-segment 'misc-info 'buffer-position :after 'main)
   (doom-modeline-refresh-bars))
