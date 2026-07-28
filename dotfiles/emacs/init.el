@@ -52,7 +52,7 @@ of reporting it absent, which defeats the alternatives fallback."
                                  '("Iosevka Curly"
                                    "Iosevka Nerd Font"
                                    "Ubuntu Mono"))))
-        (set-face-attribute 'default nil :family font :height 140))))
+        (set-face-attribute 'default nil :family font :height 160))))
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'my/apply-default-font)
     (my/apply-default-font)))
