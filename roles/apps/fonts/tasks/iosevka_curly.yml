@@ -1,0 +1,20 @@
+---
+- name: iosevka curly font directory exists
+  ansible.builtin.file:
+    path: /usr/local/share/fonts/IosevkaCurly
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: iosevka curly {{ iosevka_version }} font is installed
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_version }}/PkgTTF-IosevkaCurly-{{ iosevka_version }}.zip
+    dest: /usr/local/share/fonts/IosevkaCurly
+    owner: root
+    group: root
+    mode: u=rwX,g=rwX,o=rX
+    creates: /usr/local/share/fonts/IosevkaCurly/IosevkaCurly-Regular.ttf
+  notify: rebuild font cache
+

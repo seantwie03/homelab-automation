@@ -25,6 +25,9 @@
   loop_control:
     loop_var: font
 
+- name: iosevka curly font is installed
+  ansible.builtin.include_tasks: iosevka_curly.yml
+
 - name: install google fonts
   ansible.builtin.include_tasks: google_fonts.yml
 

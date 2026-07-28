@@ -1,6 +1,8 @@
 ---
 # The tag version from https://github.com/ryanoasis/nerd-fonts/tags
 nerd_fonts_version: v3.4.0
+# The release version from https://github.com/be5invis/Iosevka/releases
+iosevka_version: 34.8.0
 # The tag version from: https://github.com/adobe-fonts/source-sans/tags
 adobe_source_sans_version: 3.052R
 # The tag version from: https://github.com/adobe-fonts/source-serif/tags

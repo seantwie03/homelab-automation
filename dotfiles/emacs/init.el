@@ -49,8 +49,8 @@ the Windows (GDI) font backend silently substitutes a missing family instead
 of reporting it absent, which defeats the alternatives fallback."
     (when (display-graphic-p)
       (when-let ((font (seq-find (lambda (f) (member f (font-family-list)))
-                                 '("Iosevka Nerd Font"
-                                   "Iosevka Curly"
+                                 '("Iosevka Curly"
+                                   "Iosevka Nerd Font"
                                    "Ubuntu Mono"))))
         (set-face-attribute 'default nil :family font :height 140))))
   (if (daemonp)
@@ -76,6 +76,7 @@ of reporting it absent, which defeats the alternatives fallback."
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
+(setq-default line-spacing 0.1)
 (blink-cursor-mode -1)
 (show-paren-mode 1)
 (global-visual-line-mode 1)
