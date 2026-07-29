@@ -4,11 +4,6 @@
 
 ** Input & Output
 
-- Mouse & Touchpad
-  - Screen Edges
-    - Top Left Corner of Monitor: No Action
-    - Corner barrier: unchecked
-    - Edge barrier: 0 px (None)
 - Keyboard
   - Key repeat: 300ms
     - Rate: 40
@@ -25,6 +20,8 @@
   - Screen Edges
     - Top left of monitor: No action (disables overview)
     - Trigger quarter tiling in: Outer 10%
+    - Corner barrier: unchecked
+    - Edge barrier: 0 px (None)
 - Animations
   - One step away from instant
 - Notifications
