@@ -73,12 +73,17 @@ of reporting it absent, which defeats the alternatives fallback."
   :config
   (auto-dark-mode 1))
 
+(setopt use-short-answers t)
 (setopt ring-bell-function #'ignore)
 (setopt inhibit-splash-screen t)
 (setopt initial-major-mode 'org-mode)
 (setq-default line-spacing 0.1)
+(use-package paren
+  :ensure nil
+  :config
+  (show-paren-mode 1)
+  (setq show-paren-context-when-offscreen 'overlay))
 (blink-cursor-mode -1)
-(show-paren-mode 1)
 (global-visual-line-mode 1)
 
 ;; Scroll like Vim's scrolloff: keep point away from the window edges.
@@ -134,6 +139,7 @@ of reporting it absent, which defeats the alternatives fallback."
 (setq-default tab-width 4)
 (setq-default show-trailing-whitespace t)
 (setopt sentence-end-double-space nil)
+(prefer-coding-system 'utf-8)
 (editorconfig-mode 1)
 (delete-selection-mode 1)
 (setopt kill-do-not-save-duplicates t)
@@ -267,6 +273,8 @@ of reporting it absent, which defeats the alternatives fallback."
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
   (markdown-header-scaling t)
   (markdown-header-scaling-values '(1.25 1.20 1.15 1.10 1.05 1.0))
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-spaces-after-code-fence 0)
   (markdown-unordered-list-item-prefix "- ")
   :config
   (defun my/markdown-insert-list-item ()
@@ -618,7 +626,9 @@ Copy the absolute path when the file is not in a project."
   (which-key-mode 1))
 
 (use-package helpful
-  :ensure t)
+  :ensure t
+  :custom
+  (help-window-select t))
 
 (use-package keycast
   :ensure t
