@@ -114,7 +114,7 @@
 
     - name: portal priority is configured for wlr
       ansible.builtin.copy:
-        dest: "/home/{{ user }}/.config/xdg-desktop-portal/portals.conf"
+        dest: "/home/{{ user }}/.config/xdg-desktop-portal/niri-portals.conf"
         content: |
           [preferred]
           default=wlr;gtk;

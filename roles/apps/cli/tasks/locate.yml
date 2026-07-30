@@ -4,27 +4,6 @@
     name: plocate
     state: present
 
-- name: updatedb.rpmnew file status is gathered
-  ansible.builtin.stat:
-    path: /etc/updatedb.conf.rpmnew
-  register: updatedb_rpmnew
-
-- name: packaged updatedb configuration replaces prior local configuration
-  ansible.builtin.copy:
-    src: /etc/updatedb.conf.rpmnew
-    dest: /etc/updatedb.conf
-    remote_src: true
-    owner: root
-    group: root
-    mode: 0644
-  when: updatedb_rpmnew.stat.exists
-
-- name: obsolete updatedb.rpmnew file is absent
-  ansible.builtin.file:
-    path: /etc/updatedb.conf.rpmnew
-    state: absent
-  when: updatedb_rpmnew.stat.exists
-
 - name: updatedb wrapper is installed
   ansible.builtin.template:
     src: updatedb.j2
