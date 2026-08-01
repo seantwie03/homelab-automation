@@ -35,12 +35,26 @@
       - nodejs-docs
     state: absent
 
-- name: nodejs is installed
+- name: installed package facts are available
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: nodejs 22.x is absent
+  ansible.builtin.package:
+    name: nodejs
+    state: absent
+  when: >-
+    ansible_facts.packages.get('nodejs', [])
+    | selectattr('version', 'match', '^22\.')
+    | list
+    | length > 0
+
+- name: nodejs {{ node_version }} is installed
   ansible.builtin.package:
     name: nodejs
     state: present
 
-- name: pnmp is installed
+- name: pnpm is installed
   community.general.npm:
     name: pnpm
     global: true

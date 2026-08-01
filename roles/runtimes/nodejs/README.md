@@ -5,9 +5,14 @@ Install [Node.js](https://nodejs.org/en), [npm](https://www.npmjs.com/),
 
 ## Role Variables
 
-`node_version`: The node version to install. Example `22.x`
+`node_version`: The Node.js release series to install from NodeSource. Example
+`24.x`
 
 `bun_version`: The exact Bun version to install. Example `1.3.14`
+
+The role removes an installed Node.js 22.x package before installing Node.js
+from the configured NodeSource release series. It does not upgrade an existing
+24.x installation; regular system package updates manage subsequent releases.
 
 The NodeSource RPM signing key is checked into this role and deployed to `/etc/pki/rpm-gpg/RPM-GPG-KEY-nodesource`.
 The DNF repository uses that local key file instead of the upstream key URL so unattended updates cannot automatically trust a rotated remote key.
