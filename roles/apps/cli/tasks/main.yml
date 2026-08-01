@@ -24,6 +24,7 @@
       - tree
       - bind-utils # nslookup/dig/etc.
       - abduco # attach/detach workflow from tmux
+      - gh
     state: present
 
 - name: neovim is installed and configured
