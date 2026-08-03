@@ -1361,3 +1361,10 @@ unsupported because the exported text must be available immediately."
   (with-eval-after-load 'evil
     (evil-define-key 'normal org-agenda-mode-map
       (kbd "SPC") my/leader-map)))
+
+;;; Machine-specific configuration
+;; Loaded last so it can override anything above. This file is intentionally
+;; NOT synced between machines.
+(let ((local-file (expand-file-name "machine-specific.el" user-emacs-directory)))
+  (when (file-exists-p local-file)
+    (load local-file nil t)))
