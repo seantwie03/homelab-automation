@@ -57,6 +57,15 @@ of reporting it absent, which defeats the alternatives fallback."
       (add-hook 'server-after-make-frame-hook #'my/apply-default-font)
     (my/apply-default-font)))
 
+(use-package startup
+  :ensure nil
+  :no-require t
+  :custom
+  (inhibit-splash-screen t)
+  (initial-major-mode 'org-mode)
+  (initial-buffer-choice
+   (lambda () (find-file org-default-notes-file))))
+
 (use-package modus-themes
   :ensure nil
   :no-require t
@@ -75,8 +84,6 @@ of reporting it absent, which defeats the alternatives fallback."
 
 (setopt use-short-answers t)
 (setopt ring-bell-function #'ignore)
-(setopt inhibit-splash-screen t)
-(setopt initial-major-mode 'org-mode)
 (setq-default line-spacing 0.1)
 (use-package paren
   :ensure nil
@@ -964,7 +971,7 @@ Copy the absolute path when the file is not in a project."
 
   :custom
   ;;; File Structure
-  (org-directory "~/u/org")
+  (org-directory "~/u")
   (org-default-notes-file
    (expand-file-name "inbox.org" org-directory))
   (org-agenda-files
@@ -986,6 +993,8 @@ Copy the absolute path when the file is not in a project."
   (org-log-done 'time)
   (org-log-repeat 'time)
   (org-log-into-drawer "LOGBOOK")
+  (org-startup-folded 'showall)
+  (org-hide-drawer-startup t)
 
   ;;; TODO workflow:
   ;; TODO      = known work, but not currently active/actionable
