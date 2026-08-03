@@ -348,6 +348,9 @@ contains a =.git= directory or =.project= marker.
 | M-S-RET | normal | custom         | my/org-insert-todo-heading                 | N/A           | N/A           |
 | M-S-RET | visual | custom         | my/org-insert-todo-heading                 | N/A           | N/A           |
 | M-S-RET | insert | builtin        | org-insert-todo-heading                    | N/A           | N/A           |
+| RET     | normal | custom         | my/org-return-or-open-link                 | N/A           | N/A           |
+| RET     | visual | custom         | my/org-return-or-open-link                 | N/A           | N/A           |
+| RET     | insert | builtin        | org-return                                 | N/A           | N/A           |
 | S-RET   | normal | custom         | my/org-table-copy-down                     | N/A           | N/A           |
 | S-RET   | visual | custom         | my/org-table-copy-down                     | N/A           | N/A           |
 | S-RET   | insert | builtin        | org-table-copy-down                        | N/A           | N/A           |
@@ -363,6 +366,12 @@ contains a =.git= directory or =.project= marker.
 | z O     | normal | builtin        | outline-show-subtree                       | N/A           | N/A           |
 | z r     | normal | custom         | my/org-show-next-fold-level                | N/A           | N/A           |
 | z R     | normal | builtin        | outline-show-all                           | N/A           | N/A           |
+
+** Org Agenda mappings
+
+| Key | Mode   | Emacs Provider | Emacs Function | Nvim Provider | Nvim Function |
+|-----+--------+----------------+----------------+---------------+---------------|
+| SPC | normal | custom         | my/leader-map  | N/A           | N/A           |
 
 ** Org-srs review (=\ R=) mappings
 

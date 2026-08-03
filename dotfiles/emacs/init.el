@@ -738,6 +738,13 @@ Copy the absolute path when the file is not in a project."
     (my/org-command-and-enter-insert-state
      #'org-insert-todo-heading-respect-content))
 
+  (defun my/org-return-or-open-link (count)
+    "Follow the Org link at point; otherwise move down COUNT lines."
+    (interactive "p")
+    (if (org-in-regexp org-link-any-re nil t)
+        (org-open-at-point)
+      (evil-ret count)))
+
   (defun my/org-insert-todo-heading ()
     "Append an Org TODO item in Evil normal state and start editing it."
     (interactive)
@@ -970,6 +977,7 @@ Copy the absolute path when the file is not in a project."
 
   ;;; Editing
   (org-support-shift-select t)
+  (org-return-follows-link t)
 
   ;;; Export
   (org-export-with-toc nil)
@@ -1054,6 +1062,7 @@ Copy the absolute path when the file is not in a project."
       (kbd "C-M-<return>") #'org-insert-subheading)
     (evil-define-key '(normal visual motion) org-mode-map
       (kbd "\\") my/org-localleader-map
+      (kbd "RET") #'my/org-return-or-open-link
       (kbd "C-<return>") #'my/org-insert-heading-respect-content
       (kbd "M-<return>") #'my/org-meta-return
       (kbd "C-M-<return>") #'my/org-insert-subheading
@@ -1347,3 +1356,8 @@ unsupported because the exported text must be available immediately."
   (my/keymap-set-many
    (list evil-normal-state-map evil-visual-state-map evil-motion-state-map)
    "SPC" my/leader-map))
+
+(with-eval-after-load 'org-agenda
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal org-agenda-mode-map
+      (kbd "SPC") my/leader-map)))
