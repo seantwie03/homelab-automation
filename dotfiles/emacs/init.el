@@ -38,6 +38,15 @@
   :config
   (recentf-mode 1))
 
+;; Allow emacsclients to connect. This enables
+;; - AI inspection using safe wrappers
+;; - em alias on command line to open file in current frame
+(use-package server
+  :ensure nil
+  :config
+  (unless (server-running-p)
+    (server-start)))
+
 ;;; UI
 (use-package faces
   :ensure nil
