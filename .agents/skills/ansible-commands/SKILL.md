@@ -1,15 +1,16 @@
 ---
 name: ansible-commands
-description: Use when running Ansible commands in this homelab repository, especially ansible, ansible-doc, ansible-playbook syntax checks, or ansible-lint validation. Prefer host-visible execution when Codex sandboxing can hide installed collections, inventory behavior, system facts, or Ansible temporary-file behavior.
+description: Use when running Ansible commands in this homelab repository, especially ansible, ansible-doc, ansible-playbook syntax checks, or ansible-lint validation. Prefer host-visible execution when sandboxing can hide installed collections, inventory behavior, system facts, or Ansible temporary-file behavior.
 ---
 
 # Ansible Commands
 
-This repository is validated against the real workstation environment. Codex's
+This repository is validated against the real workstation environment. A
 read-only sandbox can block Ansible temporary files, installed collection
 discovery, local inventory behavior, or access to host state.
 
-Run these outside the sandbox with `sandbox_permissions: require_escalated`:
+Run these with full host access rather than a sandboxed shell; ask the user
+for approval to escalate if your environment blocks it by default:
 
 - `ansible ...`
 - `ansible-doc ...`

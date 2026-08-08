@@ -65,7 +65,7 @@ Check:
 
 Use read-only system commands and request scoped elevated access when the
 sandbox blocks the system bus, journal, or device metadata. Commands requiring
-an interactive sudo password may not work through Codex; report the exact
+an interactive sudo password may not work through this agent; report the exact
 remaining commands rather than weakening authentication.
 
 ## Apply Role Monitoring
