@@ -5,6 +5,7 @@
             "Bash(ansible-lint:*)",
             "Bash(ansible-playbook --syntax-check:*)",
             "Bash(ansible-doc:*)",
+            "Bash(ec:*)",
             "Bash(.agents/skills/check-homelab-host/scripts/list-roles.sh:*)",
             "Bash(.agents/skills/query-running-emacs/scripts/query-emacs-eval.sh:*)",
             "Bash(.agents/skills/test-emacs-config/scripts/emacs-container:*)",

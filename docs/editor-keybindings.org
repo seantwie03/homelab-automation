@@ -147,11 +147,12 @@ contains a =.git= directory or =.project= marker.
 
 ** Git (=SPC g=) mappings
 
-| Key     | Mode   | Emacs Provider | Emacs Function | Nvim Provider      | Nvim Function                                          |
-|---------+--------+----------------+----------------+--------------------+--------------------------------------------------------|
-| SPC g d | normal | N/I            | N/I            | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
-| SPC g D | normal | N/I            | N/I            | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
-| SPC g R | normal | builtin        | vc-revert      | N/I                | N/I                                                    |
+| Key     | Mode   | Emacs Provider | Emacs Function          | Nvim Provider      | Nvim Function                                          |
+|---------+--------+----------------+-------------------------+--------------------+--------------------------------------------------------|
+| SPC g d | normal | magit          | magit-diff-working-tree | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
+| SPC g D | normal | N/I            | N/I                     | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
+| SPC g g | normal | magit          | magit-status            | N/I                | N/I                                                    |
+| SPC g R | normal | builtin        | vc-revert               | N/I                | N/I                                                    |
 
 ** Help (=SPC h=) mappings
 

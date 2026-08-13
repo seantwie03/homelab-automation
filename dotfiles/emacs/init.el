@@ -489,6 +489,18 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (add-hook 'gfm-mode-hook #'my/markdown-setup-evil-bindings t)
     (my/markdown-setup-evil-bindings)))
 
+(use-package js
+  :ensure nil
+  :mode ("\\.[mc]?js[x]?\\'" . js-ts-mode))
+
+(use-package typescript-ts-mode
+  :ensure nil
+  :mode ("\\.tsx?\\'" . typescript-ts-mode))
+
+(use-package json-ts-mode
+  :ensure nil
+  :mode "\\.json\\'")
+
 (use-package olivetti
   :ensure t
   :custom
@@ -632,6 +644,9 @@ Copy the absolute path when the file is not in a project."
                    (expand-file-name buffer-file-name))))
       (kill-new path)
       (message "Copied file path: %s" path))))
+
+(use-package magit
+  :ensure t)
 
 ;;; Help and discovery
 (use-package which-key
@@ -1224,6 +1239,8 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-git-map
   :doc "Git commands."
+  "d" #'magit-diff-working-tree
+  "g" #'magit-status
   "R" #'vc-revert)
 
 (defvar-keymap my/leader-help-map
