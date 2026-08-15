@@ -19,6 +19,13 @@ journalctl -u cups.service -u avahi-daemon.service \
 
 ## Graphical User Services and Autostart
 
-Zoom is intentionally absent while the temporary RPM-signature workaround is
-active in this role.
+Zoom should be installed from the version-pinned official RPM:
 
+```sh
+rpm -q zoom
+```
+
+The role disables RPM signature verification only for this package because
+RPM 6 rejects Zoom's current signing key. It also bypasses RPM's incorrect
+Btrfs free-space result. The downloaded RPM is still verified against the
+SHA-256 checksum pinned in `defaults/main.yml`.

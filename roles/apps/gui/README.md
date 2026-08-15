@@ -66,10 +66,22 @@ fingerprint: bc528686b50d79e339d3721ceb3e94adbe1229cf
 
 ## Zoom Updates
 
-Zoom is installed from a versioned remote RPM URL and pinned by `zoom_version`
-in `roles/apps/gui/defaults/main.yml`. The role checks the installed RPM version
-before installing, so the remote package is only downloaded when Zoom is missing
-or the installed version differs from `zoom_version`.
+Zoom is installed from an official, versioned remote RPM URL. The version and
+SHA-256 checksum are pinned by `zoom_version` and `zoom_checksum` in
+`roles/apps/gui/defaults/main.yml`.
+
+The role gathers installed RPM package facts before doing any network work. If
+the installed Zoom version matches `zoom_version`, both the download and
+installation tasks are skipped.
+
+RPM 6 rejects Zoom's current package signature because the upstream key is not
+marked as signing capable. The role therefore disables signature verification
+only while installing the downloaded Zoom RPM. Both the Ansible DNF module and
+the DNF CLI ask RPM 6 to validate the rejected header, so the role invokes RPM
+directly with signature and digest checks disabled. It also bypasses RPM's
+incorrect Btrfs free-space result; DNF still resolves and reports the package's
+requirements during troubleshooting. The pinned SHA-256 checksum prevents
+installation if the downloaded file differs from the reviewed artifact.
 
 To update Zoom, find the latest RPM version:
 
@@ -77,14 +89,16 @@ To update Zoom, find the latest RPM version:
 cd ~/Downloads
 rm zoom_x86_64.rpm 2>/dev/null
 wget https://zoom.us/client/latest/zoom_x86_64.rpm
-rpm -qp ./zoom_x86_64.rpm
+rpm -qp --nosignature --nodigest ./zoom_x86_64.rpm
+sha256sum ./zoom_x86_64.rpm
 ```
 
-Use the RPM version without the release suffix as `zoom_version`. For example,
-if `rpm -qp` returns `zoom-6.7.5.6891-1.x86_64`, use:
+Use the RPM version without the release suffix as `zoom_version`, and update
+`zoom_checksum` with the SHA-256 output. For example:
 
 ```yaml
-zoom_version: 6.7.5.6891
+zoom_version: 7.1.5.4332
+zoom_checksum: sha256:92f82ac8f83c675bddfe5ea4a563c773b1d6bc95519c27f432c5557fec630b28
 ```
 
 ## JetBrains Toolbox
