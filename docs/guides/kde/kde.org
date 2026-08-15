@@ -22,21 +22,42 @@
     - Trigger quarter tiling in: Outer 10%
     - Corner barrier: unchecked
     - Edge barrier: 0 px (None)
+
+** Appearance & Style
+
+- Wallpaper
+  - =~/.local/share/backgrounds/...=
+- Colors & Themes
+  - Global Theme
+    - Breeze
 - Animations
   - One step away from instant
+
+** Apps & Windows
+
+- Default Applications
+  - Text Editor: Emacs
+  - Terminal Emulator: Kitty
 - Notifications
   - Do not disturb mode
     - While a fullscreen application is focused: Uncheck
 - Window Management
   - Desktop Effects
     - Mouse Mark: Checked
+      - Width: 5 pixels
       - Clear Mouse Marks: Shift + F2
       - Clear Last Mouse Marks: Shift + F3
-      - Free Draw: Ctrl + Shift
-      - Arrow Draw: Alt + Shift
+      - Free Draw: Meta (Super) + Ctrl + Shift
+      - Arrow Draw: Meta (Super) + Alt + Shift
+
+** Security & Privacy
+
 - Screen Locking
   - Lock screen automatically: Never
   - Lock after waking from sleep: Uncheck
+
+** System
+
 - Power Management
   - Sleep after 30 minutes
   - When power button pressed: Shut down
@@ -44,3 +65,9 @@
   - Turn off screen: Never
 - Software Update
   - Notification fequency: Never
+- Session
+  - Ask for confirmation: unchecked
+
+* Panel Configuration
+
+Clone Panel --> Select bottom of other monitor

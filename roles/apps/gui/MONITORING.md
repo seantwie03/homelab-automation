@@ -28,4 +28,6 @@ rpm -q zoom
 The role disables RPM signature verification only for this package because
 RPM 6 rejects Zoom's current signing key. It also bypasses RPM's incorrect
 Btrfs free-space result. The downloaded RPM is still verified against the
-SHA-256 checksum pinned in `defaults/main.yml`.
+SHA-256 checksum pinned in `defaults/main.yml`. This is a known problem with
+upstream Zoom's package. Nothing can be done by the user to fix this issue.
+
