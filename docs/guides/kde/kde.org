@@ -48,10 +48,10 @@
   - Desktop Effects
     - Mouse Mark: Checked
       - Width: 5 pixels
-      - Clear Mouse Marks: Shift + F2
       - Clear Last Mouse Marks: Shift + F3
-      - Free Draw: Meta (Super) + Ctrl + Shift
-      - Arrow Draw: Meta (Super) + Alt + Shift
+      - Clear Mouse Marks: Shift + F2
+      - Free Draw: Meta (Super) + Ctrl
+      - Arrow Draw: Meta (Super) + Ctrl + Shift
 
 ** Security & Privacy
 
