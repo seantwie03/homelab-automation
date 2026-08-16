@@ -9,6 +9,9 @@
     - Rate: 40
   - On-Screen Keyboard
     - Alternate characters: Uncheck show popup when holding a key
+  - Shortcuts
+    - Konsole
+      - Launch: Unchecked
 - Display & Monitor
   - Night Light
     - Switching times: Sunrise and sunset

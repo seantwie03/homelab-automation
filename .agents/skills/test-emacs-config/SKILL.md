@@ -45,6 +45,27 @@ new `use-package :ensure t` dependency can install into an empty ELPA directory:
 Use `--rebuild-image` after changing
 `.agents/skills/test-emacs-config/Containerfile`.
 
+## Stale package archives
+
+The cached ELPA volume keeps the `archive-contents` written by its last refresh.
+MELPA serves only the newest build of each package, so a cached index eventually
+names tarballs that no longer exist and `use-package :ensure t` fails:
+
+    Error (use-package): Failed to install magit: https://melpa.org/packages/with-editor-20260701.1252.tar: Not found
+    Error (use-package): Cannot load magit
+
+`package-install` does not re-read the index after a download failure. Refresh
+the cached volume once, then rerun the original command:
+
+```sh
+.agents/skills/test-emacs-config/scripts/emacs-container --eval '(package-refresh-contents)'
+```
+
+Prefer this over `--fresh`, which discards the volume and reinstalls every
+package. Treat a package that fails to install as an invalid run rather than a
+failure of the change under test: its `use-package` block never executed, so the
+commands, variables, and bindings it provides are absent.
+
 ## Custom function tests
 
 Run the ERT tests for custom functions defined in `dotfiles/emacs/init.el`:

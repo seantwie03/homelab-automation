@@ -153,6 +153,7 @@ contains a =.git= directory or =.project= marker.
 | SPC g D | normal | N/I            | N/I                     | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
 | SPC g g | normal | magit          | magit-status            | N/I                | N/I                                                    |
 | SPC g R | normal | builtin        | vc-revert               | N/I                | N/I                                                    |
+| SPC g u | normal | magit          | magit-diff-unstaged     | N/A                | N/A                                                    |
 
 ** Help (=SPC h=) mappings
 

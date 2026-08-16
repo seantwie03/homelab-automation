@@ -73,7 +73,10 @@ of reporting it absent, which defeats the alternatives fallback."
   (inhibit-splash-screen t)
   (initial-major-mode 'org-mode)
   (initial-buffer-choice
-   (lambda () (find-file org-default-notes-file))))
+   (lambda ()
+     ;; org is deferred, so load it here to bind org-default-notes-file.
+     (require 'org)
+     (find-file org-default-notes-file))))
 
 (use-package modus-themes
   :ensure nil
@@ -1241,7 +1244,8 @@ unsupported because the exported text must be available immediately."
   :doc "Git commands."
   "d" #'magit-diff-working-tree
   "g" #'magit-status
-  "R" #'vc-revert)
+  "R" #'vc-revert
+  "u" #'magit-diff-unstaged)
 
 (defvar-keymap my/leader-help-map
   :doc "Help commands."
