@@ -8,6 +8,18 @@
     'zoom' not in ansible_facts.packages
     or ansible_facts.packages.zoom[0].version != zoom_version
   block:
+    # the raw rpm install below cannot resolve dependencies. regenerate with:
+    #   rpm -qpR --nosignature --nodigest /var/cache/zoom-<version>-1.x86_64.rpm
+    - name: zoom dependencies are installed
+      ansible.builtin.package:
+        name:
+          - freetype
+          - ibus
+          - ibus-m17n
+          - mesa-dri-drivers
+          - nss
+        state: present
+
     - name: zoom rpm is downloaded
       ansible.builtin.get_url:
         url: https://zoom.us/client/{{ zoom_version }}/zoom_x86_64.rpm

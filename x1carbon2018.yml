@@ -25,6 +25,5 @@
     - role: ai
     - role: network_storage
     - role: devops
-    - role: niri
     - role: gui
 
