@@ -70,18 +70,18 @@ Zoom is installed from an official, versioned remote RPM URL. The version and
 SHA-256 checksum are pinned by `zoom_version` and `zoom_checksum` in
 `roles/apps/gui/defaults/main.yml`.
 
-The role gathers installed RPM package facts before doing any network work. If
-the installed Zoom version matches `zoom_version`, both the download and
-installation tasks are skipped.
+The role queries the installed Zoom RPM version with signature verification
+disabled before doing any network work. If the installed Zoom version matches
+`zoom_version`, both the download and installation tasks are skipped.
 
 RPM 6 rejects Zoom's current package signature because the upstream key is not
-marked as signing capable. The role therefore disables signature verification
-only while installing the downloaded Zoom RPM. Both the Ansible DNF module and
-the DNF CLI ask RPM 6 to validate the rejected header, so the role invokes RPM
-directly with signature and digest checks disabled. It also bypasses RPM's
-incorrect Btrfs free-space result; DNF still resolves and reports the package's
-requirements during troubleshooting. The pinned SHA-256 checksum prevents
-installation if the downloaded file differs from the reviewed artifact.
+marked as signing capable. Both the Ansible DNF and package_facts modules ask
+RPM 6 to validate the rejected header, so the role invokes RPM directly with
+signature and digest checks disabled for both version queries and installation.
+It also bypasses RPM's incorrect Btrfs free-space result; DNF still resolves and
+reports the package's requirements during troubleshooting. The pinned SHA-256
+checksum prevents installation if the downloaded file differs from the reviewed
+artifact.
 
 To update Zoom, find the latest RPM version:
 

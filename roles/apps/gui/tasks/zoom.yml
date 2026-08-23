@@ -1,12 +1,13 @@
 ---
-- name: installed packages are gathered
-  ansible.builtin.package_facts:
-    manager: rpm
+- name: installed zoom version is queried  # noqa command-instead-of-module
+  ansible.builtin.command:
+    cmd: rpm --nosignature --nodigest -q --queryformat "%{VERSION}" zoom
+  register: zoom_installed_version
+  changed_when: false
+  failed_when: zoom_installed_version.rc not in [0, 1]
 
 - name: zoom {{ zoom_version }} is installed
-  when: >-
-    'zoom' not in ansible_facts.packages
-    or ansible_facts.packages.zoom[0].version != zoom_version
+  when: zoom_installed_version.rc != 0 or zoom_installed_version.stdout != zoom_version
   block:
     # the raw rpm install below cannot resolve dependencies. regenerate with:
     #   rpm -qpR --nosignature --nodigest /var/cache/zoom-<version>-1.x86_64.rpm

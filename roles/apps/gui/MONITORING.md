@@ -22,7 +22,7 @@ journalctl -u cups.service -u avahi-daemon.service \
 Zoom should be installed from the version-pinned official RPM:
 
 ```sh
-rpm -q zoom
+rpm --nosignature --nodigest -q zoom
 ```
 
 The role disables RPM signature verification only for this package because
