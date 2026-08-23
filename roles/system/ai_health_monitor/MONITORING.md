@@ -60,4 +60,4 @@ Expected:
 - The OpenRouter key is owned by `root:ai-health-monitor` with mode `0440`.
 - The service uses `ProtectSystem=strict`, `InaccessiblePaths=/home/sean`,
   `ReadOnlyPaths=/home/ai-health-monitor/.config/openrouter`, and writable
-  paths only for reports and Codex state.
+  paths for reports, Codex state, container storage locks, and DNF logs.

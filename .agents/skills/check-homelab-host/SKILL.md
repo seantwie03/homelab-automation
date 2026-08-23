@@ -68,6 +68,19 @@ sandbox blocks the system bus, journal, or device metadata. Commands requiring
 an interactive sudo password may not work through this agent; report the exact
 remaining commands rather than weakening authentication.
 
+### Sandboxed Execution Context
+
+When running under an automated monitor service (such as
+`ai-health-monitor.service` with `ProtectSystem=strict`):
+
+- Recognize that the process's local mount namespace is read-only for security
+  isolation.
+- Distinguish sandbox constraints from actual host filesystem mount options. Do
+  not report host filesystems as mounted `ro` based on sandbox `EROFS` errors.
+- Auxiliary log writes (e.g., `/var/log/dnf5.log`) or container lock attempts
+  (`storage.lock`) blocked by `ProtectSystem=strict` are expected sandbox
+  artifacts, not system regressions.
+
 ## Apply Role Monitoring
 
 Execute the commands and evaluate the thresholds in each applicable

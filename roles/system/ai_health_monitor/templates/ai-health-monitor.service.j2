@@ -20,6 +20,6 @@ Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ProtectSystem=strict
 InaccessiblePaths=/home/sean
 ReadOnlyPaths={{ health_monitor_openrouter_dir }}
-ReadWritePaths={{ health_monitor_report_dir }} {{ health_monitor_home }}/.codex
+ReadWritePaths={{ health_monitor_report_dir }} {{ health_monitor_home }}/.codex -/var/lib/containers/storage -/var/log/dnf5.log
 ExecStart=/usr/local/bin/ai-health-monitor-run
 

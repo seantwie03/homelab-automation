@@ -29,6 +29,19 @@ health_monitor_prompt: |
   otherwise remediate anything. Prefer unprivileged commands first, and do not
   prepend sudo to commands that are readable as {{ health_monitor_user }}.
 
+  You are executing as the unprivileged {{ health_monitor_user }} user inside a
+  hardened systemd service with ProtectSystem=strict. In this execution sandbox,
+  the filesystem hierarchy is mounted read-only for security. Do NOT confuse
+  this sandbox mount namespace with the host's actual filesystem state:
+  - The host filesystems (/, /var/log, /home, etc.) are mounted read-write.
+  - Read-only file system errors (EROFS) produced when read-only inspection
+    commands attempt auxiliary writes (such as dnf5 check trying to write
+    /var/log/dnf5.log or podman attempting to acquire storage locks in
+    /var/lib/containers) are expected sandbox constraints, NOT host failures.
+  - If a command succeeds in its primary check but logs a read-only error for
+    auxiliary log files or locks, treat the check as successful and do not
+    report the read-only message as a host defect or ongoing follow-up issue.
+
   Before running any sudo command, review the "Allowed sudo commands" section
   included at the end of this prompt and treat it as the complete allowed
   elevated-command contract. Sudoers matching is sensitive to the executable
