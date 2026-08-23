@@ -1,6 +1,6 @@
 return {
     ansiblels = "ansible-language-server",
-    harper_ls = "harper-ls",
+    -- harper_ls = "harper-ls",
     jdtls = "jdtls",
     kotlin_lsp = "kotlin-lsp",
     lua_ls = "lua-language-server",
