@@ -1,0 +1,14 @@
+{
+    "permissions": {
+        "allow": [
+            "command(ansible-lint:*)",
+            "command(ansible-playbook --syntax-check:*)",
+            "command(ansible-doc:*)",
+            "command(ec:*)",
+            "command(.agents/skills/check-homelab-host/scripts/list-roles.sh:*)",
+            "command(.agents/skills/query-running-emacs/scripts/query-emacs-eval.sh:*)",
+            "command(.agents/skills/test-emacs-config/scripts/emacs-container:*)",
+            "command(.agents/skills/test-neovim-config/scripts/neovim-container:*)"
+        ]
+    }
+}

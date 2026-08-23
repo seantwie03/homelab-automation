@@ -3,12 +3,17 @@
 This file provides guidance to coding agents when working with code in this
 repository.
 
-Both Claude Code and Codex are used in this repository. `CLAUDE.md` imports
-this file directly, and `.claude/skills/` symlinks to `.agents/skills/`, so
-most content and skills are already shared automatically. When updating a
-skill or config for one agent, make an equivalent change for the other to
-keep their configurations in sync — for anything not already shared via
-import or symlink, such as `.codex/config.toml` versus `.claude/settings.json`.
+Claude Code, Codex, and Google Antigravity are used in this repository.
+`AGENTS.md` is the shared instruction source across all three agents:
+`CLAUDE.md` imports this file directly via `@AGENTS.md`, while Codex and
+Antigravity read `AGENTS.md` natively.
+
+Workspace skills are stored in `.agents/skills/`. Codex and Antigravity discover
+them natively, and `.claude/skills/` symlinks to `.agents/skills/`. When
+updating a skill or config for one agent, make equivalent changes for the
+others to keep their configurations in sync — for anything not already shared
+via import or symlink, such as `.agents/settings.json` (Antigravity),
+`.codex/rules/` (Codex), and `.claude/settings.json` (Claude Code).
 
 ## Project Overview
 

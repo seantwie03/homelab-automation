@@ -4,6 +4,12 @@ Install AI development tools for the user specified in the `user` variable.
 
 The role installs AI packages such as: Antigravity CLI, Codex, and Claude Code.
 
+## Antigravity Settings
+
+The role symlinks the `dotfiles/antigravity` directory in this repository to
+`~/.config/antigravity`. This provides user-level permission allowlists for safe
+read-only Linux and Git commands across all projects.
+
 ## Codex OpenRouter Profile
 
 The regular `codex` command is left unchanged so it can continue using the

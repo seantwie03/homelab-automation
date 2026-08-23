@@ -5,12 +5,8 @@
     global: true
     state: absent
 
-- name: antigravity cli is installed
-  ansible.builtin.shell:
-    cmd: curl -fsSL https://antigravity.google/cli/install.sh | bash  # noqa: command-instead-of-module
-    creates: /home/{{ user }}/.local/bin/agy
-  become: true
-  become_user: "{{ user }}"
+- name: antigravity tasks are included
+  ansible.builtin.include_tasks: antigravity.yml
 
 - name: codex tasks are included
   ansible.builtin.include_tasks: codex.yml

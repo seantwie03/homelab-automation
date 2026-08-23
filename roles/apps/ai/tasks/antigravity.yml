@@ -1,0 +1,16 @@
+---
+- name: antigravity cli is installed
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://antigravity.google/cli/install.sh | bash  # noqa: command-instead-of-module
+    creates: /home/{{ user }}/.local/bin/agy
+  become: true
+  become_user: "{{ user }}"
+
+- name: antigravity dotfiles directory is symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/antigravity"
+    dest: /home/{{ user }}/.config/antigravity
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
