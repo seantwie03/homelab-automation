@@ -12,8 +12,11 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
-# - name: agg is installed (Asciinema Gif Generator)
-#   community.general.cargo:
-#     name: https://github.com/asciinema/agg
-#     state: present
-#     path: "/home/{{ user }}" # cargo automatically appends /bin
+- name: agg is installed
+  ansible.builtin.get_url:
+    url: https://github.com/asciinema/agg/releases/download/v{{ agg_version }}/agg-x86_64-unknown-linux-gnu
+    dest: /home/{{ user }}/bin/agg
+    checksum: sha256:{{ agg_checksum }}
+    mode: 0550
+    owner: "{{ user }}"
+    group: "{{ user }}"
