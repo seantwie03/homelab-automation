@@ -151,7 +151,7 @@ contains a =.git= directory or =.project= marker.
 
 | Key     | Mode   | Emacs Provider | Emacs Function          | Nvim Provider      | Nvim Function                                          |
 |---------+--------+----------------+-------------------------+--------------------+--------------------------------------------------------|
-| SPC g d | normal | custom         | my/magit-status-new-tab | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
+| SPC g d | normal | custom         | my/magit-status-fullframe | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
 | SPC g D | normal | N/I            | N/I                     | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
 | SPC g g | normal | magit          | magit-status            | N/I                | N/I                                                    |
 | SPC g R | normal | builtin        | vc-revert               | N/I                | N/I                                                    |

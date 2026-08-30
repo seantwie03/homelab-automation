@@ -681,16 +681,15 @@ Copy the absolute path when the file is not in a project."
      (stashes . hide)))
   (magit-status-show-untracked-files 'all)
   :preface
-  (defun my/magit-status-new-tab ()
-    "Open the current repository's Magit status in a new tab."
+  (defun my/magit-status-fullframe ()
+    "Open the current repository's Magit status using the full frame."
     (interactive)
     (let ((root (magit-toplevel)))
       (unless root
         (user-error "Not inside a Git repository"))
-      (tab-bar-new-tab)
-      (tab-bar-rename-tab "Magit")
-      (magit-status root)
-      (delete-other-windows))))
+      (let ((magit-display-buffer-function
+             #'magit-display-buffer-fullframe-status-v1))
+        (magit-status root)))))
 
 (use-package vdiff
   :ensure t
@@ -1317,7 +1316,7 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-git-map
   :doc "Git commands."
-  "d" #'my/magit-status-new-tab
+  "d" #'my/magit-status-fullframe
   "g" #'magit-status
   "R" #'vc-revert
   "u" #'magit-diff-unstaged)
