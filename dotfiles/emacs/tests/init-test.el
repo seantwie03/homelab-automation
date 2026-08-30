@@ -419,6 +419,11 @@
       (my/markdown-cycle-global))
     (should (eq argument t))))
 
+(ert-deftest my/markdown-setext-headings-are-disabled ()
+  (should-not (string-match-p markdown-regex-header
+                              "src: ./chapters/example.md\n---"))
+  (should (string-match-p markdown-regex-header "## Heading")))
+
 (ert-deftest my/org-find-file-in-notes-searches-org-directory ()
   (let ((org-directory "/tmp/notes")
         arguments)

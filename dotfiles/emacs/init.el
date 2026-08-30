@@ -83,12 +83,12 @@ of reporting it absent, which defeats the alternatives fallback."
   :no-require t
   :custom
   (modus-themes-headings
-   '((1 . (variable-pitch 1.25))
-     (2 . (variable-pitch 1.20))
-     (3 . (variable-pitch 1.15))
-     (4 . (variable-pitch 1.10))
-     (5 . (variable-pitch 1.05))
-     (6 . (variable-pitch 1.0))))
+   '((1 . (1.25))
+     (2 . (1.20))
+     (3 . (1.15))
+     (4 . (1.10))
+     (5 . (1.05))
+     (6 . (1.0))))
   (modus-operandi-palette-overrides
    '((bg-mode-line-active fringe)))
   (modus-vivendi-palette-overrides
@@ -298,9 +298,15 @@ of reporting it absent, which defeats the alternatives fallback."
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
   (markdown-fontify-code-blocks-natively t)
+  (markdown-gfm-use-electric-backquote nil)
   (markdown-spaces-after-code-fence 0)
   (markdown-unordered-list-item-prefix "- ")
   :config
+  ;; Slidev's `---' separators otherwise turn the preceding line into a
+  ;; Setext heading.  Retain markdown-mode's capture groups for ATX headings.
+  (setq markdown-regex-header
+        "^\\(?4:#+[ \t]+\\)\\(?5:.*?\\)\\(?6:[ \t]+#+\\)?$")
+
   (defun my/markdown-insert-list-item ()
     "Append a Markdown list item and enter Evil insert state."
     (interactive)
