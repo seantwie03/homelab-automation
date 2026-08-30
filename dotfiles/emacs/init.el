@@ -649,7 +649,57 @@ Copy the absolute path when the file is not in a project."
       (message "Copied file path: %s" path))))
 
 (use-package magit
-  :ensure t)
+  :ensure t
+  :custom
+  (magit-section-initial-visibility-alist
+   '((untracked . show)
+     (stashes . hide)))
+  (magit-status-show-untracked-files 'all)
+  :preface
+  (defun my/magit-status-new-tab ()
+    "Open the current repository's Magit status in a new tab."
+    (interactive)
+    (let ((root (magit-toplevel)))
+      (unless root
+        (user-error "Not inside a Git repository"))
+      (tab-bar-new-tab)
+      (tab-bar-rename-tab "Magit")
+      (magit-status root)
+      (delete-other-windows))))
+
+(use-package vdiff
+  :ensure t
+  :custom
+  (vdiff-auto-refine t)
+  (vdiff-lock-scrolling t)
+  :preface
+  (defun my--vdiff-kill-revision-buffer (revision-buffer _working-tree-buffer)
+    "Kill REVISION-BUFFER after a working-tree comparison."
+    (when (buffer-live-p revision-buffer)
+      (kill-buffer revision-buffer)))
+
+  (defun my/magit-review-file-at-point ()
+    "Review the Magit file at point.
+Compare tracked files between HEAD and the working tree using vdiff.  Open an
+untracked file beside Magit because it has no earlier revision to compare."
+    (interactive)
+    (let ((file (magit-current-file))
+          (root (magit-toplevel)))
+      (unless file
+        (user-error "No file at point"))
+      (let* ((path (expand-file-name file root))
+             (working-tree-buffer
+              (or (get-file-buffer path) (find-file-noselect path))))
+        (if (magit-file-tracked-p file)
+            (vdiff-buffers (magit-find-file-noselect "HEAD" file)
+                           working-tree-buffer nil
+                           #'my--vdiff-kill-revision-buffer t nil)
+          (let ((window (or (window-in-direction 'right)
+                            (split-window-right))))
+            (set-window-buffer window working-tree-buffer)
+            (select-window window))))))
+  :config
+  (keymap-set magit-mode-map "e" #'my/magit-review-file-at-point))
 
 ;;; Help and discovery
 (use-package which-key
@@ -1242,7 +1292,7 @@ unsupported because the exported text must be available immediately."
 
 (defvar-keymap my/leader-git-map
   :doc "Git commands."
-  "d" #'magit-diff-working-tree
+  "d" #'my/magit-status-new-tab
   "g" #'magit-status
   "R" #'vc-revert
   "u" #'magit-diff-unstaged)

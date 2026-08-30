@@ -39,6 +39,7 @@
 | C-x           | normal  | builtin        | Control-X-prefix                      | builtin       | dd                                           |
 | C-x           | insert  | builtin        | Control-X-prefix                      | builtin       | i_CTRL-X                                     |
 | C-x           | visual  | builtin        | clipboard-kill-region                 | builtin       | "+x                                          |
+| e             | magit   | custom         | my/magit-review-file-at-point         | N/A           | N/A                                          |
 | <Down>        | normal  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | <Down>        | visual  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | <Down>        | insert  | evil           | evil-next-visual-line                 | builtin       | <C-\><C-o>gj                                 |
@@ -149,7 +150,7 @@ contains a =.git= directory or =.project= marker.
 
 | Key     | Mode   | Emacs Provider | Emacs Function          | Nvim Provider      | Nvim Function                                          |
 |---------+--------+----------------+-------------------------+--------------------+--------------------------------------------------------|
-| SPC g d | normal | magit          | magit-diff-working-tree | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
+| SPC g d | normal | custom         | my/magit-status-new-tab | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
 | SPC g D | normal | N/I            | N/I                     | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
 | SPC g g | normal | magit          | magit-status            | N/I                | N/I                                                    |
 | SPC g R | normal | builtin        | vc-revert               | N/I                | N/I                                                    |
