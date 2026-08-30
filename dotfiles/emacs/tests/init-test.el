@@ -131,6 +131,39 @@
   (with-temp-buffer
     (should-error (my/copy-project-relative-file-path) :type 'user-error)))
 
+(ert-deftest my/copy-region-with-context-copies-project-location-and-code ()
+  (with-temp-buffer
+    (setq buffer-file-name "/tmp/project/src/main.py"
+          major-mode 'python-mode)
+    (insert "ignored\nprint('first')\nprint('second')\nignored\n")
+    (let ((begin (progn (goto-char (point-min))
+                        (forward-line 1)
+                        (point)))
+          (end (progn (goto-char (point-min))
+                      (forward-line 3)
+                      (point)))
+          copied)
+      (cl-letf (((symbol-function 'project-current)
+                 (lambda (&rest _) 'project))
+                ((symbol-function 'project-root)
+                 (lambda (_project) "/tmp/project/"))
+                ((symbol-function 'kill-new)
+                 (lambda (text &optional _replace)
+                   (setq copied text))))
+        (my/copy-region-with-context begin end))
+      (should (equal copied
+                     (concat "src/main.py:2\n"
+                             "```python\n"
+                             "print('first')\n"
+                             "print('second')\n"
+                             "```"))))))
+
+(ert-deftest my/copy-region-with-context-rejects-a-non-file-buffer ()
+  (with-temp-buffer
+    (insert "text")
+    (should-error (my/copy-region-with-context (point-min) (point-max))
+                  :type 'user-error)))
+
 (ert-deftest my/magit-status-new-tab-opens-repository-in-named-tab ()
   (let (events)
     (cl-letf (((symbol-function 'magit-toplevel)

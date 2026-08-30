@@ -103,6 +103,7 @@ contains a =.git= directory or =.project= marker.
 | SPC t   | normal | custom         | my/leader-toggle-map                    | which-key.nvim | toggle group                                                     |
 | SPC u   | normal | builtin        | universal-argument                      | N/I            | N/I                                                              |
 | SPC w   | normal | custom         | my/leader-windows-map                   | which-key.nvim | windows group                                                    |
+| SPC y   | visual | custom         | my/copy-region-with-context             | custom         | Copy path:line and selection                                     |
 
 ** Buffers (=SPC b=) mappings
 

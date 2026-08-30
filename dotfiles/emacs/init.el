@@ -82,6 +82,13 @@ of reporting it absent, which defeats the alternatives fallback."
   :ensure nil
   :no-require t
   :custom
+  (modus-themes-headings
+   '((1 . (variable-pitch 1.25))
+     (2 . (variable-pitch 1.20))
+     (3 . (variable-pitch 1.15))
+     (4 . (variable-pitch 1.10))
+     (5 . (variable-pitch 1.05))
+     (6 . (variable-pitch 1.0))))
   (modus-operandi-palette-overrides
    '((bg-mode-line-active fringe)))
   (modus-vivendi-palette-overrides
@@ -290,8 +297,6 @@ of reporting it absent, which defeats the alternatives fallback."
   (markdown-mode . visual-wrap-prefix-mode)
   :custom
   (markdown-command '("pandoc" "--from=gfm" "--to=html5"))
-  (markdown-header-scaling t)
-  (markdown-header-scaling-values '(1.25 1.20 1.15 1.10 1.05 1.0))
   (markdown-fontify-code-blocks-natively t)
   (markdown-spaces-after-code-fence 0)
   (markdown-unordered-list-item-prefix "- ")
@@ -646,7 +651,27 @@ Copy the absolute path when the file is not in a project."
                                          (project-root project))
                    (expand-file-name buffer-file-name))))
       (kill-new path)
-      (message "Copied file path: %s" path))))
+      (message "Copied file path: %s" path)))
+
+  (defun my/copy-region-with-context (begin end)
+    "Copy the region from BEGIN to END with its file, line, and language."
+    (interactive "r")
+    (unless buffer-file-name
+      (user-error "Current buffer is not visiting a file"))
+    (let* ((project (project-current nil
+                                     (file-name-directory buffer-file-name)))
+           (path (if project
+                     (file-relative-name buffer-file-name
+                                         (project-root project))
+                   (expand-file-name buffer-file-name)))
+           (line (line-number-at-pos begin))
+           (language (string-remove-suffix "-mode" (symbol-name major-mode)))
+           (code (string-remove-suffix
+                  "\n" (buffer-substring-no-properties begin end)))
+           (context (format "%s:%d\n```%s\n%s\n```"
+                            path line language code)))
+      (kill-new context)
+      (message "Copied selection with context: %s:%d" path line))))
 
 (use-package magit
   :ensure t
@@ -1377,6 +1402,11 @@ unsupported because the exported text must be available immediately."
   "s" my/leader-search-map
   "t" my/leader-toggle-map)
 
+(defvar-keymap my/visual-leader-map
+  :doc "Global visual-state leader keymap."
+  :parent my/leader-map
+  "y" #'my/copy-region-with-context)
+
 (which-key-add-keymap-based-replacements
   my/leader-map
   "b" (cons "buffers" my/leader-buffers-map)
@@ -1443,8 +1473,9 @@ unsupported because the exported text must be available immediately."
 ;;;; Leader binding
 (with-eval-after-load 'evil
   (my/keymap-set-many
-   (list evil-normal-state-map evil-visual-state-map evil-motion-state-map)
-   "SPC" my/leader-map))
+   (list evil-normal-state-map evil-motion-state-map)
+   "SPC" my/leader-map)
+  (keymap-set evil-visual-state-map "SPC" my/visual-leader-map))
 
 (with-eval-after-load 'org-agenda
   (with-eval-after-load 'evil
