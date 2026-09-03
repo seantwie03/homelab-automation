@@ -2,7 +2,9 @@
 
 ## LSP Configuration
 
-This config uses Neovim's native LSP support.
+This config uses Neovim 0.11/0.12's native LSP support. It does not install
+`nvim-lspconfig`; selected upstream configurations are vendored as native
+`vim.lsp.Config` files when useful.
 
 Each language server has a config file in `lsp/`. The filename is the Neovim LSP server name:
 
@@ -53,9 +55,20 @@ return {
    }
    ```
 
-3. Restart Neovim or run `:Lazy reload mason-tool-installer.nvim`.
+3. Add the matching mode, command, and startup behavior to the Emacs Eglot
+   configuration when Emacs should use the server too.
+4. Restart Neovim or run `:Lazy reload mason-tool-installer.nvim`.
 
 Mason Tool Installer will install the package. Neovim will enable the LSP when a matching filetype is opened.
+
+Mason is also the language-server package manager for Emacs. Its executables
+under `~/.local/share/nvim/mason/bin` are placed on Emacs's `exec-path`, so a
+shared server must always be added to this Neovim configuration and installed
+with Mason first. Rassumfrassum is installed this way for Emacs's Angular
+multi-server connection even though it is not enabled as a Neovim LSP.
+
+nvim-treesitter similarly owns the parsers shared with Emacs. Emacs loads the
+parser libraries from `~/.local/share/nvim/site/parser`.
 
 Use `:checkhealth vim.lsp` to verify that the executable is installed and the configuration is valid.
 

@@ -43,11 +43,20 @@
 | <Down>        | normal  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | <Down>        | visual  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | <Down>        | insert  | evil           | evil-next-visual-line                 | builtin       | <C-\><C-o>gj                                 |
-| g d           | normal  | N/I            | N/I                                   | builtin       | vim.lsp.buf.definition                       |
+| g d           | normal  | builtin        | xref-find-definitions                 | builtin       | vim.lsp.buf.definition                       |
+| g O           | normal  | consult        | consult-imenu                         | builtin       | vim.lsp.buf.document_symbol                  |
+| g r a         | normal  | eglot          | eglot-code-actions                    | builtin       | vim.lsp.buf.code_action                      |
+| g r a         | visual  | eglot          | eglot-code-actions                    | builtin       | vim.lsp.buf.code_action                      |
+| g r i         | normal  | eglot          | eglot-find-implementation             | builtin       | vim.lsp.buf.implementation                   |
+| g r n         | normal  | eglot          | eglot-rename                          | builtin       | vim.lsp.buf.rename                           |
+| g r r         | normal  | builtin        | xref-find-references                  | builtin       | vim.lsp.buf.references                       |
+| g r t         | normal  | eglot          | eglot-find-typeDefinition             | builtin       | vim.lsp.buf.type_definition                  |
+| g r x         | normal  | N/I            | N/I                                   | builtin       | vim.lsp.codelens.run                         |
 | j             | normal  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | j             | visual  | evil           | evil-next-visual-line                 | builtin       | gj                                           |
 | k             | normal  | evil           | evil-previous-visual-line             | builtin       | gk                                           |
 | k             | visual  | evil           | evil-previous-visual-line             | builtin       | gk                                           |
+| K             | normal  | builtin        | eldoc-doc-buffer                      | builtin       | vim.lsp.buf.hover                            |
 | n             | normal  | custom         | my/evil-search-next-and-center        | builtin       | nzz                                          |
 | N             | normal  | custom         | my/evil-search-previous-and-center    | builtin       | Nzz                                          |
 | S-Del         | normal  | evil           | evil-delete-line                      | builtin       | dd                                           |
@@ -86,7 +95,7 @@ contains a =.git= directory or =.project= marker.
 | SPC ;   | normal | builtin        | pp-eval-expression                      | builtin        | :lua =                                                           |
 | SPC `   | normal | evil           | evil-switch-to-windows-last-buffer      | builtin        | <C-^>                                                            |
 | SPC b   | normal | custom         | my/leader-buffers-map                   | which-key.nvim | buffers group                                                    |
-| SPC c   | normal | N/I            | N/I                                     | which-key.nvim | code group                                                       |
+| SPC c   | normal | custom         | my/leader-code-map                      | which-key.nvim | code group                                                       |
 | SPC C-a | normal | N/I            | N/I                                     | builtin        | <C-a>                                                            |
 | SPC C-a | visual | N/I            | N/I                                     | builtin        | <C-a>                                                            |
 | SPC C-x | normal | N/I            | N/I                                     | builtin        | <C-x>                                                            |
@@ -123,19 +132,26 @@ contains a =.git= directory or =.project= marker.
 
 | Key     | Mode   | Emacs Provider | Emacs Function | Nvim Provider  | Nvim Function                                   |
 |---------+--------+----------------+----------------+----------------+-------------------------------------------------|
-| SPC c a | normal | N/I            | N/I            | builtin        | vim.lsp.buf.code_action                         |
-| SPC c d | normal | N/I            | N/I            | builtin        | vim.lsp.buf.definition                          |
-| SPC c D | normal | N/I            | N/I            | builtin        | vim.lsp.buf.declaration                         |
-| SPC c h | normal | N/I            | N/I            | builtin        | vim.lsp.buf.hover                               |
-| SPC c I | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_implementations           |
-| SPC c i | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_incoming_calls            |
-| SPC c n | normal | N/I            | N/I            | builtin        | vim.lsp.buf.rename                              |
-| SPC c o | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_outgoing_calls            |
-| SPC c r | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_references                |
-| SPC c s | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_document_symbols          |
-| SPC c S | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_dynamic_workspace_symbols |
-| SPC c t | normal | N/I            | N/I            | telescope.nvim | telescope.builtin.lsp_type_definitions          |
-| SPC c x | normal | N/I            | N/I            | builtin        | vim.lsp.codelens.run                            |
+| SPC c a | normal | eglot          | eglot-code-actions                    | builtin        | vim.lsp.buf.code_action                         |
+| SPC c d | normal | builtin        | xref-find-definitions                 | builtin        | vim.lsp.buf.definition                          |
+| SPC c D | normal | eglot          | eglot-find-declaration                | builtin        | vim.lsp.buf.declaration                         |
+| SPC c f | normal | eglot          | eglot-format                          | builtin        | vim.lsp.buf.format                              |
+| SPC c f | visual | eglot          | eglot-format                          | builtin        | vim.lsp.buf.format                              |
+| SPC c h | normal | builtin        | eldoc-doc-buffer                      | builtin        | vim.lsp.buf.hover                               |
+| SPC c I | normal | eglot          | eglot-find-implementation             | telescope.nvim | telescope.builtin.lsp_implementations           |
+| SPC c i | normal | eglot-hierarchy | eglot-hierarchy-call-hierarchy       | telescope.nvim | telescope.builtin.lsp_incoming_calls            |
+| SPC c n | normal | eglot          | eglot-rename                          | builtin        | vim.lsp.buf.rename                              |
+| SPC c o | normal | custom         | my/eglot-hierarchy-outgoing-calls     | telescope.nvim | telescope.builtin.lsp_outgoing_calls            |
+| SPC c r | normal | builtin        | xref-find-references                  | telescope.nvim | telescope.builtin.lsp_references                |
+| SPC c s | normal | consult        | consult-imenu                         | telescope.nvim | telescope.builtin.lsp_document_symbols          |
+| SPC c S | normal | builtin        | xref-find-apropos                     | telescope.nvim | telescope.builtin.lsp_dynamic_workspace_symbols |
+| SPC c t | normal | eglot          | eglot-find-typeDefinition             | telescope.nvim | telescope.builtin.lsp_type_definitions          |
+| SPC c x | normal | N/I            | N/I                                   | builtin        | vim.lsp.codelens.run                            |
+
+Neovim's LSP meanings for =C-s= and =C-]= are intentionally not mirrored in
+Emacs.  =C-s= remains the shared save binding, and =C-]= retains Evil's tag
+navigation.  Each editor also retains its native =gq= behavior; use =SPC c f=
+for explicit LSP formatting in either editor.
 
 ** Files (=SPC f=) mappings
 

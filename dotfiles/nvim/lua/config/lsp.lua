@@ -28,6 +28,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
             buffer = ev.buf,
             desc = 'Declaration',
         })
+        vim.keymap.set({ 'n', 'x' }, '<leader>cf', function()
+            vim.lsp.buf.format()
+        end, {
+            buffer = ev.buf,
+            desc = 'Format region or buffer',
+        })
         vim.keymap.set('n', '<leader>ch', vim.lsp.buf.hover, {
             buffer = ev.buf,
             desc = 'Hover',

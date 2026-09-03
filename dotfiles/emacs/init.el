@@ -509,7 +509,24 @@ When CHILDP is non-nil, make the new heading a child of the current one."
 
 (use-package typescript-ts-mode
   :ensure nil
-  :mode ("\\.tsx?\\'" . typescript-ts-mode))
+  :mode (("\\.ts\\'" . typescript-ts-mode)
+         ("\\.tsx\\'" . tsx-ts-mode)))
+
+(use-package java-ts-mode
+  :ensure nil
+  :mode "\\.java\\'")
+
+(use-package python
+  :ensure nil
+  :mode ("\\.py\\'" . python-ts-mode))
+
+(use-package csharp-mode
+  :ensure nil
+  :mode ("\\.cs\\'" . csharp-ts-mode))
+
+(use-package html-ts-mode
+  :ensure nil
+  :mode "\\.html\\'")
 
 (use-package json-ts-mode
   :ensure nil
@@ -614,10 +631,192 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (interactive)
     (consult-ripgrep nil (thing-at-point 'symbol t))))
 
+(use-package xref
+  :ensure nil
+  :after consult
+  :custom
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
+
 (use-package project
   :ensure nil
   :custom
   (project-vc-extra-root-markers '(".project"))
+  :config
+  (defun my/angular-project-root (&optional directory)
+    "Return the nearest Angular workspace above DIRECTORY, or nil."
+    (when-let ((root (locate-dominating-file
+                      (or directory default-directory)
+                      (lambda (candidate)
+                        (or (file-exists-p
+                             (expand-file-name "angular.json" candidate))
+                            (file-exists-p
+                             (expand-file-name "nx.json" candidate)))))))
+      (file-name-as-directory (expand-file-name root))))
+
+  (defun my/project-try-angular (directory)
+    "Return a transient project rooted at the Angular workspace for DIRECTORY."
+    (when-let ((root (my/angular-project-root directory)))
+      (cons 'transient root)))
+
+  ;; Prefer the nearest Angular workspace to a higher-level Git root so that
+  ;; TypeScript and template buffers share the right LSP workspace.
+  (add-hook 'project-find-functions #'my/project-try-angular))
+
+;;; Programming language intelligence
+(defvar my--mason-bin-directory
+  (expand-file-name ".local/share/nvim/mason/bin" "~")
+  "Directory where Neovim's Mason exposes shared language servers.")
+
+(add-to-list 'exec-path my--mason-bin-directory)
+(unless (member my--mason-bin-directory (parse-colon-path (getenv "PATH")))
+  (setenv "PATH" (concat my--mason-bin-directory path-separator
+                         (getenv "PATH"))))
+
+;; Reconsider this shared parser arrangement when upgrading to Emacs 31.
+;; Evaluate `treesit-install-language-grammar' together with
+;; `treesit-auto-install-grammar' at that time.
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-extra-load-path
+   (list (expand-file-name ".local/share/nvim/site/parser" "~"))))
+
+(use-package eglot
+  :ensure nil
+  :commands (eglot-ensure)
+  :init
+  (defun my/angular-core-version (root)
+    "Return ROOT's normalized @angular/core version, or an empty string."
+    (let ((package-file (expand-file-name "package.json" root)))
+      (if (not (file-readable-p package-file))
+          ""
+        (condition-case nil
+            (with-temp-buffer
+              (insert-file-contents package-file)
+              (let* ((package (json-parse-buffer :object-type 'alist))
+                     (dependencies (alist-get 'dependencies package))
+                     (dev-dependencies (alist-get 'devDependencies package))
+                     (version (or (alist-get '@angular/core dependencies)
+                                  (alist-get '@angular/core dev-dependencies)
+                                  "")))
+                (if (string-match "[0-9]+\\.[0-9]+\\.[0-9]+" version)
+                    (match-string 0 version)
+                  "")))
+          (error "")))))
+
+  (defun my/angular-node-modules (root)
+    "Return Angular and project node_modules probe paths below ROOT."
+    (delq nil
+          (list
+           (let ((project-modules (expand-file-name "node_modules" root)))
+             (and (file-directory-p project-modules) project-modules))
+           (let ((mason-modules
+                  (expand-file-name
+                   ".local/share/nvim/mason/packages/angular-language-server/node_modules"
+                   "~")))
+             (and (file-directory-p mason-modules) mason-modules)))))
+
+  (defun my/angular-language-server-command (root)
+    "Build the Angular language-server command for workspace ROOT."
+    (let* ((node-modules (my/angular-node-modules root))
+           (ts-probes (string-join node-modules ","))
+           (ng-probes
+            (string-join
+             (mapcar (lambda (directory)
+                       (expand-file-name
+                        "@angular/language-server/node_modules" directory))
+                     node-modules)
+             ",")))
+      (list "ngserver" "--stdio"
+            "--tsProbeLocations" ts-probes
+            "--ngProbeLocations" ng-probes
+            "--angularCoreVersion" (my/angular-core-version root))))
+
+  (defun my/eglot-typescript-contact (&optional _interactive _project)
+    "Return TypeScript LS directly, or multiplex it with Angular LS."
+    (if-let ((root (my/angular-project-root)))
+        (append '("rass" "--" "typescript-language-server" "--stdio" "--")
+                (my/angular-language-server-command root))
+      '("typescript-language-server" "--stdio")))
+
+  (defun my/eglot-angular-contact (&optional _interactive _project)
+    "Return the multiplexed language-server command for an Angular template."
+    (if-let ((root (my/angular-project-root)))
+        (append '("rass" "--" "typescript-language-server" "--stdio" "--")
+                (my/angular-language-server-command root))
+      (error "Not in an Angular workspace")))
+
+  (defun my/eglot-ensure-angular-html ()
+    "Start Eglot only when the current HTML buffer belongs to Angular."
+    (when (my/angular-project-root)
+      (eglot-ensure)))
+
+  (defun my/eglot-disable-inlay-hints ()
+    "Keep Eglot inlay hints disabled to match the Neovim configuration."
+    (when (boundp 'eglot-inlay-hints-mode)
+      (eglot-inlay-hints-mode -1)))
+
+  (defun my/eglot-open-roslyn-workspace ()
+    "Tell Roslyn to open the current solution or C# projects."
+    (when (and (derived-mode-p 'csharp-ts-mode)
+               (eglot-managed-p))
+      (let* ((server (eglot-current-server))
+             (project (project-current))
+             (root (project-root project))
+             (files (mapcar (lambda (file) (expand-file-name file root))
+                            (project-files project)))
+             (solution
+              (seq-find (lambda (file)
+                          (string-match-p "\\.slnx?\\'" file))
+                        files)))
+        (if solution
+            (jsonrpc-notify server :solution/open
+                            (list :solution (eglot-path-to-uri solution)))
+          (when-let ((projects
+                      (seq-filter (lambda (file)
+                                    (string-match-p "\\.csproj\\'" file))
+                                  files)))
+            (jsonrpc-notify
+             server :project/open
+             (list :projects
+                   (vconcat (mapcar #'eglot-path-to-uri projects)))))))))
+
+  :custom
+  (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
+  :config
+  (dolist (entry
+           '((java-ts-mode . ("jdtls"))
+             (js-ts-mode . my/eglot-typescript-contact)
+             (typescript-ts-mode . my/eglot-typescript-contact)
+             (tsx-ts-mode . my/eglot-typescript-contact)
+             (python-ts-mode . ("pyright-langserver" "--stdio"))
+             (csharp-ts-mode . ("roslyn-language-server" "--stdio"))
+             (html-ts-mode . my/eglot-angular-contact)))
+    (add-to-list 'eglot-server-programs entry))
+  :hook
+  ((java-ts-mode js-ts-mode typescript-ts-mode tsx-ts-mode python-ts-mode
+                 csharp-ts-mode)
+   . eglot-ensure)
+  (html-ts-mode . my/eglot-ensure-angular-html)
+  (eglot-managed-mode . my/eglot-disable-inlay-hints)
+  (eglot-managed-mode . my/eglot-open-roslyn-workspace))
+
+;; Emacs 30 compatibility. This package and its associated wrapper are safe
+;; to remove when upgrading to Emacs 31 and adopting Eglot's native
+;; call-hierarchy commands.
+(defun my/eglot-hierarchy-outgoing-calls ()
+  "Show outgoing calls for the symbol at point."
+  (interactive)
+  (eglot-hierarchy-call-hierarchy t))
+
+(use-package eglot-hierarchy
+  :vc (:url "https://github.com/dolmens/eglot-hierarchy" :rev :newest)
+  :after eglot
+  :commands eglot-hierarchy-call-hierarchy)
+
+(use-package project
+  :ensure nil
   :config
   ;; On Windows, `project--files-in-directory' invokes the system `find.exe'
   ;; (a text-search tool, not a file finder), which fails on paths with spaces.
@@ -1292,6 +1491,22 @@ unsupported because the exported text must be available immediately."
   "S" #'evil-write-all
   "x" #'scratch-buffer)
 
+(defvar-keymap my/leader-code-map
+  :doc "Language-server code commands."
+  "a" #'eglot-code-actions
+  "d" #'xref-find-definitions
+  "D" #'eglot-find-declaration
+  "f" #'eglot-format
+  "h" #'eldoc-doc-buffer
+  "I" #'eglot-find-implementation
+  "i" #'eglot-hierarchy-call-hierarchy
+  "n" #'eglot-rename
+  "o" #'my/eglot-hierarchy-outgoing-calls
+  "r" #'xref-find-references
+  "s" #'consult-imenu
+  "S" #'xref-find-apropos
+  "t" #'eglot-find-typeDefinition)
+
 (defvar-keymap my/leader-files-map
   :doc "File commands."
   "f" #'find-file
@@ -1399,6 +1614,7 @@ unsupported because the exported text must be available immediately."
   "u" #'universal-argument
   "w" my/leader-windows-map
   "b" my/leader-buffers-map
+  "c" my/leader-code-map
   "f" my/leader-files-map
   "g" my/leader-git-map
   "h" my/leader-help-map
@@ -1415,6 +1631,7 @@ unsupported because the exported text must be available immediately."
 (which-key-add-keymap-based-replacements
   my/leader-map
   "b" (cons "buffers" my/leader-buffers-map)
+  "c" (cons "code" my/leader-code-map)
   "f" (cons "files" my/leader-files-map)
   "g" (cons "git" my/leader-git-map)
   "h" (cons "help" my/leader-help-map)
@@ -1474,6 +1691,18 @@ unsupported because the exported text must be available immediately."
   (keymap-set evil-normal-state-map "{" #'my/evil-backward-paragraph-and-center)
   (keymap-set evil-normal-state-map "}" #'my/evil-forward-paragraph-and-center)
   (keymap-set evil-normal-state-map "-" #'dired-jump))
+
+(with-eval-after-load 'evil
+  (keymap-set evil-normal-state-map "g d" #'xref-find-definitions)
+  (my/keymap-set-many
+   (list evil-normal-state-map evil-visual-state-map)
+   "g r a" #'eglot-code-actions)
+  (keymap-set evil-normal-state-map "g r i" #'eglot-find-implementation)
+  (keymap-set evil-normal-state-map "g r n" #'eglot-rename)
+  (keymap-set evil-normal-state-map "g r r" #'xref-find-references)
+  (keymap-set evil-normal-state-map "g r t" #'eglot-find-typeDefinition)
+  (keymap-set evil-normal-state-map "g O" #'consult-imenu)
+  (keymap-set evil-normal-state-map "K" #'eldoc-doc-buffer))
 
 ;;;; Leader binding
 (with-eval-after-load 'evil

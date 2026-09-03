@@ -1,5 +1,38 @@
 #+title: Emacs Configuration
 
+* Programming languages
+
+Emacs 30 uses its built-in tree-sitter modes and Eglot client for Java,
+JavaScript, TypeScript, TSX, Python, C#, and Angular HTML templates.  Flymake
+diagnostics are enabled by Eglot.  Completion uses Emacs's standard
+=completion-at-point= UI and is invoked manually with =M-TAB= or =C-M-i=;
+Corfu or another automatic completion frontend is intentionally not installed.
+
+Neovim owns the shared tooling installations:
+
+- nvim-treesitter installs parsers in
+  =~/.local/share/nvim/site/parser=, which Emacs adds to
+  =treesit-extra-load-path=.
+- Mason installs language-server executables in
+  =~/.local/share/nvim/mason/bin=, which Emacs adds to =exec-path= and =PATH=.
+
+Angular TypeScript, TSX, and template buffers use Rassumfrassum to present the
+TypeScript and Angular language servers to Eglot as one connection.  The
+nearest =angular.json= or =nx.json= defines the workspace.  Ordinary HTML does
+not start Eglot, and React uses the regular JavaScript/TypeScript modes and
+server.
+
+Inlay hints and on-type formatting are disabled to match Neovim.  Explicit
+formatting is available through =SPC c f=, and there is no format-on-save hook.
+Emacs 30's built-in Eglot does not implement semantic-token highlighting or a
+code-lens execution command, so =SPC c x= and =grx= remain unimplemented.
+
+The =eglot-hierarchy= package supplies call hierarchy temporarily.  When
+upgrading to Emacs 31, remove that compatibility package and its outgoing-call
+wrapper in favor of native Eglot call hierarchy.  Also reconsider sharing
+nvim-treesitter parsers and evaluate =treesit-install-language-grammar= with
+=treesit-auto-install-grammar=.
+
 * Tests
 
 Run the custom function tests against the installed configuration:

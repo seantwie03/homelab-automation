@@ -1,0 +1,6 @@
+---
+- name: .net sdk is installed
+  ansible.builtin.package:
+    name: dotnet-sdk-10.0
+    state: present
+

@@ -1,4 +1,5 @@
 ---
 dependencies:
   - role: nodejs # To support neovim plugins
+  - role: dotnet # To install Mason's Roslyn language server
   # - role: rust # To install presenterm

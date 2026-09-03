@@ -5,6 +5,126 @@
 (require 'markdown-mode)
 (require 'org)
 
+(ert-deftest my/angular-project-root-finds-nearest-angular-workspace ()
+  (let* ((root (make-temp-file "angular-project" t))
+         (nested (expand-file-name "apps/web/src" root)))
+    (unwind-protect
+        (progn
+          (make-directory nested t)
+          (write-region "{}" nil (expand-file-name "angular.json" root))
+          (should (equal (my/angular-project-root nested)
+                         (file-name-as-directory root))))
+      (delete-directory root t))))
+
+(ert-deftest my/angular-project-root-rejects-ordinary-projects ()
+  (let ((root (make-temp-file "ordinary-project" t)))
+    (unwind-protect
+        (should-not (my/angular-project-root root))
+      (delete-directory root t))))
+
+(ert-deftest my/project-try-angular-returns-a-transient-project ()
+  (cl-letf (((symbol-function 'my/angular-project-root)
+             (lambda (&optional _directory) "/tmp/angular/")))
+    (should (equal (my/project-try-angular "/tmp/angular/src")
+                   '(transient . "/tmp/angular/")))))
+
+(ert-deftest my/angular-core-version-normalizes-package-version ()
+  (let ((root (make-temp-file "angular-version" t)))
+    (unwind-protect
+        (progn
+          (write-region
+           "{\"dependencies\":{\"@angular/core\":\"^20.2.1\"}}"
+           nil (expand-file-name "package.json" root))
+          (should (equal (my/angular-core-version root) "20.2.1")))
+      (delete-directory root t))))
+
+(ert-deftest my/angular-language-server-command-includes-probes-and-version ()
+  (cl-letf (((symbol-function 'my/angular-node-modules)
+             (lambda (_root) '("/tmp/project/node_modules")))
+            ((symbol-function 'my/angular-core-version)
+             (lambda (_root) "20.2.1")))
+    (should
+     (equal
+      (my/angular-language-server-command "/tmp/project")
+      '("ngserver" "--stdio"
+        "--tsProbeLocations" "/tmp/project/node_modules"
+        "--ngProbeLocations"
+        "/tmp/project/node_modules/@angular/language-server/node_modules"
+        "--angularCoreVersion" "20.2.1")))))
+
+(ert-deftest my/eglot-typescript-contact-selects-the-angular-multiplexer ()
+  (cl-letf (((symbol-function 'my/angular-project-root)
+             (lambda (&optional _directory) "/tmp/angular/"))
+            ((symbol-function 'my/angular-language-server-command)
+             (lambda (_root) '("ngserver" "--stdio"))))
+    (should
+     (equal (my/eglot-typescript-contact nil '(transient . "/tmp/angular/"))
+            '("rass" "--" "typescript-language-server" "--stdio" "--"
+              "ngserver" "--stdio")))))
+
+(ert-deftest my/eglot-typescript-contact-selects-the-direct-server ()
+  (cl-letf (((symbol-function 'my/angular-project-root)
+             (lambda (&optional _directory) nil)))
+    (should (equal (my/eglot-typescript-contact nil nil)
+                   '("typescript-language-server" "--stdio")))))
+
+(ert-deftest my/eglot-angular-contact-rejects-ordinary-html ()
+  (cl-letf (((symbol-function 'my/angular-project-root)
+             (lambda (&optional _directory) nil)))
+    (should-error (my/eglot-angular-contact nil nil))))
+
+(ert-deftest my/eglot-ensure-angular-html-only-starts-in-angular-projects ()
+  (let (started)
+    (cl-letf (((symbol-function 'my/angular-project-root)
+               (lambda (&optional _directory) "/tmp/angular/"))
+              ((symbol-function 'eglot-ensure)
+               (lambda () (setq started t))))
+      (my/eglot-ensure-angular-html)
+      (should started))))
+
+(ert-deftest my/eglot-disable-inlay-hints-disables-an-active-mode ()
+  (let ((original (and (boundp 'eglot-inlay-hints-mode)
+                       (symbol-value 'eglot-inlay-hints-mode)))
+        argument)
+    (unwind-protect
+        (progn
+          (set 'eglot-inlay-hints-mode t)
+          (cl-letf (((symbol-function 'eglot-inlay-hints-mode)
+                     (lambda (value) (setq argument value))))
+            (my/eglot-disable-inlay-hints)
+            (should (= argument -1))))
+      (set 'eglot-inlay-hints-mode original))))
+
+(ert-deftest my/eglot-hierarchy-outgoing-calls-uses-prefix-behavior ()
+  (let (argument)
+    (cl-letf (((symbol-function 'eglot-hierarchy-call-hierarchy)
+               (lambda (&optional value) (setq argument value))))
+      (my/eglot-hierarchy-outgoing-calls)
+      (should argument))))
+
+(ert-deftest my/eglot-open-roslyn-workspace-opens-csharp-projects ()
+  (with-temp-buffer
+    (setq major-mode 'csharp-ts-mode)
+    (let (notification)
+      (cl-letf (((symbol-function 'eglot-managed-p) (lambda () t))
+                ((symbol-function 'eglot-current-server)
+                 (lambda () 'server))
+                ((symbol-function 'project-current) (lambda (&rest _) 'project))
+                ((symbol-function 'project-root)
+                 (lambda (_project) "/tmp/csharp/"))
+                ((symbol-function 'project-files)
+                 (lambda (_project) '("Program.cs" "LangTest.csproj")))
+                ((symbol-function 'eglot-path-to-uri)
+                 (lambda (path) (concat "file://" path)))
+                ((symbol-function 'jsonrpc-notify)
+                 (lambda (server method params)
+                   (setq notification (list server method params)))))
+        (my/eglot-open-roslyn-workspace)
+        (should
+         (equal notification
+                '(server :project/open
+                  (:projects ["file:///tmp/csharp/LangTest.csproj"]))))))))
+
 (ert-deftest my/org-srs-localleader-is-attached-before-org-srs-loads ()
   (should (eq (keymap-lookup my/org-localleader-map "R")
               my/org-srs-map)))
