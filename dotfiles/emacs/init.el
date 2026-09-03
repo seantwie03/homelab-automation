@@ -119,7 +119,6 @@ of reporting it absent, which defeats the alternatives fallback."
 (setopt scroll-preserve-screen-position t)
 (setq next-screen-context-lines 8)
 
-
 (use-package term/xterm
   :ensure nil
   :custom
@@ -128,6 +127,46 @@ of reporting it absent, which defeats the alternatives fallback."
   ;; The initial terminal frame is initialized before init.el is loaded.
   (unless (or (daemonp) (display-graphic-p))
     (xterm--init-activate-set-selection)))
+
+;;; Terminal Emacs Support
+;; Kitty Keyboard Protocol: lets the terminal transmit the modified named-key chords
+(use-package kkp
+  :ensure t
+  :hook (tty-setup . global-kkp-mode))
+
+;;; Terminal Clipboard Paste
+(use-package select
+  :ensure nil
+  :preface
+  (defun my/tty-clipboard-paste ()
+    "Return the OS clipboard contents as a string or nil"
+    (when-let ((cmd (cond
+                     ((eq system-type 'darwin) '("pbpaste"))
+                     ((eq system-type 'windows-nt)
+                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboared"))
+                     ((and (getenv "WAYLAND_DISPLAY") (executable-find "wl-paste"))
+                      '("wl-paste" "--no-newline"))
+                     ((executable-find "powershell.exe") ; WSL fallback
+                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboared")))))
+      (with-temp-buffer
+        (when (zerop (apply #'call-process (car cmd) nil t nil (cdr cmd)))
+          (let ((text (replace-regexp-in-string "\r\n" "\n" (buffer-string))))
+            ;; PowerShell's Get-Clipboard appeands a trailing newline.
+            (when (string-match-p "powershell\\.exe\\'" (car cmd))
+              (setq text (replace-regexp-in-string "\n\\'" "" text)))
+            text)))))
+  (defun my/interprogram-paste ()
+    "Paste the window-system selection in GUI frames, the OS clipboard in tty."
+    (if (display-graphic-p)
+        (gui-selection-value)
+      (my/tty-clipboard-paste)))
+
+  :custom
+  (kill-do-not-save-duplicates t)
+  (save-interprogram-paste-before-kill 100000)
+
+  :config
+  (setq interprogram-paste-function #'my/interprogram-paste))
 
 (use-package display-line-numbers
   :ensure nil
@@ -168,8 +207,6 @@ of reporting it absent, which defeats the alternatives fallback."
 (prefer-coding-system 'utf-8)
 (editorconfig-mode 1)
 (delete-selection-mode 1)
-(setopt kill-do-not-save-duplicates t)
-(setopt save-interprogram-paste-before-kill 100000)
 
 (use-package evil
   :ensure t
@@ -1280,8 +1317,8 @@ untracked file beside Magit because it has no earlier revision to compare."
   (org-directory "~/u")
   (org-default-notes-file
    (expand-file-name "inbox.org" org-directory))
-  (org-agenda-files
-   (directory-files-recursively org-directory "\\.org$"))
+  ;; (org-agenda-files
+  ;;  (directory-files-recursively org-directory "\\.org$"))
 
   ;;; Display
   (org-blank-before-new-entry

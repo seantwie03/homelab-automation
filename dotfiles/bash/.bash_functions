@@ -1,5 +1,5 @@
 # This function returns 0 (true) if this script is being ran under WSL
-function is_wsl {
+is_wsl() {
     grep -qi 'microsoft' /proc/version
     return $?
 }
@@ -40,8 +40,17 @@ locf() {
             '
 }
 
-# Open arguments in Emacs starting a new frame, if needed.
+# Open arguments in a Terminal Emacs frame attached to the running server
 em() {
+    if [ "$#" -eq 0 ]; then
+        emacsclient -t -a ''
+    else
+        emacsclient -t -a '' -- "$@"
+    fi
+}
+
+# Open arguments in a Graphical Emacs starting a new frame, if needed.
+emg() {
      if is_wsl ; then
         local -a args=() a
         for a in "$@"; do
