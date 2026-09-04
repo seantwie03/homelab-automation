@@ -2,17 +2,23 @@
 
 * Programming languages
 
-Emacs 30 uses its built-in tree-sitter modes and Eglot client for Java,
-JavaScript, TypeScript, TSX, Python, C#, and Angular HTML templates.  Flymake
-diagnostics are enabled by Eglot.  Completion uses Emacs's standard
+Emacs 30 uses tree-sitter modes and Eglot for Java, Kotlin, JavaScript,
+TypeScript, TSX, Python, C#, Ansible, YAML, and Angular HTML
+templates.  Flymake diagnostics are enabled by Eglot.  Completion uses Emacs's standard
 =completion-at-point= UI and is invoked manually with =M-TAB= or =C-M-i=;
 Corfu or another automatic completion frontend is intentionally not installed.
+
+Kotlin uses the external =kotlin-ts-mode= package with the shared Neovim
+parser.  Both editors use JetBrains's official =kotlin-lsp= package from
+Mason, exposed as the =intellij-server= executable.
 
 Neovim owns the shared tooling installations:
 
 - nvim-treesitter installs parsers in
   =~/.local/share/nvim/site/parser=, which Emacs adds to
-  =treesit-extra-load-path=.
+  =treesit-extra-load-path=.  Library-name overrides map Emacs's usual
+  =libtree-sitter-LANGUAGE.so= lookups to Neovim's =LANGUAGE.so= parsers for
+  every configured tree-sitter language.
 - Mason installs language-server executables in
   =~/.local/share/nvim/mason/bin=, which Emacs adds to =exec-path= and =PATH=.
 
@@ -21,6 +27,12 @@ TypeScript and Angular language servers to Eglot as one connection.  The
 nearest =angular.json= or =nx.json= defines the workspace.  Ordinary HTML does
 not start Eglot, and React uses the regular JavaScript/TypeScript modes and
 server.
+
+Ansible files use a small =ansible-ts-mode= derived from Emacs's built-in
+=yaml-ts-mode=.  Conventional playbook, role, inventory-variable, and Molecule
+paths are recognized as Ansible; other YAML uses =yaml-ts-mode= and YAML
+Language Server.  Ansible Language Server validation and =ansible-lint= are
+enabled to match Neovim.
 
 Inlay hints and on-type formatting are disabled to match Neovim.  Explicit
 formatting is available through =SPC c f=, and there is no format-on-save hook.

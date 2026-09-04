@@ -561,6 +561,11 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :ensure nil
   :mode ("\\.cs\\'" . csharp-ts-mode))
 
+(use-package kotlin-ts-mode
+  :vc (:url "https://gitlab.com/bricka/emacs-kotlin-ts-mode" :rev :newest)
+  :mode (("\\.kt\\'" . kotlin-ts-mode)
+         ("\\.kts\\'" . kotlin-ts-mode)))
+
 (use-package html-ts-mode
   :ensure nil
   :mode "\\.html\\'")
@@ -568,6 +573,35 @@ When CHILDP is non-nil, make the new heading a child of the current one."
 (use-package json-ts-mode
   :ensure nil
   :mode "\\.json\\'")
+
+(use-package yaml-ts-mode
+  :ensure nil
+  :init
+  (define-derived-mode ansible-ts-mode yaml-ts-mode "Ansible"
+    "Major mode for Ansible YAML files using the YAML tree-sitter parser.")
+
+  (defun my/ansible-file-p (file)
+    "Return non-nil when FILE follows a conventional Ansible YAML path."
+    (let ((name (file-name-nondirectory file))
+          (directory (file-name-directory file)))
+      (or (file-exists-p (expand-file-name "ansible.cfg" directory))
+          (string-match-p
+           "/\\(?:defaults\\|host_vars\\|group_vars\\|playbooks?\\|tasks\\|handlers\\|vars\\|meta\\|molecule\\)/"
+           file)
+          (string-match-p "\\(?:playbook.*\\|site\\)\\.ya?ml\\'" name))))
+
+  (defun my/yaml-ts-mode ()
+    "Select Ansible or generic YAML tree-sitter mode for the current file."
+    (if (and buffer-file-name (my/ansible-file-p buffer-file-name))
+        (ansible-ts-mode)
+      (yaml-ts-mode)))
+
+  :config
+  (setq auto-mode-alist
+        (cons '("\\.ya?ml\\'" . my/yaml-ts-mode)
+              (delete '("\\.ya?ml\\'" . my/yaml-ts-mode)
+                      (delete '("\\.ya?ml\\'" . yaml-ts-mode)
+                              auto-mode-alist)))))
 
 (use-package olivetti
   :ensure t
@@ -696,9 +730,30 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (when-let ((root (my/angular-project-root directory)))
       (cons 'transient root)))
 
+  (defun my/kotlin-project-root (&optional directory)
+    "Return the nearest Kotlin build root above DIRECTORY, or nil."
+    (when-let ((root
+                (locate-dominating-file
+                 (or directory default-directory)
+                 (lambda (candidate)
+                   (seq-some
+                    (lambda (marker)
+                      (file-exists-p (expand-file-name marker candidate)))
+                    '("settings.gradle" "settings.gradle.kts" "pom.xml"
+                      "build.gradle" "build.gradle.kts"))))))
+      (file-name-as-directory (expand-file-name root))))
+
+  (defun my/project-try-kotlin (directory)
+    "Return a transient project rooted at the Kotlin build for DIRECTORY."
+    (when-let ((root (my/kotlin-project-root directory)))
+      (cons 'transient root)))
+
   ;; Prefer the nearest Angular workspace to a higher-level Git root so that
   ;; TypeScript and template buffers share the right LSP workspace.
-  (add-hook 'project-find-functions #'my/project-try-angular))
+  (add-hook 'project-find-functions #'my/project-try-angular)
+  ;; Likewise, let the Kotlin server import the nearest Gradle or Maven build
+  ;; rather than treating the source file's directory as an ad-hoc workspace.
+  (add-hook 'project-find-functions #'my/project-try-kotlin))
 
 ;;; Programming language intelligence
 (defvar my--mason-bin-directory
@@ -717,7 +772,21 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :ensure nil
   :custom
   (treesit-extra-load-path
-   (list (expand-file-name ".local/share/nvim/site/parser" "~"))))
+   (list (expand-file-name ".local/share/nvim/site/parser" "~")))
+  ;; Neovim names parsers `LANGUAGE.so', while Emacs normally searches for
+  ;; `libtree-sitter-LANGUAGE.so'.  Prefer the Neovim-managed parsers for every
+  ;; tree-sitter mode configured above.
+  (treesit-load-name-override-list
+   '((c-sharp "c_sharp" "tree_sitter_c_sharp")
+     (html "html" "tree_sitter_html")
+     (java "java" "tree_sitter_java")
+     (javascript "javascript" "tree_sitter_javascript")
+     (json "json" "tree_sitter_json")
+     (kotlin "kotlin" "tree_sitter_kotlin")
+     (python "python" "tree_sitter_python")
+     (tsx "tsx" "tree_sitter_tsx")
+     (typescript "typescript" "tree_sitter_typescript")
+     (yaml "yaml" "tree_sitter_yaml"))))
 
 (use-package eglot
   :ensure nil
@@ -794,6 +863,16 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (when (boundp 'eglot-inlay-hints-mode)
       (eglot-inlay-hints-mode -1)))
 
+  (defun my/eglot-clear-connected-message ()
+    "Clear Eglot's connection notice when it is still in the echo area."
+    (when-let ((current (current-message)))
+      (when (string-prefix-p "[eglot] Connected!" current)
+        (message nil))))
+
+  (defun my/eglot-schedule-clear-connected-message (&rest _)
+    "Clear Eglot's connection notice after a short delay."
+    (run-with-timer 2 nil #'my/eglot-clear-connected-message))
+
   (defun my/eglot-open-roslyn-workspace ()
     "Tell Roslyn to open the current solution or C# projects."
     (when (and (derived-mode-p 'csharp-ts-mode)
@@ -822,6 +901,14 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :custom
   (eglot-ignored-server-capabilities '(:documentOnTypeFormattingProvider))
   :config
+  (setopt
+   eglot-workspace-configuration
+   '(:ansible
+     (:python (:interpreterPath "python")
+      :ansible (:path "ansible")
+      :executionEnvironment (:enabled :json-false)
+      :validation (:enabled t :lint (:enabled t :path "ansible-lint")))
+     :redhat (:telemetry (:enabled :json-false))))
   (dolist (entry
            '((java-ts-mode . ("jdtls"))
              (js-ts-mode . my/eglot-typescript-contact)
@@ -829,13 +916,17 @@ When CHILDP is non-nil, make the new heading a child of the current one."
              (tsx-ts-mode . my/eglot-typescript-contact)
              (python-ts-mode . ("pyright-langserver" "--stdio"))
              (csharp-ts-mode . ("roslyn-language-server" "--stdio"))
+             (kotlin-ts-mode . ("intellij-server" "--stdio"))
+             (yaml-ts-mode . ("yaml-language-server" "--stdio"))
+             (ansible-ts-mode . ("ansible-language-server" "--stdio"))
              (html-ts-mode . my/eglot-angular-contact)))
     (add-to-list 'eglot-server-programs entry))
   :hook
   ((java-ts-mode js-ts-mode typescript-ts-mode tsx-ts-mode python-ts-mode
-                 csharp-ts-mode)
+                 csharp-ts-mode kotlin-ts-mode ansible-ts-mode yaml-ts-mode)
    . eglot-ensure)
   (html-ts-mode . my/eglot-ensure-angular-html)
+  (eglot-connect . my/eglot-schedule-clear-connected-message)
   (eglot-managed-mode . my/eglot-disable-inlay-hints)
   (eglot-managed-mode . my/eglot-open-roslyn-workspace))
 

@@ -28,6 +28,23 @@
     (should (equal (my/project-try-angular "/tmp/angular/src")
                    '(transient . "/tmp/angular/")))))
 
+(ert-deftest my/kotlin-project-root-finds-nearest-build ()
+  (let* ((root (make-temp-file "kotlin-project" t))
+         (nested (expand-file-name "src/main/kotlin/example" root)))
+    (unwind-protect
+        (progn
+          (make-directory nested t)
+          (write-region "" nil (expand-file-name "settings.gradle.kts" root))
+          (should (equal (my/kotlin-project-root nested)
+                         (file-name-as-directory root))))
+      (delete-directory root t))))
+
+(ert-deftest my/project-try-kotlin-returns-a-transient-project ()
+  (cl-letf (((symbol-function 'my/kotlin-project-root)
+             (lambda (&optional _directory) "/tmp/kotlin/")))
+    (should (equal (my/project-try-kotlin "/tmp/kotlin/src")
+                   '(transient . "/tmp/kotlin/")))))
+
 (ert-deftest my/angular-core-version-normalizes-package-version ()
   (let ((root (make-temp-file "angular-version" t)))
     (unwind-protect
@@ -95,6 +112,22 @@
             (should (= argument -1))))
       (set 'eglot-inlay-hints-mode original))))
 
+(ert-deftest my/eglot-clear-connected-message-only-clears-connection-notice ()
+  (let (cleared)
+    (cl-letf (((symbol-function 'current-message)
+               (lambda () "[eglot] Connected! Server ready"))
+              ((symbol-function 'message)
+               (lambda (&rest _) (setq cleared t))))
+      (my/eglot-clear-connected-message)
+      (should cleared))
+    (setq cleared nil)
+    (cl-letf (((symbol-function 'current-message)
+               (lambda () "[eglot] (warning) Server problem"))
+              ((symbol-function 'message)
+               (lambda (&rest _) (setq cleared t))))
+      (my/eglot-clear-connected-message)
+      (should-not cleared))))
+
 (ert-deftest my/eglot-hierarchy-outgoing-calls-uses-prefix-behavior ()
   (let (argument)
     (cl-letf (((symbol-function 'eglot-hierarchy-call-hierarchy)
@@ -124,6 +157,77 @@
          (equal notification
                 '(server :project/open
                   (:projects ["file:///tmp/csharp/LangTest.csproj"]))))))))
+
+(ert-deftest my/ansible-file-p-recognizes-role-and-playbook-files ()
+  (should (my/ansible-file-p "/tmp/project/roles/example/tasks/main.yml"))
+  (should (my/ansible-file-p "/tmp/project/roles/example/vars/main.yaml"))
+  (should (my/ansible-file-p "/tmp/project/site.yml"))
+  (should-not (my/ansible-file-p "/tmp/project/.github/workflows/test.yml")))
+
+(ert-deftest my/yaml-ts-mode-selects-ansible-mode ()
+  (with-temp-buffer
+    (setq buffer-file-name "/tmp/project/roles/example/meta/main.yml")
+    (cl-letf (((symbol-function 'ansible-ts-mode)
+               (lambda () (setq major-mode 'ansible-ts-mode))))
+      (my/yaml-ts-mode)
+      (should (eq major-mode 'ansible-ts-mode)))))
+
+(ert-deftest my/yaml-ts-mode-preserves-generic-yaml ()
+  (with-temp-buffer
+    (setq buffer-file-name "/tmp/project/.github/workflows/test.yml")
+    (cl-letf (((symbol-function 'yaml-ts-mode)
+               (lambda () (setq major-mode 'yaml-ts-mode))))
+      (my/yaml-ts-mode)
+      (should (eq major-mode 'yaml-ts-mode)))))
+
+(ert-deftest my/yaml-mode-dispatcher-precedes-generic-yaml-mode ()
+  (let ((entry (seq-find (lambda (candidate)
+                           (and (stringp (car-safe candidate))
+                                (string-match-p (car candidate)
+                                                "/tmp/example.yml")))
+                         auto-mode-alist)))
+    (should (eq (cdr entry) #'my/yaml-ts-mode))))
+
+(ert-deftest my/eglot-prefers-ansible-server-over-yaml-parent ()
+  (require 'eglot)
+  (let ((ansible-position (seq-position eglot-server-programs 'ansible-ts-mode
+                                        (lambda (entry mode)
+                                          (eq mode (car entry)))))
+        (yaml-position (seq-position eglot-server-programs 'yaml-ts-mode
+                                     (lambda (entry mode)
+                                       (eq mode (car entry))))))
+    (should ansible-position)
+    (should yaml-position)
+    (should (< ansible-position yaml-position))))
+
+(ert-deftest my/eglot-enables-ansible-validation-and-lint ()
+  (require 'eglot)
+  (should
+   (equal (plist-get (plist-get eglot-workspace-configuration :ansible)
+                     :validation)
+          '(:enabled t :lint (:enabled t :path "ansible-lint")))))
+
+(ert-deftest my/kotlin-uses-tree-sitter-mode-and-jetbrains-lsp ()
+  (require 'eglot)
+  (should (eq (cdr (assoc "\\.kt\\'" auto-mode-alist))
+              'kotlin-ts-mode))
+  (should
+   (equal (cdr (assq 'kotlin-ts-mode eglot-server-programs))
+          '("intellij-server" "--stdio"))))
+
+(ert-deftest my/tree-sitter-parsers-use-neovim-library-names ()
+  (should
+   (equal treesit-load-name-override-list
+          '((c-sharp "c_sharp" "tree_sitter_c_sharp")
+            (html "html" "tree_sitter_html")
+            (java "java" "tree_sitter_java")
+            (javascript "javascript" "tree_sitter_javascript")
+            (json "json" "tree_sitter_json")
+            (kotlin "kotlin" "tree_sitter_kotlin")
+            (python "python" "tree_sitter_python")
+            (tsx "tsx" "tree_sitter_tsx")
+            (typescript "typescript" "tree_sitter_typescript")
+            (yaml "yaml" "tree_sitter_yaml")))))
 
 (ert-deftest my/org-srs-localleader-is-attached-before-org-srs-loads ()
   (should (eq (keymap-lookup my/org-localleader-map "R")

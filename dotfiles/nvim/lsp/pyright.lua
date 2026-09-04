@@ -25,6 +25,12 @@ end
 return {
     cmd = { 'pyright-langserver', '--stdio' },
     filetypes = { 'python' },
+    -- Neovim 0.12 advertises pull diagnostics, but Pyright's pull path can
+    -- leave attached buffers without diagnostics. Keep Pyright on its
+    -- established publishDiagnostics path.
+    init_options = {
+        disablePullDiagnostics = true,
+    },
     root_markers = {
         'pyrightconfig.json',
         'pyproject.toml',
