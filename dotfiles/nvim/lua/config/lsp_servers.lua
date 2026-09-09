@@ -8,5 +8,6 @@ return {
     pyright = "pyright",
     roslyn_ls = "roslyn-language-server",
     ts_ls = "typescript-language-server",
+    vue_ls = "vue-language-server",
     yamlls = "yaml-language-server",
 }

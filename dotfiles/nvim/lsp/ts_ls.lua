@@ -4,10 +4,15 @@
 ---
 --- `ts_ls`, aka `typescript-language-server`, is a Language Server Protocol implementation for TypeScript wrapping `tsserver`. Note that `ts_ls` is not `tsserver`.
 ---
+--- TypeScript 7 includes Microsoft's native `tsc --lsp` server, which is the
+--- eventual successor to `typescript-language-server`. Keep `ts_ls` here for
+--- TypeScript 6 projects and Vue's documented hybrid-mode integration.
+---
 --- `typescript-language-server` depends on `typescript`. Both packages can be installed via `npm`:
 --- ```sh
---- npm install -g typescript typescript-language-server
+--- npm install -g typescript@6 typescript-language-server
 --- ```
+--- `typescript-language-server` does not support TypeScript 7 or newer.
 ---
 --- To configure typescript language server, add a
 --- [`tsconfig.json`](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) or
@@ -75,7 +80,20 @@
 
         ---@type vim.lsp.Config
         return {
-            init_options = { hostInfo = 'neovim' },
+            init_options = {
+                hostInfo = 'neovim',
+                plugins = {
+                    {
+                        name = '@vue/typescript-plugin',
+                        location = vim.fs.joinpath(
+                            vim.fn.stdpath('data'),
+                            'mason/packages/vue-language-server/node_modules/@vue/language-server'
+                        ),
+                        languages = { 'vue' },
+                        configNamespace = 'typescript',
+                    },
+                },
+            },
             cmd = function(dispatchers, config)
                 local cmd = 'typescript-language-server'
                 if (config or {}).root_dir then
@@ -91,6 +109,7 @@
                 'javascriptreact',
                 'typescript',
                 'typescriptreact',
+                'vue',
             },
             root_dir = function(bufnr, on_dir)
                 -- The project root is where the LSP can be started from

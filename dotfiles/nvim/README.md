@@ -12,6 +12,7 @@ Each language server has a config file in `lsp/`. The filename is the Neovim LSP
 lsp/lua_ls.lua
 lsp/pyright.lua
 lsp/ts_ls.lua
+lsp/vue_ls.lua
 ```
 
 Those files define the server command, filetypes, root markers, and any server-specific settings.
@@ -23,12 +24,17 @@ return {
     lua_ls = "lua-language-server",
     pyright = "pyright",
     ts_ls = "typescript-language-server",
+    vue_ls = "vue-language-server",
 }
 ```
 
 `lua/config/lsp.lua` enables every server listed in that table with `vim.lsp.enable()`.
 
 `lua/plugins/mason_tool_installer.lua` reads the same table and installs the Mason packages automatically.
+
+Vue uses Vue Language Server in hybrid mode. Both `vue_ls` and `ts_ls` attach
+to Vue buffers: `vue_ls` handles templates, CSS, and semantic tokens, while
+`ts_ls` loads `@vue/typescript-plugin` and handles TypeScript features.
 
 ### Adding a New LSP
 

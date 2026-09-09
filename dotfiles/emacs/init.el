@@ -566,6 +566,10 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :mode (("\\.kt\\'" . kotlin-ts-mode)
          ("\\.kts\\'" . kotlin-ts-mode)))
 
+(use-package vue-ts-mode
+  :vc (:url "https://github.com/8uff3r/vue-ts-mode" :rev :newest)
+  :mode "\\.vue\\'")
+
 (use-package html-ts-mode
   :ensure nil
   :mode "\\.html\\'")
@@ -778,6 +782,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   ;; tree-sitter mode configured above.
   (treesit-load-name-override-list
    '((c-sharp "c_sharp" "tree_sitter_c_sharp")
+     (css "css" "tree_sitter_css")
      (html "html" "tree_sitter_html")
      (java "java" "tree_sitter_java")
      (javascript "javascript" "tree_sitter_javascript")
@@ -786,6 +791,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
      (python "python" "tree_sitter_python")
      (tsx "tsx" "tree_sitter_tsx")
      (typescript "typescript" "tree_sitter_typescript")
+     (vue "vue" "tree_sitter_vue")
      (yaml "yaml" "tree_sitter_yaml"))))
 
 (use-package eglot
@@ -858,6 +864,29 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (when (my/angular-project-root)
       (eglot-ensure)))
 
+  (defun my/vue-typescript-sdk-directory (root)
+    "Return the TypeScript SDK directory for the Vue project at ROOT."
+    (let ((project-sdk (expand-file-name "node_modules/typescript/lib" root))
+          (mason-sdk
+           (expand-file-name
+            ".local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib"
+            "~")))
+      (cond
+       ((file-directory-p project-sdk) project-sdk)
+       ((file-directory-p mason-sdk) mason-sdk)
+       (t (error "No TypeScript SDK found for Vue Language Server")))))
+
+  (defun my/vue-language-server-contact (&optional _interactive project)
+    "Return a non-hybrid Vue Language Server contact for PROJECT."
+    (let* ((root (if project
+                     (project-root project)
+                   default-directory))
+           (typescript-sdk (my/vue-typescript-sdk-directory root)))
+      (list "vue-language-server" "--stdio"
+            :initializationOptions
+            (list :typescript (list :tsdk typescript-sdk)
+                  :vue (list :hybridMode :json-false)))))
+
   (defun my/eglot-disable-inlay-hints ()
     "Keep Eglot inlay hints disabled to match the Neovim configuration."
     (when (boundp 'eglot-inlay-hints-mode)
@@ -917,13 +946,15 @@ When CHILDP is non-nil, make the new heading a child of the current one."
              (python-ts-mode . ("pyright-langserver" "--stdio"))
              (csharp-ts-mode . ("roslyn-language-server" "--stdio"))
              (kotlin-ts-mode . ("intellij-server" "--stdio"))
+             (vue-ts-mode . my/vue-language-server-contact)
              (yaml-ts-mode . ("yaml-language-server" "--stdio"))
              (ansible-ts-mode . ("ansible-language-server" "--stdio"))
              (html-ts-mode . my/eglot-angular-contact)))
     (add-to-list 'eglot-server-programs entry))
   :hook
   ((java-ts-mode js-ts-mode typescript-ts-mode tsx-ts-mode python-ts-mode
-                 csharp-ts-mode kotlin-ts-mode ansible-ts-mode yaml-ts-mode)
+                 csharp-ts-mode kotlin-ts-mode vue-ts-mode ansible-ts-mode
+                 yaml-ts-mode)
    . eglot-ensure)
   (html-ts-mode . my/eglot-ensure-angular-html)
   (eglot-connect . my/eglot-schedule-clear-connected-message)

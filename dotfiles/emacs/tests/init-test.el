@@ -215,10 +215,50 @@
    (equal (cdr (assq 'kotlin-ts-mode eglot-server-programs))
           '("intellij-server" "--stdio"))))
 
+(ert-deftest my/vue-typescript-sdk-prefers-the-project-sdk ()
+  (let* ((root (make-temp-file "vue-project" t))
+         (sdk (expand-file-name "node_modules/typescript/lib" root)))
+    (unwind-protect
+        (progn
+          (make-directory sdk t)
+          (should (equal (my/vue-typescript-sdk-directory root) sdk)))
+      (delete-directory root t))))
+
+(ert-deftest my/vue-typescript-sdk-falls-back-to-mason ()
+  (let ((mason-sdk
+         (expand-file-name
+          ".local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib"
+          "~")))
+    (cl-letf (((symbol-function 'file-directory-p)
+               (lambda (directory) (equal directory mason-sdk))))
+      (should
+       (equal (my/vue-typescript-sdk-directory "/tmp/vue/") mason-sdk)))))
+
+(ert-deftest my/vue-language-server-uses-non-hybrid-mode ()
+  (cl-letf (((symbol-function 'my/vue-typescript-sdk-directory)
+             (lambda (_root) "/tmp/typescript/lib"))
+            ((symbol-function 'project-root)
+             (lambda (_project) "/tmp/vue/")))
+    (should
+     (equal
+      (my/vue-language-server-contact nil 'project)
+      '("vue-language-server" "--stdio"
+        :initializationOptions
+        (:typescript (:tsdk "/tmp/typescript/lib")
+         :vue (:hybridMode :json-false)))))))
+
+(ert-deftest my/vue-uses-tree-sitter-mode-and-vue-language-server ()
+  (require 'eglot)
+  (should (eq (cdr (assoc "\\.vue\\'" auto-mode-alist))
+              'vue-ts-mode))
+  (should (eq (cdr (assq 'vue-ts-mode eglot-server-programs))
+              'my/vue-language-server-contact)))
+
 (ert-deftest my/tree-sitter-parsers-use-neovim-library-names ()
   (should
    (equal treesit-load-name-override-list
           '((c-sharp "c_sharp" "tree_sitter_c_sharp")
+            (css "css" "tree_sitter_css")
             (html "html" "tree_sitter_html")
             (java "java" "tree_sitter_java")
             (javascript "javascript" "tree_sitter_javascript")
@@ -227,6 +267,7 @@
             (python "python" "tree_sitter_python")
             (tsx "tsx" "tree_sitter_tsx")
             (typescript "typescript" "tree_sitter_typescript")
+            (vue "vue" "tree_sitter_vue")
             (yaml "yaml" "tree_sitter_yaml")))))
 
 (ert-deftest my/org-srs-localleader-is-attached-before-org-srs-loads ()
