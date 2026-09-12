@@ -23,7 +23,14 @@ codex exec \
 if [ "$AGENT_STATUS" -ne 0 ]; then
     VERDICT=unknown
 else
-    VERDICT=$(grep -Ei '^VERDICT: (Healthy|Attention Required)$' "$REPORT_FILE" | tail -1 | sed -E 's/^VERDICT: //I' | tr '[:upper:]' '[:lower:]' || echo "unknown")
+    LAST_LINE=$(awk 'NF { line = $0 } END { print line }' "$REPORT_FILE")
+    if printf '%s\n' "$LAST_LINE" | grep -Eiq 'VERDICT:[[:space:]]*Attention Required'; then
+        VERDICT="attention required"
+    elif printf '%s\n' "$LAST_LINE" | grep -Eiq 'VERDICT:[[:space:]]*Healthy'; then
+        VERDICT=healthy
+    else
+        VERDICT=unknown
+    fi
 fi
 
 if [ "$VERDICT" = "attention required" ]; then

@@ -23,8 +23,8 @@ journalctl -u ai-health-monitor.service --since '8 days ago' --no-pager
 ls -lt /var/log/ai-health-monitor
 ```
 
-Open the newest report in `/var/log/ai-health-monitor/`. The last line should
-be one of:
+Open the newest report in `/var/log/ai-health-monitor/`. The last nonblank line
+should contain one of:
 
 ```text
 VERDICT: Healthy
