@@ -94,6 +94,28 @@ emo() {
     emacs -nw --chdir "$HOME/u/org" --eval "$emacs_eval"
 }
 
+# Move files or directories to the trash instead of deleting them outright.
+# gio picks the trash directory belonging to each file's own filesystem, so
+# this works the same on /home and on the NFS mount at /source, and the
+# desktop Trash can restore each item to where it came from.
+rmt() {
+    if [ "$#" -eq 0 ]; then
+        printf 'usage: rmt FILE...\n' >&2
+        return 2
+    fi
+
+    if ! command -v gio >/dev/null 2>&1; then
+        printf 'rmt: gio is not installed\n' >&2
+        return 127
+    fi
+
+    # `--` stops a name that begins with a dash from being read as an option,
+    # which gio otherwise rejects with "Unknown option".
+    gio trash -- "$@" || return
+
+    printf 'Trashed %d item(s).\n' "$#"
+}
+
 # Print characters in the entire asciinema recording area (120x32)
 recording_area() {
     echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
