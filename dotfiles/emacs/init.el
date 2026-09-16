@@ -27,6 +27,20 @@
    `((".*" ,(expand-file-name "auto-saves/" user-emacs-directory) t)))
   (create-lockfiles nil))
 
+(use-package buffer-guardian
+  :ensure t
+  :custom
+  (buffer-guardian-save-on-buffer-switch t)
+  (buffer-guardian-save-on-window-selection-change t)
+  (buffer-guardian-save-on-frame-closure t)
+  (buffer-guardian-save-on-focus-loss nil)
+  (buffer-guardian-save-on-minibuffer-setup nil)
+  (buffer-guardian-save-on-window-configuration-change nil)
+  (buffer-guardian-save-all-buffers-idle nil)
+  (buffer-guardian-save-all-buffers-interval nil)
+  :config
+  (buffer-guardian-mode 1))
+
 (savehist-mode 1)
 (save-place-mode 1)
 

@@ -7,6 +7,7 @@
 -- More information about using Lua in Neovim can be found in :h lua-guide
 
 -- General
+vim.opt.autowriteall = true
 vim.opt_global.fileencoding = "utf-8"
 vim.opt.fileformats = { "unix" }
 vim.opt.fixendofline = true
