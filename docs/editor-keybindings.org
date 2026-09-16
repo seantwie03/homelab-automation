@@ -298,17 +298,17 @@ for explicit LSP formatting in either editor.
 
 ** Markdown localleader (=\=) mappings
 
-| Key | Mode   | Emacs Provider | Emacs Function              | Nvim Provider | Nvim Function |
-|-----+--------+----------------+-----------------------------+---------------+---------------|
-| \   | normal | custom         | my/markdown-localleader-map | N/I           | N/I           |
-| \ . | normal | consult        | consult-outline             | N/I           | N/I           |
-| \ b | normal | custom         | my/markdown-tables-map      | N/I           | N/I           |
-| \ e | normal | markdown-mode  | markdown-export             | N/I           | N/I           |
-| \ f | normal | markdown-mode  | markdown-insert-footnote    | N/I           | N/I           |
-| \ l | normal | custom         | my/markdown-links-map       | N/I           | N/I           |
-| \ p | normal | markdown-mode  | markdown-preview            | N/I           | N/I           |
-| \ s | normal | custom         | my/markdown-subtree-map     | N/I           | N/I           |
-| \ x | normal | markdown-mode  | markdown-toggle-gfm-checkbox | N/I          | N/I           |
+| Key | Mode   | Emacs Provider | Emacs Function               | Nvim Provider  | Nvim Function |
+|-----+--------+----------------+------------------------------+----------------+---------------|
+| \   | normal | custom         | my/markdown-localleader-map  | N/I            | N/I           |
+| \ . | normal | consult        | consult-outline              | N/I            | N/I           |
+| \ b | normal | custom         | my/markdown-tables-map       | which-key.nvim | tables group  |
+| \ e | normal | markdown-mode  | markdown-export              | N/I            | N/I           |
+| \ f | normal | markdown-mode  | markdown-insert-footnote     | N/I            | N/I           |
+| \ l | normal | custom         | my/markdown-links-map        | N/I            | N/I           |
+| \ p | normal | markdown-mode  | markdown-preview             | N/I            | N/I           |
+| \ s | normal | custom         | my/markdown-subtree-map      | N/I            | N/I           |
+| \ x | normal | markdown-mode  | markdown-toggle-gfm-checkbox | N/I            | N/I           |
 
 *** Markdown links (=\ l=) mappings
 
@@ -319,17 +319,17 @@ for explicit LSP formatting in either editor.
 
 *** Markdown tables (=\ b=) mappings
 
-| Key     | Mode   | Emacs Provider | Emacs Function                | Nvim Provider | Nvim Function |
-|---------+--------+----------------+-------------------------------+---------------+---------------|
-| \ b a   | normal | markdown-mode  | markdown-table-align          | N/I           | N/I           |
-| \ b c   | normal | markdown-mode  | markdown-table-convert-region | N/I           | N/I           |
-| \ b d   | normal | custom         | my/markdown-tables-delete-map | N/I           | N/I           |
-| \ b d c | normal | markdown-mode  | markdown-table-delete-column  | N/I           | N/I           |
-| \ b d r | normal | markdown-mode  | markdown-table-delete-row     | N/I           | N/I           |
-| \ b i   | normal | custom         | my/markdown-tables-insert-map | N/I           | N/I           |
-| \ b i c | normal | markdown-mode  | markdown-table-insert-column  | N/I           | N/I           |
-| \ b i r | normal | markdown-mode  | markdown-table-insert-row     | N/I           | N/I           |
-| \ b s   | normal | markdown-mode  | markdown-table-sort-lines     | N/I           | N/I           |
+| Key     | Mode   | Emacs Provider | Emacs Function                | Nvim Provider  | Nvim Function                                      |
+|---------+--------+----------------+-------------------------------+----------------+----------------------------------------------------|
+| \ b a   | normal | markdown-mode  | markdown-table-align          | custom         | config.actions.markdown_tables.align               |
+| \ b c   | normal | markdown-mode  | markdown-table-convert-region | N/I            | N/I                                                |
+| \ b d   | normal | custom         | my/markdown-tables-delete-map | which-key.nvim | delete group                                       |
+| \ b d c | normal | markdown-mode  | markdown-table-delete-column  | vim-table-mode | tablemode#spreadsheet#DeleteColumn()               |
+| \ b d r | normal | markdown-mode  | markdown-table-delete-row     | vim-table-mode | tablemode#spreadsheet#DeleteRow()                  |
+| \ b i   | normal | custom         | my/markdown-tables-insert-map | which-key.nvim | insert group                                       |
+| \ b i c | normal | markdown-mode  | markdown-table-insert-column  | vim-table-mode | tablemode#spreadsheet#InsertColumn(0), :stopinsert |
+| \ b i r | normal | markdown-mode  | markdown-table-insert-row     | custom         | config.actions.markdown_tables.insert_row          |
+| \ b s   | normal | markdown-mode  | markdown-table-sort-lines     | vim-table-mode | :TableSort                                         |
 
 *** Markdown subtree (=\ s=) mappings
 
