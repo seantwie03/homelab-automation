@@ -575,6 +575,10 @@ When CHILDP is non-nil, make the new heading a child of the current one."
   :ensure nil
   :mode ("\\.cs\\'" . csharp-ts-mode))
 
+(use-package rust-ts-mode
+  :ensure nil
+  :mode ("\\.rs\\'" . rust-ts-mode))
+
 (use-package kotlin-ts-mode
   :vc (:url "https://gitlab.com/bricka/emacs-kotlin-ts-mode" :rev :newest)
   :mode (("\\.kt\\'" . kotlin-ts-mode)
@@ -803,6 +807,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
      (json "json" "tree_sitter_json")
      (kotlin "kotlin" "tree_sitter_kotlin")
      (python "python" "tree_sitter_python")
+     (rust "rust" "tree_sitter_rust")
      (tsx "tsx" "tree_sitter_tsx")
      (typescript "typescript" "tree_sitter_typescript")
      (vue "vue" "tree_sitter_vue")
@@ -959,6 +964,7 @@ When CHILDP is non-nil, make the new heading a child of the current one."
              (tsx-ts-mode . my/eglot-typescript-contact)
              (python-ts-mode . ("pyright-langserver" "--stdio"))
              (csharp-ts-mode . ("roslyn-language-server" "--stdio"))
+             (rust-ts-mode . ("rust-analyzer"))
              (kotlin-ts-mode . ("intellij-server" "--stdio"))
              (vue-ts-mode . my/vue-language-server-contact)
              (yaml-ts-mode . ("yaml-language-server" "--stdio"))
@@ -967,8 +973,8 @@ When CHILDP is non-nil, make the new heading a child of the current one."
     (add-to-list 'eglot-server-programs entry))
   :hook
   ((java-ts-mode js-ts-mode typescript-ts-mode tsx-ts-mode python-ts-mode
-                 csharp-ts-mode kotlin-ts-mode vue-ts-mode ansible-ts-mode
-                 yaml-ts-mode)
+                 csharp-ts-mode rust-ts-mode kotlin-ts-mode vue-ts-mode
+                 ansible-ts-mode yaml-ts-mode)
    . eglot-ensure)
   (html-ts-mode . my/eglot-ensure-angular-html)
   (eglot-connect . my/eglot-schedule-clear-connected-message)

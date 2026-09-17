@@ -3,7 +3,7 @@
 * Programming languages
 
 Emacs 30 uses tree-sitter modes and Eglot for Java, Kotlin, JavaScript,
-TypeScript, TSX, Vue, Python, C#, Ansible, YAML, and Angular HTML
+TypeScript, TSX, Vue, Python, C#, Rust, Ansible, YAML, and Angular HTML
 templates.  Flymake diagnostics are enabled by Eglot.  Completion uses Emacs's standard
 =completion-at-point= UI and is invoked manually with =M-TAB= or =C-M-i=;
 Corfu or another automatic completion frontend is intentionally not installed.
@@ -11,6 +11,10 @@ Corfu or another automatic completion frontend is intentionally not installed.
 Kotlin uses the external =kotlin-ts-mode= package with the shared Neovim
 parser.  Both editors use JetBrains's official =kotlin-lsp= package from
 Mason, exposed as the =intellij-server= executable.
+
+Rust uses the built-in =rust-ts-mode= with the shared Neovim parser and
+=rust-analyzer= from Mason.  Rust Analyzer uses its standard =cargo check=
+diagnostics.
 
 Vue single-file components use =vue-ts-mode= with the shared Vue, TypeScript,
 and CSS parsers.  Eglot runs Vue Language Server with hybrid mode disabled so

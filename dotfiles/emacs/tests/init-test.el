@@ -215,6 +215,14 @@
    (equal (cdr (assq 'kotlin-ts-mode eglot-server-programs))
           '("intellij-server" "--stdio"))))
 
+(ert-deftest my/rust-uses-tree-sitter-mode-and-rust-analyzer ()
+  (require 'eglot)
+  (should (eq (cdr (assoc "\\.rs\\'" auto-mode-alist))
+              'rust-ts-mode))
+  (should
+   (equal (cdr (assq 'rust-ts-mode eglot-server-programs))
+          '("rust-analyzer"))))
+
 (ert-deftest my/vue-typescript-sdk-prefers-the-project-sdk ()
   (let* ((root (make-temp-file "vue-project" t))
          (sdk (expand-file-name "node_modules/typescript/lib" root)))
@@ -265,6 +273,7 @@
             (json "json" "tree_sitter_json")
             (kotlin "kotlin" "tree_sitter_kotlin")
             (python "python" "tree_sitter_python")
+            (rust "rust" "tree_sitter_rust")
             (tsx "tsx" "tree_sitter_tsx")
             (typescript "typescript" "tree_sitter_typescript")
             (vue "vue" "tree_sitter_vue")

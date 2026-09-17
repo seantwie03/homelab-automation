@@ -1,6 +1,8 @@
 ---
-- name: cargo (rust pgk manager) is installed
+- name: rust development packages are installed
   ansible.builtin.package:
-    name: cargo
+    name:
+      - cargo
+      - clippy
+      - rust-src
     state: present
-

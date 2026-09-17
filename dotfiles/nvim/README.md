@@ -11,6 +11,7 @@ Each language server has a config file in `lsp/`. The filename is the Neovim LSP
 ```text
 lsp/lua_ls.lua
 lsp/pyright.lua
+lsp/rust_analyzer.lua
 lsp/ts_ls.lua
 lsp/vue_ls.lua
 ```
@@ -23,6 +24,7 @@ Enabled servers are listed in `lua/config/lsp_servers.lua`. This file maps the N
 return {
     lua_ls = "lua-language-server",
     pyright = "pyright",
+    rust_analyzer = "rust-analyzer",
     ts_ls = "typescript-language-server",
     vue_ls = "vue-language-server",
 }
@@ -31,6 +33,9 @@ return {
 `lua/config/lsp.lua` enables every server listed in that table with `vim.lsp.enable()`.
 
 `lua/plugins/mason_tool_installer.lua` reads the same table and installs the Mason packages automatically.
+
+Rust files use the shared tree-sitter parser and `rust-analyzer`. Rust Analyzer
+uses its standard `cargo check` diagnostics.
 
 Vue uses Vue Language Server in hybrid mode. Both `vue_ls` and `ts_ls` attach
 to Vue buffers: `vue_ls` handles templates, CSS, and semantic tokens, while
@@ -73,8 +78,9 @@ shared server must always be added to this Neovim configuration and installed
 with Mason first. Rassumfrassum is installed this way for Emacs's Angular
 multi-server connection even though it is not enabled as a Neovim LSP.
 
-nvim-treesitter similarly owns the parsers shared with Emacs. Emacs loads the
-parser libraries from `~/.local/share/nvim/site/parser`.
+nvim-treesitter similarly owns the explicitly configured parsers shared with
+Emacs, including Rust. Emacs loads the parser libraries from
+`~/.local/share/nvim/site/parser`.
 
 Use `:checkhealth vim.lsp` to verify that the executable is installed and the configuration is valid.
 

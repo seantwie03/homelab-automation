@@ -7,6 +7,7 @@ return {
     lua_ls = "lua-language-server",
     pyright = "pyright",
     roslyn_ls = "roslyn-language-server",
+    rust_analyzer = "rust-analyzer",
     ts_ls = "typescript-language-server",
     vue_ls = "vue-language-server",
     yamlls = "yaml-language-server",
