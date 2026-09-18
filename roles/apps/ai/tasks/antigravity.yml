@@ -6,6 +6,25 @@
   become: true
   become_user: "{{ user }}"
 
+- name: agy_acp_server is installed
+  ansible.builtin.unarchive:
+    src: https://dl.google.com/agy-extensions/releases/linux/agy-acp-server-agy_acp_server_{{ agy_acp_server_version }}-linux-x86_64.zip
+    dest: /home/{{ user }}/.local/bin
+    remote_src: true
+    creates: /home/{{ user }}/.local/bin/agy_acp_server.par
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+
+- name: agy_acp_server is symlinked
+  ansible.builtin.file:
+    src: /home/{{ user }}/.local/bin/agy_acp_server.par
+    dest: /home/{{ user }}/.local/bin/agy_acp_server
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
 - name: antigravity dotfiles directory is symlinked
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/antigravity"
