@@ -15,11 +15,12 @@
         mode: 0755
 
     - name: 1password GUI autostarts
-      ansible.builtin.copy:
-        remote_src: true
+      ansible.builtin.file:
         src: /usr/share/applications/1password.desktop
         dest: /home/{{ user }}/.config/autostart/1password.desktop
+        state: link
+        force: true
+        follow: false
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: 0644
 
