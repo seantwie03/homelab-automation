@@ -37,10 +37,7 @@
                             (horizontal-scroll-bars . nil)))
 
 ;; Only the very first frame of a non-daemon startup can render before
-;; init.el loads auto-dark/modus-themes, so bias just that frame dark
-;; (matching modus-vivendi's default face) to avoid a bright flash. Using
-;; initial-frame-alist instead of default-frame-alist means later frames
-;; (e.g. emacsclient -t/-c against an already-running server) are never
-;; fought with a stale override once the real theme is active.
-(setq initial-frame-alist '((background-color . "#000000")
-                            (foreground-color . "#ffffff")))
+;; init.el loads auto-dark/modus-themes. Rather than guess a color, start it
+;; invisible; init.el reveals it (see emacs-startup-hook there) once the real
+;; theme is active, so its first paint is already correct.
+(setq initial-frame-alist '((visibility . nil)))

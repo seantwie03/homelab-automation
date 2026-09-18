@@ -4,6 +4,19 @@
 (when (< emacs-major-version 30)
   (error "This configuration only works with Emacs 30 and newer; you have version %s" emacs-major-version))
 
+(use-package auto-dark
+  :ensure t
+  :custom
+  (auto-dark-themes '((modus-vivendi) (modus-operandi)))
+  :config
+  (auto-dark-mode 1)
+  ;; The initial frame of a non-daemon startup begins invisible (see
+  ;; early-init.el) so it never paints before the theme above is active.
+  ;; Reveal it now that the theme is set, rather than waiting for the rest
+  ;; of init.el to finish loading.
+  (unless (daemonp)
+    (make-frame-visible)))
+
 ;;; Generated state
 (use-package cus-edit
   :ensure nil
@@ -98,13 +111,6 @@ of reporting it absent, which defeats the alternatives fallback."
    '((bg-mode-line-active fringe)))
   (modus-vivendi-palette-overrides
    '((bg-mode-line-active fringe))))
-
-(use-package auto-dark
-  :ensure t
-  :custom
-  (auto-dark-themes '((modus-vivendi) (modus-operandi)))
-  :config
-  (auto-dark-mode 1))
 
 (setopt use-short-answers t)
 (setopt ring-bell-function #'ignore)
@@ -944,9 +950,9 @@ When CHILDP is non-nil, make the new heading a child of the current one."
    eglot-workspace-configuration
    '(:ansible
      (:python (:interpreterPath "python")
-      :ansible (:path "ansible")
-      :executionEnvironment (:enabled :json-false)
-      :validation (:enabled t :lint (:enabled t :path "ansible-lint")))
+              :ansible (:path "ansible")
+              :executionEnvironment (:enabled :json-false)
+              :validation (:enabled t :lint (:enabled t :path "ansible-lint")))
      :redhat (:telemetry (:enabled :json-false))))
   (dolist (entry
            '((java-ts-mode . ("jdtls"))
@@ -1447,7 +1453,7 @@ untracked file beside Magit because it has no earlier revision to compare."
 
   :custom
   ;;; File Structure
-  (org-directory "~/u")
+  (org-directory "~/u/org")
   (org-default-notes-file
    (expand-file-name "inbox.org" org-directory))
   ;; (org-agenda-files
