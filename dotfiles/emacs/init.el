@@ -52,15 +52,6 @@
   :config
   (recentf-mode 1))
 
-;; Allow emacsclients to connect. This enables
-;; - AI inspection using safe wrappers
-;; - em alias on command line to open file in current frame
-(use-package server
-  :ensure nil
-  :config
-  (unless (server-running-p)
-    (server-start)))
-
 ;;; UI
 (use-package faces
   :ensure nil
@@ -1901,3 +1892,14 @@ unsupported because the exported text must be available immediately."
 (let ((local-file (expand-file-name "machine-specific.el" user-emacs-directory)))
   (when (file-exists-p local-file)
     (load local-file nil t)))
+
+;; Allow emacsclients to connect. This enables
+;; - AI inspection using safe wrappers
+;; - em alias on command line to open file in current frame
+;; Started last so a client can never get a frame before the theme (and any
+;; machine-specific overrides above) have finished loading.
+(use-package server
+  :ensure nil
+  :config
+  (unless (server-running-p)
+    (server-start)))

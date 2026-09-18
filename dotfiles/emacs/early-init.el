@@ -34,10 +34,13 @@
 
 (setq default-frame-alist '((fullscreen . maximized)
                             (vertical-scroll-bars . nil)
-                            (horizontal-scroll-bars . nil)
+                            (horizontal-scroll-bars . nil)))
 
-                            ;; Prevent a color flash before theme setup exists.
-                            (background-color . "#ffffff")
-                            (foreground-color . "#000000")
-                            (ns-appearance . light)
-                            (ns-transparent-titlebar . t)))
+;; Only the very first frame of a non-daemon startup can render before
+;; init.el loads auto-dark/modus-themes, so bias just that frame dark
+;; (matching modus-vivendi's default face) to avoid a bright flash. Using
+;; initial-frame-alist instead of default-frame-alist means later frames
+;; (e.g. emacsclient -t/-c against an already-running server) are never
+;; fought with a stale override once the real theme is active.
+(setq initial-frame-alist '((background-color . "#000000")
+                            (foreground-color . "#ffffff")))
