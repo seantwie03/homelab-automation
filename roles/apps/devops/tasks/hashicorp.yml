@@ -11,7 +11,7 @@
     - name: hasicorp repository key is installed
       ansible.builtin.rpm_key:
         key: /etc/pki/rpm-gpg/RPM-GPG-KEY-hashicorp
-        fingerprint: 798aec654e5c15428c8e42eeaa16fcbca621e701
+        fingerprint: d55c0d1ac78a8d8126cb631cfc9ca96aca026560
         state: present
 
     - name: hasicorp repository is enabled

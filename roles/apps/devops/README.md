@@ -64,5 +64,5 @@ Update the `fingerprint` value in `roles/apps/devops/tasks/hashicorp.yml` to mat
 Use the full fingerprint with no spaces, for example:
 
 ```yaml
-fingerprint: 798aec654e5c15428c8e42eeaa16fcbca621e701
+fingerprint: d55c0d1ac78a8d8126cb631cfc9ca96aca026560
 ```
