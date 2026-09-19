@@ -2,6 +2,11 @@
 
 ## Service And Peer State
 
+Tailscale is on-demand. Most hosts do not run it all the time; the user turns
+it on and off as needed. A host with Tailscale off is normal. Do not report it
+as a finding or follow-up, and do not recommend `tailscale up`. No action is
+required when it is off.
+
 ```sh
 systemctl is-active tailscaled.service
 tailscale status
@@ -10,9 +15,13 @@ tailscale ip
 
 Expected:
 
-- `tailscaled.service` is active.
-- The local host is authenticated and appears in `tailscale status`.
-- At least currently available peers have a plausible direct or relay path.
+- `tailscaled.service` is active. The daemon keeps running while the node is
+  off.
+- `tailscale status` reports either `Tailscale is stopped.` (off) or lists the
+  host and its peers (on). The off state matches `WantRunning: false` in
+  `tailscale debug prefs`.
+- When on, the local host is authenticated and appears in `tailscale status`,
+  and at least currently available peers have a plausible direct or relay path.
 
 An offline peer is not a local failure by itself.
 
@@ -44,6 +53,9 @@ sysctl net.ipv6.conf.all.forwarding
 Both values should be `1`.
 
 ## DNS And Connectivity
+
+Run these checks only while Tailscale is on. Skip them when `tailscale status`
+reports `Tailscale is stopped.`
 
 ```sh
 resolvectl status tailscale0

@@ -56,6 +56,15 @@ health_monitor_prompt: |
   check is blocked, record exactly what was blocked and why rather than trying
   to broaden access or work around the restriction.
 
+  Attempt every check before you list it as skipped or blocked. A check may
+  appear under skipped or blocked only after you actually ran it (using an
+  allowed command form) and it failed, and its entry must quote the exact
+  command and the real error text you observed. Never state a reason you did
+  not observe, and never infer that a command would fail without running it. The
+  one exception is a check that needs a sudo form that is not in the allowed
+  sudo commands: do not run it, and list it as not permitted by the sudoers
+  allowlist, naming the command.
+
   Pay particular attention to systemd health, failed units, missed timers,
   Ansible pull results, DNF automatic updates, kernel and hardware warnings,
   Btrfs allocation and device error counters, scrub/balance/trim status,
@@ -79,6 +88,15 @@ health_monitor_prompt: |
   Structure the report so "Action required" and "Ongoing follow-up" are
   distinct from informational observations. Do not put informational findings
   under an actionable heading.
+
+  Before classifying findings, read the most recent previous health report in
+  {{ health_monitor_report_dir }} (its file name may carry a log rotation date
+  suffix). If you classify a condition differently from how that report did,
+  for example raising a previously informational or intentional state to action
+  required, or dropping a previously reported finding, state the new evidence
+  that justifies the change in that finding. A condition that has not changed
+  since the previous report keeps its previous classification unless you can
+  show the earlier classification was wrong.
 
   Write the full markdown report to the path in the REPORT_FILE environment
   variable by using a shell tool to create or overwrite that exact file. Do not

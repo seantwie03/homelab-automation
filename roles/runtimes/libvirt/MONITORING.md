@@ -8,8 +8,12 @@ Fedora can use modular, socket-activated libvirt daemons. An inactive
 ```sh
 systemctl list-unit-files 'virt*.socket' 'virt*.service'
 systemctl list-units 'virt*.socket' 'virt*.service' --all
-virsh -c qemu:///system version
+virsh --readonly -c qemu:///system version
 ```
+
+Use `--readonly` for every `virsh` check. A read-only connection uses
+`libvirt-sock-ro`, which any local user can query without sudo or polkit
+authentication, and it cannot change guests, networks, or pools.
 
 Expected:
 
@@ -20,9 +24,9 @@ Expected:
 ## Networks, Pools, And Guests
 
 ```sh
-virsh -c qemu:///system net-list --all
-virsh -c qemu:///system pool-list --all
-virsh -c qemu:///system list --all
+virsh --readonly -c qemu:///system net-list --all
+virsh --readonly -c qemu:///system pool-list --all
+virsh --readonly -c qemu:///system list --all
 ```
 
 Report inactive resources only when they are expected to autostart or currently
