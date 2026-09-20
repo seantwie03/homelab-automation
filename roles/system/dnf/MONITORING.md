@@ -71,8 +71,12 @@ Expected:
 - The effective service orders itself after DNS, Ansible Pull, and the system
   metadata refresh.
 
-The timer is not persistent. A host that was off Tuesday at 23:00 can
-legitimately have no run for that week.
+The timer is persistent. The role override changes only `OnCalendar` and the
+randomized delay, so `Persistent=yes` from the packaged timer still applies. A
+host that was off at the scheduled time still runs the missed transaction shortly after it
+next starts, for example early Wednesday. A week with no run means the host
+stayed off or the service failed, so investigate it instead of assuming a
+skipped week.
 
 ## Snapper Pre/Post Snapshots
 

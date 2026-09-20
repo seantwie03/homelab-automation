@@ -33,7 +33,7 @@ This role manages the `ansible`, `ansible-lint`, and `editorconfig-checker` pip 
 
 ## Automated System Updates (dnf-automatic)
 
-This role also configures `dnf-automatic` to apply all package updates on a daily schedule. Key behaviors:
+This role also configures `dnf-automatic` to apply all package updates on a weekly schedule. Key behaviors:
 
 - Runs after `ansible-pull.service` to avoid conflicts.
 - Randomized delay is disabled so the timer fires promptly.
