@@ -16,15 +16,6 @@
     group: "{{ user }}"
     mode: 0755
 
-- name: agy_acp_server is symlinked
-  ansible.builtin.file:
-    src: /home/{{ user }}/.local/bin/agy_acp_server.par
-    dest: /home/{{ user }}/.local/bin/agy_acp_server
-    state: link
-    follow: false
-    owner: "{{ user }}"
-    group: "{{ user }}"
-
 - name: antigravity dotfiles directory is symlinked
   ansible.builtin.file:
     src: "{{ dotfiles_path }}/antigravity"
