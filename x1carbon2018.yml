@@ -21,6 +21,7 @@
     - role: nextdns
     - role: nodejs
     - role: python
+    - role: rust
     - role: cli
     - role: ai
     - role: network_storage
