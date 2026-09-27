@@ -37,6 +37,14 @@ After the first successful run, the `ansible_pull` role takes over version manag
 
 The `ansible_pull` role also configures `dnf-automatic` to apply all system package updates daily. It runs after `ansible-pull` completes and sends a desktop notification with the number of upgraded packages. On headless systems with no active user session, the notification is silently skipped.
 
+### Use SSH for `git` operations
+
+Ansible pull needs to use https because the playbook itself install the password manager. Pulling a public repo via https works fine without authentication. This means it can be used in scripts and services as well. The problem is, everytime the `ansible-pull` service runs it will set the git origin to https:... instead of `ssh`. The fix is to run this:
+
+```sh
+git config --global url."git@github.com:".pushInsteadOf "https://github.com/"
+```
+
 ## WiFi Setup (Optional)
 
 The steps above require internet connectivity. On a fresh system with a WiFi-only connection, set up WiFi manually before running anything else:
