@@ -3,7 +3,7 @@
 Move every host from traditional Fedora to bootc images built from this
 repository, keeping ansible-pull for everything outside the image.
 
-**Current phase:** 0, overlay setup.
+**Current phase:** 1, first image and VM test loop.
 
 This directory holds material that only matters during the migration and is
 deleted when it ends. Everything else under `immutable/` is the future
@@ -72,13 +72,11 @@ delivered exist under `immutable/`.
 **Done when:** `immutable/` is on `main`, `ansible-lint` passes, and ansible-pull
 runs on the current hosts are unaffected.
 
-- [ ] Copy `immutable/` to `main`.
-- [ ] Add to the root `AGENTS.md`: "Files under `immutable/` also follow
+- [x] Copy `immutable/` to `main`.
+- [x] Add to the root `AGENTS.md`: "Files under `immutable/` also follow
   `immutable/AGENTS.md`."
-- [ ] Create `immutable/ansible.cfg`: overlay role directories first, then the
+- [x] Create `immutable/ansible.cfg`: overlay role directories first, then the
   same directories under `../roles/`.
-- [ ] Move section 7 of the original plan to
-  `docs/projects/agent-workspaces.md`.
 
 ### Phase 1: First image and VM test loop
 
@@ -239,6 +237,11 @@ every host's ansible-pull run is green.
   host's unit points into `immutable/` until its next run re-templates it.
 - [ ] Delete `immutable/`. Optionally keep a short retrospective in
   `docs/projects/`.
+
+### Phase 10: YOLO Agent Setup
+
+- [ ] Move section 7 of the original plan to
+  `docs/projects/agent-workspaces.md`.
 
 ## Role checklist
 

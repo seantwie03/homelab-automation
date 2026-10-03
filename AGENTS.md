@@ -13,6 +13,8 @@ config for one agent, make equivalent changes for the other to keep their
 configurations in sync — for anything not already shared via import or symlink,
 such as `.codex/rules/` (Codex) and `.claude/settings.json` (Claude Code).
 
+Files under `immutable/` also follow `immutable/AGENTS.md`.
+
 ## Project Overview
 
 This is an **ansible-pull** based homelab configuration management system. Rather than a central control node pushing configs, each managed host pulls this repository and applies its own playbook via a systemd timer. Targets Fedora/RHEL systems only.
