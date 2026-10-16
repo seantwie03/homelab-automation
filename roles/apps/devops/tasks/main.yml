@@ -6,3 +6,8 @@
 - name: install awscli
   ansible.builtin.include_tasks:
     file: awscli.yml
+
+- name: shellcheck is installed
+  ansible.builtin.package:
+    name: ShellCheck
+    state: present

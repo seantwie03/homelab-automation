@@ -1,0 +1,11 @@
+# KDE Plasma workstation image. The build context is this directory. See
+# README.md for build commands.
+
+ARG FEDORA_MAJOR_VERSION=44
+
+FROM quay.io/fedora/fedora-kinoite:${FEDORA_MAJOR_VERSION}
+
+COPY scripts/ansible.sh /tmp/scripts/
+RUN /tmp/scripts/ansible.sh && rm -rf /tmp/scripts
+
+RUN bootc container lint --fatal-warnings

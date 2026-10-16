@@ -1,6 +1,9 @@
 ---
-- name: uv is installed
+- name: uv, ruff, and ty are installed
   ansible.builtin.package:
-    name: uv
+    name:
+      - uv
+      - ruff
+      - ty
     state: present
 

@@ -5,6 +5,8 @@ Install DevOps tools
 - Terraform
 - Vagrant
 - AWS CLI
+- ShellCheck
+- bcvk, for booting bootc container images as VMs
 
 ## AWS CLI Updates
 

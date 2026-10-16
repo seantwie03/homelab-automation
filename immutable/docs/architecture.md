@@ -35,17 +35,20 @@ building, switching, upgrades, and rollback.
 
 ## Filesystem
 
-**Status:** proposed. Each row is verified in a VM before roles depend on it.
+**Status:** decided for workstation images, where `images/vm_test.py` checks
+the read-only, writable, and linked paths on every run. Proposed for the server
+image.
 
 | Path | Owned by | Behavior |
 | --- | --- | --- |
 | `/usr` | Image | Read-only on a running host. |
 | `/etc` | Runtime | Writable. Local changes carry across image updates through a three-way merge. |
-| `/var` | Runtime | Persistent and writable. Holds `/var/home`, Flatpaks, and container storage. |
-| `/` | Image | Read-only. The only top-level directory the image adds is `/srv`. |
-| `/srv` | Image | Holds mounted and shared storage: `/srv/source`, `/srv/tier1`, and `/srv/tier2` (NFS mounts on clients, local data on odroidh3plus) and `/srv/games` (a local games disk). |
-| Repository checkout | Runtime | Location to be decided. |
-| `/usr/local` | Runtime | Expected to link to `/var/usrlocal`; to be confirmed. |
+| `/var` | Runtime | Persistent and writable. Holds `/var/home`, Flatpaks, and container storage. bootc copies the image's `/var` only at install, so image builds leave it empty. |
+| `/` | Image | Read-only. The image adds no top-level directories. |
+| `/srv` | Runtime | Links to `/var/srv` in every base image. Holds mounted and shared storage: `/srv/source`, `/srv/tier1`, and `/srv/tier2` (NFS mounts on clients, local data on odroidh3plus) and `/srv/games` (a local games disk). Runtime roles create these directories. |
+| `/opt` | Runtime on workstations | Kinoite links it to `/var/opt`. fedora-bootc ships it as a read-only directory. |
+| Repository checkout | Runtime | `/opt/homelab-automation` on workstations. The server's location is open. |
+| `/usr/local` | Runtime on workstations | Kinoite links it to `/var/usrlocal`. fedora-bootc ships it as a read-only directory. |
 
 ## Decisions
 
@@ -80,22 +83,30 @@ roles never install packages. Images need a build and publishing pipeline
 
 ### D2. One base image per desktop
 
-**Status:** proposed.
+**Status:** decided for KDE; proposed for the others.
 
-KDE builds on Kinoite and GNOME on Silverblue. Niri and the server build on
-fedora-bootc.
+KDE builds on Kinoite (`quay.io/fedora/fedora-kinoite`) and GNOME on
+Silverblue. Niri and the server build on fedora-bootc
+(`quay.io/fedora/fedora-bootc`). All of these come from Fedora release
+engineering.
 
 **Why:** The Fedora desktop images already include the display manager,
 portals, and session services for their desktop. Adding a full desktop to a
 minimal base means maintaining all of that here.
 
-**Alternative rejected:** One fedora-bootc base with every desktop added by
-scripts. It shares one layer cache, but this repository would own each
-desktop's composition.
+**Alternatives rejected:**
+
+- One fedora-bootc base with every desktop added by scripts. It shares one
+  layer cache, but this repository would own each desktop's composition.
+- `quay.io/fedora-ostree-desktops/kinoite`, the Atomic Desktops SIG's CI
+  channel. It publishes the same composes with dated tags and sigstore
+  signatures, but it is a testing channel rather than a release.
 
 **Consequences:** Flavors share no layer cache. Shared build scripts keep
 common steps in one place. Each base is pinned to a Fedora major version, so
-major upgrades are deliberate changes.
+major upgrades are deliberate changes. The release repositories publish only
+the major-version tag and no signatures, so a build is reproducible only
+through the base image digest it records.
 
 ### D3. NVIDIA modules from Universal Blue
 
@@ -142,17 +153,29 @@ on every host, and switching back to an installed version needs no download.
 
 **Status:** proposed.
 
-CI builds every image when its sources change and weekly. Each build gets a
-date-and-commit tag and is identified by digest. desktop22 follows the newest
-build. Other hosts move to a tag after desktop22 has run it.
+CI builds every image when its sources change and weekly. An image's sources
+are the `images/` directory, which is its only build context. Playbooks, roles,
+and dotfiles reach hosts through ansible-pull, never through the image, so
+changing them never builds or publishes an image. CI tests a playbook change
+without a build: a VM booted from the current published image runs the
+playbook twice and the capability tests (D7).
+
+Each build gets a date-and-commit tag and is identified by digest. desktop22
+follows the newest build. Other hosts move to a tag after desktop22 has run it.
 
 **Why:** Weekly builds pick up Fedora updates. Hosts other than the canary
-never receive an untested build.
+never receive an untested build. Playbooks change more often than images, and
+a playbook change reaches hosts on their next ansible-pull run without a new
+image.
 
 **Alternative rejected:** Each host building its own image, which needs build
 tooling and build time on every host.
 
-**Consequences:** Promoting a release is a manual step.
+**Consequences:**
+
+- Promoting a release is a manual step.
+- Anything baked into an image lives under `images/`, such as `h`. Copying a
+  file in from a role would make role changes rebuild the image.
 
 ### D6. Three test tiers
 
@@ -168,3 +191,33 @@ tooling and build time on every host.
 
 **Consequences:** A VM harness exists before the first host changes, and no
 hardware change happens before tier 2 passes.
+
+### D7. Playbooks support the current and next image
+
+**Status:** proposed.
+
+ansible-pull applies the newest playbook on its next run, but a new image takes
+effect only after a reboot. For a while, every host runs the new playbook on
+the image it already has. Each playbook change must converge on two images:
+
+- **Current:** the oldest image any host runs. With canary promotion (D5),
+  that is the image the other hosts were last promoted to.
+- **Next:** the build that carries the change.
+
+**Why:** Hosts update their playbook and their image on different schedules.
+Supporting both images lets either update land first.
+
+**Alternative rejected:** Also supporting the previous image, which hosts reach
+by rolling back past the current one. It adds an image to every test for a
+three-host fleet.
+
+**Consequences:**
+
+- A role change that needs new image content ships after that image is current
+  on every host: the image change first, the role change later.
+- A host that upgrades to the next image and rolls back is on the current
+  image, which the playbook supports. A host that rolls back past the current
+  image may fail its ansible-pull runs. Disable the timer with
+  `h job disable` until the host is upgraded again.
+- The VM test runs the playbook and the capability tests on the current image,
+  again after upgrading to the next image, and again after rolling back.

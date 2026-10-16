@@ -14,7 +14,12 @@ in `immutable/migration/README.md` before starting migration work.
   `immutable/ansible.cfg`.
 - To change a root role for bootc hosts, copy the whole role here first. Do not
   edit root roles to suit bootc hosts, because traditional hosts still run them.
-- Root files must not depend on anything under `immutable/`.
+- Root files must not depend on anything under `immutable/`, except agent
+  skills: they live in the root `.agents/skills/`, because Codex discovers
+  skills only under the directory it starts in.
+- Docs under `immutable/` give paths as they will be after the move to the
+  root, such as `images/vm_test.py`. Until then, prefix them with
+  `immutable/`.
 - Material that only matters during the migration goes in
   `immutable/migration/`. Nothing outside of this file and `immutable/migration`
   should mention the migration. Instead, documents, comments, etc. should be
@@ -45,26 +50,24 @@ list it in the role's README as an image requirement.
 
 ## Image builds
 
-- Build logic lives in `images/scripts/*.sh`. Containerfiles stay thin: copy a
-  script, run it.
-- Scripts start with `set -euo pipefail`, use 4-space indentation, and pass
-  ShellCheck.
-- The root repository-signing-key rules still apply, but they run in a build
-  script instead of a role: check the key into `images/`, install it under
-  `/etc/pki/rpm-gpg/`, import it from that file, verify the full fingerprint,
-  and keep `gpgcheck` enabled. Document key rotation in `images/README.md`.
-- Pin base images to a Fedora major version. Never build from `:latest`.
+Follow "Changing an image" in `immutable/images/README.md`. Its signing-key
+rule replaces the root repository-signing-key conventions for images, which
+assume a role installs the package at runtime.
 
 ## Paths
 
 - Refer to the repository checkout through `playbook_path` and
-  `dotfiles_path`, never a literal path. The bootc checkout location is still
-  open.
+  `dotfiles_path`, never a literal path. Workstations keep it at
+  `/opt/homelab-automation`, but the server's location is still open.
 
 ## Validation
 
 - `ansible-lint`
-- `shellcheck immutable/images/scripts/*.sh`
+- After changing anything under `immutable/images/`, run the checks in
+  "Changing an image" in `immutable/images/README.md`. Use the
+  `test-bootc-image` skill for the VM test.
+- After changing `vm_test.py`, also follow "Changing the test harness" in the
+  same README.
 
 ## Documentation
 

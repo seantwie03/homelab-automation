@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Bootc Image"
+  short_description: "Build a bootc image and test it in a VM"
+  default_prompt: "Use $test-bootc-image to build and test my bootc image changes."

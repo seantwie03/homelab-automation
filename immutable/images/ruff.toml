@@ -1,0 +1,7 @@
+line-length = 100
+
+[lint]
+# Defaults plus import sorting (I), modern syntax (UP), likely bugs (B),
+# simplifications (SIM), and required type annotations (ANN). ty checks the
+# annotations themselves.
+extend-select = ["I", "UP", "B", "SIM", "ANN"]

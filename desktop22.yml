@@ -27,6 +27,7 @@
     - role: libvirt
     - role: devops
     - role: nodejs
+    - role: python
     - role: gui
     - role: gaming
 

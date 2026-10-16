@@ -1,0 +1,4 @@
+[environment]
+python-version = "3.12"
+# vm_test_tests.py imports vm_test from this directory.
+extra-paths = ["."]
