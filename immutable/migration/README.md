@@ -3,7 +3,7 @@
 Move every host from traditional Fedora to bootc images built from this
 repository, keeping ansible-pull for everything outside the image.
 
-**Current phase:** 2, runtime roles for desktop22.
+**Current phase:** 2, imgman and kickstart installs.
 
 This directory holds material that only matters during the migration and is
 deleted when it ends. Everything else under `immutable/` is the future
@@ -111,16 +111,83 @@ rollback, and `bootc status` reports the expected image.
 - [x] Upgrade and rollback rehearsal in the VM.
 - [x] Agent skill that wraps the harness.
 
-### Phase 2: Runtime roles for desktop22
+### Phase 2: imgman and kickstart installs
 
-**Depends on:** Phase 1, Q7, Q8, Q9, Q14, Q15.
+**Depends on:** Phase 1, Q4.
 
-**Done when:** `immutable/desktop22.yml` converges in the VM from a fresh image,
-a second run reports no changes, and every role under [desktop22](#desktop22)
-is checked off with its README and MONITORING current.
+**Done when:** `imgman test image` passes for desktop22, desktop25, and
+x1carbon2018, each on a VM disk that Anaconda installed with that host's
+kickstart; `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh` are deleted; and
+`immutable/images/README.md`, `immutable/AGENTS.md`, and the `test-bootc-image`
+skill describe `imgman`.
 
-- [ ] Delete `immutable/images/vm-test.sh`, the Bash version of `vm_test.py`,
-  once you've compared the two.
+- [x] Finish the design in `immutable/images/imgman-plan.md`, working through
+  `immutable/images/imgman-plan-review.md`.
+- [ ] Prototype the install by hand on desktop22, with
+  `localhost/workstation-kde` and a throwaway kickstart, before writing
+  `imgman`. Confirm each assumption
+  the design depends on, and revisit the design for any that fails:
+  - [ ] Fedora 44's Anaconda resolves `%include` of a file written in `%pre`,
+    and installs with the `ostreecontainer` and `ignoredisk` commands it
+    contains.
+  - [ ] The netinst ISO's kernel and initrd boot under QEMU with `-kernel` and
+    `-initrd`, read a kickstart appended to the initrd as a cpio archive, and
+    find stage 2 with the `inst.stage2` value found here. Record that value.
+  - [ ] Anaconda pulls from the test registry at `10.0.2.2:5000` after `%pre`
+    marks it insecure.
+  - [ ] `-no-reboot` makes QEMU exit when the kickstart's `reboot` runs, and
+    the disk then boots without `-kernel`.
+  - [ ] The installed image's systemd applies a
+    `systemd.unit-dropin.ansible-pull.service` credential passed through
+    SMBIOS: a condition-skipped service is not counted as failed.
+  - [ ] Whether Kinoite ships `rsync` and `spice-vdagent`, and whether
+    `remote-viewer` connects over `spice+unix://`.
+  - [ ] How long the install takes, compared with about 5 minutes for
+    `bcvk to-disk`.
+- [ ] A kickstart per workstation host, `immutable/images/kickstart/<host>.ks`:
+  - `ignoredisk --only-use` limits the installer to the system disk, so
+    desktop22's games SSD survives. In the VM, an extra disk stands in for it.
+  - A btrfs `home` subvolume at `/var/home`, with nested subvolumes for
+    directories that home snapshots exclude: `~/.cache`,
+    `~/.local/share/containers`, and possibly `~/Downloads`.
+  - Fixed UIDs, so restored files keep their owners.
+  - The same file installs the hardware and the VM. Only the image URL and
+    the system disk differ: `%pre` takes them from `imgman.url` and
+    `imgman.disk` kernel arguments when `imgman` passes them, uses the
+    hardware values otherwise, and writes them to a file the kickstart
+    includes.
+- [ ] `immutable/images/hosts.toml`. Every workstation maps to `kde` until
+  Phase 4 adds `kde-nvidia`.
+- [ ] `imgman` with `image build`, `machine init`, `run`, `gui`, `ssh`, and
+  `rm`, `test image`, and `system prune`. `machine init` installs with
+  Anaconda from a Fedora netinst ISO that you download, verify, and place in
+  `imgman`'s cache; a missing ISO fails the prerequisite check with download
+  and placement instructions. `machine init` boots the ISO's kernel
+  and initrd directly with the kickstart injected into the initrd, as
+  `virt-install --initrd-inject` does. `test playbook` follows in Phase 3.
+- [ ] Port `vm_test.py`'s layout checks and unit tests to `imgman`, then
+  delete `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh`. Its synthetic
+  upgrade and rollback are not ported; `test upgrade` replaces them in
+  Phase 3.
+- [ ] Add `imgman`'s host requirements (see "Requirements" in
+  `immutable/images/imgman-plan.md`) to the workstation image, so `imgman`
+  runs on desktop22 after its cutover. Add `rsync` to the image if Kinoite
+  lacks it, and `spice-vdagent` if wanted.
+- [ ] Capability test: a file that `sean` writes under `~/.cache` is absent
+  from a snapshot of the `home` subvolume.
+- [ ] Once `imgman` works: write its durable docs in
+  `immutable/images/README.md`, replacing the `vm_test.py` sections; update
+  `immutable/AGENTS.md` and the `test-bootc-image` skill; then delete
+  `immutable/images/imgman-plan.md` and `imgman-plan-review.md`.
+
+### Phase 3: Runtime roles for desktop22
+
+**Depends on:** Phase 2, Q7, Q8, Q9, Q14, Q15.
+
+**Done when:** `immutable/desktop22.yml` converges in a VM installed with
+desktop22's kickstart, a second run reports no changes, and every role under
+[desktop22](#desktop22) is checked off with its README and MONITORING current.
+
 - [ ] Container tests (tier 1) for fast role iteration.
 - [ ] Refactor desktop22's roles (see the [role checklist](#role-checklist)).
 - [ ] `immutable/desktop22.yml`.
@@ -128,57 +195,64 @@ is checked off with its README and MONITORING current.
   config, and `h` is baked into the image. Move `h`'s source under
   `immutable/images/`, such as `immutable/images/bin/h`, instead of copying it
   from the role, so role changes never rebuild the image (D5).
+- [ ] `imgman test playbook`: copy the working tree into the VM, then run the
+  host's playbook twice, as the `ansible_pull` unit runs it, expecting no
+  changes on the second run.
 - [ ] Add the Fedora package of each collection a ported role needs to
   `immutable/images/scripts/ansible.sh`, which starts with only
   `ansible.posix`.
 - [ ] RPM Fusion repositories in the image, if Q14 keeps them: a shared script
   that installs the checked-in keys and verifies their fingerprints.
-- [ ] Re-evaluate the VM upgrade test against
-  [D7](../docs/architecture.md#d7-playbooks-support-the-current-and-next-image).
-  It upgrades a build to itself plus a marker file, which mostly re-tests
-  bootc. The proposal, not yet agreed:
-  1. Install the disk from the current image, run the playbook, and run the
+- [ ] `imgman test upgrade`, the upgrade test for
+  [D7](../docs/architecture.md#d7-playbooks-support-the-current-and-next-image),
+  run before promotion and in CI:
+  1. Start from a cached disk installed from the current image and converged
+     once. Run the working tree's playbook twice, expecting no changes on the
+     second run, and run the capability tests.
+  2. Upgrade to the new build and reboot. Run the playbook twice and the
      capability tests.
-  2. Upgrade to the new build and reboot. Run the playbook twice, expecting
-     no changes on the second run, and run the capability tests.
   3. Roll back, reboot, and run the capability tests.
 
-  Until Phase 4 publishes images, `vm_test.py promote` marks a build as the
-  current image, refusing builds that have not passed `check`. After Phase 4,
-  the current image is the oldest published image a host runs. Builds carry
-  their git commit in the `org.opencontainers.image.revision` label. The
-  concerns are run time and promotion overhead. If the proposal is dropped,
-  decide whether the synthetic upgrade and rollback stay in every `check`.
+  The cached disks are rebuilt only when the current image changes, so a run
+  costs three boots and incremental playbook runs. `test image` has no
+  upgrade test of its own: upgrading a build to itself plus a marker file
+  only re-tested bootc.
+- [ ] `imgman image promote` marks a build as the current image, refusing
+  builds that have not passed `test image` and, once a current image exists,
+  `test upgrade`. After Phase 5, the current image is the oldest published
+  image a host runs. Builds carry their git commit in the
+  `org.opencontainers.image.revision` label.
 - [ ] Capability tests, run as `sean` in the VM after the playbook converges.
   For example: opening a TypeScript file in Neovim attaches `ts_ls`, a login
   shell starts without errors, rootless Podman runs a container, and names
   resolve through NextDNS. The `cli` role installs Neovim's language servers
   during convergence, so the test does not race Mason's background install.
-- [ ] Remove `vm_test.py`'s `ansible-pull --version` and collection checks.
-  They restate the image's package install; converging the playbook in the VM
-  exercises both.
+- [ ] Remove the `ansible-pull --version` and collection checks from
+  `imgman test image`. They restate the image's package install; converging
+  the playbook in the VM exercises both.
 
-### Phase 3: NVIDIA and Secure Boot
+### Phase 4: NVIDIA and Secure Boot
 
-**Depends on:** Phase 1, Q3.
+**Depends on:** Phase 2, Q3.
 
 **Done when:** the NVIDIA variant builds, desktop22 has the module-signing
 certificate enrolled, and `immutable/images/README.md` covers NVIDIA builds,
 enrollment, and certificate rotation. Module loading under Secure Boot can only
-be confirmed on hardware, in Phase 9.
+be confirmed on hardware, in Phase 10.
 
 - [ ] NVIDIA build option using Universal Blue's prebuilt modules.
+- [ ] desktop22 and desktop25 map to `kde-nvidia` in `hosts.toml`.
 - [ ] Certificate fingerprint checked against a source independent of the
   download.
 - [ ] Certificate enrolled on desktop22. Enrollment is stored in firmware, so it
   can happen long before cutover.
 - [ ] Capability test: the image's NVIDIA kernel modules are signed by the
   certificate desktop22 enrolled. Loading them is confirmed on hardware in
-  Phase 9.
+  Phase 10.
 
-### Phase 4: Image publishing
+### Phase 5: Image publishing
 
-**Depends on:** Phase 3, Q5.
+**Depends on:** Phase 4, Q5.
 
 **Done when:** CI builds every image and pushes it to GHCR on change and
 weekly, CI tests playbook changes without building an image, and
@@ -187,14 +261,14 @@ No host runs the published images yet.
 
 - [ ] `.github/workflows/build-images.yml` at the root, triggered by changes
   under `immutable/images/`, weekly, and manually.
-- [ ] Run the VM test in CI inside a privileged `fedora:44` container on
+- [ ] Run `imgman` in CI inside a privileged `fedora:44` container on
   GitHub's Ubuntu runners, with `/dev/kvm` and `/dev/vhost-vsock` passed
   through. The container installs the same Fedora packages as desktop22, so
-  `vm_test.py`'s Fedora paths and tools hold. Prove it with a throwaway
-  workflow first: KVM access, free disk space, `bcvk` and Podman inside the
-  container, and run time.
-- [ ] A playbook workflow for changes outside `immutable/images/`: boot the
-  current published image in a VM, run the playbook twice and the capability
+  `imgman`'s Fedora paths and tools hold. Prove it with a throwaway workflow
+  first: KVM access, free disk space, QEMU and Podman inside the container,
+  caching the installer ISO, and run time.
+- [ ] A playbook workflow for changes outside `immutable/images/`: run
+  `imgman test playbook` on the current published image, run the capability
   tests, and publish nothing.
 - [ ] Tag, digest, and retention scheme.
 - [ ] The GHCR packages are public, so installers pull them without
@@ -202,14 +276,15 @@ No host runs the published images yet.
 - [ ] Capability test: a VM installed from a published image upgrades from
   GHCR to a newer published build and rolls back.
 
-### Phase 5: Runtime roles for desktop25 and x1carbon2018
+### Phase 6: Runtime roles for desktop25 and x1carbon2018
 
-**Depends on:** Phase 2.
+**Depends on:** Phase 3.
 
 **Done when:** `immutable/desktop25.yml` and `immutable/x1carbon2018.yml`
-converge in the VM from a fresh image, a second run reports no changes, and
-every role under [desktop25 and x1carbon2018](#desktop25-and-x1carbon2018) is
-checked off with its README and MONITORING current.
+converge in VMs installed with their kickstarts, a second run reports no
+changes, and every role under
+[desktop25 and x1carbon2018](#desktop25-and-x1carbon2018) is checked off with
+its README and MONITORING current.
 
 - [ ] Refactor the remaining roles they use.
 - [ ] `immutable/desktop25.yml` and `immutable/x1carbon2018.yml`.
@@ -217,25 +292,27 @@ checked off with its README and MONITORING current.
 - [ ] Optional: a Niri variant to exercise desktop switching (Q13), with a
   capability test that switching desktops gives a working session.
 
-### Phase 6: Server image and roles for odroidh3plus
+### Phase 7: Server image and roles for odroidh3plus
 
-**Depends on:** Phase 1, Q12.
+**Depends on:** Phase 2, Q12.
 
 **Done when:** the `server` image builds, `immutable/odroidh3plus.yml`
-converges in the VM from a fresh image, a second run reports no changes, and
-every role under [odroidh3plus](#odroidh3plus) is checked off with its README
-and MONITORING current.
+converges in a VM installed with odroidh3plus's kickstart, a second run reports
+no changes, and every role under [odroidh3plus](#odroidh3plus) is checked off
+with its README and MONITORING current.
 
 - [ ] `server` image: fedora-bootc, no desktop, `cage` for the kiosk.
+- [ ] `immutable/images/kickstart/odroidh3plus.ks`, with `ignoredisk
+  --only-use` keeping the `/srv` volume, and odroidh3plus in `hosts.toml`.
 - [ ] Refactor the server roles.
 - [ ] `immutable/odroidh3plus.yml`.
 - [ ] Capability tests in the VM: an NFS client mounts each export and reads
   and writes with the intended permissions, an SMB client reads and writes the
   share, karakeep answers over HTTPS, and the kiosk session starts.
 
-### Phase 7: Kickstart installs
+### Phase 8: Install rehearsals
 
-**Depends on:** Phases 4, 5, and 6.
+**Depends on:** Phases 5, 6, and 7.
 
 **Done when:** each host's kickstart installs its published image in a VM with
 the intended disk layout, a `/var/home` restored from a backup is readable with
@@ -243,15 +320,7 @@ correct ownership and SELinux labels, the playbook converges, and the host's
 capability tests pass. `immutable/README.md` has the install steps in "Getting
 Started".
 
-- [ ] A kickstart file per host:
-  - `ostreecontainer` installs the host's published image. Until images are
-    published, develop the kickstart against stock Kinoite in a VM.
-  - `ignoredisk --only-use` limits the installer to the system disk, so
-    desktop22's games SSD and odroidh3plus's `/srv` volume survive.
-  - A btrfs `home` subvolume at `/var/home`, with nested subvolumes for
-    directories that home snapshots exclude: `~/.cache`,
-    `~/.local/share/containers`, and possibly `~/Downloads`.
-  - Fixed UIDs, so restored files keep their owners.
+- [ ] Each kickstart's hardware target installs the host's published image.
 - [ ] Rehearse each install in a VM, including a restore of `/var/home` from a
   backup. An extra disk stands in for each data disk the install must leave
   alone.
@@ -260,9 +329,9 @@ Started".
   historical.
 - [ ] "Getting Started" install steps in `immutable/README.md`.
 
-### Phase 8: desktop22 cutover
+### Phase 9: desktop22 cutover
 
-**Depends on:** Phase 7, a verified backup.
+**Depends on:** Phase 8, a verified backup.
 
 **Done when:** desktop22 boots its published NVIDIA image, runtime Ansible has
 converged, restored data is readable, and the games SSD is intact.
@@ -270,9 +339,9 @@ converged, restored data is readable, and the games SSD is intact.
 - [ ] Back up, install with the kickstart, restore, and run ansible-pull,
   following the runbook.
 
-### Phase 9: desktop22 acceptance
+### Phase 10: desktop22 acceptance
 
-**Depends on:** Phase 8.
+**Depends on:** Phase 9.
 
 **Done when:** the checks below pass, an upgrade and a rollback on the hardware
 keep user and games data, and desktop22 has been the daily driver for a soak
@@ -302,9 +371,9 @@ One-time checks:
 - [ ] Games SSD mounted at `/srv/games` with its contents intact, and Steam's
   library folder re-added at the new path.
 
-### Phase 10: Promotion and OS updates
+### Phase 11: Promotion and OS updates
 
-**Depends on:** Phase 9, Q6.
+**Depends on:** Phase 10, Q6.
 
 **Done when:** promoting a build from the canary to the other hosts works as
 documented in `immutable/images/README.md`, and bootc hosts receive OS updates
@@ -315,9 +384,9 @@ as Q6 decides.
 - [ ] Capability test: a VM tracking the promoted tag installs a newly
   promoted build on its next update.
 
-### Phase 11: desktop25 and x1carbon2018 cutover
+### Phase 12: desktop25 and x1carbon2018 cutover
 
-**Depends on:** Phase 10, a verified backup of each host.
+**Depends on:** Phase 11, a verified backup of each host.
 
 **Done when:** both hosts run a promoted image and pass the recurring checks
 that apply to them.
@@ -329,9 +398,9 @@ that apply to them.
 - [ ] Capability tests on the hardware: on x1carbon2018, the managed Wi-Fi
   profile connects, and suspend and resume work.
 
-### Phase 12: odroidh3plus cutover
+### Phase 13: odroidh3plus cutover
 
-**Depends on:** Phase 10, Q12, a verified backup.
+**Depends on:** Phase 11, Q12, a verified backup.
 
 **Done when:** odroidh3plus runs the `server` image; NFS, SMB, karakeep,
 orbit, the retro-gaming kiosk, the Tailscale exit node, and `/srv` snapshots
@@ -344,9 +413,9 @@ work; and clients' NFS automounts recover.
 - [ ] Capability tests on the hardware for what the VM could not cover, such
   as the kiosk on the real display and the Tailscale exit node.
 
-### Phase 13: Move to the root
+### Phase 14: Move to the root
 
-**Depends on:** Phases 11 and 12.
+**Depends on:** Phases 12 and 13.
 
 **Done when:** the repository root is the new tree, `immutable/` is gone, and
 every host's ansible-pull run is green.
@@ -365,7 +434,26 @@ every host's ansible-pull run is green.
 - [ ] Delete `immutable/`. Optionally keep a short retrospective in
   `docs/projects/`.
 
-### Phase 14: YOLO Agent Setup
+### Phase 15: Single `site.yml` (optional)
+
+**Depends on:** Phase 14.
+
+**Done when:** every host runs `site.yml`, the per-host playbooks are gone, and
+every host's ansible-pull run is green.
+
+Replaces the near-duplicate per-host playbooks with one playbook. Record the
+decision in `docs/architecture.md` first.
+
+- [ ] Each image writes its flavor to `/etc/ansible/facts.d/desktop.fact`, so
+  `ansible_local.desktop.flavor` names the booted image.
+- [ ] `site.yml` includes the desktop roles (`wm/kde`, `wm/niri`) for that
+  flavor, and `host_vars/` holds per-host differences.
+- [ ] An inventory that names each host, replacing `--limit localhost`, and an
+  ansible-pull unit that runs `site.yml` with it.
+- [ ] `imgman test playbook` runs `site.yml` with the same inventory and limit
+  as the unit.
+
+### Phase 16: YOLO Agent Setup
 
 - [ ] Move section 7 of the original plan to
   `docs/projects/agent-workspaces.md`.
@@ -395,7 +483,7 @@ Includes roles pulled in as dependencies.
   read-only, so snapshots move under a mount of the btrfs top level in
   `/var/mnt`. Snapshot the `home` subvolume; nested subvolumes for `~/.cache`
   and `~/.local/share/containers` keep those directories out of snapshots
-  (Phase 7 creates them at install). desktop22 already has both.
+  (the kickstart creates them at install). desktop22 already has both.
 - [ ] `wifi`: NetworkManager and firmware to the image; connection profiles
   stay.
 - [ ] `nextdns`: packages to the image; resolver configuration stays.
@@ -403,12 +491,13 @@ Includes roles pulled in as dependencies.
 - [ ] `network_storage`: `nfs-utils` to the image; automounts and groups stay.
   Mount `/source` at `/srv/source`. The role needs separate remote and local
   paths, because odroidh3plus keeps exporting `/source` until its cutover in
-  Phase 12.
+  Phase 13.
 - [ ] `ai_health_monitor`: system user to the image; sudoers, logrotate,
   scripts, and units stay.
 - [ ] `docker`, `podman`: packages to the image; enablement and groups stay.
-- [ ] `libvirt`: packages to the image; enablement, groups, and
-  `/var/lib/libvirt` stay.
+- [ ] `libvirt`: packages to the image, including QEMU, OVMF, and the SPICE
+  support that `imgman` needs; enablement, groups, and `/var/lib/libvirt`
+  stay.
 - [ ] `flatpak`: remotes and apps stay; they live in `/var`.
 - [ ] `nodejs`, `dotnet`, `rust`: image or user space (Q8).
 - [ ] `cli`: rewrite for user-space installs into `~/bin`; drop package tasks.
@@ -458,16 +547,16 @@ Each of these describes the traditional setup. Write its replacement under
 
 | # | Question | Blocks |
 | --- | --- | --- |
-| Q3 | Universal Blue modules (D3): certificate provenance, how quickly matching modules follow Fedora kernel updates, and what builds do in between. | Phase 3 |
-| Q5 | Publishing (D5): tag format, retention, and how a host is promoted to a release. | Phase 4 |
-| Q6 | How do hosts receive OS updates? bootc's stock update timer reboots to apply them, and the goals rule out forced reboots. Does the server differ? | Phase 10 |
-| Q7 | User-space tools (D4): tools without standalone release builds (`zsh`, `tmux`) and the login shell: image or user space? | Phase 2 |
-| Q8 | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`): image or user space? | Phase 2 |
-| Q9 | Container tests: which roles can converge in a container, and how do playbooks written for `hosts: localhost` with a local connection target the container instead of the machine running the tests? | Phase 2 |
-| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1): where do the checkout and karakeep's compose project live? | Phases 6 and 12 |
-| Q13 | Switching desktops replaces `/usr` but not configuration in home directories. What does a clean switch require? | Phase 5 |
-| Q14 | RPM Fusion: with NVIDIA from Universal Blue, RPM Fusion supplies only Steam (`gaming`), the freeworld multimedia codecs, and `intel-media-driver`. Add RPM Fusion to the image for those, or take Steam from Flathub and rely on Flatpak apps for codecs? | Phase 2 |
-| Q15 | sshd: desktop22 runs `sshd.service` today, but no role manages it, and Kinoite ships it disabled. Should workstation images enable it, or should a runtime role enable it per host? If the image enables it, `vm_test.py` no longer needs its sshd test layer. | Phase 2 |
+| Q3 | Universal Blue modules (D3): certificate provenance, how quickly matching modules follow Fedora kernel updates, and what builds do in between. | Phase 4 |
+| Q5 | Publishing (D5): tag format, retention, and how a host is promoted to a release. | Phase 5 |
+| Q6 | How do hosts receive OS updates? bootc's stock update timer reboots to apply them, and the goals rule out forced reboots. Does the server differ? | Phase 11 |
+| Q7 | User-space tools (D4): tools without standalone release builds (`zsh`, `tmux`) and the login shell: image or user space? | Phase 3 |
+| Q8 | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`): image or user space? | Phase 3 |
+| Q9 | Container tests: which roles can converge in a container, and how do playbooks written for `hosts: localhost` with a local connection target the container instead of the machine running the tests? | Phase 3 |
+| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1): where do the checkout and karakeep's compose project live? | Phases 7 and 13 |
+| Q13 | Switching desktops replaces `/usr` but not configuration in home directories. What does a clean switch require? | Phase 6 |
+| Q14 | RPM Fusion: with NVIDIA from Universal Blue, RPM Fusion supplies only Steam (`gaming`), the freeworld multimedia codecs, and `intel-media-driver`. Add RPM Fusion to the image for those, or take Steam from Flathub and rely on Flatpak apps for codecs? | Phase 3 |
+| Q15 | sshd: desktop22 runs `sshd.service` today, but no role manages it, and Kinoite ships it disabled. Should workstation images enable it, or should a runtime role enable it per host? | Phase 3 |
 
 ## Answered questions
 
@@ -475,6 +564,6 @@ Each of these describes the traditional setup. Write its replacement under
 | --- | --- |
 | Q1 | Kinoite links `/opt`, `/srv`, `/usr/local`, `/home`, `/mnt`, and `/root` into `/var`. Workstations keep the checkout at `/opt/homelab-automation`, the image adds no top-level directories, and runtime roles create the directories under `/srv`. fedora-bootc links `/srv` but ships `/opt` and `/usr/local` as read-only directories, which moves the server's checkout question to Q12. Recorded in the [filesystem table](../docs/architecture.md#filesystem). |
 | Q2 | KDE builds on `quay.io/fedora/fedora-kinoite`, published by Fedora release engineering. `quay.io/fedora-ostree-desktops/kinoite` is the Atomic Desktops SIG's CI channel for the same composes, with dated tags and sigstore signatures. The official repository has only the major-version tag and no signatures, so builds pin by digest when publishing starts (Q5). Recorded in [D2](../docs/architecture.md#d2-one-base-image-per-desktop). |
-| Q4 | Each host is installed by a kickstart file whose `ostreecontainer` directive installs the host's published image directly, with the disk layout declared in the file. Kickstart development starts against stock Kinoite in a VM, before images are published. Hardware cutovers wait until every host has an equivalent setup in VMs. Recorded in Phase 7. |
-| Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: Phase 2 copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`. |
+| Q4 | Each host is installed by a kickstart file whose `ostreecontainer` directive installs the host's image directly, with the disk layout declared in the file. VM test disks are installed with the same kickstarts, from images built locally and served by the test registry, so kickstart development starts in Phase 2. Hardware cutovers wait until every host has an equivalent setup in VMs. Recorded in Phases 2 and 8. |
+| Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: `imgman test playbook` copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`. |
 | Q11 | Claude Code finds skills under `immutable/` only after a session touches a file there. Codex finds them only when started inside `immutable/`. Skills go in the root `.agents/skills/`; see the exceptions under [how the overlay works](#how-the-overlay-works). |
