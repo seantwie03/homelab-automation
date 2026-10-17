@@ -45,12 +45,13 @@
    - Workstations (e.g., desktop22, desktop25 with 64 GB RAM and multi-core Intel CPUs) can run several VMs concurrently.
    - Each host maintains an isolated runtime directory (`~/.cache/homelab-images/<host>/run/`), independent PID file, ephemeral overlay, random vsock context ID (CID), and SPICE display socket (`run/spice.sock`).
    - Running `imgman machine run --all` leaves all booted VMs running in parallel without collisions: each display socket lives in its host's `run/` directory, and a CID already in use is retried (see "Vsock CID Allocation").
+   - Commands on the same host never overlap: a per-host lock makes a second command fail immediately and name the command holding the host (see "Concurrency").
 
 8. **Virtual Graphics by Default, Explicit Viewer via `imgman machine gui`:**
    - Both `machine run` and `test` commands boot with virtual graphics hardware (`-device virtio-vga`) and a SPICE display server on a Unix socket enabled by default (unless `--no-gui` is passed). Nothing listens on the network, not even on loopback.
    - `remote-viewer` is **not** launched automatically, keeping your terminal focused and preventing unwanted popups.
    - When you want to inspect the graphical desktop, display manager (SDDM), or compositor, simply run `imgman machine gui [HOST]` to connect `remote-viewer` to that host's SPICE socket.
-   - For automated CI or headless terminal workflows, pass `--no-gui` to boot QEMU with `-display none`.
+   - For automated CI or headless terminal workflows, pass `--no-gui` to boot QEMU with `-display none` and no SPICE server. The VM keeps its `virtio-vga` device, so the display manager still starts and `test image`'s graphical boot check still applies.
 
 ---
 
@@ -109,10 +110,10 @@ imgman
 - **Under the hood:**
   1. Starts the local container registry (`homelab-image-registry`) on `127.0.0.1:5000` and pushes `localhost/workstation-<flavor>` to `127.0.0.1:5000/<host>/workstation-<flavor>:test`.
   2. Extracts `images/pxeboot/vmlinuz` and `initrd.img` from the cached Fedora netinst ISO with `xorriso -osirrox`, and appends a cpio archive holding `images/kickstart/<host>.ks` as `ks.cfg` to the initrd, as `virt-install --initrd-inject` does.
-  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda`. imgman reads the ISO label with `xorriso`. desktop22 also gets a second blank disk, `vdb`, standing in for its games SSD.
+  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda`. imgman reads the ISO label with `xorriso`. Each size in the host's `data_disks` in `hosts.toml` adds a blank disk after the system disk (`vdb`, `vdc`, and so on), standing in for a data disk the kickstart must leave alone, such as desktop22's games SSD.
   4. The kickstart's `%pre` sees the `imgman.*` arguments and selects the test registry and `vda` (see "Kickstart Targets" below). Anaconda pulls the image from `10.0.2.2:5000`, partitions the disk with production Btrfs subvolumes (`home` at `/var/home`, nested `.cache`), provisions user `sean` (UID 1000), and installs the bootloader. The installer's output goes to `run/console.log`.
   5. The kickstart ends with `reboot`, which `-no-reboot` turns into QEMU exiting, leaving `~/.cache/homelab-images/<host>/workstation-<flavor>.qcow2`. Later boots start from the disk, without `-kernel`.
-  6. Writes `workstation-<flavor>.inputs` next to the disk, recording the installed image ID and the kickstart's SHA-256, for the staleness check.
+  6. Writes `workstation-<flavor>.inputs` next to the disk, recording the installed image ID and the kickstart's SHA-256 for the staleness check, and the manifest digest `podman push` reported in step 1, for `test image`. `machine init` deletes the old `.inputs` file before step 1, so an interrupted install always leaves the disk stale.
 - **Options:**
   - `HOST`: Target host (default: this machine's short hostname).
   - `-a, --all`: Provisions disks for every host in `images/hosts.toml`.
@@ -124,13 +125,13 @@ imgman
   1. Checks if a VM for `HOST` is running; if so, immediately terminates the QEMU process (`SIGTERM` / `SIGKILL`) and unlinks its runtime directory.
   2. Discards any previous ephemeral overlay and creates a fresh `overlay.qcow2` backed by the host's disk for the selected flavor. Runs `machine init` first only if the disk is missing, and warns if it is stale, without building.
   3. Picks a random vsock CID and stores it in `run/cid`.
-  4. Spawns QEMU with KVM acceleration, OVMF UEFI firmware, vsock SSH, virtio-vga graphics, a SPICE server on `run/spice.sock`, and systemd credentials: `system.hostname`, which sets the VM's hostname to `HOST`; `tmpfiles.extra`, which installs the one-time root SSH key; and `systemd.unit-dropin.ansible-pull.service`, which keeps `ansible-pull` from replacing the synced tree (see `test playbook`).
+  4. Spawns QEMU with the host's `memory` and `cpus` from `hosts.toml`, KVM acceleration, OVMF UEFI firmware, vsock SSH, virtio-vga graphics, a SPICE server on `run/spice.sock`, and systemd credentials: `system.hostname`, which sets the VM's hostname to `HOST`; `tmpfiles.extra`, which installs the one-time root SSH key; and `systemd.unit-dropin.ansible-pull.service`, which keeps `ansible-pull` from replacing the synced tree (see `test playbook`).
   5. Leaves the VM booted and ready for interactive SSH (`imgman machine ssh`) or graphical inspection (`imgman machine gui`).
 - **Options:**
   - `HOST`: Target host (default: this machine's short hostname).
   - `-a, --all`: Sequentially resets and boots every host, leaving all of them running in parallel, each with its own SPICE socket.
   - `--flavor NAME`: Boots the host's disk for `NAME` instead of the host's flavor.
-  - `--no-gui`: Disables the virtual display and SPICE socket; runs QEMU headless (`-display none`).
+  - `--no-gui`: Disables the SPICE socket; runs QEMU headless (`-display none`). The `virtio-vga` device stays, so the guest's display manager still starts.
 
 #### `imgman machine gui [HOST]`
 - **Purpose:** Launches `remote-viewer` to view and interact with the graphical desktop of a running VM.
@@ -185,8 +186,8 @@ imgman
 - **Under the hood:**
   1. **Smart Dependency Check:** Always runs `podman build` for the host's flavor; on a cache hit this finishes in < 0.5s and the image ID is unchanged. If the disk is missing or stale (see "Dependency Detection Logic"), automatically runs `machine init` to refresh the host's disk.
   2. Boots the VM with a fresh throwaway overlay (virtual graphics enabled by default; inspect live via `imgman machine gui` unless `--no-gui` is specified).
-  3. Asserts filesystem invariants: `/usr` read-only, `/etc` and `/var` writable, `/srv -> /var/srv`.
-  4. Asserts the kickstart's layout: `home` is a subvolume at `/var/home`, a file `sean` writes under `~/.cache` is absent from a snapshot of `home`, `sean` has UID 1000, and on desktop22 the stand-in games disk `vdb` is untouched.
+  3. Asserts that `bootc status` reports the booted image digest recorded in the disk's `.inputs` file, then asserts filesystem invariants: `/usr` read-only, `/etc` and `/var` writable, and `/opt`, `/srv`, and `/usr/local` linked into `/var`.
+  4. Asserts the kickstart's layout: `home` is a subvolume at `/var/home`, a file `sean` writes under `~/.cache` is absent from a snapshot of `home`, `sean` has UID 1000, and every disk from the host's `data_disks` is still blank.
   5. Asserts the boot reached `graphical.target` and the display manager is active, then runs the no-failed-units check (see "No Failed Units Check").
   6. Marks the test registry insecure in the VM over SSH, then runs `bootc upgrade --check`, which confirms the VM can reach the tag it tracks and that the image's signature policy accepts it, without downloading or rebooting.
   7. Records that the image ID passed on `HOST`, for `image promote`.
@@ -245,7 +246,7 @@ imgman
 - **Options:**
   - `HOST`: Target host to prune (default: this machine's short hostname).
   - `-a, --all`: Prunes across all hosts discovered in cache, and the shared registry when no VM is running.
-  - `-d, --disks`: In addition to default cleanup, removes base `.qcow2` virtual disks for inactive hosts.
+  - `-d, --disks`: In addition to default cleanup, removes the base, current, and converged `.qcow2` disks of inactive hosts.
 
 ---
 
@@ -318,6 +319,30 @@ imgman image promote kde
 
 ## 4. Technical Architecture & Implementation Details
 
+### Project Layout
+imgman lives in its own directory, `imgman/`, not in `images/`. `images/` is the image's build context, and CI builds and publishes an image whenever anything under it changes (D5), so keeping the tool out of it means a change to imgman never rebuilds an image or enters a build context. imgman is a uv project that uses only the Python standard library:
+
+```text
+imgman/
+├── pyproject.toml        # Entry point, Python version, dev tools, ruff and pyrefly settings, no dependencies
+├── uv.lock               # Pinned versions of the dev tools
+├── README.md             # Using imgman, its prerequisites, and changing it
+├── src/imgman/
+│   ├── __init__.py
+│   ├── cli.py            # argparse tree and main()
+│   ├── vm.py             # QEMU, vsock SSH, and systemd credentials
+│   ├── install.py        # Installer ISO, initrd injection, and machine init
+│   └── checks.py         # test image and test upgrade checks
+└── tests/
+```
+
+The module split is a starting point; split or merge modules as the code grows.
+
+- `pyproject.toml` declares `dependencies = []`, `requires-python = ">=3.14"`, the entry point `imgman = "imgman.cli:main"`, and the `dev` dependency group (see "Toolchain"). It holds the ruff and pyrefly settings, so imgman needs no separate `ruff.toml` or type checker configuration, and pyrefly resolves imports between modules and tests without extra search paths.
+- Install it from the repository root with `uv tool install --editable imgman`, which puts `imgman` on `PATH` in `~/.local/bin`. Because the install is editable, changes to the source take effect without reinstalling.
+- imgman finds the repository from its own location, the parent of `imgman/`. From there it reads the Containerfiles, `hosts.toml`, and kickstarts under `images/`, and `test playbook` syncs that checkout. This works only with an editable install, so imgman exits with an error naming the expected checkout when `images/` is not beside it.
+- What imgman reads stays in `images/`: the Containerfiles, `scripts/`, `hosts.toml`, and `kickstart/`.
+
 ### Dependency Detection Logic
 A disk's inputs are the image ID it was installed from and the SHA-256 of the host's kickstart. `machine init` records both in a `.inputs` file next to the disk. A disk is stale when the file is missing or either value differs:
 
@@ -334,9 +359,15 @@ expected = {
 }
 recorded = json.loads(inputs_path.read_text()) if inputs_path.exists() else None
 
-stale = not disk_path.exists() or recorded != expected
+stale = (
+    not disk_path.exists()
+    or recorded is None
+    or {key: recorded.get(key) for key in expected} != expected
+)
 ```
 
+- `.inputs` also holds the pushed manifest digest, which `test image` compares with `bootc status`. It plays no part in staleness.
+- `machine init` deletes `.inputs` before installing and writes it only after the install succeeds, so an interrupted install never passes as current.
 - The image ID is derived from the image's content, so a `podman build` cache hit keeps it, and a rebuild with any change replaces it. File timestamps play no part, so `git checkout` and `touch` never cause a reinstall.
 - The kickstart is the only kickstart input: its one `%include` names the file `%pre` writes, not a file in the repository.
 - Disks are kept per flavor, so a flavor change in `hosts.toml` selects a different disk, which is missing or stale on its own terms.
@@ -365,8 +396,12 @@ images/
 ```
 
 ```toml
+# Hosts imgman can run as a VM. Each host's kickstart is kickstart/<host>.ks,
+# and its playbook is <host>.yml.
+
 [desktop22]
 flavor = "kde-nvidia"
+data_disks = ["10G"]    # stands in for the games SSD
 
 [desktop25]
 flavor = "kde-nvidia"
@@ -375,7 +410,16 @@ flavor = "kde-nvidia"
 flavor = "kde"
 ```
 
-imgman reads `hosts.toml` with the standard library's `tomllib`. A flavor that no host lists is still built by `image build --all` and can be tested on any host with `--flavor`.
+Each host's table has these keys:
+
+- `flavor` (required): the `Containerfile.<flavor>` the host runs.
+- `memory` (optional, default `8G`): the VM's memory, in QEMU notation.
+- `cpus` (optional, default `4`): the VM's vCPUs.
+- `data_disks` (optional, default none): sizes, in `qemu-img` notation, of blank disks attached after the system disk. They stand in for data disks the kickstart must leave alone. qcow2 disks are sparse, so the size costs nothing until written.
+
+`hosts.toml` holds only what imgman needs and cannot derive from a naming convention. Host configuration belongs to Ansible, never to this file.
+
+imgman reads `hosts.toml` with the standard library's `tomllib`, which keeps imgman free of third-party packages; reading YAML would need PyYAML. imgman rejects a missing `flavor` and any unknown key, naming the host and key, so a typo such as `flavour` fails instead of falling back to a default. A unit test loads the real file. A flavor that no host lists is still built by `image build --all` and can be tested on any host with `--flavor`.
 
 ### Installer ISO
 imgman never downloads the installer. The Fedora netinst ISO is a prerequisite you download, verify, and place yourself:
@@ -384,17 +428,17 @@ imgman never downloads the installer. The Fedora netinst ISO is a prerequisite y
 - **Version:** the Fedora major version must match the Containerfiles' `FEDORA_MAJOR_VERSION`, so Anaconda and the image move to a new release together. Exactly one ISO for that version must be present.
 - **Checked early:** `machine init`, `test image`, and `test all` check for the ISO in the prerequisite check, before building or booting anything, so a missing ISO fails in under a second. Other commands never need it.
 
-When the ISO is missing, imgman lists it with the other missing prerequisites and exits 1:
+When the ISO is missing, imgman lists it with the other missing prerequisites and exits 2:
 
 ```text
 imgman: missing prerequisites:
     the Fedora 44 netinst ISO in ~/.cache/homelab-images/iso/
         Download Fedora-Everything-netinst-x86_64-44-*.iso and its CHECKSUM file from
         https://download.fedoraproject.org/pub/fedora/linux/releases/44/Everything/x86_64/iso/
-        then verify and place it as described in "Installer ISO" in images/README.md.
+        then verify and place it as described in "Installer ISO" in imgman/README.md.
 ```
 
-When two or more ISOs match the version, imgman names them and asks you to remove all but one. `images/README.md` documents the download, verifying the `CHECKSUM` file's signature with Fedora's release key, and checking the ISO's SHA-256 against it.
+When two or more ISOs match the version, imgman names them and asks you to remove all but one. `imgman/README.md` documents the download, verifying the `CHECKSUM` file's signature with Fedora's release key, and checking the ISO's SHA-256 against it.
 
 ### Local Registry & Installer Networking
 Anaconda inside QEMU pulls the container image via QEMU's virtual user networking:
@@ -412,6 +456,7 @@ Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both t
 url=$(sed -n 's/.*imgman\.url=\([^ ]*\).*/\1/p' /proc/cmdline)
 if [ -n "$url" ]; then
     disk=$(sed -n 's/.*imgman\.disk=\([^ ]*\).*/\1/p' /proc/cmdline)
+    mkdir -p /etc/containers/registries.conf.d
     printf '[[registry]]\nlocation = "%s"\ninsecure = true\n' "${url%%/*}" \
         >/etc/containers/registries.conf.d/50-imgman.conf
 else
@@ -419,7 +464,7 @@ else
     disk=disk/by-id/nvme-EXAMPLE
 fi
 cat >/tmp/target.ks <<EOF
-ostreecontainer --url=$url --no-signature
+ostreecontainer --url=$url --no-signature-verification
 ignoredisk --only-use=$disk
 EOF
 %end
@@ -437,13 +482,14 @@ EOF
 - **Explicit Viewer (`imgman machine gui`):** To avoid unwanted popups and keep the terminal focused during test runs, `remote-viewer` is **not** launched automatically. When graphical inspection is needed, running `imgman machine gui [HOST]` launches `remote-viewer spice+unix://<run dir>/spice.sock`.
 - **Local Socket, No Ports:** Each VM's socket lives in its host's `run/` directory, so `imgman machine run --all` runs several GUI sessions at once with nothing to allocate. Only your user can reach the socket, through the `run/` directory's permissions, so SPICE needs no password.
 - **Guest Integration:** With `spice-vdagent` running in the guest, SPICE shares the clipboard and resizes the guest display to the viewer window. The prototype checks whether the image ships it.
-- **Headless Opt-Out (`--no-gui`):** When `--no-gui` is passed, QEMU is launched with `-display none` and no SPICE socket is opened, conserving host resources.
+- **Headless Opt-Out (`--no-gui`):** When `--no-gui` is passed, QEMU is launched with `-display none` and no SPICE socket is opened, conserving host resources. The `virtio-vga` device stays, so the guest still reaches `graphical.target` with an active display manager, and `test image` asserts the same boot with or without `--no-gui`.
 
 ### Requirements
-Before doing any work, imgman checks what the command needs, lists everything missing at once, and exits 1. Each check applies only to the commands that need it, so a missing `remote-viewer` fails only `machine gui`.
+Before doing any work, imgman checks what the command needs, lists everything missing at once, and exits 2. Each check applies only to the commands that need it, so a missing `remote-viewer` fails only `machine gui`. Commands that create disks or boot VMs also warn, without failing, when less than 25 GB is free under `~/.cache/homelab-images`.
 
 | Where | Needs | Used for |
 | --- | --- | --- |
+| Host | Python 3.14 or later and `uv` | Running and installing imgman (see "Project Layout") |
 | Host | `podman`, `qemu-system-x86_64`, `qemu-img`, `edk2-ovmf`, `qemu-ui-spice-core` | Builds, VMs, UEFI firmware, the SPICE display |
 | Host | `xorriso` | Extracting the kernel, initrd, and volume label from the ISO |
 | Host | `remote-viewer` (`virt-viewer`) | `machine gui` |
@@ -504,4 +550,95 @@ Implemented using nested `argparse` subparsers:
 - `--flavor NAME`: Available on `machine init`, `machine run`, and all `test` subcommands to use a flavor other than the host's.
 - `--no-gui`: Available on `machine run` and all `test` subcommands (`playbook`, `image`, `upgrade`, `all`) to disable virtual graphics and run headless (`-display none`).
 - `--rm`: Available on all `test` subcommands to automatically remove the VM instance and its ephemeral overlay upon test completion.
-- `-d, --disks`: Available on `system prune` to remove base `.qcow2` virtual disks for inactive hosts.
+- `-d, --disks`: Available on `system prune` to remove the base, current, and converged `.qcow2` disks of inactive hosts.
+
+---
+
+## 5. Non-Functional Requirements & Code Style
+
+### Toolchain
+- **Runtime:** the Python standard library only. `pyproject.toml` declares `dependencies = []`.
+- **Python:** `requires-python = ">=3.14"`, the version Fedora 44 ships, so the newest syntax is available.
+- **Development tools:** a `dev` dependency group in `pyproject.toml`, pinned in `uv.lock`: ruff (formatting and linting), pyrefly (type checking), pytest (tests), and pykickstart (`ksvalidator`). uv installs them from PyPI, never from Fedora packages. Upgrade one deliberately with `uv lock --upgrade-package NAME` and fix what the new version reports in the same change.
+- **Checks:** after any change, run these from `imgman/`. All four must pass before committing:
+
+  ```sh
+  uv run ruff format
+  uv run ruff check
+  uv run pyrefly check
+  uv run pytest
+  ```
+
+### Types
+Model the domain so that illegal states cannot be represented, and let the type checker prove it.
+
+- **Strict checking:** pyrefly runs with its strict preset, which also rejects implicit `Any`. Fix errors instead of suppressing them. A `# pyrefly: ignore` needs a comment saying why, and the preset's `unused-ignore` check removes stale ones.
+- **Everything annotated:** every function, method, test, and fixture has parameter and return annotations. ruff's `ANN` rules enforce this, and `ANN401` bans explicit `Any`.
+- **Distinct identifiers, distinct types:** `NewType` wraps each kind of identifier, such as `HostName`, `Flavor`, `ImageId`, `Digest`, and `Cid`, so a flavor cannot be passed where a host name is expected.
+- **Closed sets:** values from a fixed set are an `enum` or a `Literal`, such as `ExitCode`.
+- **Variants as unions:** each variant is its own dataclass, and code over the union uses `match` with `assert_never`, so a new variant fails type checking until every `match` handles it. Parsed commands (`MachineRun`, `TestImage`, and so on) and VM state (`Stopped`, `Running` with its PID and CID) work this way. A field that exists only in some states belongs only to those variants, never to a shared class as an optional `None`.
+- **Immutable data:** data types are `@dataclass(frozen=True, slots=True, kw_only=True)`, and collections inside them are tuples or frozensets.
+- **Parse at the boundary:** untyped input becomes typed values once, where it enters: command-line arguments, `hosts.toml`, `.inputs` files, `bootc status` JSON, and command output. Invalid input fails there. Code past the boundary never handles a raw `dict`, an `argparse.Namespace`, or an unvalidated `str`.
+- **Paths:** filesystem paths are `Path`, never `str`.
+
+### Code Structure
+- **One way to run commands:** every external command goes through one `run()` wrapper, which tests replace. Commands are argument lists; nothing on the host uses `shell=True`. A command sent into the VM over SSH quotes its arguments with `shlex.join`.
+- **Pure core:** the logic that decides what to do is pure functions with no side effects, such as building QEMU arguments and the kernel command line, rendering kickstart targets, deciding staleness, and parsing `hosts.toml`. Side effects stay in thin functions around them.
+- **Injected time:** functions that wait take a clock and a sleep function as parameters, so tests cover timeouts without waiting.
+- **Constants:** paths such as the OVMF firmware, timeouts, and defaults are module-level constants, defined once. imgman supports only Fedora on x86_64 with KVM, so it never discovers paths at runtime.
+- **Formatting and lint:** `ruff format` with a 100-column limit. ruff's default rules plus import sorting, modern syntax, likely bugs, simplification, and the annotation rules.
+- **Comments:** docstrings on public functions and classes. Other comments explain why, never what.
+
+### Tests
+- **pytest:** plain `assert`; `@pytest.mark.parametrize` for table-driven cases such as argument parsing, staleness, `hosts.toml` validation, and kickstart targets; `tmp_path` for files.
+- **Isolated:** every external command is mocked. No test starts a VM, needs the network, or touches `~/.cache/homelab-images`. The whole suite runs in under 5 seconds.
+- **Coverage:** every new behavior gets a test. One test loads the real `hosts.toml`, and one validates every kickstart with `ksvalidator` for both its hardware and VM targets.
+- **VM behavior:** imgman's own `test` commands exercise real VMs. Unit tests never stand in for them.
+
+### Exit Codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Success. |
+| 1 | Bad input: arguments, `hosts.toml`, or other configuration. |
+| 2 | Missing prerequisite: something must exist or finish first, such as a command, a device, the installer ISO, a running VM for `machine gui`, a current image for `test upgrade`, or a host another command holds. |
+| 3 | A step or check failed. |
+| 130 | Interrupted with Ctrl-C. |
+
+- argparse exits 2 on a usage error by default. imgman overrides `ArgumentParser.error` to exit 1.
+- An expected failure prints one `imgman: ...` line, plus details such as the failed checks, and no traceback. A traceback means a bug in imgman.
+
+### Output
+Output is written for a person at a terminal. imgman has no machine-readable output formats.
+
+- One line per step when it finishes, with its duration; a `PASS` or `FAIL` line per check; a summary at the end.
+- Command output is captured and shown only when a command fails, as its last lines. `--verbose`, on the root parser, streams all command output.
+- Progress and results go to stdout; warnings and errors go to stderr.
+- A long wait, such as an install or a boot, prints what it is waiting for and where to watch, such as `run/console.log`, so the terminal never looks frozen.
+
+### Concurrency
+- **Per-host lock:** commands that change a host's VM or disks hold `~/.cache/homelab-images/<host>/lock` with `fcntl.flock` for as long as they run: `machine init`, `machine run`, `machine rm`, every `test` command, and `system prune`. `machine gui` and `machine ssh` never lock, so you can watch or inspect a VM while a test runs.
+- **Fail immediately:** a second command on a busy host exits 2 at once, naming the holder, such as `imgman: desktop22 is busy: imgman test image (pid 4321), started 10:42`. The holder writes its command line, PID, and start time into the lock file.
+- **No stale locks:** the kernel releases a `flock` when its process exits, even after a crash, so a dead command never blocks the next one.
+- **Hosts are independent:** different hosts never block each other. `--all` takes each host's lock as it reaches that host. `system prune --all` skips busy hosts and says so.
+- **Shared resources:** starting the shared registry treats "already exists" from `podman create` as success, so two hosts can start it at once.
+
+### Interrupts
+- Ctrl-C stops every QEMU process the interrupted command started, including an installer, and exits 130. A VM that was already running when the command started keeps running.
+- An interrupted install never leaves an `.inputs` file, so its disk is stale and the next command that needs it reinstalls it.
+
+### Resources
+- Each VM gets the `memory` and `cpus` from its host's table in `hosts.toml`, defaulting to `8G` and `4`.
+- imgman warns, without failing, when less than 25 GB is free under `~/.cache/homelab-images`.
+- GitHub's standard Linux runners have 16 GB of memory, so CI runs hosts one at a time.
+
+### Performance
+- `imgman --help` and argument errors return in under 100 ms. Modules that only some commands need are imported inside those commands.
+- `test image` adds under 1 second before booting when the build is a cache hit and the disk is current.
+- The `test playbook` sync takes under 200 ms when little has changed.
+
+### Security
+- imgman never runs as root and never calls `sudo`.
+- Nothing listens beyond loopback: the registry binds `127.0.0.1:5000`, and SPICE uses a Unix socket in a `run/` directory only your user can open (mode `0700`).
+- Each VM boot gets a new SSH key, deleted with its `run/` directory.
+- The registry serves plain HTTP. Only test VMs trust it, and only through QEMU's loopback forwarding.

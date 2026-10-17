@@ -118,8 +118,8 @@ rollback, and `bootc status` reports the expected image.
 **Done when:** `imgman test image` passes for desktop22, desktop25, and
 x1carbon2018, each on a VM disk that Anaconda installed with that host's
 kickstart; `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh` are deleted; and
-`immutable/images/README.md`, `immutable/AGENTS.md`, and the `test-bootc-image`
-skill describe `imgman`.
+`immutable/imgman/README.md`, `immutable/images/README.md`,
+`immutable/AGENTS.md`, and the `test-bootc-image` skill describe `imgman`.
 
 - [x] Finish the design in `immutable/images/imgman-plan.md`, working through
   `immutable/images/imgman-plan-review.md`.
@@ -135,6 +135,13 @@ skill describe `imgman`.
     find stage 2 with the `inst.stage2` value found here. Record that value.
   - [ ] Anaconda pulls from the test registry at `10.0.2.2:5000` after `%pre`
     marks it insecure.
+  - [ ] With `ostreecontainer`, Anaconda's `user --uid=1000` creates `sean`,
+    and a `%post` creates the nested `~/.cache` subvolume inside the `home`
+    subvolume.
+  - [ ] A fresh install reaches `systemctl is-system-running` = `running`,
+    with no failed units, before any playbook runs.
+  - [ ] With `-display none` and no SPICE server, the VM still reaches
+    `graphical.target` with SDDM active, because `virtio-vga` stays.
   - [ ] `-no-reboot` makes QEMU exit when the kickstart's `reboot` runs, and
     the disk then boots without `-kernel`.
   - [ ] The installed image's systemd applies a
@@ -146,7 +153,8 @@ skill describe `imgman`.
     `bcvk to-disk`.
 - [ ] A kickstart per workstation host, `immutable/images/kickstart/<host>.ks`:
   - `ignoredisk --only-use` limits the installer to the system disk, so
-    desktop22's games SSD survives. In the VM, an extra disk stands in for it.
+    desktop22's games SSD survives. In the VM, a blank disk from the host's
+    `data_disks` in `hosts.toml` stands in for it.
   - A btrfs `home` subvolume at `/var/home`, with nested subvolumes for
     directories that home snapshots exclude: `~/.cache`,
     `~/.local/share/containers`, and possibly `~/Downloads`.
@@ -156,29 +164,52 @@ skill describe `imgman`.
     `imgman.disk` kernel arguments when `imgman` passes them, uses the
     hardware values otherwise, and writes them to a file the kickstart
     includes.
-- [ ] `immutable/images/hosts.toml`. Every workstation maps to `kde` until
-  Phase 4 adds `kde-nvidia`.
-- [ ] `imgman` with `image build`, `machine init`, `run`, `gui`, `ssh`, and
-  `rm`, `test image`, and `system prune`. `machine init` installs with
-  Anaconda from a Fedora netinst ISO that you download, verify, and place in
-  `imgman`'s cache; a missing ISO fails the prerequisite check with download
-  and placement instructions. `machine init` boots the ISO's kernel
-  and initrd directly with the kickstart injected into the initrd, as
+- [ ] `immutable/images/hosts.toml`, with `flavor` and, for desktop22,
+  `data_disks`. Every workstation maps to `kde` until Phase 4 adds
+  `kde-nvidia`.
+- [ ] `imgman` as a standard-library-only uv project in `immutable/imgman/`,
+  installed with `uv tool install --editable` (see "Project Layout" in
+  `immutable/images/imgman-plan.md`) and following its "Non-Functional
+  Requirements & Code Style": ruff, pyrefly's strict preset, and pytest in a
+  pinned `dev` group. Its commands are `image build`, `machine init`, `run`,
+  `gui`, `ssh`, and `rm`, `test image`, and `system prune`. `machine init`
+  installs with Anaconda from a Fedora netinst ISO that you download, verify,
+  and place in `imgman`'s cache; a missing ISO fails the prerequisite check
+  with download and placement instructions. `machine init` boots the ISO's
+  kernel and initrd directly with the kickstart injected into the initrd, as
   `virt-install --initrd-inject` does. `test playbook` follows in Phase 3.
-- [ ] Port `vm_test.py`'s layout checks and unit tests to `imgman`, then
-  delete `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh`. Its synthetic
-  upgrade and rollback are not ported; `test upgrade` replaces them in
-  Phase 3.
+- [ ] Port `vm_test.py`'s layout checks to `imgman` and its unit tests to
+  pytest, then delete `vm_test.py`, `vm_test_tests.py`, `vm-test.sh`, and
+  `immutable/images/ruff.toml` and `ty.toml`, whose settings move to
+  `immutable/imgman/pyproject.toml`. Its synthetic upgrade and rollback are
+  not ported; `test upgrade` replaces them in Phase 3. Its
+  `ansible-pull --version` and collection checks are not ported either: they
+  restate the image's package install, and converging the playbook in the VM
+  exercises both.
 - [ ] Add `imgman`'s host requirements (see "Requirements" in
   `immutable/images/imgman-plan.md`) to the workstation image, so `imgman`
   runs on desktop22 after its cutover. Add `rsync` to the image if Kinoite
   lacks it, and `spice-vdagent` if wanted.
 - [ ] Capability test: a file that `sean` writes under `~/.cache` is absent
   from a snapshot of the `home` subvolume.
-- [ ] Once `imgman` works: write its durable docs in
-  `immutable/images/README.md`, replacing the `vm_test.py` sections; update
-  `immutable/AGENTS.md` and the `test-bootc-image` skill; then delete
-  `immutable/images/imgman-plan.md` and `imgman-plan-review.md`.
+- [ ] Once `imgman` works, write its durable docs and point the existing
+  ones at it, then delete `immutable/images/imgman-plan.md` and
+  `imgman-plan-review.md`:
+  - `immutable/imgman/README.md`: installing and using `imgman`, its
+    prerequisites, the installer ISO, and "Changing imgman" (formatting,
+    linting, type checking, and unit tests), replacing the "Testing in a VM"
+    and "Changing the test harness" sections of `immutable/images/README.md`.
+  - `immutable/images/README.md`: the file table lists `hosts.toml` and
+    `kickstart/` instead of `vm_test.py`, `ruff.toml`, and `ty.toml`;
+    "Changing an image" uses `imgman image build` and `imgman test image`;
+    the `COLLECTIONS` step goes.
+  - `immutable/AGENTS.md`: under Validation, after changing anything under
+    `immutable/imgman/`, follow "Changing imgman" in
+    `immutable/imgman/README.md`, replacing the `vm_test.py` rule.
+  - `test-bootc-image` skill: its commands and description use `imgman`.
+    Its description drops the Ansible bootstrap and the upgrade and rollback
+    checks, which `imgman test image` no longer runs. Phase 3 adds
+    `imgman test upgrade` to the skill.
 
 ### Phase 3: Runtime roles for desktop22
 
@@ -227,9 +258,6 @@ desktop22's kickstart, a second run reports no changes, and every role under
   shell starts without errors, rootless Podman runs a container, and names
   resolve through NextDNS. The `cli` role installs Neovim's language servers
   during convergence, so the test does not race Mason's background install.
-- [ ] Remove the `ansible-pull --version` and collection checks from
-  `imgman test image`. They restate the image's package install; converging
-  the playbook in the VM exercises both.
 
 ### Phase 4: NVIDIA and Secure Boot
 
