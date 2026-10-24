@@ -14,7 +14,7 @@
     src: "{{ item.src }}"
     fstype: none
     boot: false
-    opts: bind,x-systemd.mount-timeout=10,x-systemd.automount,nofail
+    opts: bind,x-systemd.mount-timeout=10,x-systemd.automount,x-systemd.idle-timeout=10min,nofail
     state: present
   loop: "{{ bind_mounts }}"
   loop_control:
