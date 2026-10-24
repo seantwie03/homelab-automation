@@ -1,0 +1,13 @@
+# Hosts imgman can run as a VM. Each host's kickstart is kickstart/<host>.ks,
+# and its playbook is <host>.yml. Keys: flavor (required), data_disks, memory
+# (default "6G"), and cpus (default 4).
+
+[desktop22]
+flavor = "kde"
+data_disks = ["10G"]    # stands in for the games SSD
+
+[desktop25]
+flavor = "kde"
+
+[x1carbon2018]
+flavor = "kde"

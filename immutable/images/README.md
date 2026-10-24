@@ -4,14 +4,16 @@ Bootable container images for bootc hosts. A host boots one of these images,
 then configures everything outside it with ansible-pull. See the
 [architecture](../docs/architecture.md) for what belongs in an image.
 
-| File                 | Purpose                                                                                        |
-|----------------------|------------------------------------------------------------------------------------------------|
-| `Containerfile.kde`  | `workstation-kde`: KDE Plasma on Kinoite.                                                      |
-| `scripts/ansible.sh` | Installs `git`, `python3`, `ansible-core`, and the Ansible collections that runtime roles use. |
-| `vm_test.py`         | Builds an image and tests it in a VM.                                                          |
-| `vm_test_tests.py`   | Unit tests for `vm_test.py`.                                                                   |
-| `ruff.toml`          | Lint and format settings for the Python files.                                                 |
-| `ty.toml`            | Type checker settings for the Python files.                                                    |
+| File                  | Purpose                                                                                        |
+|-----------------------|------------------------------------------------------------------------------------------------|
+| `Containerfile.kde`   | `workstation-kde`: KDE Plasma on Kinoite.                                                      |
+| `scripts/ansible.sh`  | Installs `git`, `python3`, `ansible-core`, and the Ansible collections that runtime roles use. |
+| `hosts.toml`          | The hosts a VM can stand in for, and each host's flavor and VM resources.                      |
+| `kickstart/<host>.ks` | Installs a host, on its hardware or as a VM.                                                   |
+| `vm_test.py`          | Builds an image and tests it in a VM.                                                          |
+| `vm_test_tests.py`    | Unit tests for `vm_test.py`.                                                                   |
+| `ruff.toml`           | Lint and format settings for the Python files.                                                 |
+| `ty.toml`             | Type checker settings for the Python files.                                                    |
 
 ## Contents
 

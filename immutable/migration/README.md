@@ -123,48 +123,77 @@ kickstart; `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh` are deleted; and
 
 - [x] Finish the design in `immutable/images/imgman-plan.md`, working through
   `immutable/images/imgman-plan-review.md`.
-- [ ] Prototype the install by hand on desktop22, with
+- [x] Prototype the install by hand on desktop22, with
   `localhost/workstation-kde` and a throwaway kickstart, before writing
-  `imgman`. Confirm each assumption
-  the design depends on, and revisit the design for any that fails:
-  - [ ] Fedora 44's Anaconda resolves `%include` of a file written in `%pre`,
-    and installs with the `ostreecontainer` and `ignoredisk` commands it
-    contains.
-  - [ ] The netinst ISO's kernel and initrd boot under QEMU with `-kernel` and
-    `-initrd`, read a kickstart appended to the initrd as a cpio archive, and
-    find stage 2 with the `inst.stage2` value found here. Record that value.
-  - [ ] Anaconda pulls from the test registry at `10.0.2.2:5000` after `%pre`
-    marks it insecure.
-  - [ ] With `ostreecontainer`, Anaconda's `user --uid=1000` creates `sean`,
-    and a `%post` creates the nested `~/.cache` subvolume inside the `home`
-    subvolume.
-  - [ ] A fresh install reaches `systemctl is-system-running` = `running`,
-    with no failed units, before any playbook runs.
-  - [ ] With `-display none` and no SPICE server, the VM still reaches
-    `graphical.target` with SDDM active, because `virtio-vga` stays.
-  - [ ] `-no-reboot` makes QEMU exit when the kickstart's `reboot` runs, and
-    the disk then boots without `-kernel`.
-  - [ ] The installed image's systemd applies a
+  `imgman`. Confirm each assumption the design depends on, and revisit the
+  design for any that fails. The scripts and kickstart are in
+  [imgman-prototype/](imgman-prototype/).
+  - [x] Fedora 44's Anaconda (44.30) resolves `%include` of a file written in
+    `%pre`, and installs with the `ostreecontainer` and `ignoredisk` commands
+    it contains. The data disk stayed blank.
+  - [x] The netinst ISO's kernel and initrd boot under QEMU with `-kernel` and
+    `-initrd` and read a kickstart appended to the initrd as a cpio archive.
+    Stage 2 is `inst.stage2=hd:LABEL=Fedora-E-dvd-x86_64-44`, the ISO's
+    volume ID.
+  - [x] Anaconda pulls from the test registry at `10.0.2.2:5000` after `%pre`
+    marks it insecure. `bootc status` reports the pushed digest, and
+    `bootc upgrade --check` reaches the tag once the installed VM marks the
+    registry insecure too.
+  - [x] With `ostreecontainer`, Anaconda's `user --uid=1000` creates `sean`
+    with its home directory before `%post` runs, and a `%post` creates the nested `~/.cache`
+    subvolume inside `home`. After `restorecon`, it is labeled
+    `cache_home_t`, and a file in it is absent from a snapshot of `home`.
+  - [x] A fresh install reaches `running` with no failed units, but only
+    after three `%post` fixes, now in "Kickstart Targets" in
+    `immutable/images/imgman-plan.md`: Anaconda's `/` line in `/etc/fstab`
+    fails `systemd-remount-fs`, its `default.target` override selects
+    `multi-user.target`, and without `/etc/plasma-setup-done` KDE's
+    first-boot wizard takes the seat.
+  - [x] With `-display none` and no SPICE server, the VM reaches
+    `graphical.target` with the display manager active. Kinoite 44 ships
+    Plasma Login Manager, not SDDM, so checks use `display-manager.service`.
+  - [x] `-no-reboot` makes QEMU exit 0 when the kickstart's `reboot` runs,
+    and the disk then boots without `-kernel`, from a fresh copy of
+    `OVMF_VARS.fd`, in about 18 seconds.
+  - [x] Fedora 44's systemd (259) applies a
     `systemd.unit-dropin.ansible-pull.service` credential passed through
-    SMBIOS: a condition-skipped service is not counted as failed.
-  - [ ] Whether Kinoite ships `rsync` and `spice-vdagent`, and whether
-    `remote-viewer` connects over `spice+unix://`.
-  - [ ] How long the install takes, compared with about 5 minutes for
-    `bcvk to-disk`.
-- [ ] A kickstart per workstation host, `immutable/images/kickstart/<host>.ks`:
+    SMBIOS: the service is condition-skipped with `Result=success`, and the
+    system stays `running`.
+  - [x] Kinoite ships `rsync` and `spice-vdagent`, and `remote-viewer`
+    connects over `spice+unix://` and shows the login screen. In the KDE
+    Wayland session, pasting host text into the guest works, but copying out
+    of the guest does not: `spice-vdagent` sees the clipboard only through
+    XWayland. Resizing the viewer window resizes the guest display.
+  - [x] The install takes about 6.5 minutes (377 and 389 seconds), compared
+    with about 5 minutes for `bcvk to-disk`.
+- [x] A kickstart per workstation host, `immutable/images/kickstart/<host>.ks`:
   - `ignoredisk --only-use` limits the installer to the system disk, so
     desktop22's games SSD survives. In the VM, a blank disk from the host's
     `data_disks` in `hosts.toml` stands in for it.
   - A btrfs `home` subvolume at `/var/home`, with nested subvolumes for
     directories that home snapshots exclude: `~/.cache`,
-    `~/.local/share/containers`, and possibly `~/Downloads`.
+    `~/.local/share/containers`, and `~/Downloads`.
   - Fixed UIDs, so restored files keep their owners.
-  - The same file installs the hardware and the VM. Only the image URL and
-    the system disk differ: `%pre` takes them from `imgman.url` and
-    `imgman.disk` kernel arguments when `imgman` passes them, uses the
-    hardware values otherwise, and writes them to a file the kickstart
-    includes.
-- [ ] `immutable/images/hosts.toml`, with `flavor` and, for desktop22,
+  - `en_US.UTF-8`, a `us` keyboard, and `America/Chicago` on every host.
+  - `sean` gets a bootstrap password: a yescrypt hash published in the
+    kickstart, changed at first login. A locked account has no way in on the
+    first boot, because Kinoite ships sshd disabled (Q15).
+  - btrfs compression actually applies. btrfs takes `compress` from the
+    filesystem's first mount, which on a bootc host is the initramfs
+    mounting root from `rootflags=subvol=root`, so Anaconda's
+    `compress=zstd:1` in fstab never took effect. The prototype confirmed it
+    with `filefrag`: no compressed extents until a second
+    `rootflags=subvol=root,compress=zstd:1` was on the kernel command line.
+    The initramfs combines both `rootflags=`: compression applied with the
+    appended one after Anaconda's (added with `rpm-ostree kargs`) and before
+    it (written by each kickstart's `bootloader --append`).
+  - The same file installs the hardware and the VM. Only the image URL, the
+    system disk, and the plain-HTTP registry differ: `%pre` reads the
+    `imgman.url`, `imgman.disk`, and `imgman.insecure-registry` kernel
+    arguments, each falling back on its own to the hardware value, checks
+    that the system disk exists, and writes the image and disk to a file the
+    kickstart includes.
+- [x] `immutable/images/hosts.toml`, with `flavor` and, for desktop22,
   `data_disks`. Every workstation maps to `kde` until Phase 4 adds
   `kde-nvidia`.
 - [ ] `imgman` as a standard-library-only uv project in `immutable/imgman/`,
@@ -349,6 +378,12 @@ capability tests pass. `immutable/README.md` has the install steps in "Getting
 Started".
 
 - [ ] Each kickstart's hardware target installs the host's published image.
+  Replace the placeholder image URL and system disk in each kickstart's
+  `%pre` with the published image and the disk's `/dev/disk/by-id/` path,
+  read on the host with `ls -l /dev/disk/by-id/`. x1carbon2018 has no wired
+  network for the installer's image pull: decide between a USB Ethernet
+  adapter and a Wi-Fi profile, which would put the Wi-Fi password in the
+  public kickstart.
 - [ ] Rehearse each install in a VM, including a restore of `/var/home` from a
   backup. An extra disk stands in for each data disk the install must leave
   alone.
@@ -525,7 +560,11 @@ Includes roles pulled in as dependencies.
 - [ ] `docker`, `podman`: packages to the image; enablement and groups stay.
 - [ ] `libvirt`: packages to the image, including QEMU, OVMF, and the SPICE
   support that `imgman` needs; enablement, groups, and `/var/lib/libvirt`
-  stay.
+  stay. Optionally, set `chattr +C` on `/var/lib/libvirt/images` while it is
+  still empty, so VM disks skip copy-on-write and compression. desktop22
+  keeps `/var/lib/libvirt` in its own subvolume only to exclude it from root
+  rollbacks, which bootc hosts no longer do, so the kickstarts add no
+  subvolume for it.
 - [ ] `flatpak`: remotes and apps stay; they live in `/var`.
 - [ ] `nodejs`, `dotnet`, `rust`: image or user space (Q8).
 - [ ] `cli`: rewrite for user-space installs into `~/bin`; drop package tasks.

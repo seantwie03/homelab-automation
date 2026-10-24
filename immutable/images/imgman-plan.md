@@ -42,7 +42,7 @@
    - `machine run`, `test image`, and `test upgrade` always boot fresh, so they replace any VM the host is running, including one you are using. `test playbook` reuses a running VM. Any test command with `--rm` stops the VM when it finishes. Whenever a command replaces a running VM, it prints one line first, such as `stopping desktop22's running VM`.
 
 7. **Multi-VM Concurrency & Isolation:**
-   - Workstations (e.g., desktop22, desktop25 with 64 GB RAM and multi-core Intel CPUs) can run several VMs concurrently.
+   - Workstations can run several VMs concurrently. At the default 6 GB per VM, three VMs use 18 GB of desktop22's 31 GB.
    - Each host maintains an isolated runtime directory (`~/.cache/homelab-images/<host>/run/`), independent PID file, ephemeral overlay, random vsock context ID (CID), and SPICE display socket (`run/spice.sock`).
    - Running `imgman machine run --all` leaves all booted VMs running in parallel without collisions: each display socket lives in its host's `run/` directory, and a CID already in use is retried (see "Vsock CID Allocation").
    - Commands on the same host never overlap: a per-host lock makes a second command fail immediately and name the command holding the host (see "Concurrency").
@@ -50,7 +50,7 @@
 8. **Virtual Graphics by Default, Explicit Viewer via `imgman machine gui`:**
    - Both `machine run` and `test` commands boot with virtual graphics hardware (`-device virtio-vga`) and a SPICE display server on a Unix socket enabled by default (unless `--no-gui` is passed). Nothing listens on the network, not even on loopback.
    - `remote-viewer` is **not** launched automatically, keeping your terminal focused and preventing unwanted popups.
-   - When you want to inspect the graphical desktop, display manager (SDDM), or compositor, simply run `imgman machine gui [HOST]` to connect `remote-viewer` to that host's SPICE socket.
+   - When you want to inspect the graphical desktop, display manager, or compositor, simply run `imgman machine gui [HOST]` to connect `remote-viewer` to that host's SPICE socket.
    - For automated CI or headless terminal workflows, pass `--no-gui` to boot QEMU with `-display none` and no SPICE server. The VM keeps its `virtio-vga` device, so the display manager still starts and `test image`'s graphical boot check still applies.
 
 ---
@@ -110,9 +110,9 @@ imgman
 - **Under the hood:**
   1. Starts the local container registry (`homelab-image-registry`) on `127.0.0.1:5000` and pushes `localhost/workstation-<flavor>` to `127.0.0.1:5000/<host>/workstation-<flavor>:test`.
   2. Extracts `images/pxeboot/vmlinuz` and `initrd.img` from the cached Fedora netinst ISO with `xorriso -osirrox`, and appends a cpio archive holding `images/kickstart/<host>.ks` as `ks.cfg` to the initrd, as `virt-install --initrd-inject` does.
-  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda`. imgman reads the ISO label with `xorriso`. Each size in the host's `data_disks` in `hosts.toml` adds a blank disk after the system disk (`vdb`, `vdc`, and so on), standing in for a data disk the kickstart must leave alone, such as desktop22's games SSD.
-  4. The kickstart's `%pre` sees the `imgman.*` arguments and selects the test registry and `vda` (see "Kickstart Targets" below). Anaconda pulls the image from `10.0.2.2:5000`, partitions the disk with production Btrfs subvolumes (`home` at `/var/home`, nested `.cache`), provisions user `sean` (UID 1000), and installs the bootloader. The installer's output goes to `run/console.log`.
-  5. The kickstart ends with `reboot`, which `-no-reboot` turns into QEMU exiting, leaving `~/.cache/homelab-images/<host>/workstation-<flavor>.qcow2`. Later boots start from the disk, without `-kernel`.
+  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda imgman.insecure-registry=10.0.2.2:5000`. imgman reads the ISO label with `xorriso`. Each size in the host's `data_disks` in `hosts.toml` adds a blank disk after the system disk (`vdb`, `vdc`, and so on), standing in for a data disk the kickstart must leave alone, such as desktop22's games SSD.
+  4. The kickstart's `%pre` reads the `imgman.*` arguments, selects the test registry's image and `vda`, and marks the registry insecure for the installer (see "Kickstart Targets" below). Anaconda pulls the image from `10.0.2.2:5000`, partitions the disk with production Btrfs subvolumes (`home` at `/var/home`, nested `.cache`), provisions user `sean` (UID 1000), and installs the bootloader. The installer's output goes to `run/console.log`.
+  5. The kickstart ends with `reboot`, which `-no-reboot` turns into QEMU exiting after about 6.5 minutes, leaving `~/.cache/homelab-images/<host>/workstation-<flavor>.qcow2`. Later boots start from the disk, without `-kernel`.
   6. Writes `workstation-<flavor>.inputs` next to the disk, recording the installed image ID and the kickstart's SHA-256 for the staleness check, and the manifest digest `podman push` reported in step 1, for `test image`. `machine init` deletes the old `.inputs` file before step 1, so an interrupted install always leaves the disk stale.
 - **Options:**
   - `HOST`: Target host (default: this machine's short hostname).
@@ -188,7 +188,7 @@ imgman
   2. Boots the VM with a fresh throwaway overlay (virtual graphics enabled by default; inspect live via `imgman machine gui` unless `--no-gui` is specified).
   3. Asserts that `bootc status` reports the booted image digest recorded in the disk's `.inputs` file, then asserts filesystem invariants: `/usr` read-only, `/etc` and `/var` writable, and `/opt`, `/srv`, and `/usr/local` linked into `/var`.
   4. Asserts the kickstart's layout: `home` is a subvolume at `/var/home`, a file `sean` writes under `~/.cache` is absent from a snapshot of `home`, `sean` has UID 1000, and every disk from the host's `data_disks` is still blank.
-  5. Asserts the boot reached `graphical.target` and the display manager is active, then runs the no-failed-units check (see "No Failed Units Check").
+  5. Asserts the boot reached `graphical.target` and `display-manager.service` is active, then runs the no-failed-units check (see "No Failed Units Check").
   6. Marks the test registry insecure in the VM over SSH, then runs `bootc upgrade --check`, which confirms the VM can reach the tag it tracks and that the image's signature policy accepts it, without downloading or rebooting.
   7. Records that the image ID passed on `HOST`, for `image promote`.
   8. Leaves the VM running unless `--rm` is passed.
@@ -413,7 +413,7 @@ flavor = "kde"
 Each host's table has these keys:
 
 - `flavor` (required): the `Containerfile.<flavor>` the host runs.
-- `memory` (optional, default `8G`): the VM's memory, in QEMU notation.
+- `memory` (optional, default `6G`): the VM's memory, in QEMU notation.
 - `cpus` (optional, default `4`): the VM's vCPUs.
 - `data_disks` (optional, default none): sizes, in `qemu-img` notation, of blank disks attached after the system disk. They stand in for data disks the kickstart must leave alone. qcow2 disks are sparse, so the size costs nothing until written.
 
@@ -438,7 +438,7 @@ imgman: missing prerequisites:
         then verify and place it as described in "Installer ISO" in imgman/README.md.
 ```
 
-When two or more ISOs match the version, imgman names them and asks you to remove all but one. `imgman/README.md` documents the download, verifying the `CHECKSUM` file's signature with Fedora's release key, and checking the ISO's SHA-256 against it.
+When two or more ISOs match the version, imgman names them and asks you to remove all but one. `imgman/README.md` documents the download, verifying the `CHECKSUM` file's signature with Fedora's release key, and checking the ISO's SHA-256 against it. The key is already on every Fedora host as `/etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-<version>-primary`; `gpgv` needs it dearmored into a keyring file first (`gpg --dearmor`), because it cannot read a key from a pipe.
 
 ### Local Registry & Installer Networking
 Anaconda inside QEMU pulls the container image via QEMU's virtual user networking:
@@ -449,19 +449,39 @@ Anaconda inside QEMU pulls the container image via QEMU's virtual user networkin
 - The registry serves plain HTTP. The kickstart's `%pre` marks it insecure for the installer, and imgman marks it insecure in the installed VM over SSH before running `bootc upgrade --check` or `bootc upgrade`.
 
 ### Kickstart Targets
-Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both the hardware and the VM. Only the image URL and the system disk differ. The kickstart leaves both out of its top-level commands; its `%pre` writes them to `/tmp/target.ks`, which the kickstart then includes. Anaconda resolves `%include` after `%pre` runs.
+Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both the hardware and the VM. Only the image URL, the system disk, and whether a registry is reached over plain HTTP differ. The kickstart leaves the image and disk out of its top-level commands; its `%pre` writes them to `/tmp/target.ks`, which the kickstart then includes. Anaconda resolves `%include` after `%pre` runs.
+
+`%pre` reads three optional kernel arguments. Each one falls back on its own, so passing one never changes another:
+
+| Argument | Without it | imgman passes |
+| --- | --- | --- |
+| `imgman.url` | The host's published image | `10.0.2.2:5000/<host>/workstation-<flavor>:test` |
+| `imgman.disk` | The host's system disk, a `/dev/disk/by-id/` path | `vda` |
+| `imgman.insecure-registry` | Every registry is reached over TLS | `10.0.2.2:5000` |
+
+`arg` matches an argument only at the start of the command line or after a space, so `foo-imgman.url=` never matches. Before writing the target, `%pre` checks that the system disk exists and stops the install if it does not, before `clearpart --all` wipes anything.
 
 ```text
-%pre --erroronfail
-url=$(sed -n 's/.*imgman\.url=\([^ ]*\).*/\1/p' /proc/cmdline)
-if [ -n "$url" ]; then
-    disk=$(sed -n 's/.*imgman\.disk=\([^ ]*\).*/\1/p' /proc/cmdline)
+%pre --erroronfail --log=/tmp/pre.log
+# Prints the value of kernel argument $1, a sed pattern, or nothing.
+arg() {
+    sed -n "s/.*\(^\| \)$1=\([^ ]*\).*/\2/p" /proc/cmdline
+}
+url=$(arg 'imgman\.url')
+url=${url:-ghcr.io/seantwie03/workstation-kde:placeholder}
+disk=$(arg 'imgman\.disk')
+disk=${disk:-disk/by-id/placeholder}
+insecure=$(arg 'imgman\.insecure-registry')
+if [ -n "$insecure" ]; then
     mkdir -p /etc/containers/registries.conf.d
-    printf '[[registry]]\nlocation = "%s"\ninsecure = true\n' "${url%%/*}" \
+    printf '[[registry]]\nlocation = "%s"\ninsecure = true\n' "$insecure" \
         >/etc/containers/registries.conf.d/50-imgman.conf
-else
-    url=ghcr.io/seantwie03/workstation-kde-nvidia:stable
-    disk=disk/by-id/nvme-EXAMPLE
+fi
+# clearpart wipes this disk, so stop before Anaconda touches any disk if it
+# does not exist.
+if [ ! -b "/dev/$disk" ]; then
+    echo "system disk /dev/$disk does not exist" >&2
+    exit 1
 fi
 cat >/tmp/target.ks <<EOF
 ostreecontainer --url=$url --no-signature-verification
@@ -472,16 +492,26 @@ EOF
 %include /tmp/target.ks
 ```
 
-- **Hardware:** booted with `inst.ks=https://...` or from a USB stick, with no `imgman.*` arguments, so `%pre` uses the hardware values written in the file.
-- **VM:** `machine init` passes `imgman.url` and `imgman.disk`. `--flavor` changes only `imgman.url`.
+- **Hardware:** booted with `inst.ks=https://...` or from a USB stick, with no `imgman.*` arguments, so `%pre` uses the hardware values written in the file. Typing `imgman.url=...` at the boot prompt installs another tag or digest onto the same disk, still over TLS.
+- **VM:** `machine init` passes all three arguments. `--flavor` changes only `imgman.url`.
 - The kickstart names the system disk only in `ignoredisk`. `clearpart --all` and `part` lines without `--ondisk` then apply to that one disk, so every other disk, such as desktop22's games SSD, is left alone in both targets.
 - `ksvalidator` cannot see the included commands, so imgman's unit tests validate each kickstart with both targets' commands filled in.
 
+Every workstation kickstart's `%post` also undoes three things Anaconda does that do not suit a bootc host. Without them, a fresh install is degraded or stops in a setup wizard, and `test image` fails:
+
+- **Removes the `/` line from `/etc/fstab`.** bootc mounts the composefs root from the kernel command line. Anaconda's `/` entry makes `systemd-remount-fs.service` fail, because the overlay root rejects btrfs remount options.
+- **Removes `/etc/systemd/system/default.target`.** Anaconda points it at `multi-user.target` after a text-mode install, overriding the image's `graphical.target`.
+- **Creates `/etc/plasma-setup-done`.** The kickstart creates the user, so KDE's first-boot wizard (`plasma-setup`) must not run in place of the login screen.
+
+The same `%post` creates the nested subvolumes that home snapshots exclude (`~/.cache`, `~/.local/share/containers`, and `~/Downloads`) with `btrfs subvolume create`, sets their owners and modes, and runs `restorecon -R` on the home directory, so each gets its SELinux label.
+
+Each kickstart also sets `bootloader --append="rootflags=subvol=root,compress=zstd:1"`. btrfs takes `compress` from the filesystem's first mount, which on a bootc host is the initramfs mounting root from the kernel command line, so the `compress=zstd:1` Anaconda writes into fstab never applies. The initramfs combines every `rootflags=` on the kernel command line, so the appended one adds `compress` whether it lands before or after Anaconda's own `rootflags=subvol=root`.
+
 ### Graphical Display & Viewer Architecture
-- **Virtual Display by Default:** Desktop images run Wayland compositors (KWin for KDE Plasma, Niri) and display managers (SDDM). Both `machine run` and `test` commands configure virtual graphics hardware (`-device virtio-vga`) and serve the display over SPICE on a Unix socket (`-spice unix=on,addr=<run dir>/spice.sock,disable-ticketing=on`) by default.
+- **Virtual Display by Default:** Desktop images run Wayland compositors (KWin for KDE Plasma, Niri) and display managers (Plasma Login Manager on Kinoite). Checks use the generic `display-manager.service` alias, so they hold whichever display manager an image ships. Both `machine run` and `test` commands configure virtual graphics hardware (`-device virtio-vga`) and serve the display over SPICE on a Unix socket (`-spice unix=on,addr=<run dir>/spice.sock,disable-ticketing=on`) by default.
 - **Explicit Viewer (`imgman machine gui`):** To avoid unwanted popups and keep the terminal focused during test runs, `remote-viewer` is **not** launched automatically. When graphical inspection is needed, running `imgman machine gui [HOST]` launches `remote-viewer spice+unix://<run dir>/spice.sock`.
 - **Local Socket, No Ports:** Each VM's socket lives in its host's `run/` directory, so `imgman machine run --all` runs several GUI sessions at once with nothing to allocate. Only your user can reach the socket, through the `run/` directory's permissions, so SPICE needs no password.
-- **Guest Integration:** With `spice-vdagent` running in the guest, SPICE shares the clipboard and resizes the guest display to the viewer window. The prototype checks whether the image ships it.
+- **Guest Integration:** Kinoite ships `spice-vdagent`. QEMU adds its channel with `-device virtio-serial -chardev spicevmc,id=vdagent,name=vdagent -device virtserialport,chardev=vdagent,name=com.redhat.spice.0`, so text copied on the host pastes into the guest. Copying out of the guest does not work in a Wayland session: `spice-vdagent` reaches the clipboard only through XWayland, and Wayland lets only the focused app read it, so the agent never sees what native Wayland apps copy. Resizing the viewer window resizes the guest display in KDE Plasma.
 - **Headless Opt-Out (`--no-gui`):** When `--no-gui` is passed, QEMU is launched with `-display none` and no SPICE socket is opened, conserving host resources. The `virtio-vga` device stays, so the guest still reaches `graphical.target` with an active display manager, and `test image` asserts the same boot with or without `--no-gui`.
 
 ### Requirements
@@ -496,8 +526,8 @@ Before doing any work, imgman checks what the command needs, lists everything mi
 | Host | `rsync`, `ssh`, and an ssh configuration that sends `vsock/` hosts through `systemd-ssh-proxy` | Vsock SSH and the `test playbook` sync |
 | Host | Read and write access to `/dev/kvm` and `/dev/vhost-vsock` | KVM and vsock |
 | Host | The Fedora netinst ISO | `machine init` (see "Installer ISO") |
-| Image | `rsync` | Receiving the `test playbook` sync |
-| Image | `spice-vdagent` (optional) | Clipboard sharing and display resizing |
+| Image | `rsync` (Kinoite ships it) | Receiving the `test playbook` sync |
+| Image | `spice-vdagent` (Kinoite ships it) | Pasting host text into the guest, and display resizing |
 
 Workstations that run imgman are bootc hosts, so the host packages come from the workstation image, not a runtime role. Image packages missing from the base image are added to the image's build scripts.
 
@@ -537,6 +567,8 @@ To allow multiple hosts to build, run, and be inspected simultaneously without f
 ```
 
 The registry is shared because one `homelab-image-registry` container serves every host. Repositories are named per host and flavor (`desktop22/workstation-kde-nvidia`), so hosts never collide on tags.
+
+When imgman creates `~/.cache/homelab-images`, it sets `chattr +C` on it before writing anything. New files and directories inherit the attribute, so the qcow2 disks, overlays, and registry storage skip btrfs copy-on-write and compression, which fragment large files rewritten in place. The attribute applies only to files created after it is set, so imgman sets it on the empty directory. Files with `+C` also lose btrfs data checksums, which these disposable files do not need. The directory is already under `~/.cache`, a subvolume that home snapshots exclude. On a filesystem other than btrfs, `chattr +C` fails, and imgman continues without it.
 
 ### Argument Parsing Structure
 Implemented using nested `argparse` subparsers:
@@ -628,7 +660,7 @@ Output is written for a person at a terminal. imgman has no machine-readable out
 - An interrupted install never leaves an `.inputs` file, so its disk is stale and the next command that needs it reinstalls it.
 
 ### Resources
-- Each VM gets the `memory` and `cpus` from its host's table in `hosts.toml`, defaulting to `8G` and `4`.
+- Each VM gets the `memory` and `cpus` from its host's table in `hosts.toml`, defaulting to `6G` and `4`.
 - imgman warns, without failing, when less than 25 GB is free under `~/.cache/homelab-images`.
 - GitHub's standard Linux runners have 16 GB of memory, so CI runs hosts one at a time.
 
