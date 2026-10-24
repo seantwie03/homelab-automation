@@ -329,16 +329,21 @@ imgman/
 ├── README.md             # Using imgman, its prerequisites, and changing it
 ├── src/imgman/
 │   ├── __init__.py
-│   ├── cli.py            # argparse tree and main()
-│   ├── vm.py             # QEMU, vsock SSH, and systemd credentials
-│   ├── install.py        # Installer ISO, initrd injection, and machine init
-│   └── checks.py         # test image and test upgrade checks
+│   ├── cli.py            # argparse tree, resolving hosts and flavors, and main()
+│   ├── commands.py       # One frozen dataclass per command, the Command union, and dispatch
+│   ├── checkout.py       # The checkout's paths and the cache directory
+│   ├── hosts.py          # hosts.toml, parsed into typed host configs
+│   ├── prerequisites.py  # What each command needs from the machine
+│   ├── lock.py           # The per-host lock
+│   ├── process.py        # run(), the one way to run external commands
+│   ├── output.py         # Terminal output
+│   └── errors.py         # Exit codes and the errors that map to them
 └── tests/
 ```
 
-The module split is a starting point; split or merge modules as the code grows.
+Modules still to come include QEMU, vsock SSH, and systemd credentials; the installer ISO, initrd injection, and `machine init`; and the `test image` checks. Split or merge modules as the code grows.
 
-- `pyproject.toml` declares `dependencies = []`, `requires-python = ">=3.14"`, the entry point `imgman = "imgman.cli:main"`, and the `dev` dependency group (see "Toolchain"). It holds the ruff and pyrefly settings, so imgman needs no separate `ruff.toml` or type checker configuration, and pyrefly resolves imports between modules and tests without extra search paths.
+- `pyproject.toml` declares `dependencies = []`, `requires-python = ">=3.14"`, the entry point `imgman = "imgman.cli:main"`, and the `dev` dependency group (see "Toolchain"). It holds the ruff, pyrefly, and pytest settings, so imgman needs no separate `ruff.toml` or type checker configuration. pyrefly's `search-path` adds the project directory, so the tests can import their shared fixtures as `tests.conftest`.
 - Install it from the repository root with `uv tool install --editable imgman`, which puts `imgman` on `PATH` in `~/.local/bin`. Because the install is editable, changes to the source take effect without reinstalling.
 - imgman finds the repository from its own location, the parent of `imgman/`. From there it reads the Containerfiles, `hosts.toml`, and kickstarts under `images/`, and `test playbook` syncs that checkout. This works only with an editable install, so imgman exits with an error naming the expected checkout when `images/` is not beside it.
 - What imgman reads stays in `images/`: the Containerfiles, `scripts/`, `hosts.toml`, and `kickstart/`.
@@ -624,7 +629,7 @@ Model the domain so that illegal states cannot be represented, and let the type 
 
 ### Tests
 - **pytest:** plain `assert`; `@pytest.mark.parametrize` for table-driven cases such as argument parsing, staleness, `hosts.toml` validation, and kickstart targets; `tmp_path` for files.
-- **Isolated:** every external command is mocked. No test starts a VM, needs the network, or touches `~/.cache/homelab-images`. The whole suite runs in under 5 seconds.
+- **Isolated:** every external command is mocked. No test starts a VM, needs the network, or touches `~/.cache/homelab-images`. The whole suite runs in under 5 seconds. The one exception is the tests of `run()` itself, which run `sh` and `cat`.
 - **Coverage:** every new behavior gets a test. One test loads the real `hosts.toml`, and one validates every kickstart with `ksvalidator` for both its hardware and VM targets.
 - **VM behavior:** imgman's own `test` commands exercise real VMs. Unit tests never stand in for them.
 

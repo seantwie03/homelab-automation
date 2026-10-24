@@ -1,0 +1,44 @@
+[project]
+name = "imgman"
+version = "0.1.0"
+description = "Builds this repository's bootc images and tests them in VMs installed with its kickstarts."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+imgman = "imgman.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12,<0.13"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pykickstart>=3.78",
+    "pyrefly>=1.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.17.2",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# Defaults plus import sorting (I), modern syntax (UP), likely bugs (B),
+# simplifications (SIM), and required annotations (ANN), which also bans
+# explicit Any (ANN401). pyrefly checks the annotations themselves.
+extend-select = ["I", "UP", "B", "SIM", "ANN"]
+
+[tool.pyrefly]
+project-includes = ["src", "tests"]
+# The tests import their shared fixtures as tests.conftest.
+search-path = [".", "src"]
+# Adds rejecting implicit Any, strict callable subtyping, required @override,
+# and unused suppressions to the default checks.
+preset = "strict"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config"]
+xfail_strict = true

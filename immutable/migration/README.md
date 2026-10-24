@@ -207,6 +207,29 @@ kickstart; `vm_test.py`, `vm_test_tests.py`, and `vm-test.sh` are deleted; and
   with download and placement instructions. `machine init` boots the ISO's
   kernel and initrd directly with the kickstart injected into the initrd, as
   `virt-install --initrd-inject` does. `test playbook` follows in Phase 3.
+  Build it in steps, each passing the four checks in `immutable/imgman/README.md`:
+  - [x] Skeleton: `pyproject.toml` and `uv.lock`, the argument parser with
+    usage errors exiting 1, `hosts.toml` parsing, exit codes, prerequisite
+    checks, the per-host lock, and their tests. Every command parses and
+    exits 3 with "not implemented yet".
+  - [ ] `image build`.
+  - [ ] `machine init`, porting `immutable/migration/imgman-prototype/install.sh`.
+    Also:
+    - Wait until the registry answers on `/v2/` before pushing. The
+      prototype's first push after starting the container hit "connection
+      reset".
+    - Create `~/.cache/homelab-images` with `chattr +C` (see "Filesystem
+      Layout per Host" in `imgman-plan.md`).
+    - Add the installer ISO to the prerequisite check (see "Installer ISO").
+    - Make `%pre` errors reach `console.log`. `%pre` writes them to
+      `/tmp/pre.log` in the installer, and the console shows only Anaconda's
+      `ScriptError` traceback, so echo the message to `/dev/console` too in
+      each kickstart.
+    - Take each host's lock while it installs.
+  - [ ] `machine run`, `ssh`, `gui`, and `rm`, porting the prototype's
+    `boot.sh` and `vm.sh`.
+  - [ ] `test image`.
+  - [ ] `system prune`.
 - [ ] Port `vm_test.py`'s layout checks to `imgman` and its unit tests to
   pytest, then delete `vm_test.py`, `vm_test_tests.py`, `vm-test.sh`, and
   `immutable/images/ruff.toml` and `ty.toml`, whose settings move to
