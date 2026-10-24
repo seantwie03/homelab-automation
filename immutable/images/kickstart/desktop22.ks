@@ -69,7 +69,9 @@ chmod 0700 "$home/.local" "$home/.local/share" "$home/.cache" "$home/.local/shar
 chmod 0755 "$home/Downloads"
 restorecon -R "$home"
 # bootc mounts / from the kernel command line. Anaconda's / entry makes
-# systemd-remount-fs fail on the composefs root.
+# systemd-remount-fs fail on the composefs root. bootc's guidance is to leave
+# / out of fstab and put its options in rootflags:
+# https://github.com/bootc-dev/bootc/issues/971
 sed -i '\|^UUID=[^ ]* / btrfs |d' /etc/fstab
 # Anaconda points default.target at multi-user.target after a text install.
 # Remove the link so the image's default applies.

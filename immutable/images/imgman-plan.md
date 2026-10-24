@@ -496,10 +496,11 @@ EOF
 - **VM:** `machine init` passes all three arguments. `--flavor` changes only `imgman.url`.
 - The kickstart names the system disk only in `ignoredisk`. `clearpart --all` and `part` lines without `--ondisk` then apply to that one disk, so every other disk, such as desktop22's games SSD, is left alone in both targets.
 - `ksvalidator` cannot see the included commands, so imgman's unit tests validate each kickstart with both targets' commands filled in.
+- The kickstarts use `ostreecontainer`, not Anaconda's newer `bootc` command (Fedora 44), which installs with `bootc install to-filesystem` and can track a different tag than it installs from (`--target-imgref`). In Fedora 44, `bootc` rejects every user-specified mount point, including `/boot/efi`, so it cannot install these UEFI hosts or their `/var` and `/var/home` subvolumes (Red Hat issue RHEL-135114). `ostreecontainer` is not deprecated. Revisit `bootc` once it accepts user-specified mount points.
 
 Every workstation kickstart's `%post` also undoes three things Anaconda does that do not suit a bootc host. Without them, a fresh install is degraded or stops in a setup wizard, and `test image` fails:
 
-- **Removes the `/` line from `/etc/fstab`.** bootc mounts the composefs root from the kernel command line. Anaconda's `/` entry makes `systemd-remount-fs.service` fail, because the overlay root rejects btrfs remount options.
+- **Removes the `/` line from `/etc/fstab`.** bootc mounts the composefs root from the kernel command line. Anaconda's `/` entry makes `systemd-remount-fs.service` fail, because the overlay root rejects btrfs remount options. This affects every Fedora Atomic install since composefs became the default in Fedora 42 ([Atomic Desktops SIG issue 72](https://gitlab.com/fedora/ostree/sig/-/issues/72)), and bootc's guidance is to leave `/` out of fstab and set its options in `rootflags` ([bootc issue 971](https://github.com/bootc-dev/bootc/issues/971)), which is what these kickstarts do.
 - **Removes `/etc/systemd/system/default.target`.** Anaconda points it at `multi-user.target` after a text-mode install, overriding the image's `graphical.target`.
 - **Creates `/etc/plasma-setup-done`.** The kickstart creates the user, so KDE's first-boot wizard (`plasma-setup`) must not run in place of the login screen.
 
