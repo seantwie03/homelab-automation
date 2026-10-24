@@ -9,6 +9,9 @@ collections/*
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Python bytecode caches
+__pycache__/
+
 # Ansible
 .ansible/
 

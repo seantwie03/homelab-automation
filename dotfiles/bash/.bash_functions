@@ -51,24 +51,24 @@ em() {
 
 # Open arguments in a Graphical Emacs starting a new frame, if needed.
 emg() {
-     if is_wsl ; then
+    if is_wsl ; then
         local -a args=() a
         for a in "$@"; do
             case "$a" in
-                 -*) args+=("$a") ;;
-                 *)  args+=("$(wslpath -w "$a")") ;;
+                -*) args+=("$a") ;;
+                *)  args+=("$(wslpath -w "$a")") ;;
             esac
         done
         if [ "${#args[@]}" -eq 0 ]; then
-           # Focus Emacs, will start a new frame, if needed.
-           emacsclientw.exe -a runemacs -e "(select-frame-set-input-focus (selected-frame))" >/dev/null
+            # Focus Emacs, will start a new frame, if needed.
+            emacsclientw.exe -a runemacs -e "(select-frame-set-input-focus (selected-frame))" >/dev/null
         else
             # Open arguments in Emacs. Prefers existing frame but will spawn a new one if needed
             emacsclientw.exe -n -a runemacs -- "${args[@]}"
         fi
-     else
+    else
         if [ "$#" -eq 0 ]; then
-           # No file: raise the existing frame, or start Emacs if it is not running
+            # No file: raise the existing frame, or start Emacs if it is not running
             emacsclient -e "(select-frame-set-input-focus (selected-frame))" >/dev/null 2>&1 || { setsid emacs >/dev/null 2>&1 & }
         else
             # Open arguments in Emacs. Prefers existing frame but will spawn a new one, if needed.
