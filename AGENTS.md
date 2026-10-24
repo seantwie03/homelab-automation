@@ -43,6 +43,11 @@ h test
 
 # Run local testing with an explicit playbook
 h test desktop25.yml
+
+# Revert libvirt VMs to their newest snapshot and start them; discards changes
+# made since the snapshot (see roles/runtimes/libvirt/README.md)
+start-latest-snapshot --dry-run DOMAIN [DOMAIN ...]
+start-latest-snapshot DOMAIN [DOMAIN ...]
 ```
 
 No build or test framework exists; this is declarative Ansible configuration.

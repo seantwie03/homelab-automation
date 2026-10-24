@@ -45,3 +45,17 @@
   ansible.builtin.package:
     name: virtio-win
     state: present
+
+- name: python3-libvirt is installed for start-latest-snapshot
+  ansible.builtin.package:
+    name: python3-libvirt
+    state: present
+
+- name: start-latest-snapshot script is deployed
+  ansible.builtin.copy:
+    src: start-latest-snapshot.py
+    dest: /usr/local/bin/start-latest-snapshot
+    mode: 0755
+    owner: root
+    group: root
+

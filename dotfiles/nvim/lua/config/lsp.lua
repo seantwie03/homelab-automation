@@ -96,6 +96,14 @@ desc = 'Type definition',
             vim.lsp.completion.get()
         end)
     end
+
+    -- Replaces Neovim's default i_CTRL-S, which is mapped to save.
+    if client:supports_method('textDocument/signatureHelp') then
+        vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, {
+            buffer = ev.buf,
+            desc = 'Signature help',
+        })
+    end
 end,
 })
 

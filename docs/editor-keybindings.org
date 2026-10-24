@@ -24,6 +24,7 @@
 | C-Insert      | visual  | builtin        | clipboard-kill-ring-save              | builtin       | "+y                                          |
 | C-j           | normal  | evil           | evil-window-down                      | builtin       | <C-w><C-j>                                   |
 | C-k           | normal  | evil           | evil-window-up                        | builtin       | <C-w><C-k>                                   |
+| C-k           | insert  | builtin        | eldoc                                 | builtin       | vim.lsp.buf.signature_help                   |
 | C-l           | normal  | evil           | evil-window-right                     | builtin       | <C-w><C-l>                                   |
 | C-r           | normal  | evil           | evil-redo                             | builtin       | <C-r>                                        |
 | C-s           | normal  | builtin        | save-buffer                           | builtin       | <Esc>:update                                 |

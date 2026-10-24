@@ -1878,7 +1878,8 @@ unsupported because the exported text must be available immediately."
   (keymap-set evil-normal-state-map "g r r" #'xref-find-references)
   (keymap-set evil-normal-state-map "g r t" #'eglot-find-typeDefinition)
   (keymap-set evil-normal-state-map "g O" #'consult-imenu)
-  (keymap-set evil-normal-state-map "K" #'eldoc-doc-buffer))
+  (keymap-set evil-normal-state-map "K" #'eldoc-doc-buffer)
+  (keymap-set evil-insert-state-map "C-k" #'eldoc))
 
 ;;;; Leader binding
 (with-eval-after-load 'evil

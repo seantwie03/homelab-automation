@@ -558,8 +558,9 @@ Includes roles pulled in as dependencies.
 - [ ] `ai_health_monitor`: system user to the image; sudoers, logrotate,
   scripts, and units stay.
 - [ ] `docker`, `podman`: packages to the image; enablement and groups stay.
-- [ ] `libvirt`: packages to the image, including QEMU, OVMF, and the SPICE
-  support that `imgman` needs; enablement, groups, and `/var/lib/libvirt`
+- [ ] `libvirt`: packages to the image, including QEMU, OVMF, the SPICE
+  support that `imgman` needs, and `python3-libvirt` for
+  `start-latest-snapshot`; enablement, groups, and `/var/lib/libvirt`
   stay. Optionally, set `chattr +C` on `/var/lib/libvirt/images` while it is
   still empty, so VM disks skip copy-on-write and compression. desktop22
   keeps `/var/lib/libvirt` in its own subvolume only to exclude it from root
