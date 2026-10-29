@@ -1,0 +1,9 @@
+---
+- name: pyroclear is installed
+  community.general.cargo:
+    name: pyroclear
+    version: "{{ pyroclear_version }}"
+    locked: true
+    state: present
+    path: /home/{{ user }} # cargo automatically appends /bin
+

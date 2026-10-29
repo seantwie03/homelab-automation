@@ -77,5 +77,8 @@
 - name: yazi is installed
   ansible.builtin.include_tasks: yazi.yml
 
+- name: pyroclear is installed
+  ansible.builtin.include_tasks: pyroclear.yml
+
 # - name: install and configure presenterm
 #   ansible.builtin.include_tasks: presenterm.yml
