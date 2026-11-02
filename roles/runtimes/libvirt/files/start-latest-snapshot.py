@@ -3,11 +3,13 @@
 
 Changes made since that snapshot are discarded. A snapshot taken while the
 domain was running resumes where it left off; one taken while it was shut off
-boots fresh.
+boots fresh. A resumed domain's clock is set to the host's through the QEMU
+guest agent, since it would otherwise resume at the snapshot's time.
 """
 
 import argparse
 import sys
+import time
 import xml.etree.ElementTree as ET
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -19,6 +21,8 @@ import libvirt
 
 PROG = Path(sys.argv[0]).name
 URI = "qemu:///system"
+CLOCK_SYNC_ATTEMPTS = 10
+CLOCK_SYNC_INTERVAL = 1.0
 
 EPILOG = """\
 The last line of output summarizes which domains succeeded and failed.
@@ -51,10 +55,11 @@ class Snapshot:
     handle: libvirt.virDomainSnapshot
     name: str
     created: datetime
+    running: bool
 
     @classmethod
     def load(cls, handle: libvirt.virDomainSnapshot) -> Self:
-        """Reads the creation time from the snapshot XML."""
+        """Reads the creation time and domain state from the snapshot XML."""
         root = ET.fromstring(text=handle.getXMLDesc())
         try:
             created = int(root.findtext(path="creationTime", default=""))
@@ -64,7 +69,31 @@ class Snapshot:
             handle=handle,
             name=handle.getName(),
             created=datetime.fromtimestamp(timestamp=created).astimezone(),
+            running=root.findtext(path="state") == "running",
         )
+
+
+def sync_clock(domain: libvirt.virDomain) -> None:
+    """Sets DOMAIN's clock to the host's through the QEMU guest agent.
+
+    A domain resumed from a snapshot keeps the snapshot's time, and chronyd
+    steps the clock only in its first updates after boot, so it would only
+    slew. The agent can take a moment to answer after the resume, so an
+    unresponsive agent is retried. A failure warns rather than raises, since
+    the revert itself succeeded.
+    """
+    for attempt in range(1, CLOCK_SYNC_ATTEMPTS + 1):
+        now = time.time_ns()
+        try:
+            domain.setTime(time={"seconds": now // 1_000_000_000, "nseconds": now % 1_000_000_000})
+        except libvirt.libvirtError as error:
+            if error.get_error_code() != libvirt.VIR_ERR_AGENT_UNRESPONSIVE or attempt == CLOCK_SYNC_ATTEMPTS:
+                warn(message=f"Could not set {domain.name()}'s clock: {error}")
+                return
+            time.sleep(CLOCK_SYNC_INTERVAL)
+        else:
+            log(message=f"Set {domain.name()}'s clock to the host's")
+            return
 
 
 def restore_latest_snapshot(domain: libvirt.virDomain, *, dry_run: bool) -> None:
@@ -81,6 +110,8 @@ def restore_latest_snapshot(domain: libvirt.virDomain, *, dry_run: bool) -> None
     # Changes made since this snapshot will be discarded.
     log(message=f"Restoring {domain.name()} to snapshot {latest.name} and starting it")
     domain.revertToSnapshot(snap=latest.handle, flags=libvirt.VIR_DOMAIN_SNAPSHOT_REVERT_RUNNING)
+    if latest.running:
+        sync_clock(domain=domain)
 
 
 def restore_all(conn: libvirt.virConnect, names: Sequence[str], *, dry_run: bool) -> int:
