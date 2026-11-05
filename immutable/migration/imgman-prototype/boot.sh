@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 # Boots the prototype disk through a throwaway overlay, headless but with
 # virtio-vga, with Secure Boot enforced and the credentials imgman will pass,
-# including the throwaway LUKS passphrase. Usage: boot.sh [fresh|installer]
+# including the throwaway LUKS passphrase. Usage: [DISK=PATH] boot.sh [fresh|installer]
 set -euo pipefail
 D=~/.cache/homelab-images/prototype
 R=$D/run
 vars=${1:-fresh}
 rm -rf "$R" && mkdir -m 0700 "$R"
 ssh-keygen -q -t ed25519 -N '' -C proto -f "$R/id_ed25519"
-qemu-img create -q -f qcow2 -b "$D/disk.qcow2" -F qcow2 "$R/overlay.qcow2"
-qemu-img create -q -f qcow2 -b "$D/data.qcow2" -F qcow2 "$R/data-overlay.qcow2"
+qemu-img create -q -f qcow2 -b "${DISK:-$D/disk.qcow2}" -F qcow2 "$R/overlay.qcow2"
+data=()
+if [ -z "${DISK:-}" ]; then
+    qemu-img create -q -f qcow2 -b "$D/data.qcow2" -F qcow2 "$R/data-overlay.qcow2"
+    data=(-drive "if=virtio,format=qcow2,file=$R/data-overlay.qcow2")
+fi
 if [ "$vars" = fresh ]; then
     cp /usr/share/edk2/ovmf/OVMF_VARS.secboot.fd "$R/OVMF_VARS.fd"
 else
@@ -27,7 +31,7 @@ qemu-system-x86_64 \
     -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd \
     -drive if=pflash,format=raw,file="$R/OVMF_VARS.fd" \
     -drive if=virtio,format=qcow2,file="$R/overlay.qcow2" \
-    -drive if=virtio,format=qcow2,file="$R/data-overlay.qcow2" \
+    "${data[@]}" \
     -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
     -device vhost-vsock-pci,guest-cid="$cid" \
     -device virtio-vga \

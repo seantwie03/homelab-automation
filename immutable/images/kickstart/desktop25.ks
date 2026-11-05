@@ -34,7 +34,8 @@ fi
 # clearpart wipes this disk, so stop before Anaconda touches any disk if it
 # does not exist.
 if [ ! -b "/dev/$disk" ]; then
-    echo "system disk /dev/$disk does not exist" >&2
+    # /tmp/pre.log gets stderr; the console shows the reason too.
+    echo "system disk /dev/$disk does not exist" | tee /dev/console >&2
     exit 1
 fi
 cat >/tmp/target.ks <<EOF

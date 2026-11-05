@@ -8,6 +8,7 @@ from collections.abc import Callable, Sequence
 from typing import NoReturn, override
 
 from imgman import commands, output, prerequisites
+from imgman.cache import Cache
 from imgman.checkout import Checkout, default_cache_dir, find_checkout
 from imgman.commands import (
     Command,
@@ -258,10 +259,10 @@ def short_hostname() -> str:
 
 
 def warn_if_low_space(context: Context) -> None:
-    free = prerequisites.free_gb(context.cache_dir)
+    free = prerequisites.free_gb(context.cache.root)
     if free < prerequisites.LOW_SPACE_GB:
         output.warn(
-            f"only {free} GB free under {prerequisites.existing_ancestor(context.cache_dir)}; "
+            f"only {free} GB free under {prerequisites.existing_ancestor(context.cache.root)}; "
             "'imgman system prune --all --disks' removes disks of hosts with no VM running"
         )
 
@@ -288,7 +289,7 @@ def run_cli(
         check(needs)
         context = Context(
             checkout=checkout,
-            cache_dir=default_cache_dir(),
+            cache=Cache(root=default_cache_dir()),
             verbose=_flag(namespace, "verbose"),
             command_line=shlex.join([output.PROG, *argv]),
         )

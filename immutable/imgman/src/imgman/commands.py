@@ -1,10 +1,10 @@
 """The commands imgman runs, each a typed value parsed from the command line."""
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import ClassVar, assert_never
 
-from imgman import images, prerequisites
+from imgman import images, installer, prerequisites
+from imgman.cache import Cache
 from imgman.checkout import Checkout
 from imgman.errors import StepFailed
 from imgman.hosts import Flavor, HostConfig, HostName
@@ -93,7 +93,7 @@ class Context:
     """What every command runs with, besides its own arguments."""
 
     checkout: Checkout
-    cache_dir: Path
+    cache: Cache
     verbose: bool
     # The command line as typed, recorded in host locks.
     command_line: str
@@ -127,15 +127,17 @@ def execute(command: Command, context: Context) -> None:
         case ImageBuild():
             for flavor in command.flavors:
                 images.build(flavor, context.checkout, verbose=context.verbose)
-        case (
-            MachineInit()
-            | MachineRun()
-            | MachineGui()
-            | MachineSsh()
-            | MachineRm()
-            | TestImage()
-            | SystemPrune()
-        ):
+        case MachineInit():
+            for target in command.targets:
+                installer.install(
+                    host=target.host,
+                    config=target.config,
+                    flavor=target.flavor,
+                    cache=context.cache,
+                    checkout=context.checkout,
+                    command_line=context.command_line,
+                )
+        case MachineRun() | MachineGui() | MachineSsh() | MachineRm() | TestImage() | SystemPrune():
             raise StepFailed(f"{command.name} is not implemented yet")
         case _:
             assert_never(command)

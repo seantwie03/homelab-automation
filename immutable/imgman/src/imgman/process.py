@@ -65,3 +65,32 @@ class Runner(Protocol):
         capture: bool = False,
         check: bool = True,
     ) -> Result: ...
+
+
+class Process(Protocol):
+    """A command running in the background."""
+
+    def poll(self) -> int | None: ...
+
+    def kill(self) -> None: ...
+
+    def wait(self) -> int: ...
+
+
+class Spawner(Protocol):
+    """Anything that starts commands as spawn() does. Tests pass a fake."""
+
+    def __call__(self, args: Sequence[str | Path]) -> Process: ...
+
+
+def spawn(args: Sequence[str | Path]) -> Process:
+    """Starts a command without a shell and returns without waiting for it.
+
+    For long-running commands, such as an install, that imgman watches while
+    they run. Its output goes to the terminal; it reads nothing.
+    """
+    argv = [str(arg) for arg in args]
+    try:
+        return subprocess.Popen(argv, stdin=subprocess.DEVNULL)
+    except FileNotFoundError as missing:
+        raise StepFailed(f"{argv[0]} is not installed") from missing

@@ -37,7 +37,7 @@ class Requirements:
 
 BUILD = Requirements(commands=("podman",), disk_space=True)
 INSTALL = Requirements(
-    commands=("podman", "qemu-system-x86_64", "qemu-img", "xorriso", "cpio"),
+    commands=("podman", "qemu-system-x86_64", "qemu-img", "xorriso"),
     files=(OVMF_CODE, OVMF_VARS),
     devices=(KVM,),
     disk_space=True,

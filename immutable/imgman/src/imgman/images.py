@@ -1,9 +1,14 @@
 """Building the images in images/."""
 
+from typing import NewType
+
 from imgman.checkout import Checkout
 from imgman.hosts import Flavor
 from imgman.output import log, step
 from imgman.process import Runner, run
+
+# Podman's content-derived image ID: a rebuild with any change gets a new one.
+ImageId = NewType("ImageId", str)
 
 
 def image_ref(flavor: Flavor) -> str:
@@ -23,3 +28,13 @@ def build(flavor: Flavor, checkout: Checkout, *, verbose: bool, runner: Runner =
             ["podman", "build", "-f", containerfile, "-t", image_ref(flavor), checkout.images],
             capture=not verbose,
         )
+
+
+def image_id(flavor: Flavor, *, runner: Runner = run) -> ImageId | None:
+    """Returns the ID of FLAVOR's built image, or None if it has not been built."""
+    result = runner(
+        ["podman", "image", "inspect", "--format", "{{.Id}}", image_ref(flavor)],
+        capture=True,
+        check=False,
+    )
+    return ImageId(result.stdout.strip()) if result.returncode == 0 else None

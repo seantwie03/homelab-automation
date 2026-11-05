@@ -176,7 +176,7 @@ def test_runs_the_resolved_command(
     assert command == MachineRm(hosts=(D25,))
     assert context.verbose
     assert context.command_line == "imgman -v machine rm desktop25"
-    assert context.cache_dir == tmp_path / "cache/homelab-images"
+    assert context.cache.root == tmp_path / "cache/homelab-images"
     assert checked == [Requirements()]
 
 

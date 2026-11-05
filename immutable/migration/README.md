@@ -255,20 +255,27 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
     checks, the per-host lock, and their tests. Every command parses and
     exits 3 with "not implemented yet".
   - [x] `image build`.
-  - [ ] `machine init`, porting `immutable/migration/imgman-prototype/install.sh`.
-    Also:
-    - Wait until the registry answers on `/v2/` before pushing. The
-      prototype's first push after starting the container hit "connection
-      reset".
-    - Create `~/.cache/homelab-images` with `chattr +C` (see "Filesystem
-      Layout per Host" in `imgman-plan.md`).
-    - Add the installer ISO to the prerequisite check (see "Installer ISO").
-    - Pass `imgman.luks-passphrase` with the other `imgman.*` arguments.
-    - Make `%pre` errors reach `console.log`. `%pre` writes them to
-      `/tmp/pre.log` in the installer, and the console shows only Anaconda's
-      `ScriptError` traceback, so echo the message to `/dev/console` too in
-      each kickstart.
-    - Take each host's lock while it installs.
+  - [x] `machine init`, porting `immutable/migration/imgman-prototype/install.sh`.
+    `imgman machine init x1carbon23` installs an encrypted disk in 7 minutes,
+    and the disk boots with Secure Boot enforced, unlocks from the credential,
+    and runs the digest its `.inputs` file records. Also done:
+    - It waits until the registry answers on `/v2/` before pushing.
+    - It creates `~/.cache/homelab-images` with `chattr +C`, but only when the
+      directory does not exist yet; an existing cache keeps copy-on-write
+      until `system prune --all --disks` empties it.
+    - It finds the installer ISO from the Containerfile's
+      `FEDORA_MAJOR_VERSION` before running anything, and explains how to get
+      a missing one.
+    - It passes `imgman.luks-passphrase` with the other `imgman.*` arguments.
+    - It writes the kickstart into the initrd itself, as a cpio archive, so
+      `cpio` is not a prerequisite.
+    - `%pre` echoes its errors to `/dev/console`, so they reach `console.log`.
+    - It detects a failed install by watching `console.log` for Anaconda's
+      error output (`ScriptError`, "An error occurred", a Python traceback)
+      and stops QEMU at once, with a 30-minute timeout as the backstop.
+      Anaconda's `%onerror` did not run after a `%pre` failure, so the
+      kickstarts have none.
+    - It takes the host's lock, and refuses while the host's VM is running.
   - [ ] `machine run`, `ssh`, `gui`, and `rm`, porting the prototype's
     `boot.sh` and `vm.sh`, with the Secure Boot firmware and the
     `cryptsetup.passphrase` credential.
