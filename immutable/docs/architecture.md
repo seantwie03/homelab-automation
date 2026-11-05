@@ -35,7 +35,7 @@ building, switching, upgrades, and rollback.
 
 ## Filesystem
 
-**Status:** decided for workstation images, where `images/vm_test.py` checks
+**Status:** decided for workstation images, where `imgman test image` checks
 the read-only, writable, and linked paths on every run. Proposed for the server
 image.
 

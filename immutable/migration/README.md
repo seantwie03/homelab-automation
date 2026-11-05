@@ -3,7 +3,7 @@
 Move every host from traditional Fedora to bootc images built from this
 repository, keeping ansible-pull for everything outside the image.
 
-**Current phase:** 2, imgman and the x1carbon23 kickstart.
+**Current phase:** 3, x1carbon23 install.
 
 This directory holds material that only matters during the migration and is
 deleted when it ends. Everything else under `immutable/` is the future
@@ -128,13 +128,13 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 `immutable/images/README.md`, `immutable/AGENTS.md`, and the
 `test-bootc-image` skill describe `imgman`.
 
-- [x] Finish the design in `immutable/images/imgman-plan.md`, working through
-  `immutable/images/imgman-plan-review.md`.
+- [x] Finish the design in [imgman-plan.md](imgman-plan.md), working through
+  a review of it, deleted once every item was resolved.
 - [x] Prototype the install by hand on desktop22, with
   `localhost/workstation-kde` and a throwaway kickstart, before writing
   `imgman`. Confirm each assumption the design depends on, and revisit the
-  design for any that fails. The scripts and kickstart are in
-  [imgman-prototype/](imgman-prototype/).
+  design for any that fails. Its scripts were removed once `imgman` replaced
+  them.
   - [x] Fedora 44's Anaconda (44.30) resolves `%include` of a file written in
     `%pre`, and installs with the `ostreecontainer` and `ignoredisk` commands
     it contains. The data disk stayed blank.
@@ -152,7 +152,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
     `cache_home_t`, and a file in it is absent from a snapshot of `home`.
   - [x] A fresh install reaches `running` with no failed units, but only
     after three `%post` fixes, now in "Kickstart Targets" in
-    `immutable/images/imgman-plan.md`: Anaconda's `/` line in `/etc/fstab`
+    [imgman-plan.md](imgman-plan.md): Anaconda's `/` line in `/etc/fstab`
     fails `systemd-remount-fs`, its `default.target` override selects
     `multi-user.target`, and without `/etc/plasma-setup-done` KDE's
     first-boot wizard takes the seat.
@@ -205,8 +205,8 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 - [x] `immutable/images/hosts.toml`, with `flavor` and, for desktop22,
   `data_disks`. Every workstation maps to `kde` until Phase 6 adds
   `kde-nvidia`.
-- [x] Prototype encryption and Secure Boot by hand, extending
-  [imgman-prototype/](imgman-prototype/), before `imgman` relies on them.
+- [x] Prototype encryption and Secure Boot by hand, extending the prototype's
+  scripts, before `imgman` relies on them.
   Every assumption held, with `x1carbon23.ks` itself:
   - [x] With `ostreecontainer`, Anaconda creates a LUKS2 container (aes-xts,
     argon2id) holding the btrfs volume from a `part btrfs.01 --fstype=btrfs
@@ -239,7 +239,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
   so Anaconda asks for one. x1carbon23 replaces x1carbon2018 in `hosts.toml`.
 - [x] `imgman` as a standard-library-only uv project in `immutable/imgman/`,
   installed with `uv tool install --editable` (see "Project Layout" in
-  `immutable/images/imgman-plan.md`) and following its "Non-Functional
+  [imgman-plan.md](imgman-plan.md)) and following its "Non-Functional
   Requirements & Code Style": ruff, pyrefly's strict preset, and pytest in a
   pinned `dev` group. Phase 2 needs `image build`, `machine init`, `run`,
   `gui`, `ssh`, and `rm`, and `test image`; `system prune` follows in
@@ -255,7 +255,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
     checks, the per-host lock, and their tests. Every command parses and
     exits 3 with "not implemented yet".
   - [x] `image build`.
-  - [x] `machine init`, porting `immutable/migration/imgman-prototype/install.sh`.
+  - [x] `machine init`, porting the prototype's `install.sh`.
     `imgman machine init x1carbon23` installs an encrypted disk in 7 minutes,
     and the disk boots with Secure Boot enforced, unlocks from the credential,
     and runs the digest its `.inputs` file records. Also done:
@@ -292,34 +292,35 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
     so the installer checks the disks the install itself saw with
     `qemu-img map`. `imgman test image --all` passes for desktop22,
     desktop25, and x1carbon23, installing the two missing disks, in 14 minutes.
-- [ ] Port `vm_test.py`'s layout checks to `imgman` and its unit tests to
-  pytest, then delete `vm_test.py`, `vm_test_tests.py`, `vm-test.sh`, and
-  `immutable/images/ruff.toml` and `ty.toml`, whose settings move to
-  `immutable/imgman/pyproject.toml`. Its synthetic upgrade and rollback are
-  not ported; `test upgrade` replaces them in Phase 7. Its
+- [x] Port `vm_test.py`'s layout checks to `imgman`, then delete
+  `vm_test.py`, `vm_test_tests.py`, `vm-test.sh`, and `immutable/images/`'s
+  `ruff.toml` and `ty.toml`, whose settings moved to
+  `immutable/imgman/pyproject.toml`. `test image` runs the layout checks;
+  `imgman`'s own tests replace `vm_test_tests.py`. Its synthetic upgrade and
+  rollback are not ported; `test upgrade` replaces them in Phase 7. Its
   `ansible-pull --version` and collection checks are not ported either: they
   restate the image's package install, and converging the playbook in the VM
   exercises both.
 - [x] Capability test: a file that `sean` writes under `~/.cache` is absent
   from a snapshot of the `home` subvolume. It is one of `test image`'s checks.
-- [ ] Once `imgman` works, write its durable docs and point the existing
-  ones at it, then delete `immutable/images/imgman-plan.md` and
-  `imgman-plan-review.md`:
+- [x] Durable docs for `imgman`, with the existing docs pointing at them:
   - `immutable/imgman/README.md`: installing and using `imgman`, its
-    prerequisites, the installer ISO, and "Changing imgman" (formatting,
-    linting, type checking, and unit tests), replacing the "Testing in a VM"
-    and "Changing the test harness" sections of `immutable/images/README.md`.
+    commands and checks, exit codes, prerequisites, the installer ISO, how it
+    works, and "Changing imgman", replacing the "Testing in a VM" and
+    "Changing the test harness" sections of `immutable/images/README.md`.
   - `immutable/images/README.md`: the file table lists `hosts.toml` and
-    `kickstart/` instead of `vm_test.py`, `ruff.toml`, and `ty.toml`;
-    "Changing an image" uses `imgman image build` and `imgman test image`;
-    the `COLLECTIONS` step goes.
-  - `immutable/AGENTS.md`: under Validation, after changing anything under
-    `immutable/imgman/`, follow "Changing imgman" in
-    `immutable/imgman/README.md`, replacing the `vm_test.py` rule.
+    `kickstart/`; "Changing an image" uses `imgman image build` and
+    `imgman test image`; a "Hosts and kickstarts" section covers the
+    kickstarts; the `COLLECTIONS` step is gone.
+  - `immutable/AGENTS.md`: after changing anything under `immutable/imgman/`,
+    follow "Changing imgman", replacing the `vm_test.py` rule.
   - `test-bootc-image` skill: its commands and description use `imgman`.
-    Its description drops the Ansible bootstrap and the upgrade and rollback
-    checks, which `imgman test image` no longer runs. Phase 7 adds
-    `imgman test upgrade` to the skill.
+    Phase 7 adds `imgman test upgrade` to it.
+  - [imgman-plan.md](imgman-plan.md) moved here from `immutable/images/`
+    instead of being deleted: it still holds the design for the commands
+    later phases add (`test playbook`, `test upgrade`, `image promote`,
+    `system prune`) and the code style. Delete it once they exist and
+    `immutable/imgman/README.md` covers them.
 
 ### Phase 3: x1carbon23 install
 
@@ -426,8 +427,8 @@ desktop22's kickstart, a second run reports no changes, and every role under
 - [ ] Container tests (tier 1) for fast role iteration.
 - [ ] Refactor the roles desktop22 adds to x1carbon23's.
 - [ ] `immutable/desktop22.yml`.
-- [ ] Add `imgman`'s host requirements (see "Requirements" in
-  `immutable/images/imgman-plan.md`) to the workstation image, so `imgman`
+- [ ] Add `imgman`'s host requirements (see "Prerequisites" in
+  `immutable/imgman/README.md`) to the workstation image, so `imgman`
   runs on desktop22 after its cutover.
 - [ ] `imgman system prune`.
 

@@ -18,7 +18,7 @@ in `immutable/migration/README.md` before starting migration work.
   skills: they live in the root `.agents/skills/`, because Codex discovers
   skills only under the directory it starts in.
 - Docs under `immutable/` give paths as they will be after the move to the
-  root, such as `images/vm_test.py`. Until then, prefix them with
+  root, such as `images/hosts.toml`. Until then, prefix them with
   `immutable/`.
 - Material that only matters during the migration goes in
   `immutable/migration/`. Nothing outside of this file and `immutable/migration`
@@ -66,14 +66,14 @@ assume a role installs the package at runtime.
 - After changing anything under `immutable/images/`, run the checks in
   "Changing an image" in `immutable/images/README.md`. Use the
   `test-bootc-image` skill for the VM test.
-- After changing `vm_test.py`, also follow "Changing the test harness" in the
-  same README.
+- After changing anything under `immutable/imgman/`, follow "Changing imgman"
+  in `immutable/imgman/README.md`.
 
 ## Documentation
 
 - Durable docs for bootc hosts go under `immutable/` at their final path, such
-  as `immutable/README.md`, `immutable/images/README.md`, and role README and
-  MONITORING files.
+  as `immutable/README.md`, `immutable/images/README.md`,
+  `immutable/imgman/README.md`, and role README and MONITORING files.
 - Write a durable doc in the present tense once the thing it describes exists.
   Until then, the design lives in `immutable/migration/README.md` and
   `immutable/docs/architecture.md`.

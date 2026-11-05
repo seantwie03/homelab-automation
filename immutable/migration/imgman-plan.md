@@ -1,5 +1,10 @@
 # imgman: Design & UX Plan
 
+The design of `imgman`. What exists is documented in
+[imgman/README.md](../imgman/README.md); this plan keeps the design for the
+commands later phases add (`image promote`, `test playbook`, `test upgrade`,
+`test all`, `system prune`) and the code style.
+
 `imgman` (Image Manager) is a CLI tool for building, testing, and managing bootable container (`bootc`) images and virtual machines. Its interface is directly modeled after Podman's command hierarchy and lifecycle semantics.
 
 ---

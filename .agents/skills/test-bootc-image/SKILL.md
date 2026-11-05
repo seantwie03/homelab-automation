@@ -1,71 +1,56 @@
 ---
 name: test-bootc-image
-description: Build this repository's bootc workstation image and test it in a VM installed from it, checking read-only /usr, writable /etc and /var, the Ansible bootstrap, and an upgrade followed by a rollback. Use before committing a change to a Containerfile or build script under immutable/images, or when checking how a bootc host behaves.
+description: Build this repository's bootc images and test them in VMs installed with each host's kickstart, using imgman. Checks Secure Boot, LUKS2 on hosts whose kickstart encrypts, read-only /usr, writable /etc and /var, the kickstart's btrfs layout, a clean boot, and that the VM can reach its update source. Use before committing a change to a Containerfile, build script, kickstart, or hosts.toml under immutable/images, or when checking how a bootc host behaves.
 ---
 
 # Test Bootc Image
 
-Use `immutable/images/vm_test.py` to build and test bootc images. It runs
-without root: rootless Podman builds the image, `bcvk` installs it to a VM
-disk, and QEMU boots the disk with KVM. Do not use `sudo`,
-`bootc-image-builder`, or `bootc switch` on the host.
+Use `imgman`, in `immutable/imgman/`, to build bootc images and test them. It
+runs without root: rootless Podman builds the image, Anaconda installs it to a
+VM disk with the host's kickstart, and QEMU boots the disk with KVM. Do not use
+`sudo`, `bootc-image-builder`, or `bootc switch` on this machine.
+
+Run imgman from the repository root through uv, which works whether or not it
+is installed:
+
+```sh
+uv run --project immutable/imgman imgman image build
+```
 
 While iterating on an image change, rebuild it, which also runs the lint:
 
 ```sh
-immutable/images/vm_test.py build
+uv run --project immutable/imgman imgman image build --all
 ```
 
-Before committing the change, run the whole cycle:
+Before committing the change, test every host:
 
 ```sh
-immutable/images/vm_test.py all
+uv run --project immutable/imgman imgman test image --all --rm --no-gui
 ```
 
-`all` builds `localhost/workstation-kde`, installs it to a disk under
-`~/.cache/homelab-images`, boots the disk through a throwaway overlay, and
-prints a `PASS` or `FAIL` line per check. It exits nonzero if any check
-fails. A first run takes several minutes and needs about 30 GB free, so run it
-in the background and wait for it to finish.
+`test image` builds each host's flavor, reinstalls the host's VM disk if the
+image or the host's kickstart changed, boots it, and prints a `PASS` or `FAIL`
+line per check. It exits 3 if any check fails. With current disks it takes
+about 20 seconds per host; each reinstall adds about 7 minutes, so run it in
+the background and wait for it to finish. Each host's disk needs about 7 GB.
 
-Run the steps separately to avoid repeating work:
-
-```sh
-immutable/images/vm_test.py build   # rebuild the image
-immutable/images/vm_test.py disk    # reinstall the disk from the image
-immutable/images/vm_test.py check   # boot the disk and run the checks
-```
-
-`check` uses the existing disk, so run `disk` after `build` to test a new
-image. Select another Containerfile with `--flavor NAME`, which builds
-`Containerfile.NAME`.
+Test one host by naming it, such as `imgman test image x1carbon23`.
+`imgman/README.md` describes every command, the checks, and the exit codes.
 
 ## Investigating failures
 
-Keep the VM running after the checks, then run commands in it as root:
+`test image` without `--rm` leaves the VM running. Run commands in it as root,
+then stop it:
 
 ```sh
-immutable/images/vm_test.py check --keep
-immutable/images/vm_test.py ssh bootc status
-immutable/images/vm_test.py ssh journalctl -b -p warning --no-pager
-immutable/images/vm_test.py stop
+uv run --project immutable/imgman imgman machine ssh x1carbon23 bootc status
+uv run --project immutable/imgman imgman machine ssh x1carbon23 journalctl -b -p warning --no-pager
+uv run --project immutable/imgman imgman machine rm x1carbon23
 ```
 
-The VM's console log is `~/.cache/homelab-images/run/console.log` while it
-runs. Changes inside the VM are discarded when it stops.
-
-## Upgrade test
-
-The upgrade check starts a registry container, `homelab-image-registry`, on
-`127.0.0.1:5000`. The VM reaches it at `10.0.2.2:5000` through QEMU user
-networking. The check pushes the image plus one marker file in `/usr` to the
-tag the VM tracks, then runs `bootc upgrade` and `bootc rollback` in the VM,
-rebooting after each.
-
-## Cleanup
-
-Remove the registry, disks, and test images:
-
-```sh
-immutable/images/vm_test.py clean
-```
+The VM's serial console is logged to
+`~/.cache/homelab-images/<host>/run/console.log`, and the installer's to
+`~/.cache/homelab-images/<host>/install/console.log`. A failed install shows
+Anaconda's error at the end of the installer's console log. Changes inside a
+running VM are discarded when it stops.
