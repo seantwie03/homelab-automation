@@ -9,5 +9,5 @@ data_disks = ["10G"]    # stands in for the games SSD
 [desktop25]
 flavor = "kde"
 
-[x1carbon2018]
+[x1carbon23]
 flavor = "kde"

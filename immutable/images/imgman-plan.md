@@ -110,7 +110,7 @@ imgman
 - **Under the hood:**
   1. Starts the local container registry (`homelab-image-registry`) on `127.0.0.1:5000` and pushes `localhost/workstation-<flavor>` to `127.0.0.1:5000/<host>/workstation-<flavor>:test`.
   2. Extracts `images/pxeboot/vmlinuz` and `initrd.img` from the cached Fedora netinst ISO with `xorriso -osirrox`, and appends a cpio archive holding `images/kickstart/<host>.ks` as `ks.cfg` to the initrd, as `virt-install --initrd-inject` does.
-  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda imgman.insecure-registry=10.0.2.2:5000`. imgman reads the ISO label with `xorriso`. Each size in the host's `data_disks` in `hosts.toml` adds a blank disk after the system disk (`vdb`, `vdc`, and so on), standing in for a data disk the kickstart must leave alone, such as desktop22's games SSD.
+  3. Boots QEMU directly into that kernel and initrd (`-kernel`, `-initrd`), with the ISO attached for the installer's stage 2, a blank target disk, and `-no-reboot`. The kernel command line is `inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=<ISO label> inst.text console=ttyS0 imgman.url=10.0.2.2:5000/<host>/workstation-<flavor>:test imgman.disk=vda imgman.insecure-registry=10.0.2.2:5000 imgman.luks-passphrase=imgman`. The installer boots with the standard firmware, not the Secure Boot firmware: firmware that verifies a kernel passed with `-kernel` accepts only Microsoft's keys, and Fedora's kernel is signed by Fedora, which only shim trusts. imgman reads the ISO label with `xorriso`. Each size in the host's `data_disks` in `hosts.toml` adds a blank disk after the system disk (`vdb`, `vdc`, and so on), standing in for a data disk the kickstart must leave alone, such as desktop22's games SSD.
   4. The kickstart's `%pre` reads the `imgman.*` arguments, selects the test registry's image and `vda`, and marks the registry insecure for the installer (see "Kickstart Targets" below). Anaconda pulls the image from `10.0.2.2:5000`, partitions the disk with production Btrfs subvolumes (`home` at `/var/home`, nested `.cache`), provisions user `sean` (UID 1000), and installs the bootloader. The installer's output goes to `run/console.log`.
   5. The kickstart ends with `reboot`, which `-no-reboot` turns into QEMU exiting after about 6.5 minutes, leaving `~/.cache/homelab-images/<host>/workstation-<flavor>.qcow2`. Later boots start from the disk, without `-kernel`.
   6. Writes `workstation-<flavor>.inputs` next to the disk, recording the installed image ID and the kickstart's SHA-256 for the staleness check, and the manifest digest `podman push` reported in step 1, for `test image`. `machine init` deletes the old `.inputs` file before step 1, so an interrupted install always leaves the disk stale.
@@ -125,7 +125,7 @@ imgman
   1. Checks if a VM for `HOST` is running; if so, immediately terminates the QEMU process (`SIGTERM` / `SIGKILL`) and unlinks its runtime directory.
   2. Discards any previous ephemeral overlay and creates a fresh `overlay.qcow2` backed by the host's disk for the selected flavor. Runs `machine init` first only if the disk is missing, and warns if it is stale, without building.
   3. Picks a random vsock CID and stores it in `run/cid`.
-  4. Spawns QEMU with the host's `memory` and `cpus` from `hosts.toml`, KVM acceleration, OVMF UEFI firmware, vsock SSH, virtio-vga graphics, a SPICE server on `run/spice.sock`, and systemd credentials: `system.hostname`, which sets the VM's hostname to `HOST`; `tmpfiles.extra`, which installs the one-time root SSH key; and `systemd.unit-dropin.ansible-pull.service`, which keeps `ansible-pull` from replacing the synced tree (see `test playbook`).
+  4. Spawns QEMU with the host's `memory` and `cpus` from `hosts.toml`, KVM acceleration, the Secure Boot UEFI firmware (`OVMF_CODE.secboot.fd` with a fresh copy of `OVMF_VARS.secboot.fd`, which has Microsoft's keys enrolled, with `-machine q35,smm=on` and `-global driver=cfi.pflash01,property=secure,value=on`, so only firmware code can change the Secure Boot keys), vsock SSH, virtio-vga graphics, a SPICE server on `run/spice.sock`, and systemd credentials: `system.hostname`, which sets the VM's hostname to `HOST`; `tmpfiles.extra`, which installs the one-time root SSH key; `cryptsetup.passphrase`, which unlocks an encrypted disk with the throwaway passphrase `machine init` installed it with; and `systemd.unit-dropin.ansible-pull.service`, which keeps `ansible-pull` from replacing the synced tree (see `test playbook`).
   5. Leaves the VM booted and ready for interactive SSH (`imgman machine ssh`) or graphical inspection (`imgman machine gui`).
 - **Options:**
   - `HOST`: Target host (default: this machine's short hostname).
@@ -186,7 +186,7 @@ imgman
 - **Under the hood:**
   1. **Smart Dependency Check:** Always runs `podman build` for the host's flavor; on a cache hit this finishes in < 0.5s and the image ID is unchanged. If the disk is missing or stale (see "Dependency Detection Logic"), automatically runs `machine init` to refresh the host's disk.
   2. Boots the VM with a fresh throwaway overlay (virtual graphics enabled by default; inspect live via `imgman machine gui` unless `--no-gui` is specified).
-  3. Asserts that `bootc status` reports the booted image digest recorded in the disk's `.inputs` file, then asserts filesystem invariants: `/usr` read-only, `/etc` and `/var` writable, and `/opt`, `/srv`, and `/usr/local` linked into `/var`.
+  3. Asserts that `bootc status` reports the booted image digest recorded in the disk's `.inputs` file, then asserts filesystem invariants: `/usr` read-only, `/etc` and `/var` writable, and `/opt`, `/srv`, and `/usr/local` linked into `/var`. Asserts that Secure Boot is enabled (`mokutil --sb-state`) and, for a kickstart that encrypts, that the root filesystem is on a LUKS2 device.
   4. Asserts the kickstart's layout: `home` is a subvolume at `/var/home`, a file `sean` writes under `~/.cache` is absent from a snapshot of `home`, `sean` has UID 1000, and every disk from the host's `data_disks` is still blank.
   5. Asserts the boot reached `graphical.target` and `display-manager.service` is active, then runs the no-failed-units check (see "No Failed Units Check").
   6. Marks the test registry insecure in the VM over SSH, then runs `bootc upgrade --check`, which confirms the VM can reach the tag it tracks and that the image's signature policy accepts it, without downloading or rebooting.
@@ -397,7 +397,7 @@ images/
 └── kickstart/
     ├── desktop22.ks      # Includes the secondary /games disk
     ├── desktop25.ks
-    └── x1carbon2018.ks
+    └── x1carbon23.ks     # Encrypts the system disk with LUKS2
 ```
 
 ```toml
@@ -411,7 +411,7 @@ data_disks = ["10G"]    # stands in for the games SSD
 [desktop25]
 flavor = "kde-nvidia"
 
-[x1carbon2018]
+[x1carbon23]
 flavor = "kde"
 ```
 
@@ -454,15 +454,16 @@ Anaconda inside QEMU pulls the container image via QEMU's virtual user networkin
 - The registry serves plain HTTP. The kickstart's `%pre` marks it insecure for the installer, and imgman marks it insecure in the installed VM over SSH before running `bootc upgrade --check` or `bootc upgrade`.
 
 ### Kickstart Targets
-Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both the hardware and the VM. Only the image URL, the system disk, and whether a registry is reached over plain HTTP differ. The kickstart leaves the image and disk out of its top-level commands; its `%pre` writes them to `/tmp/target.ks`, which the kickstart then includes. Anaconda resolves `%include` after `%pre` runs.
+Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both the hardware and the VM. Only the image URL, the system disk, whether a registry is reached over plain HTTP, and, for a kickstart that encrypts, the LUKS passphrase differ. The kickstart leaves the image and disk out of its top-level commands; its `%pre` writes them to `/tmp/target.ks`, which the kickstart then includes. Anaconda resolves `%include` after `%pre` runs.
 
-`%pre` reads three optional kernel arguments. Each one falls back on its own, so passing one never changes another:
+`%pre` reads up to four optional kernel arguments. Each one falls back on its own, so passing one never changes another:
 
 | Argument | Without it | imgman passes |
 | --- | --- | --- |
 | `imgman.url` | The host's published image | `10.0.2.2:5000/<host>/workstation-<flavor>:test` |
 | `imgman.disk` | The host's system disk, a `/dev/disk/by-id/` path | `vda` |
 | `imgman.insecure-registry` | Every registry is reached over TLS | `10.0.2.2:5000` |
+| `imgman.luks-passphrase` | Anaconda asks for the passphrase during the install | `imgman`, a throwaway passphrase |
 
 `arg` matches an argument only at the start of the command line or after a space, so `foo-imgman.url=` never matches. Before writing the target, `%pre` checks that the system disk exists and stops the install if it does not, before `clearpart --all` wipes anything.
 
@@ -498,7 +499,8 @@ EOF
 ```
 
 - **Hardware:** booted with `inst.ks=https://...` or from a USB stick, with no `imgman.*` arguments, so `%pre` uses the hardware values written in the file. Typing `imgman.url=...` at the boot prompt installs another tag or digest onto the same disk, still over TLS.
-- **VM:** `machine init` passes all three arguments. `--flavor` changes only `imgman.url`.
+- **VM:** `machine init` passes all four arguments, and a kickstart that does not encrypt ignores `imgman.luks-passphrase`. `--flavor` changes only `imgman.url`.
+- **Encryption:** a kickstart that encrypts (x1carbon23's) also has `%pre` write its `part` line to `/tmp/target.ks`, as `part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2`, adding `--passphrase=` only when `imgman.luks-passphrase` is given. On the hardware, Anaconda asks for the passphrase, so it never enters the repository. The VM has no TPM; it unlocks from the `cryptsetup.passphrase` credential `machine run` passes. TPM2 enrollment happens on the hardware, after the install (see D8 in `docs/architecture.md`).
 - The kickstart names the system disk only in `ignoredisk`. `clearpart --all` and `part` lines without `--ondisk` then apply to that one disk, so every other disk, such as desktop22's games SSD, is left alone in both targets.
 - `ksvalidator` cannot see the included commands, so imgman's unit tests validate each kickstart with both targets' commands filled in.
 - The kickstarts use `ostreecontainer`, not Anaconda's newer `bootc` command (Fedora 44), which installs with `bootc install to-filesystem` and can track a different tag than it installs from (`--target-imgref`). In Fedora 44, `bootc` rejects every user-specified mount point, including `/boot/efi`, so it cannot install these UEFI hosts or their `/var` and `/var/home` subvolumes (Red Hat issue RHEL-135114). `ostreecontainer` is not deprecated. Revisit `bootc` once it accepts user-specified mount points.
@@ -526,7 +528,7 @@ Before doing any work, imgman checks what the command needs, lists everything mi
 | Where | Needs | Used for |
 | --- | --- | --- |
 | Host | Python 3.14 or later and `uv` | Running and installing imgman (see "Project Layout") |
-| Host | `podman`, `qemu-system-x86_64`, `qemu-img`, `edk2-ovmf`, `qemu-ui-spice-core` | Builds, VMs, UEFI firmware, the SPICE display |
+| Host | `podman`, `qemu-system-x86_64`, `qemu-img`, `edk2-ovmf`, `qemu-ui-spice-core` | Builds, VMs, UEFI firmware (the standard and the Secure Boot builds), the SPICE display |
 | Host | `xorriso` | Extracting the kernel, initrd, and volume label from the ISO |
 | Host | `remote-viewer` (`virt-viewer`) | `machine gui` |
 | Host | `rsync`, `ssh`, and an ssh configuration that sends `vsock/` hosts through `systemd-ssh-proxy` | Vsock SSH and the `test playbook` sync |

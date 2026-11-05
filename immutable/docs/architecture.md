@@ -27,7 +27,7 @@ Everything else belongs in a runtime role.
 | Image                    | Base                                           | Hosts                |
 |--------------------------|------------------------------------------------|----------------------|
 | `workstation-kde-nvidia` | Kinoite, plus ublue's prebuilt NVIDIA packages | desktop22, desktop25 |
-| `workstation-kde`        | Kinoite                                        | x1carbon2018         |
+| `workstation-kde`        | Kinoite                                        | x1carbon23           |
 | `server`                 | fedora-bootc                                   | odroidh3plus         |
 
 Niri and GNOME variants are possible additions (D2). `images/README.md` covers
@@ -49,6 +49,7 @@ image.
 | `/opt` | Runtime on workstations | Kinoite links it to `/var/opt`. fedora-bootc ships it as a read-only directory. |
 | Repository checkout | Runtime | `/opt/homelab-automation` on workstations. The server's location is open. |
 | `/usr/local` | Runtime on workstations | Kinoite links it to `/var/usrlocal`. fedora-bootc ships it as a read-only directory. |
+| System disk | Kickstart | The EFI partition and `/boot` are unencrypted. On an encrypted host, a LUKS2 container holds the btrfs volume with `root`, `var`, and `home` (D8). |
 
 ## Decisions
 
@@ -162,6 +163,8 @@ playbook twice and the capability tests (D7).
 
 Each build gets a date-and-commit tag and is identified by digest. desktop22
 follows the newest build. Other hosts move to a tag after desktop22 has run it.
+Until desktop22 runs an image, x1carbon23 is the only image-based host, and it
+moves to a build only after the build passes its VM tests.
 
 **Why:** Weekly builds pick up Fedora updates. Hosts other than the canary
 never receive an untested build. Playbooks change more often than images, and
@@ -221,3 +224,53 @@ three-host fleet.
   `h job disable` until the host is upgraded again.
 - The VM test runs the playbook and the capability tests on the current image,
   again after upgrading to the next image, and again after rolling back.
+
+### D8. Full-disk encryption
+
+**Status:** decided for laptops. Whether each desktop and the server is
+encrypted is decided before its install.
+
+Laptops encrypt the system disk with LUKS2. The EFI partition and `/boot` stay
+unencrypted, and the btrfs volume with `root`, `var`, and `home` sits inside
+the LUKS2 container. A laptop unlocks with TPM2 + PIN, sealed to PCR 7, the
+Secure Boot state, with a recovery key stored in 1Password. A desktop or server
+that is encrypted unlocks with TPM2 automatic unlock.
+
+**Why:** A laptop travels, so the main threat is the whole machine being stolen
+while powered off. With TPM2 + PIN, the key never leaves the TPM, which limits
+PIN guesses, so a short PIN protects the disk and a copied disk is useless
+elsewhere. TPM2 automatic unlock releases the key to anyone who boots the
+machine: PCR 7 does not cover the kernel command line, so adding
+`systemd.debug-shell` at the GRUB menu gives a root shell on the unlocked disk.
+That is acceptable only for machines that stay at home, where the threat is a
+disk leaving the house for warranty replacement or disposal and unattended
+reboots matter.
+
+**Alternatives rejected:**
+
+- A passphrase at every boot, with no TPM: a long passphrase each boot, and
+  anyone with a copy of the disk can guess it offline.
+- The SSD's OPAL self-encryption: drive firmware implementations have had
+  serious flaws, and Anaconda does not set it up.
+- Encrypting every host for uniformity: each host has its own kickstart, so
+  encryption is one host's `part` line either way, and uniformity saves no
+  work.
+
+**Consequences:**
+
+- The passphrase never enters the repository. The hardware install's
+  kickstart has no `--passphrase`, so Anaconda asks for one. VM installs use a
+  throwaway passphrase that `imgman` passes on the kernel command line, and
+  the VM unlocks from a systemd credential. VMs have no TPM.
+- TPM enrollment is a one-time step on the hardware, after the install. It
+  needs the real TPM, and PCR 7 differs between the installer's boot and the
+  installed system's.
+- The initramfs is built into the image, so nothing in the host's
+  `/etc/crypttab` reaches it. Unlock settings come from the LUKS2 header's
+  token or from kernel arguments.
+- Anything that changes PCR 7, such as a Secure Boot database update or
+  toggling Secure Boot, needs a re-enrollment, unlocking once with the
+  recovery key.
+- Neither unlock method stops an attacker who tampers with the boot and waits
+  for the owner to type the PIN: Fedora's image-based systems do not sign the
+  initramfs.

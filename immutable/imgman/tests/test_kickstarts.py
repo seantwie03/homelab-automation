@@ -25,6 +25,20 @@ TARGETS = {
         "ignoredisk --only-use=vda"
     ),
 }
+# A kickstart that encrypts has %pre write its part line too, with a passphrase
+# only for the VM.
+ENCRYPTED_PART = {
+    "hardware": "part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2",
+    "vm": "part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2 --passphrase=x",
+}
+
+
+def fill_target(text: str, target: str) -> str:
+    """Replaces the include with what %pre writes for TARGET."""
+    lines = TARGETS[target]
+    if "\npart btrfs.01 " not in text:
+        lines += "\n" + ENCRYPTED_PART[target]
+    return text.replace(INCLUDE, lines)
 
 
 def kickstarts(checkout: Checkout) -> set[str]:
@@ -44,4 +58,4 @@ def test_kickstart_is_valid_for_both_targets(host: HostName, target: str) -> Non
     with warnings.catch_warnings():
         # ksvalidator reports deprecated or ignored commands as warnings.
         warnings.simplefilter("error")
-        parser.readKickstartFromString(text.replace(INCLUDE, TARGETS[target]))
+        parser.readKickstartFromString(fill_target(text, target))

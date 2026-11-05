@@ -5,6 +5,7 @@ import subprocess
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
 from imgman.errors import StepFailed
 
@@ -51,3 +52,16 @@ def run(
         tail = result.stderr.strip().splitlines()[-ERROR_LINES:]
         raise StepFailed("\n".join([message, *(f"    {line}" for line in tail)]))
     return result
+
+
+class Runner(Protocol):
+    """Anything that runs commands as run() does. Tests pass a fake that records them."""
+
+    def __call__(
+        self,
+        args: Sequence[str | Path],
+        *,
+        input: str | None = None,
+        capture: bool = False,
+        check: bool = True,
+    ) -> Result: ...

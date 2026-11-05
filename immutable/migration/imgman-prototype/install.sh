@@ -32,6 +32,6 @@ qemu-system-x86_64 \
     -drive media=cdrom,readonly=on,file="$ISO" \
     -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
     -kernel "$W/vmlinuz" -initrd "$W/initrd-ks.img" \
-    -append "inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=Fedora-E-dvd-x86_64-44 inst.text console=ttyS0 imgman.url=10.0.2.2:5000/desktop22/workstation-kde:test imgman.disk=vda imgman.insecure-registry=10.0.2.2:5000" \
+    -append "inst.ks=file:/ks.cfg inst.stage2=hd:LABEL=Fedora-E-dvd-x86_64-44 inst.text console=ttyS0 imgman.url=10.0.2.2:5000/desktop22/workstation-kde:test imgman.disk=vda imgman.insecure-registry=10.0.2.2:5000 imgman.luks-passphrase=imgman" \
     -display none -serial file:"$D/install-console.log" -no-reboot
 echo "installed in $(($(date +%s) - start))s"

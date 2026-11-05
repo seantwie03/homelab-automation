@@ -1,17 +1,20 @@
-# Installs x1carbon2018, a laptop, on its hardware or as an imgman VM.
+# Installs x1carbon23, a laptop, on its hardware or as an imgman VM. The system
+# disk is encrypted with LUKS2; the EFI partition and /boot are not.
 #
-# %pre reads three optional kernel arguments, each on its own:
+# %pre reads four optional kernel arguments, each on its own:
 #   imgman.url                the image to install
 #   imgman.disk               the system disk, relative to /dev
 #   imgman.insecure-registry  a registry to reach over plain HTTP
-# imgman passes all three to install from its test registry onto a VM's disk.
+#   imgman.luks-passphrase    the LUKS passphrase, for a throwaway VM only
+# imgman passes all four to install from its test registry onto a VM's disk.
 # Without them, %pre uses this host's published image and system disk, which
-# are placeholders until images are published, and verifies TLS.
+# are placeholders until images are published, verifies TLS, and leaves the
+# passphrase out, so Anaconda asks for it.
 text
 lang en_US.UTF-8
 keyboard us
 timezone America/Chicago --utc
-network --bootproto=dhcp --activate --hostname=x1carbon2018
+network --bootproto=dhcp --activate --hostname=x1carbon23
 rootpw --lock
 # A bootstrap password, published with this file. Change it at first login.
 user --name=sean --uid=1000 --gid=1000 --groups=wheel --iscrypted --password=$y$j9T$d7zLGmZwspvuPbCe750ya/$NPPNjIoTofZbVBZv4fdXjiW73H1feqMszK7e31vgg5A
@@ -26,6 +29,7 @@ url=${url:-ghcr.io/seantwie03/workstation-kde:placeholder}
 disk=$(arg 'imgman\.disk')
 disk=${disk:-disk/by-id/placeholder}
 insecure=$(arg 'imgman\.insecure-registry')
+passphrase=$(arg 'imgman\.luks-passphrase')
 if [ -n "$insecure" ]; then
     mkdir -p /etc/containers/registries.conf.d
     printf '[[registry]]\nlocation = "%s"\ninsecure = true\n' "$insecure" \
@@ -40,6 +44,7 @@ fi
 cat >/tmp/target.ks <<EOF
 ostreecontainer --url=$url --no-signature-verification
 ignoredisk --only-use=$disk
+part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2${passphrase:+ --passphrase=$passphrase}
 EOF
 %end
 
@@ -48,7 +53,6 @@ EOF
 zerombr
 clearpart --all --initlabel --disklabel=gpt
 reqpart --add-boot
-part btrfs.01 --fstype=btrfs --grow
 btrfs none --label=fedora btrfs.01
 btrfs / --subvol --name=root LABEL=fedora
 btrfs /var --subvol --name=var LABEL=fedora
@@ -56,7 +60,8 @@ btrfs /var/home --subvol --name=home LABEL=fedora
 # btrfs takes compress from the filesystem's first mount, which is the
 # initramfs mounting root from the kernel command line. The initramfs combines
 # this rootflags with the one Anaconda writes, whichever comes first.
-bootloader --append="rootflags=subvol=root,compress=zstd:1"
+# rd.luks.options=discard lets TRIM reach the SSD through LUKS.
+bootloader --append="rootflags=subvol=root,compress=zstd:1 rd.luks.options=discard"
 
 %post --erroronfail --log=/root/ks-post.log
 # Directories that home snapshots exclude are nested subvolumes. Anaconda's

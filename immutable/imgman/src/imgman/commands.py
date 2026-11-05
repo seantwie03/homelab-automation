@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar, assert_never
 
-from imgman import prerequisites
+from imgman import images, prerequisites
 from imgman.checkout import Checkout
 from imgman.errors import StepFailed
 from imgman.hosts import Flavor, HostConfig, HostName
@@ -124,9 +124,11 @@ def requirements(command: Command) -> Requirements:
 def execute(command: Command, context: Context) -> None:
     """Runs COMMAND. Raises an ImgmanError subclass on an expected failure."""
     match command:
+        case ImageBuild():
+            for flavor in command.flavors:
+                images.build(flavor, context.checkout, verbose=context.verbose)
         case (
-            ImageBuild()
-            | MachineInit()
+            MachineInit()
             | MachineRun()
             | MachineGui()
             | MachineSsh()
