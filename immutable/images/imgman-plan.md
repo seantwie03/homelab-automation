@@ -145,7 +145,7 @@ imgman
 - **Purpose:** Connects to a running VM over vsock SSH without exposing network ports on the host LAN.
 - **Behavior:**
   - If the first word is a host in `images/hosts.toml`, it selects the host. Otherwise every word is part of `COMMAND...`, which runs on the default host. `imgman machine ssh nvim --version` runs on the default host; `imgman machine ssh desktop25 nvim --version` runs on `desktop25`.
-  - If `COMMAND...` is provided, executes the command as root inside the VM and prints the output.
+  - If `COMMAND...` is provided, executes the command as root inside the VM and prints the output. A command that fails in the VM makes imgman exit 3, naming its exit status.
   - If omitted, opens an interactive root shell inside the VM.
 - **Options:**
   - `HOST`: Target host if multiple VMs are running (default: this machine's short hostname).

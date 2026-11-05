@@ -6,11 +6,11 @@ import pytest
 from imgman import installer
 from imgman.cache import Cache
 from imgman.checkout import Checkout
+from imgman.console import console_tail
 from imgman.errors import BadInput, MissingPrerequisite, StepFailed
 from imgman.hosts import Flavor, HostConfig, HostName, Hosts, Size
 from imgman.installer import (
     Inputs,
-    console_tail,
     fedora_version,
     find_iso,
     inject,

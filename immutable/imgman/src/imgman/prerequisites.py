@@ -11,6 +11,9 @@ from imgman.process import run
 
 OVMF_CODE = Path("/usr/share/edk2/ovmf/OVMF_CODE.fd")
 OVMF_VARS = Path("/usr/share/edk2/ovmf/OVMF_VARS.fd")
+# The Secure Boot build, and a variable store with Microsoft's keys enrolled.
+OVMF_CODE_SECBOOT = Path("/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd")
+OVMF_VARS_SECBOOT = Path("/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd")
 KVM = Path("/dev/kvm")
 VHOST_VSOCK = Path("/dev/vhost-vsock")
 LOW_SPACE_GB = 25
@@ -46,7 +49,7 @@ SSH = Requirements(commands=("ssh",), vsock_ssh=True)
 BOOT = (
     Requirements(
         commands=("qemu-system-x86_64", "qemu-img", "ssh-keygen"),
-        files=(OVMF_CODE, OVMF_VARS),
+        files=(OVMF_CODE_SECBOOT, OVMF_VARS_SECBOOT),
         devices=(KVM, VHOST_VSOCK),
         disk_space=True,
     )

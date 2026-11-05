@@ -12,27 +12,24 @@ from pathlib import Path
 from imgman import images, registry
 from imgman.cache import Cache, ensure_cache
 from imgman.checkout import Checkout
+from imgman.console import console_tail
 from imgman.errors import BadInput, MissingPrerequisite, StepFailed
 from imgman.hosts import Flavor, HostConfig, HostName, Size
 from imgman.lock import host_lock
 from imgman.output import log, step
 from imgman.prerequisites import OVMF_CODE, OVMF_VARS
 from imgman.process import Process, Runner, Spawner, run, spawn
-from imgman.vm import running_pid
+from imgman.vm import TEST_PASSPHRASE, running_pid
 
 ISO_GLOB = "Fedora-Everything-netinst-x86_64-{version}-*.iso"
 ISO_URL = (
     "https://download.fedoraproject.org/pub/fedora/linux/releases/{version}/Everything/x86_64/iso/"
 )
 DISK_SIZE = Size("40G")
-# A throwaway passphrase for VM disks. Real hosts' passphrases never enter the repository.
-TEST_PASSPHRASE = "imgman"
 INSTALL_TIMEOUT_SECONDS = 30 * 60
 POLL_SECONDS = 5.0
 # Anaconda prints these when an install fails, then waits forever at its error screen.
 FAILURE_MARKERS = ("ScriptError", "An error occurred", "Traceback (most recent call last)")
-CONSOLE_LINES = 30
-ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -211,16 +208,6 @@ def install_args(
     ]  # fmt: skip
 
 
-def console_tail(console: Path, lines: int = CONSOLE_LINES) -> str:
-    """Returns the last LINES of a console log, without terminal escape sequences."""
-    try:
-        text = console.read_text(errors="replace")
-    except OSError:
-        return "(no console output)"
-    clean = ANSI_ESCAPE.sub("", text.replace("\r", ""))
-    return "\n".join(f"    {line}" for line in clean.splitlines()[-lines:] if line.strip())
-
-
 def watch(
     process: Process,
     console: Path,
@@ -279,76 +266,121 @@ def install(
     ovmf_vars: Path = OVMF_VARS,
     registry_ready: Callable[[], bool] = registry.answers,
 ) -> None:
-    """Installs HOST's VM disk for FLAVOR with the host's kickstart."""
+    """Installs HOST's VM disk for FLAVOR with the host's kickstart, holding the host's lock."""
+    ensure_cache(cache, runner=runner)
+    with host_lock(cache.host_dir(host), host, command=command_line):
+        install_holding_lock(
+            host=host,
+            config=config,
+            flavor=flavor,
+            cache=cache,
+            checkout=checkout,
+            runner=runner,
+            spawner=spawner,
+            ovmf_vars=ovmf_vars,
+            registry_ready=registry_ready,
+        )
+
+
+def install_holding_lock(
+    *,
+    host: HostName,
+    config: HostConfig,
+    flavor: Flavor,
+    cache: Cache,
+    checkout: Checkout,
+    runner: Runner = run,
+    spawner: Spawner = spawn,
+    ovmf_vars: Path = OVMF_VARS,
+    registry_ready: Callable[[], bool] = registry.answers,
+) -> None:
+    """Installs HOST's VM disk. The caller holds the host's lock."""
     kickstart_path = checkout.kickstart(host)
     kickstart = kickstart_path.read_bytes()
     iso = find_iso(cache.iso_dir, fedora_version(checkout.containerfile(flavor)))
-    ensure_cache(cache, runner=runner)
-    with host_lock(cache.host_dir(host), host, command=command_line):
-        if running_pid(cache.run_dir(host)) is not None:
-            raise MissingPrerequisite(
-                f"{host}'s VM is running; stop it with 'imgman machine rm {host}'"
-            )
-        image = images.image_ref(flavor)
-        image_id = images.image_id(flavor, runner=runner)
-        if image_id is None:
-            raise MissingPrerequisite(
-                f"no image {image}; build it with 'imgman image build {flavor}'"
-            )
-        inputs_file = cache.inputs(host, flavor)
-        # Written only after a successful install, so an interrupted one leaves the disk stale.
-        inputs_file.unlink(missing_ok=True)
-
-        with step("push to the test registry"):
-            registry.start(cache, runner=runner, ready=registry_ready)
-            digest = registry.push(
-                image, registry.install_ref(registry.HOST_ADDRESS, host, flavor), runner=runner
-            )
-
-        work = cache.install_dir(host)
-        shutil.rmtree(work, ignore_errors=True)
-        work.mkdir(parents=True)
-        with step("prepare the installer"):
-            label = volume_label(iso, runner=runner)
-            kernel, initrd = extract_boot_files(iso, work, runner=runner)
-            initrd_ks = work / "initrd-ks.img"
-            inject(initrd, kickstart, initrd_ks)
-            initrd.unlink()
-            vars_file = work / "OVMF_VARS.fd"
-            shutil.copyfile(ovmf_vars, vars_file)
-            vars_file.chmod(0o644)
-            data_disks = [work / f"data{n}.qcow2" for n in range(1, len(config.data_disks) + 1)]
-            disk = cache.disk(host, flavor)
-            disk.unlink(missing_ok=True)
-            for path, size in [(disk, DISK_SIZE), *zip(data_disks, config.data_disks, strict=True)]:
-                runner(["qemu-img", "create", "-q", "-f", "qcow2", path, size], capture=True)
-
-        console = work / "console.log"
-        log(
-            f"installing {host} ({flavor}) with {kickstart_path.relative_to(checkout.root)}, "
-            f"about 7 minutes; the installer's console is {console}"
+    if running_pid(cache.run_dir(host)) is not None:
+        raise MissingPrerequisite(
+            f"{host}'s VM is running; stop it with 'imgman machine rm {host}'"
         )
-        args = install_args(
-            config=config,
-            vars_file=vars_file,
-            disk=disk,
-            data_disks=data_disks,
-            iso=iso,
-            kernel=kernel,
-            initrd=initrd_ks,
-            cmdline=kernel_cmdline(
-                label, registry.install_ref(registry.GUEST_ADDRESS, host, flavor)
-            ),
-            console=console,
-        )
-        with step(f"install {host}"):
-            watch(spawner(args), console)
+    image = images.image_ref(flavor)
+    image_id = images.image_id(flavor, runner=runner)
+    if image_id is None:
+        raise MissingPrerequisite(f"no image {image}; build it with 'imgman image build {flavor}'")
+    inputs_file = cache.inputs(host, flavor)
+    # Written only after a successful install, so an interrupted one leaves the disk stale.
+    inputs_file.unlink(missing_ok=True)
 
-        for leftover in (kernel, initrd_ks, vars_file, *data_disks):
-            leftover.unlink()
-        inputs = Inputs(
-            image_id=image_id,
-            kickstart_sha256=hashlib.sha256(kickstart).hexdigest(),
-            digest=digest,
+    with step("push to the test registry"):
+        registry.start(cache, runner=runner, ready=registry_ready)
+        digest = registry.push(
+            image, registry.install_ref(registry.HOST_ADDRESS, host, flavor), runner=runner
         )
-        inputs_file.write_text(inputs.to_json())
+
+    work = cache.install_dir(host)
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    with step("prepare the installer"):
+        label = volume_label(iso, runner=runner)
+        kernel, initrd = extract_boot_files(iso, work, runner=runner)
+        initrd_ks = work / "initrd-ks.img"
+        inject(initrd, kickstart, initrd_ks)
+        initrd.unlink()
+        vars_file = work / "OVMF_VARS.fd"
+        shutil.copyfile(ovmf_vars, vars_file)
+        vars_file.chmod(0o644)
+        data_disks = [work / f"data{n}.qcow2" for n in range(1, len(config.data_disks) + 1)]
+        disk = cache.disk(host, flavor)
+        disk.unlink(missing_ok=True)
+        for path, size in [(disk, DISK_SIZE), *zip(data_disks, config.data_disks, strict=True)]:
+            runner(["qemu-img", "create", "-q", "-f", "qcow2", path, size], capture=True)
+
+    console = work / "console.log"
+    log(
+        f"installing {host} ({flavor}) with {kickstart_path.relative_to(checkout.root)}, "
+        f"about 7 minutes; the installer's console is {console}"
+    )
+    args = install_args(
+        config=config,
+        vars_file=vars_file,
+        disk=disk,
+        data_disks=data_disks,
+        iso=iso,
+        kernel=kernel,
+        initrd=initrd_ks,
+        cmdline=kernel_cmdline(label, registry.install_ref(registry.GUEST_ADDRESS, host, flavor)),
+        console=console,
+    )
+    with step(f"install {host}"):
+        watch(spawner(args), console)
+
+    for leftover in (kernel, initrd_ks, vars_file, *data_disks):
+        leftover.unlink()
+    inputs = Inputs(
+        image_id=image_id,
+        kickstart_sha256=hashlib.sha256(kickstart).hexdigest(),
+        digest=digest,
+    )
+    inputs_file.write_text(inputs.to_json())
+
+
+def disk_is_stale(
+    *,
+    host: HostName,
+    flavor: Flavor,
+    cache: Cache,
+    checkout: Checkout,
+    runner: Runner = run,
+) -> bool:
+    """Reports whether HOST's disk for FLAVOR is missing or was installed from other inputs.
+
+    Inputs are the image ID and the kickstart's content, never file timestamps.
+    """
+    try:
+        recorded = parse_inputs(cache.inputs(host, flavor).read_text())
+    except OSError:
+        return True
+    if recorded is None or not cache.disk(host, flavor).exists():
+        return True
+    sha = hashlib.sha256(checkout.kickstart(host).read_bytes()).hexdigest()
+    image = images.image_id(flavor, runner=runner)
+    return recorded.image_id != image or recorded.kickstart_sha256 != sha

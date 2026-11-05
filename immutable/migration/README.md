@@ -276,9 +276,14 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
       Anaconda's `%onerror` did not run after a `%pre` failure, so the
       kickstarts have none.
     - It takes the host's lock, and refuses while the host's VM is running.
-  - [ ] `machine run`, `ssh`, `gui`, and `rm`, porting the prototype's
+  - [x] `machine run`, `ssh`, `gui`, and `rm`, porting the prototype's
     `boot.sh` and `vm.sh`, with the Secure Boot firmware and the
-    `cryptsetup.passphrase` credential.
+    `cryptsetup.passphrase` credential. `machine run x1carbon23` boots and
+    answers over SSH in 13 seconds; `machine ssh` reports a failed command
+    with exit 3; `machine gui` refuses a VM started with `--no-gui`.
+    `machine run` installs a missing disk while holding the host's lock,
+    because a second `flock` on the same file from the same process would
+    find the host busy.
   - [ ] `test image`, which also checks that Secure Boot is enabled and, for a
     kickstart that encrypts, that the root filesystem is on a LUKS2 device.
 - [ ] Port `vm_test.py`'s layout checks to `imgman` and its unit tests to

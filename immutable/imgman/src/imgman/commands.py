@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import ClassVar, assert_never
 
-from imgman import images, installer, prerequisites
+from imgman import images, installer, machine, prerequisites, vm
 from imgman.cache import Cache
 from imgman.checkout import Checkout
 from imgman.errors import StepFailed
@@ -106,7 +106,8 @@ def requirements(command: Command) -> Requirements:
         case MachineInit():
             return prerequisites.BUILD | prerequisites.INSTALL
         case MachineRun():
-            return prerequisites.BOOT
+            # It installs the disk first if it is missing.
+            return prerequisites.BOOT | prerequisites.INSTALL
         case MachineGui():
             return prerequisites.VIEWER
         case MachineSsh():
@@ -137,7 +138,27 @@ def execute(command: Command, context: Context) -> None:
                     checkout=context.checkout,
                     command_line=context.command_line,
                 )
-        case MachineRun() | MachineGui() | MachineSsh() | MachineRm() | TestImage() | SystemPrune():
+        case MachineRun():
+            for target in command.targets:
+                machine.run_machine(
+                    host=target.host,
+                    config=target.config,
+                    flavor=target.flavor,
+                    gui=command.gui,
+                    cache=context.cache,
+                    checkout=context.checkout,
+                    command_line=context.command_line,
+                )
+        case MachineSsh():
+            vm.ssh(command.host, context.cache.run_dir(command.host), command.command)
+        case MachineGui():
+            vm.gui(command.host, context.cache.run_dir(command.host))
+        case MachineRm():
+            for host in command.hosts:
+                machine.remove_machine(
+                    host=host, cache=context.cache, command_line=context.command_line
+                )
+        case TestImage() | SystemPrune():
             raise StepFailed(f"{command.name} is not implemented yet")
         case _:
             assert_never(command)
