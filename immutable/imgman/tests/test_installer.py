@@ -202,6 +202,8 @@ def respond(argv: list[str]) -> Result:
                     Path(argv[i + 2]).write_bytes(b"boot")
         case ["qemu-img", "create", *_]:
             Path(argv[-2]).touch()
+        case ["qemu-img", "map", *_]:
+            return Result(returncode=0, stdout='[{"data": false}]', stderr="")
         case _:
             pass
     return OK
@@ -263,6 +265,7 @@ def test_install_runs_the_installer_and_records_its_inputs(
         "xorriso -osirrox",
         "qemu-img create",
         "qemu-img create",
+        "qemu-img map",
     ]
     assert (
         "imgman.url=10.0.2.2:5000/desktop22/workstation-kde:test" in qemu[qemu.index("-append") + 1]
@@ -299,3 +302,24 @@ def test_install_checks_for_the_iso_before_running_anything(
     with pytest.raises(MissingPrerequisite, match="netinst ISO"):
         run_install(setup, hosts, runner, tmp_path)
     assert runner.calls == []
+
+
+def test_install_fails_when_it_wrote_to_a_data_disk(
+    setup: tuple[Checkout, Cache], hosts: Hosts, tmp_path: Path
+) -> None:
+    def wrote(argv: list[str]) -> Result:
+        if argv[:2] == ["qemu-img", "map"]:
+            return Result(returncode=0, stdout='[{"data": true}]', stderr="")
+        return respond(argv)
+
+    with pytest.raises(StepFailed, match="wrote to data1.qcow2"):
+        run_install(setup, hosts, FakeRunner(wrote), tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("extents", "blank"),
+    [("[]", True), ('[{"data": false, "zero": true}]', True), ('[{"data": true}]', False)],
+)
+def test_is_blank(extents: str, blank: bool) -> None:
+    runner = FakeRunner(lambda _: Result(returncode=0, stdout=extents, stderr=""))
+    assert installer.is_blank(Path("d.qcow2"), runner=runner) is blank

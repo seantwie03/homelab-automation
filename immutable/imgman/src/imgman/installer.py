@@ -208,6 +208,16 @@ def install_args(
     ]  # fmt: skip
 
 
+def is_blank(image: Path, *, runner: Runner = run) -> bool:
+    """Reports whether no block of the qcow2 IMAGE holds data."""
+    output = runner(["qemu-img", "map", "--output=json", image], capture=True).stdout
+    extents: object = json.loads(output)
+    if not isinstance(extents, list):
+        raise StepFailed(f"qemu-img map printed no extent list for {image}")
+    items: list[object] = extents
+    return not any(isinstance(extent, dict) and extent.get("data") is True for extent in items)
+
+
 def watch(
     process: Process,
     console: Path,
@@ -352,6 +362,9 @@ def install_holding_lock(
     )
     with step(f"install {host}"):
         watch(spawner(args), console)
+    for path in data_disks:
+        if not is_blank(path, runner=runner):
+            raise StepFailed(f"the install wrote to {path.name}, a data disk it must leave alone")
 
     for leftover in (kernel, initrd_ks, vars_file, *data_disks):
         leftover.unlink()

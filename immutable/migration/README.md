@@ -237,7 +237,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
   `part` line `%pre` writes: the VM gets the throwaway passphrase `imgman`
   passes as `imgman.luks-passphrase`, and the hardware gets no `--passphrase`,
   so Anaconda asks for one. x1carbon23 replaces x1carbon2018 in `hosts.toml`.
-- [ ] `imgman` as a standard-library-only uv project in `immutable/imgman/`,
+- [x] `imgman` as a standard-library-only uv project in `immutable/imgman/`,
   installed with `uv tool install --editable` (see "Project Layout" in
   `immutable/images/imgman-plan.md`) and following its "Non-Functional
   Requirements & Code Style": ruff, pyrefly's strict preset, and pytest in a
@@ -284,8 +284,14 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
     `machine run` installs a missing disk while holding the host's lock,
     because a second `flock` on the same file from the same process would
     find the host busy.
-  - [ ] `test image`, which also checks that Secure Boot is enabled and, for a
+  - [x] `test image`, which also checks that Secure Boot is enabled and, for a
     kickstart that encrypts, that the root filesystem is on a LUKS2 device.
+    `imgman test image x1carbon23` passes all 15 checks in 20 seconds when
+    the disk is current. The data-disk check moved into `machine init`: by
+    the time `test image` boots, the VM's data disks are new blank overlays,
+    so the installer checks the disks the install itself saw with
+    `qemu-img map`. `imgman test image --all` passes for desktop22,
+    desktop25, and x1carbon23, installing the two missing disks, in 14 minutes.
 - [ ] Port `vm_test.py`'s layout checks to `imgman` and its unit tests to
   pytest, then delete `vm_test.py`, `vm_test_tests.py`, `vm-test.sh`, and
   `immutable/images/ruff.toml` and `ty.toml`, whose settings move to
@@ -294,8 +300,8 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
   `ansible-pull --version` and collection checks are not ported either: they
   restate the image's package install, and converging the playbook in the VM
   exercises both.
-- [ ] Capability test: a file that `sean` writes under `~/.cache` is absent
-  from a snapshot of the `home` subvolume.
+- [x] Capability test: a file that `sean` writes under `~/.cache` is absent
+  from a snapshot of the `home` subvolume. It is one of `test image`'s checks.
 - [ ] Once `imgman` works, write its durable docs and point the existing
   ones at it, then delete `immutable/images/imgman-plan.md` and
   `imgman-plan-review.md`:

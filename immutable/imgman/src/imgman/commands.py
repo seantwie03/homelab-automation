@@ -158,7 +158,29 @@ def execute(command: Command, context: Context) -> None:
                 machine.remove_machine(
                     host=host, cache=context.cache, command_line=context.command_line
                 )
-        case TestImage() | SystemPrune():
+        case TestImage():
+            failures: list[str] = []
+            for target in command.targets:
+                try:
+                    machine.test_image(
+                        host=target.host,
+                        config=target.config,
+                        flavor=target.flavor,
+                        gui=command.gui,
+                        remove=command.remove,
+                        cache=context.cache,
+                        checkout=context.checkout,
+                        command_line=context.command_line,
+                        verbose=context.verbose,
+                    )
+                except StepFailed as failure:
+                    # With --all, test every host, then report all failures together.
+                    if len(command.targets) == 1:
+                        raise
+                    failures.append(str(failure))
+            if failures:
+                raise StepFailed("\n".join(failures))
+        case SystemPrune():
             raise StepFailed(f"{command.name} is not implemented yet")
         case _:
             assert_never(command)
