@@ -324,7 +324,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 
 ### Phase 3: x1carbon23 install
 
-**Depends on:** Phase 2, Q5 (the tag x1carbon23 tracks), Q6.
+**Depends on:** Phase 2.
 
 **Done when:** x1carbon23 boots its image from GHCR with Secure Boot on and its
 disk unlocked by TPM2 + PIN, `immutable/x1carbon23.yml` converges through the
@@ -336,11 +336,18 @@ keep `/var/home`, and the install runbook in `migration/` matches what was done.
   the system disk's `/dev/disk/by-id/` path and the firmware's Secure Boot
   settings.
 - [ ] Publish by hand: push `localhost/workstation-kde` to the public GHCR
-  package `ghcr.io/seantwie03/workstation-kde`, under the tag x1carbon23
-  tracks. CI publishing and signing follow in Phase 7 (Q17); until then the
+  package `ghcr.io/seantwie03/workstation-kde`, tagged with its date and git
+  commit (D5), and move `:stable`, the tag x1carbon23 tracks, to it only after
+  `imgman test image x1carbon23` passes. CI publishing and signing follow in Phase 7 (Q17); until then the
   laptop tracks unsigned builds pushed only after `imgman test image` passes.
-- [ ] OS updates (Q6): at least, updates download and stage in the background
-  and apply only when you reboot.
+  Podman logs in with the authenticated `gh` CLI's token: run
+  `gh auth refresh --scopes write:packages` once, because `gh`'s default
+  scopes cannot push packages, then
+  `gh auth token | podman login ghcr.io --username seantwie03 --password-stdin`.
+  A new GHCR package is private; make it public once in its settings on
+  github.com, so installers pull it without credentials.
+- [ ] OS updates (Q6): updates download and stage in the background, and apply
+  only at the next reboot you do. Nothing reboots the laptop on its own.
 - [ ] `ansible_pull`: the unit runs `immutable/x1carbon23.yml` with the
   overlay config, and `h` is baked into the image. Move `h`'s source under
   `immutable/images/`, such as `immutable/images/bin/h`, instead of copying it
@@ -353,8 +360,14 @@ keep `/var/home`, and the install runbook in `migration/` matches what was done.
 - [ ] Add the Fedora package of each collection a ported role needs to
   `immutable/images/scripts/ansible.sh`, which starts with only
   `ansible.posix`.
-- [ ] Replace the placeholder image URL and system disk in x1carbon23's
-  `%pre` with the published image and the disk's `/dev/disk/by-id/` path.
+- [ ] Set the image URL in x1carbon23's `%pre` to
+  `ghcr.io/seantwie03/workstation-kde:stable`. This can happen any time:
+  VM installs override it with `imgman.url`.
+- [ ] On the day of the install, replace the placeholder system disk in
+  x1carbon23's `%pre` with the disk's `/dev/disk/by-id/` path, read from the
+  live USB with `ls -l /dev/disk/by-id/`. This is the only step that needs the
+  laptop before the install itself; until then, the placeholder fails `%pre`'s
+  disk check, so a hardware install cannot start by accident.
 - [ ] An install runbook, `migration/x1carbon23-install.md`:
   - BIOS supervisor password, and Secure Boot on. If the install USB does not
     boot, enable "Allow Microsoft 3rd Party UEFI CA" in the BIOS.
@@ -769,12 +782,11 @@ Each of these describes the traditional setup. Write its replacement under
 | # | Question | Blocks |
 | --- | --- | --- |
 | Q3 | Universal Blue modules (D3): certificate provenance, how quickly matching modules follow Fedora kernel updates, and what builds do in between. | Phase 6 |
-| Q5 | Publishing (D5): tag format, retention, and how a host is promoted to a release. Phase 3 needs only the tag x1carbon23 tracks. | Phases 3 and 7 |
-| Q6 | How do hosts receive OS updates? bootc's stock update timer reboots to apply them, and the goals rule out forced reboots. Does the server differ? | Phase 3 |
+| Q5 | Publishing (D5): retention, and how a host is promoted to a release once CI publishes. The tags are decided: `:stable`, which hosts track, plus a date-and-commit tag per build. | Phase 7 |
 | Q7 | User-space tools (D4): tools without standalone release builds (`zsh`, `tmux`) and the login shell: image or user space? | Phase 4 |
 | Q8 | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`): image or user space? | Phase 4 |
 | Q9 | Container tests: which roles can converge in a container, and how do playbooks written for `hosts: localhost` with a local connection target the container instead of the machine running the tests? | Phase 5 |
-| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1): where do the checkout and karakeep's compose project live? | Phases 9 and 15 |
+| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1): where do the checkout and karakeep's compose project live? When does the server apply staged OS updates, given that workstations apply them only at a reboot you do (Q6)? | Phases 9 and 15 |
 | Q13 | Switching desktops replaces `/usr` but not configuration in home directories. What does a clean switch require? | Phase 8 |
 | Q14 | RPM Fusion: with NVIDIA from Universal Blue, RPM Fusion supplies only Steam (`gaming`), the freeworld multimedia codecs, and `intel-media-driver`. Add RPM Fusion to the image for those, or take Steam from Flathub and rely on Flatpak apps for codecs? `intel-media-driver` matters first, for hardware video decoding on x1carbon23. | Phases 4 and 5 |
 | Q15 | sshd: desktop22 runs `sshd.service` today, but no role manages it, and Kinoite ships it disabled. Should workstation images enable it, or should a runtime role enable it per host? | Phase 4 |
@@ -789,5 +801,6 @@ Each of these describes the traditional setup. Write its replacement under
 | Q1 | Kinoite links `/opt`, `/srv`, `/usr/local`, `/home`, `/mnt`, and `/root` into `/var`. Workstations keep the checkout at `/opt/homelab-automation`, the image adds no top-level directories, and runtime roles create the directories under `/srv`. fedora-bootc links `/srv` but ships `/opt` and `/usr/local` as read-only directories, which moves the server's checkout question to Q12. Recorded in the [filesystem table](../docs/architecture.md#filesystem). |
 | Q2 | KDE builds on `quay.io/fedora/fedora-kinoite`, published by Fedora release engineering. `quay.io/fedora-ostree-desktops/kinoite` is the Atomic Desktops SIG's CI channel for the same composes, with dated tags and sigstore signatures. The official repository has only the major-version tag and no signatures, so builds pin by digest when publishing starts (Q5). Recorded in [D2](../docs/architecture.md#d2-one-base-image-per-desktop). |
 | Q4 | Each host is installed by a kickstart file whose `ostreecontainer` directive installs the host's image directly, with the disk layout declared in the file. VM test disks are installed with the same kickstarts, from images built locally and served by the test registry, so kickstart development starts in Phase 2. A host's hardware install waits until its kickstart and image pass in a VM. Recorded in Phases 2, 3, and 10. |
+| Q6 | Workstations download and stage OS updates in the background and apply them only at the next reboot you do; nothing reboots them on their own. bootc's stock update timer, which reboots to apply, is not used as shipped. The server's policy is part of Q12. Recorded in Phase 3. |
 | Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: `imgman test playbook` copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`. |
 | Q11 | Claude Code finds skills under `immutable/` only after a session touches a file there. Codex finds them only when started inside `immutable/`. Skills go in the root `.agents/skills/`; see the exceptions under [how the overlay works](#how-the-overlay-works). |

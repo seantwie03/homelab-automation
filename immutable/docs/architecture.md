@@ -161,7 +161,8 @@ changing them never builds or publishes an image. CI tests a playbook change
 without a build: a VM booted from the current published image runs the
 playbook twice and the capability tests (D7).
 
-Each build gets a date-and-commit tag and is identified by digest. desktop22
+Each build gets a date-and-commit tag and is identified by digest. Hosts track
+`:stable`, which moves to a build only after it passes its VM tests. desktop22
 follows the newest build. Other hosts move to a tag after desktop22 has run it.
 Until desktop22 runs an image, x1carbon23 is the only image-based host, and it
 moves to a build only after the build passes its VM tests.
