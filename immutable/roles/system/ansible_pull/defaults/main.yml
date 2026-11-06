@@ -1,0 +1,9 @@
+---
+homelab_ansible_repo_url: https://github.com/seantwie03/homelab-automation
+homelab_ansible_repo_git: https://github.com/seantwie03/homelab-automation.git
+homelab_ansible_repo_git_ssh: git@github.com:seantwie03/homelab-automation.git
+# The playbook ansible-pull runs, relative to the checkout, and the Ansible
+# configuration it runs with.
+ansible_pull_playbook: immutable/{{ ansible_facts['hostname'] }}.yml
+ansible_pull_config: "{{ playbook_path }}/immutable/ansible.cfg"
+

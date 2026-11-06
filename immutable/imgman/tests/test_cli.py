@@ -61,6 +61,12 @@ def test_test_image_options(hosts: Hosts) -> None:
     )
 
 
+def test_test_playbook_options(hosts: Hosts) -> None:
+    assert parse(["test", "playbook", "desktop25", "--rm", "--no-gui"], hosts) == (
+        commands.TestPlaybook(targets=(target(hosts, D25),), remove=True, gui=False)
+    )
+
+
 def test_gui(hosts: Hosts) -> None:
     assert parse(["machine", "gui", "desktop25"], hosts) == MachineGui(host=D25)
 

@@ -1,0 +1,15 @@
+---
+- name: Configure x1carbon23 as a laptop
+  hosts: localhost
+  connection: local
+  become: true
+  force_handlers: true
+
+  vars:
+    user: sean
+    uid: 1000
+    gid: 1000
+
+  roles:
+    - role: ansible_pull
+

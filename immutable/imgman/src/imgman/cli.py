@@ -22,6 +22,7 @@ from imgman.commands import (
     SystemPrune,
     Target,
     TestImage,
+    TestPlaybook,
 )
 from imgman.errors import BadInput, ExitCode, ImgmanError
 from imgman.hosts import Flavor, HostName, Hosts, load_hosts
@@ -93,11 +94,15 @@ def build_parser() -> Parser:
         dest="action", required=True, metavar="COMMAND"
     )
     test_image = test.add_parser("image", help="install a host's VM and check it boots correctly")
-    _host(test_image)
-    _all(test_image, "every host")
-    _flavor(test_image)
-    test_image.add_argument("--rm", action="store_true", help="stop the VM when the test ends")
-    _no_gui(test_image)
+    test_playbook = test.add_parser(
+        "playbook", help="run a host's playbook from the working tree in its VM, twice"
+    )
+    for subcommand in (test_image, test_playbook):
+        _host(subcommand)
+        _all(subcommand, "every host")
+        _flavor(subcommand)
+        subcommand.add_argument("--rm", action="store_true", help="stop the VM when the test ends")
+        _no_gui(subcommand)
 
     system = domains.add_parser("system", help="housekeeping").add_subparsers(
         dest="action", required=True, metavar="COMMAND"
@@ -240,6 +245,12 @@ def resolve(
             return MachineRm(hosts=_hosts(namespace, hosts, hostname))
         case "test", "image":
             return TestImage(
+                targets=_targets(namespace, hosts, flavors, hostname),
+                remove=_flag(namespace, "rm"),
+                gui=gui,
+            )
+        case "test", "playbook":
+            return TestPlaybook(
                 targets=_targets(namespace, hosts, flavors, hostname),
                 remove=_flag(namespace, "rm"),
                 gui=gui,

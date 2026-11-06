@@ -1,0 +1,27 @@
+[Unit]
+Description=Ansible Pull Workstation Configuration
+Documentation={{ homelab_ansible_repo_url }}
+After=network-online.target
+After=dns-online.service
+Wants=network-online.target
+Wants=dns-online.service
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/etc/ansible-pull.conf
+WorkingDirectory={{ playbook_path }}
+Environment="PYTHONUNBUFFERED=True"
+ExecStart=/bin/bash -c "set -o pipefail; ansible-pull \
+    --limit localhost \
+    --accept-host-key \
+    --directory \"$ANSIBLE_PULL_DIRECTORY\" \
+    --url \"$ANSIBLE_PULL_URL\" \
+    --diff \
+    --verbose \
+    \"$ANSIBLE_PULL_PLAYBOOK\" \
+    2>&1 | tee /var/log/ansible-pull/ansible-pull-$(date --iso-8601='minutes').log"
+ExecStopPost=-/usr/local/bin/ansible-pull-notify.sh
+
+[Install]
+WantedBy=multi-user.target

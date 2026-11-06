@@ -68,6 +68,14 @@ class TestImage:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class TestPlaybook:
+    name: ClassVar[str] = "test playbook"
+    targets: tuple[Target, ...]
+    remove: bool
+    gui: bool
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class SystemPrune:
     name: ClassVar[str] = "system prune"
     hosts: tuple[HostName, ...]
@@ -84,6 +92,7 @@ type Command = (
     | MachineSsh
     | MachineRm
     | TestImage
+    | TestPlaybook
     | SystemPrune
 )
 
@@ -116,6 +125,8 @@ def requirements(command: Command) -> Requirements:
             return Requirements()
         case TestImage():
             return prerequisites.BUILD | prerequisites.INSTALL | prerequisites.BOOT
+        case TestPlaybook():
+            return prerequisites.BOOT | prerequisites.INSTALL | prerequisites.SYNC
         case SystemPrune():
             return prerequisites.REGISTRY
         case _:
@@ -180,6 +191,19 @@ def execute(command: Command, context: Context) -> None:
                     failures.append(str(failure))
             if failures:
                 raise StepFailed("\n".join(failures))
+        case TestPlaybook():
+            for target in command.targets:
+                machine.test_playbook(
+                    host=target.host,
+                    config=target.config,
+                    flavor=target.flavor,
+                    gui=command.gui,
+                    remove=command.remove,
+                    cache=context.cache,
+                    checkout=context.checkout,
+                    command_line=context.command_line,
+                    verbose=context.verbose,
+                )
         case SystemPrune():
             raise StepFailed(f"{command.name} is not implemented yet")
         case _:

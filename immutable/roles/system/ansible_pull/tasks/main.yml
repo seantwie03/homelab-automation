@@ -1,0 +1,91 @@
+---
+- name: "{{ playbook_path }} is a safe git directory"
+  ansible.builtin.blockinfile:
+    path: /etc/gitconfig
+    create: true
+    mode: 0644
+    marker: "# {mark} ansible_pull"
+    block: |
+      [safe]
+          directory = {{ playbook_path }}
+
+- name: wheel group can edit {{ playbook_path }}
+  ansible.builtin.shell:
+    cmd: >-
+      find {{ playbook_path }} -xdev
+      -not -path '{{ playbook_path }}/docs'
+      -exec chown root:wheel {} + &&
+      find {{ playbook_path }} -xdev
+      -not -path '{{ playbook_path }}/docs'
+      -exec chmod u=rwX,g=rwX,o=rX {} +
+  changed_when: false
+
+- name: ansible-pull settings are written for the unit and h
+  ansible.builtin.template:
+    src: ansible-pull.conf.j2
+    dest: /etc/ansible-pull.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: ansible-pull service is templated
+  ansible.builtin.template:
+    src: ansible-pull.service.j2
+    dest: /etc/systemd/system/ansible-pull.service
+    mode: 0644
+    owner: root
+    group: root
+
+- name: ansible-pull timer is templated
+  ansible.builtin.template:
+    src: ansible-pull.timer.j2
+    dest: /etc/systemd/system/ansible-pull.timer
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart ansible-pull timer
+
+- name: ansible-pull log directory exists
+  ansible.builtin.file:
+    path: /var/log/ansible-pull
+    state: directory
+    mode: 0775
+    owner: root
+    group: wheel
+
+- name: ansible-pull logs are rotated
+  ansible.builtin.copy:
+    content: |
+      /var/log/ansible-pull/*.log {
+          su root wheel
+          rotate 30
+          maxage 30
+          missingok
+          notifempty
+          nocompress
+          nocreate
+      }
+    dest: /etc/logrotate.d/ansible-pull
+    mode: 0640
+    owner: root
+    group: wheel
+
+- name: ansible-pull-notify script is deployed
+  ansible.builtin.template:
+    src: ansible-pull-notify.sh.j2
+    dest: /usr/local/bin/ansible-pull-notify.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: systemd daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: false
+
+- name: ansible-pull.timer is enabled and started
+  ansible.builtin.service:
+    name: ansible-pull.timer
+    enabled: true
+    state: started
+

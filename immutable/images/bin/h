@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# h (Homelab) - A script for Homelab Automation management.
+#
+# The ansible_pull role writes this host's settings to /etc/ansible-pull.conf,
+# which ansible-pull.service also loads, so h and the timer run the same
+# playbook from the same checkout.
+
+AUTOMATION_CONFIG=/etc/ansible-pull.conf
+if [ ! -r "$AUTOMATION_CONFIG" ]; then
+    echo "h: $AUTOMATION_CONFIG is missing; the ansible_pull role writes it" >&2
+    exit 1
+fi
+# shellcheck source=/dev/null
+. "$AUTOMATION_CONFIG"
+AUTOMATION_DIR="$ANSIBLE_PULL_DIRECTORY"
+AUTOMATION_SERVICE_NAME="ansible-pull"
+AUTOMATION_GIT_REMOTE="$ANSIBLE_PULL_PUSH_URL"
+
+show_usage() {
+    echo "Usage: h [subcommand] [arguments]"
+    echo ""
+    echo "Homelab Automation Script"
+    echo ""
+    echo "With no subcommand, shows the status of ${AUTOMATION_SERVICE_NAME}.service."
+    echo ""
+    echo "Subcommands:"
+    echo "  e, edit                 - Opens EDITOR in the Homelab Automation directory ($AUTOMATION_DIR)"
+    echo "  c, commit               - Commits changes in the Automation directory ($AUTOMATION_DIR)"
+    echo "  g, git [args]           - Run arbitrary git commands in the Automation directory ($AUTOMATION_DIR)"
+    echo "                            Any arguments after g[it] will be passed directly to git."
+    echo "                            If no arguments are provided, defaults to showing git status"
+    echo "  l, logs [n]             - Opens a summary and the last n log files for ${AUTOMATION_SERVICE_NAME} (default: 1)"
+    echo "                            The first less buffer shows the play recap and changed tasks."
+    echo "  r, run                  - Runs ${AUTOMATION_SERVICE_NAME}.service (requires sudo)"
+    echo "  t, test [playbook]      - Runs ansible-pull on a playbook with --force to ignore dirty working directory"
+    echo "                            If no playbook specified, defaults to this host's ($ANSIBLE_PULL_PLAYBOOK)"
+    echo "  j, job [action]         - Enables or disables ${AUTOMATION_SERVICE_NAME}.timer (requires sudo)"
+    echo "                            Action should be either 'enable' or 'disable'"
+    echo "                            If no action is specified, defaults to showing systemctl status"
+    echo ""
+    echo "Examples:"
+    echo "  h edit"
+    echo "  h commit"
+    echo "  h logs"
+    echo "  h run"
+    echo "  h test my_new_role.yml"
+    echo "  h git diff"
+}
+
+write_ansible_log_summary() {
+    local _log_file
+
+    for _log_file in "$@"; do
+        printf 'Log: %s\n\n' "${_log_file}"
+
+        awk '
+            /^TASK \[/ {
+                task = $0
+            }
+
+            /"changed": true/ {
+                changed = changed task "\n" $0 "\n\n"
+                changed_found = 1
+            }
+
+            /^PLAY RECAP / {
+                recap_started = 1
+            }
+
+            recap_started {
+                recap = recap $0 "\n"
+                recap_found = 1
+            }
+
+            END {
+                if (recap_found) {
+                    printf "%s", recap
+                } else {
+                    print "No play recap found."
+                }
+                print ""
+
+                print "CHANGED TASKS ******************************************************************"
+                if (!changed_found) {
+                    print "No changed tasks found."
+                } else {
+                    printf "%s", changed
+                }
+            }
+        ' "${_log_file}"
+
+        printf '\n'
+    done
+}
+
+if [ "$#" -eq 0 ]; then
+    systemctl status ${AUTOMATION_SERVICE_NAME}.service --no-pager -l
+    exit 0
+fi
+
+case "$1" in
+    e|edit)
+        # The ##*/ bash parameter expansion strips everything up to and including the last slash.
+        # This ensures the conditional works whether or not the EDITOR variable includes
+        # the full path or just the executable name.
+        if [ "${EDITOR##*/}" = 'vim' ] || [ "${EDITOR##*/}" = 'nvim' ]; then
+            "$EDITOR" "${AUTOMATION_DIR}" "+cd ${AUTOMATION_DIR}"
+        elif [ "${EDITOR##*/}" = 'code' ] || [ "${EDITOR##*/}" = 'code-oss' ] || [ "${EDITOR##*/}" = 'codium' ]; then
+            code -n "${AUTOMATION_DIR}"
+        else
+            "$EDITOR" "${AUTOMATION_DIR}"
+        fi
+        ;;
+    c|commit)
+        echo "Commiting all changes in: $AUTOMATION_DIR"
+        cd "$AUTOMATION_DIR" || exit
+        git add .
+        git commit -m "$(date --iso-8601='minutes')"
+        git push "$AUTOMATION_GIT_REMOTE" main
+        ;;
+    l|logs)
+        _count="${2:-1}"
+        # The logs are named ansible-pull-<date>.log, so parsing ls is safe here.
+        # shellcheck disable=SC2012
+        mapfile -t _files < <(ls -t /var/log/${AUTOMATION_SERVICE_NAME}/*.log 2>/dev/null | head -n "$_count")
+        if [ -z "${_files[0]}" ]; then
+            echo "No logs found in /var/log/${AUTOMATION_SERVICE_NAME}/" >&2
+            exit 1
+        fi
+        _summary_file="$(mktemp --tmpdir "${AUTOMATION_SERVICE_NAME}-summary.XXXXXXXXXX")"
+        trap 'rm -f "$_summary_file"' EXIT
+        write_ansible_log_summary "${_files[@]}" > "$_summary_file"
+        less "$_summary_file" "${_files[@]}"
+        ;;
+    r|run)
+        echo "Running ${AUTOMATION_SERVICE_NAME}.service immediately..."
+        sudo systemctl start ${AUTOMATION_SERVICE_NAME}.service
+        echo "Run completed. Check logs with: h logs"
+        ;;
+    t|test)
+        PLAYBOOK_NAME="${2:-$ANSIBLE_PULL_PLAYBOOK}"
+        echo "Running Ansible playbook '${PLAYBOOK_NAME}'..."
+        sudo env PYTHONUNBUFFERED=True ANSIBLE_CONFIG="$ANSIBLE_CONFIG" \
+            ansible-pull --limit localhost \
+            --accept-host-key \
+            --directory "$AUTOMATION_DIR" \
+            --url "$ANSIBLE_PULL_URL" \
+            --diff \
+            --force \
+            "$PLAYBOOK_NAME"
+        ;;
+    j|job)
+        if [ -z "$2" ]; then
+            JOB_STATUS="status"
+        else
+            JOB_STATUS="${2,,}"
+        fi
+        case "${JOB_STATUS}" in
+            enable)
+                sudo systemctl enable "${AUTOMATION_SERVICE_NAME}".timer
+                echo "Enabled ${AUTOMATION_SERVICE_NAME}.timer use 'run' subcommand to execute immediately."
+                ;;
+            disable)
+                sudo systemctl disable "${AUTOMATION_SERVICE_NAME}".timer
+                sudo systemctl stop "${AUTOMATION_SERVICE_NAME}".timer
+                echo "Disabled and stopped ${AUTOMATION_SERVICE_NAME}.timer"
+                ;;
+            status)
+                systemctl status "${AUTOMATION_SERVICE_NAME}".timer
+                ;;
+            *)
+                echo "Error: Invalid argument to job subcommand: '$JOB_STATUS'. Use 'enable' or 'disable'." >&2
+                show_usage
+                exit 1
+                ;;
+        esac
+        ;;
+    g|git)
+        if [ "$#" -lt 2 ]; then
+            echo "No git arguments provided. Showing git status in: $AUTOMATION_DIR"
+            cd "$AUTOMATION_DIR" || exit
+            git status
+        else
+            echo "Running git ${*:2} in: $AUTOMATION_DIR"
+            cd "$AUTOMATION_DIR" || exit
+            git "${@:2}"
+        fi
+        ;;
+    h|-h|help|--help)
+        show_usage
+        ;;
+    *)
+        echo "Error: Invalid subcommand '$1'." >&2
+        show_usage
+        exit 1
+        ;;
+esac
+
+exit 0

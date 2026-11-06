@@ -1,0 +1,7 @@
+# Written by the ansible_pull role. ansible-pull.service loads it, and h reads
+# it, so both run the same playbook from the same checkout.
+ANSIBLE_PULL_DIRECTORY={{ playbook_path }}
+ANSIBLE_PULL_URL={{ homelab_ansible_repo_git }}
+ANSIBLE_PULL_PUSH_URL={{ homelab_ansible_repo_git_ssh }}
+ANSIBLE_PULL_PLAYBOOK={{ ansible_pull_playbook }}
+ANSIBLE_CONFIG={{ ansible_pull_config }}

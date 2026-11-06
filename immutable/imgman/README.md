@@ -30,6 +30,8 @@ imgman machine gui  [HOST]                          open the VM's display in rem
 imgman machine rm   [HOST] [--all]                  stop the VM and remove its overlay
 imgman test image   [HOST] [--all] [--flavor NAME] [--rm] [--no-gui]
                                                     install if needed, boot fresh, and check the VM
+imgman test playbook [HOST] [--all] [--flavor NAME] [--rm] [--no-gui]
+                                                    run the host's playbook from the working tree, twice
 ```
 
 - `HOST` defaults to this machine's short hostname when `hosts.toml` lists it.
@@ -62,6 +64,15 @@ and prints `PASS` or `FAIL` for each check:
 With a current disk, `test image` takes about 20 seconds per host. A reinstall
 adds about 7 minutes.
 
+`test playbook` is the check to run before committing a change to a playbook,
+role, or dotfile. It copies the working tree, including uncommitted and
+untracked changes but not `.git` or ignored files, into the VM's
+`/opt/homelab-automation`, then runs the host's playbook twice as the
+`ansible_pull` unit runs it. The first run must succeed, and the second must
+change nothing. It reuses the host's running VM, so repeated runs take seconds;
+`machine run` gives it a fresh overlay first. `--verbose` prints each run's
+output.
+
 ## Exit status
 
 | Code | Meaning |
@@ -81,6 +92,7 @@ everything missing at once.
 - `podman`, `qemu-system-x86_64`, `qemu-img`, and the OVMF firmware
   (`edk2-ovmf`), including its Secure Boot build.
 - `xorriso`, to read the installer ISO.
+- `rsync` and `git`, for `test playbook`.
 - `remote-viewer` (`virt-viewer`) and QEMU's SPICE support
   (`qemu-ui-spice-core`), for `machine gui`.
 - Read and write access to `/dev/kvm` and `/dev/vhost-vsock`.

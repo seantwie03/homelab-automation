@@ -57,6 +57,7 @@ BOOT = (
 )
 VIEWER = Requirements(commands=("remote-viewer",))
 REGISTRY = Requirements(commands=("podman",))
+SYNC = Requirements(commands=("git", "rsync"))
 
 
 def vsock_ssh_configured() -> bool:

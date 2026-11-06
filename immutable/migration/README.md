@@ -348,15 +348,24 @@ keep `/var/home`, and the install runbook in `migration/` matches what was done.
   github.com, so installers pull it without credentials.
 - [ ] OS updates (Q6): updates download and stage in the background, and apply
   only at the next reboot you do. Nothing reboots the laptop on its own.
-- [ ] `ansible_pull`: the unit runs `immutable/x1carbon23.yml` with the
-  overlay config, and `h` is baked into the image. Move `h`'s source under
-  `immutable/images/`, such as `immutable/images/bin/h`, instead of copying it
-  from the role, so role changes never rebuild the image (D5).
-- [ ] `immutable/x1carbon23.yml`, starting with `ansible_pull` and the roles
-  Phase 4 has ported so far.
-- [ ] `imgman test playbook`: copy the working tree into the VM, then run the
+- [x] `ansible_pull`: the unit runs `immutable/x1carbon23.yml` with the
+  overlay config, and `h` is baked into the image as `immutable/images/bin/h`,
+  so role changes never rebuild the image (D5). The overlay role writes
+  `/etc/ansible-pull.conf`, which the unit loads with `EnvironmentFile=` and
+  `h` reads, so the image holds no host-specific paths. It drops the pip
+  installs, the Snapper hooks, and its `dnf`, `nextdns`, and `podman`
+  dependencies; `nextdns` and `podman` return as Phase 4 ports them. The
+  overlay `core` keeps only the `is_graphical_system` fact; its packages
+  come from the image, with `images/scripts/base.sh` adding the three
+  Kinoite lacks. In Fedora 44, `dnf install wget p7zip` installs
+  `wget2-wget` and `7zip`; name those in `base.sh` with the next image change.
+- [x] `immutable/x1carbon23.yml`, starting with `ansible_pull`; it gains the
+  roles Phase 4 ports.
+- [x] `imgman test playbook`: copy the working tree into the VM, then run the
   host's playbook twice, as the `ansible_pull` unit runs it, expecting no
-  changes on the second run.
+  changes on the second run. `imgman test playbook x1carbon23` converges in
+  6 seconds (9 changes) and reruns with no changes; the whole command takes
+  12 seconds on a running VM.
 - [ ] Add the Fedora package of each collection a ported role needs to
   `immutable/images/scripts/ansible.sh`, which starts with only
   `ansible.posix`.

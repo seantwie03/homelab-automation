@@ -1,0 +1,53 @@
+_h() {
+    local cur prev
+    # COMPREPLY is the array of possible completions.
+    # COMP_WORDS is an array containing the individual words in the current command line.
+    # COMP_CWORD is the index of the current word in the COMP_WORDS array.
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    local ANSIBLE_PULL_DIRECTORY ANSIBLE_PULL_PLAYBOOK
+    # shellcheck source=/dev/null
+    [ -r /etc/ansible-pull.conf ] && . /etc/ansible-pull.conf
+    local AUTOMATION_DIR="${ANSIBLE_PULL_DIRECTORY:-}"
+    # Playbooks live beside this host's playbook, such as immutable/.
+    local playbook_dir prefix=""
+    playbook_dir="$(dirname "${ANSIBLE_PULL_PLAYBOOK:-.}")"
+    [ "$playbook_dir" != . ] && prefix="$playbook_dir/"
+    local subcommands="edit commit git logs run test job help"
+
+    case ${COMP_CWORD} in
+        1)
+            mapfile -t COMPREPLY < <(compgen -W "${subcommands}" -- "${cur}")
+            ;;
+        2)
+            case "${prev}" in
+                t|test)
+                    if [ -d "${AUTOMATION_DIR}/${playbook_dir}" ]; then
+                        local yaml_files=()
+                        while IFS= read -r -d '' file; do
+                            yaml_files+=("${prefix}$(basename "$file")")
+                        done < <(find "${AUTOMATION_DIR}/${playbook_dir}" -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \) ! -name ".*" -print0 2>/dev/null)
+
+                        if [ ${#yaml_files[@]} -gt 0 ]; then
+                            mapfile -t COMPREPLY < <(compgen -W "${yaml_files[*]}" -- "${cur}")
+                        fi
+                    fi
+                    ;;
+                j|job)
+                    local job_actions="enable disable"
+                    mapfile -t COMPREPLY < <(compgen -W "${job_actions}" -- "${cur}")
+                    ;;
+                g|git)
+                    local git_subcommands="add commit push pull status log diff branch checkout reset fetch merge rebase tag remote stash show config"
+                    mapfile -t COMPREPLY < <(compgen -W "${git_subcommands}" -- "${cur}")
+                    ;;
+            esac
+            ;;
+    esac
+
+    return 0
+}
+
+# Register the completion function for the 'h' command
+complete -F _h h
