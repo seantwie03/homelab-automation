@@ -27,12 +27,23 @@ The reasons and rejected alternatives are in the
 
 ## Scope
 
-| Order | Host | Purpose | GPU | Target image | Disk encryption |
-| --- | --- | --- | --- | --- | --- |
-| 1 | x1carbon23 | Laptop, the first bootc host | Intel Iris Xe | `workstation-kde` | LUKS2, TPM2 + PIN ([D8](../docs/architecture.md#d8-full-disk-encryption)) |
-| 2 | desktop22 | Workstation, canary once migrated | NVIDIA RTX 4070 SUPER | `workstation-kde-nvidia` | Q18 |
-| 3 | desktop25 | Workstation | NVIDIA RTX 2070, installed before cutover | `workstation-kde-nvidia` | Q18 |
-| 4 | odroidh3plus | Server, NFS/SMB, retro-gaming kiosk | Intel | `server` | Q18 |
+| Order | Host         | Purpose       | GPU             | Target image             | Disk         |
+|       |              |               |                 |                          | encryption   |
+|-------|--------------|---------------|-----------------|--------------------------|--------------|
+| 1     | x1carbon23   | Laptop, the   | Intel Iris Xe   | `workstation-kde`        | LUKS2, TPM2  |
+|       |              | first bootc   |                 |                          | + PIN        |
+|       |              | host          |                 |                          | ([D8][d8])   |
+| 2     | desktop22    | Workstation   | NVIDIA RTX 4070 | `workstation-kde-nvidia` | Q18          |
+|       |              |               | SUPER           |                          |              |
+| 3     | desktop25    | Workstation   | NVIDIA RTX      | `workstation-kde-nvidia` | Q18          |
+|       |              |               | 2070, installed |                          |              |
+|       |              |               | before cutover  |                          |              |
+| 4     | odroidh3plus | Server,       | Intel           | `server`                 | Q18          |
+|       |              | NFS/SMB,      |                 |                          |              |
+|       |              | retro-gaming  |                 |                          |              |
+|       |              | kiosk         |                 |                          |              |
+
+[d8]: ../docs/architecture.md#d8-full-disk-encryption
 
 x1carbon23 goes first. It is new hardware with no data to restore, it needs no
 NVIDIA modules, and x1carbon2018 stays in service while it settles in. It runs
@@ -74,14 +85,8 @@ Exceptions to the mirror rule:
 A phase is done when its "done when" holds, its capability tests pass, and
 the durable docs for what it delivered exist under `immutable/`.
 
-A phase that adds a significant capability adds capability tests: end-to-end
-checks that use the capability the way a person would. For example, opening a
-file in a TypeScript project in Neovim attaches the `ts_ls` language server.
-That one check covers Neovim, Node.js, the language server install, the
-dotfiles, and `PATH` together. Do not write tests that restate a task, such as
-checking that a package version is installed or that a symlink exists. A
-capability test that should keep passing on a running host also becomes the
-check in the owning role's MONITORING file.
+A phase that adds a significant capability adds
+[capability tests](../docs/architecture.md#capability-tests).
 
 ### Phase 0: Overlay setup
 
@@ -110,7 +115,7 @@ rollback, and `bootc status` reports the expected image.
 - [x] `immutable/images/Containerfile.kde` and shared scripts: Ansible
   bootstrap (`git`, `python3`, `ansible-core`, collections) and
   `/srv`.
-- [x] VM harness (tier 2): build a disk from the image, boot it with a
+- [x] VM harness: build a disk from the image, boot it with a
   copy-on-write overlay, run the checks over SSH, exit nonzero when a check
   fails.
 - [x] Upgrade and rollback rehearsal in the VM.
@@ -453,13 +458,12 @@ them, where `check-homelab-host` uses them after every upgrade:
 
 ### Phase 5: Runtime roles for desktop22
 
-**Depends on:** Phase 4, Q9.
+**Depends on:** Phase 4.
 
 **Done when:** `immutable/desktop22.yml` converges in a VM installed with
 desktop22's kickstart, a second run reports no changes, and every role under
 [desktop22](#desktop22) is checked off with its README and MONITORING current.
 
-- [ ] Container tests (tier 1) for fast role iteration.
 - [ ] Refactor the roles desktop22 adds to x1carbon23's.
 - [ ] `immutable/desktop22.yml`.
 - [ ] Add `imgman`'s host requirements (see "Prerequisites" in
@@ -476,6 +480,13 @@ certificate enrolled, and `immutable/images/README.md` covers NVIDIA builds,
 enrollment, and certificate rotation. Module loading under Secure Boot can only
 be confirmed on hardware, in Phase 12.
 
+- [ ] Before building the NVIDIA option, study how Bazzite builds its NVIDIA
+  images since Fedora 45: everything in one build stage, with the NVIDIA
+  additions behind a build argument. See the
+  [Bazzite 45 announcement](https://universal-blue.discourse.group/t/bazzite-45-is-here/12702)
+  and `build_files/` in [ublue-os/bazzite](https://github.com/ublue-os/bazzite).
+  `imgman` maps each flavor to its own `Containerfile.<flavor>`, so adopting a
+  build argument also means deciding how a flavor selects it.
 - [ ] NVIDIA build option using Universal Blue's prebuilt modules.
 - [ ] desktop22 and desktop25 map to `kde-nvidia` in `hosts.toml`.
 - [ ] Certificate fingerprint checked against a source independent of the
@@ -504,16 +515,15 @@ are promoted only after `imgman test upgrade` passes, and
   first: KVM access, free disk space, QEMU and Podman inside the container,
   caching the installer ISO, and run time.
 - [ ] A playbook workflow for changes outside `immutable/images/`: run
-  `imgman test playbook` on the current published image, run the capability
-  tests, and publish nothing.
+  `imgman test playbook` on `:stable`, run the capability tests, and publish
+  nothing.
 - [ ] Tag, digest, and retention scheme.
 - [ ] The GHCR packages are public, so installers pull them without
   credentials.
 - [ ] Signing (Q17): CI signs each published image without a long-lived key,
   and hosts enforce a signature policy for `ghcr.io/seantwie03`.
-- [ ] `imgman test upgrade`, the upgrade test for
-  [D7](../docs/architecture.md#d7-playbooks-support-the-current-and-next-image),
-  run before promotion and in CI:
+- [ ] `imgman test upgrade`, run before promotion and in CI (see the
+  [testing strategy](../docs/architecture.md#testing-strategy)):
   1. Start from a cached disk installed from the current image and converged
      once. Run the working tree's playbook twice, expecting no changes on the
      second run, and run the capability tests.
@@ -556,6 +566,12 @@ no changes, and every role under [odroidh3plus](#odroidh3plus) is checked off
 with its README and MONITORING current.
 
 - [ ] `server` image: fedora-bootc, no desktop, `cage` for the kiosk.
+- [ ] `/usr/local` is the same on both images: a shared script links it to
+  `/var/usrlocal` where the base image ships a directory, as fedora-bootc does,
+  and adds a tmpfiles rule for `/var/usrlocal/bin`. Neither base image's
+  tmpfiles rules create it, although the x1carbon23 VM has it. `bootc
+  container lint --fatal-warnings` accepts a fedora-bootc image with the link
+  (checked 2026-11-07); booting one waits for odroidh3plus's kickstart.
 - [ ] `immutable/images/kickstart/odroidh3plus.ks`, with `ignoredisk
   --only-use` keeping the `/srv` volume, and odroidh3plus in `hosts.toml`.
 - [ ] Refactor the server roles.
@@ -617,19 +633,16 @@ One-time checks:
 - [ ] Games SSD mounted at `/srv/games` with its contents intact, and Steam's
   library folder re-added at the new path.
 
-### Phase 13: Promotion and OS updates
+### Phase 13: OS updates
 
 **Depends on:** Phase 12, Q6.
 
-**Done when:** promoting a build from the canary to the other hosts works as
-documented in `immutable/images/README.md`, and bootc hosts receive OS updates
-as Q6 decides.
+**Done when:** every bootc host tracks `:stable` and receives OS updates as Q6
+decides.
 
-- [ ] desktop22 becomes the canary that follows the newest build; x1carbon23
-  and the other hosts move to a tag after desktop22 has run it.
 - [ ] Automatic OS updates on each host.
-- [ ] Capability test: a VM tracking the promoted tag installs a newly
-  promoted build on its next update.
+- [ ] Capability test: a VM tracking `:stable` installs a newly published
+  build on its next update.
 
 ### Phase 14: desktop25 cutover
 
@@ -718,9 +731,13 @@ and desktop25 run all of them too.
 
 - [ ] `core`: base packages to the image; limits, sysctl, and group membership
   stay.
-- [ ] `ansible_pull`: `ansible-core`, `git`, collections, and `h` to the image;
-  units and logrotate stay; drop pip upgrades, `dnf-makecache` ordering, and
-  Snapper hooks.
+- [ ] `ansible_pull`: `ansible-core`, `git`, and collections to the image;
+  units, logrotate, and `h` stay; drop pip upgrades, `dnf-makecache` ordering,
+  and Snapper hooks. Move `h` from `immutable/images/bin/` back into the role,
+  installed as `/usr/local/bin/h` with its completion in
+  `/etc/bash_completion.d/`, then remove `bin/` and its `COPY` lines from the
+  image. `/usr/local/bin` comes before `/usr/bin` on `PATH`, so the role's
+  `h` takes over before the image change lands.
 - [ ] `dnf`: drop; OS updates come from images (Q6).
 - [ ] `rpm_fusion`: drop. Images use no RPM Fusion (Q14): Flatpak apps bring
   their own codecs, and Steam comes from Flathub.
@@ -737,7 +754,12 @@ and desktop25 run all of them too.
 - [ ] `network_storage`: `nfs-utils` to the image; automounts and groups stay.
   Mount `/source` at `/srv/source`. The role needs separate remote and local
   paths, because odroidh3plus keeps exporting `/source` until its cutover in
-  Phase 15.
+  Phase 15. `/srv` links to `/var/srv`, so fstab entries name the real mount
+  point, such as `/var/srv/tier1`: on Fedora Atomic, an fstab mount point
+  under the `/mnt` link failed where its `/var/mnt` path worked
+  ([Team Silverblue issue 46](https://pagure.io/teamsilverblue/issue/46)).
+  Everything else, people and scripts included, uses `/srv`. Confirm the
+  mounts in the VM.
 - [ ] `docker`, `podman`: packages to the image; enablement and groups stay.
 - [ ] `libvirt`: packages to the image, including QEMU, OVMF, the SPICE
   support that `imgman` needs, and `python3-libvirt` for
@@ -780,8 +802,9 @@ The roles desktop22 adds to x1carbon23's.
 - [ ] `ai_health_monitor`: system user to the image; sudoers, logrotate,
   scripts, and units stay.
 - [ ] `gaming`: Steam from Flathub (Q14); Wine and udev rules to the image;
-  user configuration stays. Mount the games SSD at
-  `/srv/games`; no role manages that mount today.
+  user configuration stays. Mount the games SSD at `/srv/games`, with
+  `/var/srv/games` in fstab, as `network_storage` does; no role manages that
+  mount today.
 
 ### desktop25
 
@@ -815,28 +838,78 @@ Each of these describes the traditional setup. Write its replacement under
 
 ## Open questions
 
-| # | Question | Blocks |
-| --- | --- | --- |
-| Q3 | Universal Blue modules (D3): certificate provenance, how quickly matching modules follow Fedora kernel updates, and what builds do in between. | Phase 6 |
-| Q5 | Publishing (D5): retention, and how a host is promoted to a release once CI publishes. The tags are decided: `:stable`, which hosts track, plus a date-and-commit tag per build. | Phase 7 |
-| Q7 | The `cli` role installs your everyday tools with `dnf`, which runtime roles cannot do. Which go into the image, and which become pinned user-space downloads (D4)? The recommendation: stable distro tools (`git`, `tree`, `bind-utils`, `fzf`, `bat`, `abduco`) into the image; fast-moving tools with release builds (Neovim, `gh`, `yazi`, `asciinema`) into user space. The login shell is bash, which the image already ships. | Phase 4 |
-| Q9 | Container tests: which roles can converge in a container, and how do playbooks written for `hosts: localhost` with a local connection target the container instead of the machine running the tests? | Phase 5 |
-| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1): where do the checkout and karakeep's compose project live? When does the server apply staged OS updates, given that workstations apply them only at a reboot you do (Q6)? | Phases 9 and 15 |
-| Q13 | Switching desktops replaces `/usr` but not configuration in home directories. What does a clean switch require? | Phase 8 |
-| Q16 | x1carbon2018, which x1carbon23 replaces: a backup for odroidh3plus on the `server` image, or retired? Its workstation kickstart and `hosts.toml` entry were removed. | Phase 9, if it becomes a server |
-| Q17 | Image signing: CI signs published images without a long-lived key (cosign keyless signing with GitHub Actions' identity), and hosts enforce a signature policy for `ghcr.io/seantwie03`, switching to it with `bootc switch --enforce-container-sigpolicy` after an install that used `--no-signature-verification`. Until then, hosts track unsigned images, protected by the GHCR account's two-factor login. | Phase 7 |
-| Q18 | Disk encryption for desktop22, desktop25, and odroidh3plus, decided per host ([D8](../docs/architecture.md#d8-full-disk-encryption)). An encrypted desktop or server unlocks with TPM2 automatic unlock. The games SSD and the `/srv` volume survive installs unencrypted unless reformatted and restored, and a headless server whose automatic unlock breaks after a firmware update waits at a passphrase prompt. | Phase 10 |
+| #   | Question                                                                     | Blocks      |
+|-----|------------------------------------------------------------------------------|-------------|
+| Q3  | Universal Blue modules (D3): certificate provenance, how quickly matching    | Phase 6     |
+|     | modules follow Fedora kernel updates, and what builds do in between.         |             |
+| Q5  | Publishing (D5): retention. The tags are decided: `:stable`, which every     | Phase 7     |
+|     | host tracks and CI moves to a build once it passes its VM tests, plus a      |             |
+|     | date-and-commit tag per build.                                               |             |
+| Q7  | The `cli` role installs your everyday tools with `dnf`, which runtime roles  | Phase 4     |
+|     | cannot do. Which go into the image, and which become pinned user-space       |             |
+|     | downloads (D4)? The recommendation: stable distro tools (`git`, `tree`,      |             |
+|     | `bind-utils`, `fzf`, `bat`, `abduco`) into the image; fast-moving tools with |             |
+|     | release builds (Neovim, `gh`, `yazi`, `asciinema`) into user space. The      |             |
+|     | login shell is bash, which the image already ships.                          |             |
+| Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own    | Phases 9    |
+|     | volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1):   | and 15      |
+|     | where do the checkout and karakeep's compose project live? When does the     |             |
+|     | server apply staged OS updates, given that workstations apply them only at a |             |
+|     | reboot you do (Q6)?                                                          |             |
+| Q13 | Switching desktops replaces `/usr` but not configuration in home             | Phase 8     |
+|     | directories. What does a clean switch require?                               |             |
+| Q16 | x1carbon2018, which x1carbon23 replaces: a backup for odroidh3plus on the    | Phase 9, if |
+|     | `server` image, or retired? Its workstation kickstart and `hosts.toml` entry | it becomes  |
+|     | were removed.                                                                | a server    |
+| Q17 | Image signing: CI signs published images without a long-lived key (cosign    | Phase 7     |
+|     | keyless signing with GitHub Actions' identity), and hosts enforce a          |             |
+|     | signature policy for `ghcr.io/seantwie03`, switching to it with              |             |
+|     | `bootc switch --enforce-container-sigpolicy` after an install that used      |             |
+|     | `--no-signature-verification`. Until then, hosts track unsigned images,      |             |
+|     | protected by the GHCR account's two-factor login.                            |             |
+| Q18 | Disk encryption for desktop22, desktop25, and odroidh3plus, decided per host | Phase 10    |
+|     | ([D8](../docs/architecture.md#d8-full-disk-encryption)). An encrypted        |             |
+|     | desktop or server unlocks with TPM2 automatic unlock. The games SSD and the  |             |
+|     | `/srv` volume survive installs unencrypted unless reformatted and restored,  |             |
+|     | and a headless server whose automatic unlock breaks after a firmware update  |             |
+|     | waits at a passphrase prompt.                                                |             |
 
 ## Answered questions
 
-| # | Answer |
-| --- | --- |
-| Q1 | Kinoite links `/opt`, `/srv`, `/usr/local`, `/home`, `/mnt`, and `/root` into `/var`. Workstations keep the checkout at `/opt/homelab-automation`, the image adds no top-level directories, and runtime roles create the directories under `/srv`. fedora-bootc links `/srv` but ships `/opt` and `/usr/local` as read-only directories, which moves the server's checkout question to Q12. Recorded in the [filesystem table](../docs/architecture.md#filesystem). |
-| Q2 | KDE builds on `quay.io/fedora/fedora-kinoite`, published by Fedora release engineering. `quay.io/fedora-ostree-desktops/kinoite` is the Atomic Desktops SIG's CI channel for the same composes, with dated tags and sigstore signatures. The official repository has only the major-version tag and no signatures, so builds pin by digest when publishing starts (Q5). Recorded in [D2](../docs/architecture.md#d2-one-base-image-per-desktop). |
-| Q4 | Each host is installed by a kickstart file whose `ostreecontainer` directive installs the host's image directly, with the disk layout declared in the file. VM test disks are installed with the same kickstarts, from images built locally and served by the test registry, so kickstart development starts in Phase 2. A host's hardware install waits until its kickstart and image pass in a VM. Recorded in Phases 2, 3, and 10. |
-| Q6 | Workstations download and stage OS updates in the background and apply them only at the next reboot you do; nothing reboots them on their own. bootc's stock update timer, which reboots to apply, is not used as shipped. The server's policy is part of Q12. Recorded in Phase 3. |
-| Q8 | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`) live in user space, each through its own version manager, so per-project versions and updates need no image build. The image keeps only `python3`, which Ansible needs. |
-| Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: `imgman test playbook` copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`. |
-| Q11 | Claude Code finds skills under `immutable/` only after a session touches a file there. Codex finds them only when started inside `immutable/`. Skills go in the root `.agents/skills/`; see the exceptions under [how the overlay works](#how-the-overlay-works). |
-| Q14 | Images use no RPM Fusion. Flatpak apps, including Firefox, bring their own codecs, Steam comes from Flathub, and hardware video decoding uses what Fedora ships. Recorded in the role checklist. |
-| Q15 | Workstations run no SSH server: images leave `sshd.service` disabled, as Kinoite ships it, and no role enables it. desktop22 runs one today, so it loses it at its cutover. |
+| #   | Answer                                                                                     |
+|-----|--------------------------------------------------------------------------------------------|
+| Q1  | Kinoite links `/opt`, `/srv`, `/usr/local`, `/home`, `/mnt`, and `/root` into `/var`.      |
+|     | Workstations keep the checkout at `/opt/homelab-automation`, the image adds no top-level   |
+|     | directories, and runtime roles create the directories under `/srv`. fedora-bootc links     |
+|     | `/srv` but ships `/opt` and `/usr/local` as read-only directories, which moves the         |
+|     | server's checkout question to Q12. Recorded in the                                         |
+|     | [filesystem table](../docs/architecture.md#filesystem).                                    |
+| Q2  | KDE builds on `quay.io/fedora/fedora-kinoite`, published by Fedora release engineering.    |
+|     | `quay.io/fedora-ostree-desktops/kinoite` is the Atomic Desktops SIG's CI channel for the   |
+|     | same composes, with dated tags and sigstore signatures. The official repository has only   |
+|     | the major-version tag and no signatures, so builds pin by digest when publishing starts    |
+|     | (Q5). Recorded in [D2](../docs/architecture.md#d2-one-base-image-per-desktop).             |
+| Q4  | Each host is installed by a kickstart file whose `ostreecontainer` directive installs the  |
+|     | host's image directly, with the disk layout declared in the file. VM test disks are        |
+|     | installed with the same kickstarts, from images built locally and served by the test       |
+|     | registry, so kickstart development starts in Phase 2. A host's hardware install waits      |
+|     | until its kickstart and image pass in a VM. Recorded in Phases 2, 3, and 10.               |
+| Q6  | Workstations download and stage OS updates in the background and apply them only at the    |
+|     | next reboot you do; nothing reboots them on their own. bootc's stock update timer, which   |
+|     | reboots to apply, is not used as shipped. The server's policy is part of Q12. Recorded in  |
+|     | Phase 3.                                                                                   |
+| Q8  | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`) live in user space, each through  |
+|     | its own version manager, so per-project versions and updates need no image build. The      |
+|     | image keeps only `python3`, which Ansible needs.                                           |
+| Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches |
+|     | at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: `imgman test playbook` |
+|     | copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`.    |
+| Q11 | Claude Code finds skills under `immutable/` only after a session touches a file there.     |
+|     | Codex finds them only when started inside `immutable/`. Skills go in the root              |
+|     | `.agents/skills/`; see the exceptions under                                                |
+|     | [how the overlay works](#how-the-overlay-works).                                           |
+| Q14 | Images use no RPM Fusion. Flatpak apps, including Firefox, bring their own codecs, Steam   |
+|     | comes from Flathub, and hardware video decoding uses what Fedora ships. Recorded in the    |
+|     | role checklist.                                                                            |
+| Q15 | Workstations run no SSH server: images leave `sshd.service` disabled, as Kinoite ships it, |
+|     | and no role enables it. desktop22 runs one today, so it loses it at its cutover.           |

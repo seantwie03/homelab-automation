@@ -1,0 +1,37 @@
+---
+- name: claude code config directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.claude
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+
+- name: antigravity global rules directory exists
+  ansible.builtin.file:
+    path: /home/{{ user }}/.gemini
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+
+- name: shared agent instructions are symlinked
+  ansible.builtin.file:
+    src: "{{ dotfiles_path }}/agents/AGENTS.md"
+    dest: "{{ item }}"
+    state: link
+    follow: false
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  loop:
+    - /home/{{ user }}/.claude/CLAUDE.md
+    - /home/{{ user }}/.codex/AGENTS.md
+    - /home/{{ user }}/.gemini/GEMINI.md
+
+- name: align-tables is installed
+  ansible.builtin.copy:
+    src: align-tables.el
+    dest: /home/{{ user }}/bin/align-tables
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0550

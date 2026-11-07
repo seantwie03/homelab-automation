@@ -75,13 +75,14 @@ output.
 
 ## Exit status
 
-| Code | Meaning |
-| --- | --- |
-| 0 | Success. |
-| 1 | Bad input: arguments, `hosts.toml`, or other configuration. |
-| 2 | Missing prerequisite: a command, a device, the installer ISO, a VM that is not running, or a host another imgman command holds. |
-| 3 | A step or check failed, including a command `machine ssh` ran in the VM. |
-| 130 | Interrupted. |
+| Code | Meaning                                                                                   |
+|------|-------------------------------------------------------------------------------------------|
+| 0    | Success.                                                                                  |
+| 1    | Bad input: arguments, `hosts.toml`, or other configuration.                               |
+| 2    | Missing prerequisite: a command, a device, the installer ISO, a VM that is not running,   |
+|      | or a host another imgman command holds.                                                   |
+| 3    | A step or check failed, including a command `machine ssh` ran in the VM.                  |
+| 130  | Interrupted.                                                                              |
 
 ## Prerequisites
 

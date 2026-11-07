@@ -23,3 +23,7 @@
     creates: /home/{{ user }}/.local/bin/claude
   become: true
   become_user: "{{ user }}"
+
+# Runs after codex.yml, which creates ~/.codex and ~/bin.
+- name: shared agent instructions tasks are included
+  ansible.builtin.include_tasks: agent_instructions.yml

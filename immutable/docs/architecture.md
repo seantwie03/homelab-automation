@@ -9,15 +9,16 @@ everything a running host is allowed to change.
 ```text
 Image: built from images/, deployed to /usr
   Kernel and modules, desktop or kiosk compositor, system packages,
-  repositories and signing keys, Ansible bootstrap, h
+  repositories and signing keys, Ansible bootstrap
                          │ boots into
                          ▼
 Runtime: ansible-pull on each host, writing /etc, /var, and home directories
   Host configuration, per-host service enablement, mounts, users and groups,
-  Flatpaks, user-space CLI tools, dotfiles
+  Flatpaks, scripts in /usr/local, user-space CLI tools, dotfiles
 ```
 
-A change belongs in the image if it installs software or writes under `/usr`.
+A change belongs in the image if it installs software or writes under `/usr`,
+apart from `/usr/local`.
 Everything else belongs in a runtime role.
 
 ## Images
@@ -33,23 +34,107 @@ Everything else belongs in a runtime role.
 Niri and GNOME variants are possible additions (D2). `images/README.md` covers
 building, switching, upgrades, and rollback.
 
+### Tags
+
+Each build is pushed to GHCR under a tag of its build date and git commit,
+such as `:20261106-7ad2330`, and is identified by its digest. `:stable` is the
+only tag that moves. CI moves it to a build once the build passes its VM tests,
+and every host tracks it: a host stages each new `:stable` build in the
+background and boots it at its next reboot, with the previous deployment one
+GRUB entry away. How long old builds are kept is open.
+
 ## Filesystem
 
-**Status:** decided for workstation images, where `imgman test image` checks
-the read-only, writable, and linked paths on every run. Proposed for the server
-image.
+**Status:** decided for workstation images, where every VM test checks the
+read-only, writable, and linked paths. Proposed for the server image.
 
-| Path | Owned by | Behavior |
-| --- | --- | --- |
-| `/usr` | Image | Read-only on a running host. |
-| `/etc` | Runtime | Writable. Local changes carry across image updates through a three-way merge. |
-| `/var` | Runtime | Persistent and writable. Holds `/var/home`, Flatpaks, and container storage. bootc copies the image's `/var` only at install, so image builds leave it empty. |
-| `/` | Image | Read-only. The image adds no top-level directories. |
-| `/srv` | Runtime | Links to `/var/srv` in every base image. Holds mounted and shared storage: `/srv/source`, `/srv/tier1`, and `/srv/tier2` (NFS mounts on clients, local data on odroidh3plus) and `/srv/games` (a local games disk). Runtime roles create these directories. |
-| `/opt` | Runtime on workstations | Kinoite links it to `/var/opt`. fedora-bootc ships it as a read-only directory. |
-| Repository checkout | Runtime | `/opt/homelab-automation` on workstations. The server's location is open. |
-| `/usr/local` | Runtime on workstations | Kinoite links it to `/var/usrlocal`. fedora-bootc ships it as a read-only directory. |
-| System disk | Kickstart | The EFI partition and `/boot` are unencrypted. On an encrypted host, a LUKS2 container holds the btrfs volume with `root`, `var`, and `home` (D8). |
+| Path         | Owned by     | Behavior                                                           |
+|--------------|--------------|--------------------------------------------------------------------|
+| `/usr`       | Image        | Read-only on a running host.                                       |
+| `/etc`       | Runtime      | Writable. Local changes carry across image updates through a       |
+|              |              | three-way merge.                                                   |
+| `/var`       | Runtime      | Persistent and writable. Holds `/var/home`, Flatpaks, and          |
+|              |              | container storage. bootc copies the image's `/var` only at         |
+|              |              | install, so image builds leave it empty.                           |
+| `/`          | Image        | Read-only. The image adds no top-level directories.                |
+| `/srv`       | Runtime      | Links to `/var/srv` in every base image. Holds mounted and shared  |
+|              |              | storage: `/srv/source`, `/srv/tier1`, and `/srv/tier2` (NFS mounts |
+|              |              | on clients, local data on odroidh3plus) and `/srv/games` (a local  |
+|              |              | games disk). Runtime roles create these directories.               |
+| `/opt`       | Runtime on   | Kinoite links it to `/var/opt`. fedora-bootc ships it as a         |
+|              | workstations | read-only directory.                                               |
+| Repository   | Runtime      | `/opt/homelab-automation` on workstations. The server's location   |
+| checkout     |              | is open.                                                           |
+| `/usr/local` | Runtime      | Links to `/var/usrlocal` in every image. Kinoite ships the link,   |
+|              |              | and the server image adds it in place of fedora-bootc's read-only  |
+|              |              | directory. Holds the scripts runtime roles install for systemd,    |
+|              |              | root, and `sudo`, in `/usr/local/bin`.                             |
+| System disk  | Kickstart    | The EFI partition and `/boot` are unencrypted. On an encrypted     |
+|              |              | host, a LUKS2 container holds the btrfs volume with `root`, `var`, |
+|              |              | and `home` (D8).                                                   |
+
+## Testing Strategy
+
+**Status:** proposed.
+
+Every change is tested in a VM booted from an image before it reaches a host.
+What a VM cannot show is checked on the host itself.
+
+### Tested in a VM
+
+VMs are created using the host's kickstart. Playbooks targeting specific hosts
+see the disk layout and users they expect. With this setup VMs can test:
+
+- Secure Boot
+- File system layout: read-only `/usr`, writable `/etc` and `/var`
+- A clean boot, with no failed units
+- Upgrades
+- Rollbacks
+- Ansible roles and idempotency
+
+Every host tracks `:stable` ([Tags](#tags)), so each change is tested on the
+image it will meet:
+
+- A playbook change converges on `:stable`.
+- A new build converges with the playbook on `main` before `:stable` moves to
+  it.
+
+Hosts run `:stable` nearly all the time: most new builds are the weekly rebuild
+with Fedora's updates, and image changes made here are rare, because most
+configuration lives in runtime roles. A host that has not rebooted for a while
+runs an older build, but older builds differ from `:stable` mostly in Fedora's
+package updates. Two consequences follow:
+
+- A role change that needs new image content waits until that image is
+  `:stable`: the image change first, the role change later.
+- A host that rolls back from `:stable` runs an image the playbook was not
+  tested on, and its ansible-pull runs may fail. Disable the timer with
+  `h job disable` until the host is upgraded again.
+
+Changes are tested in a VM before they are committed. CI also runs each
+playbook change on `:stable`, but the change reaches hosts through ansible-pull
+as soon as it is on `main`, so CI can only report a failing playbook after the
+fact. Testing before committing is the gate.
+
+Container tests were rejected. A container shares the host's kernel and is not
+a bootc deployment, so it shows less than a VM without a faster loop, and
+playbooks written for `hosts: localhost` would need changes to target one.
+
+#### Capability Tests
+
+One thing we don't want is tests becoming a copy of the Ansible tasks in
+reverse by ensuring that a package is installed when a task clearly says to
+install it. Instead, we will test capabilities. Example: when I open this
+TypeScript file with Neovim the `ts_ls` language server attaches. That one
+check covers Neovim, Node.js, the language server install, the dotfiles, and
+`PATH` together. A VM runs the capability tests after its playbook converges. A
+capability test that should keep passing on a running host is also the check in
+the owning role's MONITORING file.
+
+### Not Testable in a VM
+
+A VM is not good at testing specific hardware. Testing that an NVIDIA module
+loads under Secure Boot or that a TPM2 unlock works is not easily done in a VM.
 
 ## Decisions
 
@@ -60,13 +145,13 @@ settled. **Proposed** means the direction is chosen but still needs validation.
 
 **Status:** decided.
 
-Every host, including the server, runs a bootc image. ansible-pull stays and
-manages everything outside the image.
+Every host, including the server, runs a bootc image. ansible-pull manages
+everything outside the image.
 
 **Why:** Updates and rollbacks apply to the whole OS as one known build.
 Changing desktops replaces `/usr` without leftover packages. The workflow
-matches RHEL 10 image mode. The existing ansible-pull model carries over for
-host configuration.
+matches RHEL 10 image mode. ansible-pull keeps host configuration in this
+repository, and each host applies its own without a central control node.
 
 **Alternatives rejected:**
 
@@ -158,78 +243,38 @@ CI builds every image when its sources change and weekly. An image's sources
 are the `images/` directory, which is its only build context. Playbooks, roles,
 and dotfiles reach hosts through ansible-pull, never through the image, so
 changing them never builds or publishes an image. CI tests a playbook change
-without a build: a VM booted from the current published image runs the
-playbook twice and the capability tests (D7).
+without a build, as the [testing strategy](#testing-strategy) describes.
 
-Each build gets a date-and-commit tag and is identified by digest. Hosts track
-`:stable`, which moves to a build only after it passes its VM tests. desktop22
-follows the newest build. Other hosts move to a tag after desktop22 has run it.
-Until desktop22 runs an image, x1carbon23 is the only image-based host, and it
-moves to a build only after the build passes its VM tests.
+CI moves `:stable`, the tag every host tracks, to a build once the build
+passes its VM tests. [Tags](#tags) describes the scheme.
 
-**Why:** Weekly builds pick up Fedora updates. Hosts other than the canary
-never receive an untested build. Playbooks change more often than images, and
-a playbook change reaches hosts on their next ansible-pull run without a new
-image.
+**Why:** Weekly builds pick up Fedora updates, and no host receives a build
+that failed its VM tests. Workstations boot a new image only at a reboot you
+do, so a bad build shows at once, and the previous deployment is one GRUB
+entry away. Playbooks change more often than images, and a playbook change
+reaches hosts on their next ansible-pull run without a new image.
 
-**Alternative rejected:** Each host building its own image, which needs build
-tooling and build time on every host.
+**Alternatives rejected:**
 
-**Consequences:**
-
-- Promoting a release is a manual step.
-- Anything baked into an image lives under `images/`, such as `h`. Copying a
-  file in from a role would make role changes rebuild the image.
-
-### D6. Three test tiers
-
-**Status:** proposed.
-
-| Tier | Environment | Shows | Cannot show |
-| --- | --- | --- | --- |
-| 1 | Container | Runtime roles converge and are idempotent; tools and dotfiles install. | bootc behavior, read-only `/usr`, upgrades. |
-| 2 | VM booted from the image | Filesystem layout, `/etc` merge, persistence, upgrade and rollback. | GPU, Secure Boot, peripherals. |
-| 3 | desktop22 hardware | NVIDIA under Secure Boot, desktop session, audio, peripherals, daily use. | — |
-
-**Why:** Each tier covers what the cheaper tier cannot.
-
-**Consequences:** A VM harness exists before the first host changes, and no
-hardware change happens before tier 2 passes.
-
-### D7. Playbooks support the current and next image
-
-**Status:** proposed.
-
-ansible-pull applies the newest playbook on its next run, but a new image takes
-effect only after a reboot. For a while, every host runs the new playbook on
-the image it already has. Each playbook change must converge on two images:
-
-- **Current:** the oldest image any host runs. With canary promotion (D5),
-  that is the image the other hosts were last promoted to.
-- **Next:** the build that carries the change.
-
-**Why:** Hosts update their playbook and their image on different schedules.
-Supporting both images lets either update land first.
-
-**Alternative rejected:** Also supporting the previous image, which hosts reach
-by rolling back past the current one. It adds an image to every test for a
-three-host fleet.
+- Each host building its own image, which needs build tooling and build time
+  on every host.
+- A canary host that runs each build before `:stable` moves to it. It adds a
+  tag and a manual promotion step, and the workstations already reboot into
+  new images only while someone watches. Revisit it if hosts start rebooting
+  into updates on their own, as the server may.
 
 **Consequences:**
 
-- A role change that needs new image content ships after that image is current
-  on every host: the image change first, the role change later.
-- A host that upgrades to the next image and rolls back is on the current
-  image, which the playbook supports. A host that rolls back past the current
-  image may fail its ansible-pull runs. Disable the timer with
-  `h job disable` until the host is upgraded again.
-- The VM test runs the playbook and the capability tests on the current image,
-  again after upgrading to the next image, and again after rolling back.
+- A build that passes its VM tests reaches every host at its next update, with
+  no manual step. Rolling back a bad build is choosing the previous deployment
+  in GRUB, or `bootc rollback`.
+- Anything baked into an image lives under `images/`, such as repository
+  signing keys. Copying a file in from a role would make role changes rebuild
+  the image.
 
 ### D8. Full-disk encryption
 
-**Status:** decided for laptops. Whether each desktop and the server is
-encrypted is decided before its install.
+**Status:** decided for laptops. Open for each desktop and the server.
 
 Laptops encrypt the system disk with LUKS2. The EFI partition and `/boot` stay
 unencrypted, and the btrfs volume with `root`, `var`, and `home` sits inside
@@ -261,8 +306,8 @@ reboots matter.
 
 - The passphrase never enters the repository. The hardware install's
   kickstart has no `--passphrase`, so Anaconda asks for one. VM installs use a
-  throwaway passphrase that `imgman` passes on the kernel command line, and
-  the VM unlocks from a systemd credential. VMs have no TPM.
+  throwaway passphrase passed on the kernel command line, and the VM unlocks
+  from a systemd credential. VMs have no TPM.
 - TPM enrollment is a one-time step on the hardware, after the install. It
   needs the real TPM, and PCR 7 differs between the installer's boot and the
   installed system's.

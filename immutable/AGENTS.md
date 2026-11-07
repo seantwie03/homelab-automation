@@ -27,23 +27,27 @@ in `immutable/migration/README.md` before starting migration work.
 
 ## Image or runtime
 
-The image owns everything that installs software or writes under `/usr`:
-packages, repositories and their signing keys, kernel modules, compositors and
-display managers, units enabled on every host that uses the image, and the
-Ansible bootstrap.
+The image owns everything that installs software or writes under `/usr`, apart
+from `/usr/local`: packages, repositories and their signing keys, kernel
+modules, compositors and display managers, units enabled on every host that
+uses the image, and the Ansible bootstrap.
 
-Runtime roles own `/etc`, `/var`, and home directories: host configuration,
-per-host service enablement, mounts, users and groups, Flatpaks, user-space
-tools, and dotfiles.
+Runtime roles own `/etc`, `/var`, `/usr/local`, and home directories: host
+configuration, per-host service enablement, mounts, users and groups,
+Flatpaks, scripts, user-space tools, and dotfiles.
 
 Runtime roles must not:
 
 - Install or remove packages (`ansible.builtin.package`, `dnf`, `rpm_key`,
   `yum_repository`).
-- Write under `/usr`.
+- Write under `/usr`, except `/usr/local`, which every image links to
+  `/var/usrlocal`.
 - Run `pip` or `npm -g` installs outside a user's home directory.
 - Create directories directly under `/`. Mount points and shared data go under
   `/srv`.
+
+Scripts that systemd, root, or `sudo` run go in `/usr/local/bin`. A user's
+own tools go in their home directory.
 
 When a runtime role needs a package, add the package to the image build and
 list it in the role's README as an image requirement.

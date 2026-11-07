@@ -23,13 +23,28 @@ playbook from a copy of the working tree instead.
 
 ## Role Variables
 
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `homelab_ansible_repo_url` | `https://github.com/seantwie03/homelab-automation` | The repository's web page, for the unit's documentation link. |
-| `homelab_ansible_repo_git` | `https://github.com/seantwie03/homelab-automation.git` | The URL `ansible-pull` clones and pulls. |
-| `homelab_ansible_repo_git_ssh` | `git@github.com:seantwie03/homelab-automation.git` | The URL `h commit` pushes to. |
-| `ansible_pull_playbook` | `immutable/<hostname>.yml` | The playbook, relative to the checkout. |
-| `ansible_pull_config` | `<checkout>/immutable/ansible.cfg` | The Ansible configuration the playbook runs with. |
+| Variable                       | Default                                                | Meaning        |
+|--------------------------------|--------------------------------------------------------|----------------|
+| `homelab_ansible_repo_url`     | `https://github.com/seantwie03/homelab-automation`     | The            |
+|                                |                                                        | repository's   |
+|                                |                                                        | web page, for  |
+|                                |                                                        | the unit's     |
+|                                |                                                        | documentation  |
+|                                |                                                        | link.          |
+| `homelab_ansible_repo_git`     | `https://github.com/seantwie03/homelab-automation.git` | The URL        |
+|                                |                                                        | `ansible-pull` |
+|                                |                                                        | clones and     |
+|                                |                                                        | pulls.         |
+| `homelab_ansible_repo_git_ssh` | `git@github.com:seantwie03/homelab-automation.git`     | The URL        |
+|                                |                                                        | `h commit`     |
+|                                |                                                        | pushes to.     |
+| `ansible_pull_playbook`        | `immutable/<hostname>.yml`                             | The playbook,  |
+|                                |                                                        | relative to    |
+|                                |                                                        | the checkout.  |
+| `ansible_pull_config`          | `<checkout>/immutable/ansible.cfg`                     | The Ansible    |
+|                                |                                                        | configuration  |
+|                                |                                                        | the playbook   |
+|                                |                                                        | runs with.     |
 
 `playbook_path`, the checkout's location, is fixed at `/opt/homelab-automation`.
 

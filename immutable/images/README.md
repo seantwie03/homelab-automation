@@ -4,17 +4,18 @@ Bootable container images for bootc hosts. A host boots one of these images,
 then configures everything outside it with ansible-pull. See the
 [architecture](../docs/architecture.md) for what belongs in an image.
 
-| File                  | Purpose                                                                                        |
-|-----------------------|------------------------------------------------------------------------------------------------|
-| `Containerfile.kde`   | `workstation-kde`: KDE Plasma on Kinoite.                                                      |
-| `scripts/ansible.sh`  | Installs `git`, `python3`, `ansible-core`, and the Ansible collections that runtime roles use. |
-| `scripts/base.sh`     | Installs the command-line tools every host uses that the base image lacks.                     |
-| `scripts/updates.sh`  | Stages OS updates in the background without rebooting.                                         |
-| `scripts/onepassword.sh` | Installs the 1Password app and CLI.                                                         |
-| `keys/`               | Signing keys of the package repositories the scripts use.                                      |
-| `bin/h`               | `h`, the homelab management script, installed as `/usr/bin/h`, with its bash completion.       |
-| `hosts.toml`          | The hosts a VM can stand in for, and each host's flavor and VM resources.                      |
-| `kickstart/<host>.ks` | Installs a host, on its hardware or as a VM.                                                   |
+## Layout
+
+- `Containerfile.<flavor>`: one per image, such as `Containerfile.kde` for
+  `workstation-kde`.
+- `scripts/`: the build steps the Containerfiles run, one shell script each.
+- `keys/`: signing keys of the package repositories the scripts add.
+- `bin/`: files the image installs unchanged, such as `h` and its bash
+  completion.
+- `kickstart/`: one kickstart per host, `<host>.ks`, which installs the host on
+  its hardware or as a VM.
+- `hosts.toml`: the hosts a VM can stand in for, with each host's flavor and VM
+  resources.
 
 ## Contents
 
@@ -23,17 +24,21 @@ Each image starts from a Fedora base pinned to a major version by the
 
 - The Ansible bootstrap. `ansible-core` and the collections come from Fedora
   packages, which install collections to `/usr/share/ansible/collections`.
+  ansible-pull runs on first boot with no network installs, and both update
+  with the base image.
 - `h`, which manages the host's `ansible-pull` runs. It reads the host's
   settings from `/etc/ansible-pull.conf`, which the `ansible_pull` role writes,
   so the image holds no host-specific paths.
 - Command-line tools every host uses, such as `wget` and `7z`.
+- Tailscale. The `tailscale` role enables and configures it, and
+  `systemd-tmpfiles` creates its state and cache directories under `/var` at
+  boot.
+- The 1Password app and CLI, described under [1Password](#1password).
 - Staged OS updates. `bootc-fetch-apply-updates.timer` is enabled, with a
   drop-in that runs `bootc upgrade` without `--apply`: it downloads a newer
   image and stages it an hour after boot and every 8 hours, and the host
   boots into it at the next reboot you do. Nothing reboots the host on its
   own.
-  ansible-pull runs on first boot with no network installs, and both update
-  with the base image.
 
 ## Changing an image
 
@@ -56,9 +61,9 @@ Each image starts from a Fedora base pinned to a major version by the
   `--skip NAME` and a comment explaining why. `bootc container lint --list`
   lists the lints.
 - To add a package repository with a signing key, check the key into
-  `images/`, install it under `/etc/pki/rpm-gpg/`, import it from that file,
-  verify its full fingerprint, and keep `gpgcheck` enabled. Document how to
-  rotate the key in this README.
+  `images/keys/`, install it under `/etc/pki/rpm-gpg/`, import it from that
+  file, verify its full fingerprint, and keep `gpgcheck` enabled. Document how
+  to rotate the key in this README.
 - To add an Ansible collection a role needs, add its `ansible-collection-*`
   package to `scripts/ansible.sh`.
 - After every change, build the image with `imgman image build`, which also

@@ -145,6 +145,9 @@ of reporting it absent, which defeats the alternatives fallback."
   :ensure t
   :hook (tty-setup . global-kkp-mode))
 
+;; Mouse: send clicks, drags, and wheel events from the terminal to Emacs
+(xterm-mouse-mode 1)
+
 ;;; Terminal Clipboard Paste
 (use-package select
   :ensure nil
@@ -296,7 +299,7 @@ of reporting it absent, which defeats the alternatives fallback."
 
   :init
   (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
-  (setq evil-respect-visual-line-mode t)
+  (setq evil-want-Y-yank-to-eol t)
   (setq evil-undo-system 'undo-redo)
   :config
   (evil-mode 1))

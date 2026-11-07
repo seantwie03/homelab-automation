@@ -4,6 +4,26 @@ Install AI development tools for the user specified in the `user` variable.
 
 The role installs AI packages such as: Antigravity CLI, Antigravity ACP server (`agy_acp_server`), Codex, and Claude Code.
 
+## Shared Agent Instructions
+
+`dotfiles/agents/AGENTS.md` holds user-level instructions that apply to every project. The role symlinks it to the global instruction file of each agent:
+
+| Agent       | Global instruction file |
+|-------------|-------------------------|
+| Claude Code | `~/.claude/CLAUDE.md`   |
+| Codex       | `~/.codex/AGENTS.md`    |
+| Antigravity | `~/.gemini/GEMINI.md`   |
+
+Edit the repository file directly; each agent reads the change in its next session. The role sets `~/.claude` and `~/.gemini` to mode `0700` because they hold credentials.
+
+The instructions tell agents to align Markdown and Org tables with `align-tables`, an Emacs Lisp script that the role installs to `~/bin/align-tables`. It aligns every table in the given files in place with Emacs in batch mode, so Emacs and the `markdown-mode` package from the Emacs configuration must be installed:
+
+```sh
+align-tables README.md notes.org
+```
+
+It exits with status 3 and prints `FILE:LINE: table is N characters wide (limit 109)` for each aligned table wider than 109 characters. Wide tables are still aligned and saved; status 3 is only a warning that you can ignore.
+
 ## Antigravity Settings
 
 The role symlinks the `dotfiles/antigravity` directory in this repository to

@@ -463,12 +463,19 @@ Each host has one kickstart, `images/kickstart/<host>.ks`, which installs both t
 
 `%pre` reads up to four optional kernel arguments. Each one falls back on its own, so passing one never changes another:
 
-| Argument | Without it | imgman passes |
-| --- | --- | --- |
-| `imgman.url` | The host's published image | `10.0.2.2:5000/<host>/workstation-<flavor>:test` |
-| `imgman.disk` | The host's system disk, a `/dev/disk/by-id/` path | `vda` |
-| `imgman.insecure-registry` | Every registry is reached over TLS | `10.0.2.2:5000` |
-| `imgman.luks-passphrase` | Anaconda asks for the passphrase during the install | `imgman`, a throwaway passphrase |
+| Argument                   | Without it         | imgman passes                                    |
+|----------------------------|--------------------|--------------------------------------------------|
+| `imgman.url`               | The host's         | `10.0.2.2:5000/<host>/workstation-<flavor>:test` |
+|                            | published image    |                                                  |
+| `imgman.disk`              | The host's system  | `vda`                                            |
+|                            | disk, a            |                                                  |
+|                            | `/dev/disk/by-id/` |                                                  |
+|                            | path               |                                                  |
+| `imgman.insecure-registry` | Every registry is  | `10.0.2.2:5000`                                  |
+|                            | reached over TLS   |                                                  |
+| `imgman.luks-passphrase`   | Anaconda asks for  | `imgman`, a throwaway passphrase                 |
+|                            | the passphrase     |                                                  |
+|                            | during the install |                                                  |
 
 `arg` matches an argument only at the start of the command line or after a space, so `foo-imgman.url=` never matches. Before writing the target, `%pre` checks that the system disk exists and stops the install if it does not, before `clearpart --all` wipes anything.
 
@@ -530,17 +537,24 @@ Each kickstart also sets `bootloader --append="rootflags=subvol=root,compress=zs
 ### Requirements
 Before doing any work, imgman checks what the command needs, lists everything missing at once, and exits 2. Each check applies only to the commands that need it, so a missing `remote-viewer` fails only `machine gui`. Commands that create disks or boot VMs also warn, without failing, when less than 25 GB is free under `~/.cache/homelab-images`.
 
-| Where | Needs | Used for |
-| --- | --- | --- |
-| Host | Python 3.14 or later and `uv` | Running and installing imgman (see "Project Layout") |
-| Host | `podman`, `qemu-system-x86_64`, `qemu-img`, `edk2-ovmf`, `qemu-ui-spice-core` | Builds, VMs, UEFI firmware (the standard and the Secure Boot builds), the SPICE display |
-| Host | `xorriso` | Extracting the kernel, initrd, and volume label from the ISO |
-| Host | `remote-viewer` (`virt-viewer`) | `machine gui` |
-| Host | `rsync`, `ssh`, and an ssh configuration that sends `vsock/` hosts through `systemd-ssh-proxy` | Vsock SSH and the `test playbook` sync |
-| Host | Read and write access to `/dev/kvm` and `/dev/vhost-vsock` | KVM and vsock |
-| Host | The Fedora netinst ISO | `machine init` (see "Installer ISO") |
-| Image | `rsync` (Kinoite ships it) | Receiving the `test playbook` sync |
-| Image | `spice-vdagent` (Kinoite ships it) | Pasting host text into the guest, and display resizing |
+| Where | Needs                             | Used for                                             |
+|-------|-----------------------------------|------------------------------------------------------|
+| Host  | Python 3.14 or later and `uv`     | Running and installing imgman (see "Project Layout") |
+| Host  | `podman`, `qemu-system-x86_64`,   | Builds, VMs, UEFI firmware (the standard and the     |
+|       | `qemu-img`, `edk2-ovmf`,          | Secure Boot builds), the SPICE display               |
+|       | `qemu-ui-spice-core`              |                                                      |
+| Host  | `xorriso`                         | Extracting the kernel, initrd, and volume label from |
+|       |                                   | the ISO                                              |
+| Host  | `remote-viewer` (`virt-viewer`)   | `machine gui`                                        |
+| Host  | `rsync`, `ssh`, and an ssh        | Vsock SSH and the `test playbook` sync               |
+|       | configuration that sends `vsock/` |                                                      |
+|       | hosts through `systemd-ssh-proxy` |                                                      |
+| Host  | Read and write access to          | KVM and vsock                                        |
+|       | `/dev/kvm` and `/dev/vhost-vsock` |                                                      |
+| Host  | The Fedora netinst ISO            | `machine init` (see "Installer ISO")                 |
+| Image | `rsync` (Kinoite ships it)        | Receiving the `test playbook` sync                   |
+| Image | `spice-vdagent` (Kinoite ships    | Pasting host text into the guest, and display        |
+|       | it)                               | resizing                                             |
 
 Workstations that run imgman are bootc hosts, so the host packages come from the workstation image, not a runtime role. Image packages missing from the base image are added to the image's build scripts.
 
@@ -642,13 +656,15 @@ Model the domain so that illegal states cannot be represented, and let the type 
 
 ### Exit Codes
 
-| Code | Meaning |
-| --- | --- |
-| 0 | Success. |
-| 1 | Bad input: arguments, `hosts.toml`, or other configuration. |
-| 2 | Missing prerequisite: something must exist or finish first, such as a command, a device, the installer ISO, a running VM for `machine gui`, a current image for `test upgrade`, or a host another command holds. |
-| 3 | A step or check failed. |
-| 130 | Interrupted with Ctrl-C. |
+| Code | Meaning                                                                                   |
+|------|-------------------------------------------------------------------------------------------|
+| 0    | Success.                                                                                  |
+| 1    | Bad input: arguments, `hosts.toml`, or other configuration.                               |
+| 2    | Missing prerequisite: something must exist or finish first, such as a command, a device,  |
+|      | the installer ISO, a running VM for `machine gui`, a current image for `test upgrade`, or |
+|      | a host another command holds.                                                             |
+| 3    | A step or check failed.                                                                   |
+| 130  | Interrupted with Ctrl-C.                                                                  |
 
 - argparse exits 2 on a usage error by default. imgman overrides `ArgumentParser.error` to exit 1.
 - An expected failure prints one `imgman: ...` line, plus details such as the failed checks, and no traceback. A traceback means a bug in imgman.

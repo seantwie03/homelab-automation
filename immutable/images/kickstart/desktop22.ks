@@ -1,4 +1,4 @@
-# Installs desktop22, a workstation and the canary, on its hardware or as an imgman VM.
+# Installs desktop22, a workstation, on its hardware or as an imgman VM.
 #
 # %pre reads three optional kernel arguments, each on its own:
 #   imgman.url                the image to install
