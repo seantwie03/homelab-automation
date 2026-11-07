@@ -124,4 +124,13 @@ h                                                     # ansible-pull.service sta
 sudo cryptsetup luksDump "$disk" | grep systemd-tpm2  # the TPM2 token
 ```
 
+Then sign in to 1Password, which never signs in to a VM, and check:
+
+1. It starts on its own at login.
+2. After locking it, it unlocks with the system password. This exercises the
+   image's polkit fix.
+3. With "Integrate with 1Password CLI" on in its developer settings,
+   `op vault list` asks the app for approval instead of a password.
+4. It fills a login in Firefox.
+
 Then run Phase 4's checks on the hardware.

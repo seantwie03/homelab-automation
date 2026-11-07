@@ -760,10 +760,11 @@ and desktop25 run all of them too.
   link back, creates the three groups with fixed system IDs and declares them
   in `sysusers.d`, and fills the polkit policy's owners with UID 1000; see
   "1Password" in `images/README.md`. Checked in the VM: the setgid helpers
-  resolve to their groups, and `op` runs. Still to check by hand, logged in
-  with `imgman machine gui x1carbon23`: the app starts, unlocks with the
-  system password, and fills in Firefox, which as a Flatpak may need its own
-  browser-integration setup.
+  resolve to their groups, `op` runs, and the installed polkit policy names
+  UID 1000 as its owner. No 1Password account signs in to a VM, so the
+  signed-in checks run on the hardware, in the runbook's "Check": unlock with
+  the system password, `op` app integration, and fill in Firefox, which as a
+  Flatpak may need its own browser-integration setup.
 - [ ] `devops`: Vagrant packages to the image; Terraform and the AWS CLI move to
   user space.
 - [ ] `gui`: graphical packages to the image; Flatpak apps stay.
