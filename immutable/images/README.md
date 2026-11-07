@@ -10,6 +10,8 @@ then configures everything outside it with ansible-pull. See the
 | `scripts/ansible.sh`  | Installs `git`, `python3`, `ansible-core`, and the Ansible collections that runtime roles use. |
 | `scripts/base.sh`     | Installs the command-line tools every host uses that the base image lacks.                     |
 | `scripts/updates.sh`  | Stages OS updates in the background without rebooting.                                         |
+| `scripts/onepassword.sh` | Installs the 1Password app and CLI.                                                         |
+| `keys/`               | Signing keys of the package repositories the scripts use.                                      |
 | `bin/h`               | `h`, the homelab management script, installed as `/usr/bin/h`, with its bash completion.       |
 | `hosts.toml`          | The hosts a VM can stand in for, and each host's flavor and VM resources.                      |
 | `kickstart/<host>.ks` | Installs a host, on its hardware or as a VM.                                                   |
@@ -63,6 +65,35 @@ Each image starts from a Fedora base pinned to a major version by the
   runs the lint. Before committing, test it in VMs with
   `imgman test image --all`, which installs a host's disk again only if the
   image or the host's kickstart changed. See [imgman](../imgman/README.md).
+
+## 1Password
+
+`scripts/onepassword.sh` installs the 1Password app and CLI from 1Password's
+repository, then adapts what their install scripts assume about a writable
+system:
+
+- They install to `/opt/1Password`. The script moves the files to
+  `/usr/lib/1Password`, and `systemd-tmpfiles` links `/opt/1Password` to them
+  at boot.
+- They create the `onepassword`, `onepassword-cli`, and `onepassword-mcp`
+  groups for their setgid helpers. The script creates them first with fixed
+  system IDs 450 to 452, below Fedora's dynamically allocated system groups and
+  below regular users, and declares the same IDs in `sysusers.d`.
+- Their polkit policy names the users allowed to authorize the CLI and SSH
+  agent. The script names UID 1000, every host's user.
+
+The repository's signing key is `keys/1password.asc`. The script verifies its
+fingerprint before importing it. If 1Password rotates the key, the build fails
+until it is updated:
+
+```sh
+curl -fsSL https://downloads.1password.com/linux/keys/1password.asc \
+    -o images/keys/1password.asc
+gpg --show-keys --with-fingerprint images/keys/1password.asc
+```
+
+Check the new fingerprint against 1Password's published one, then set
+`fingerprint` in `scripts/onepassword.sh` to it, with no spaces.
 
 ## Building
 

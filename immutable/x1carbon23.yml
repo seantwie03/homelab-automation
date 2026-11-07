@@ -12,4 +12,6 @@
 
   roles:
     - role: ansible_pull
+    - role: tailscale
+    - role: onepassword
 

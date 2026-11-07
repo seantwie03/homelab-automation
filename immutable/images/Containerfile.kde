@@ -14,6 +14,10 @@ RUN /tmp/scripts/base.sh && rm -rf /tmp/scripts
 COPY scripts/updates.sh /tmp/scripts/
 RUN /tmp/scripts/updates.sh && rm -rf /tmp/scripts
 
+COPY keys/1password.asc /tmp/keys/
+COPY scripts/onepassword.sh /tmp/scripts/
+RUN /tmp/scripts/onepassword.sh && rm -rf /tmp/scripts /tmp/keys
+
 # h manages this host's ansible-pull. Its settings come from
 # /etc/ansible-pull.conf, which the ansible_pull role writes.
 COPY --chmod=0755 bin/h /usr/bin/h
