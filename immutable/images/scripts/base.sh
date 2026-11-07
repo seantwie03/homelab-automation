@@ -2,9 +2,10 @@
 # Installs the command-line tools every host uses that the base image lacks.
 set -euo pipefail
 
+# Fedora's wget is wget2-wget, and 7zip provides 7z and 7za.
 dnf install -y \
-    wget \
-    p7zip \
+    wget2-wget \
+    7zip \
     kitty-terminfo
 dnf clean all
 # bootc copies /var from the image only on first install, so leave nothing

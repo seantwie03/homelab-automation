@@ -9,6 +9,7 @@ then configures everything outside it with ansible-pull. See the
 | `Containerfile.kde`   | `workstation-kde`: KDE Plasma on Kinoite.                                                      |
 | `scripts/ansible.sh`  | Installs `git`, `python3`, `ansible-core`, and the Ansible collections that runtime roles use. |
 | `scripts/base.sh`     | Installs the command-line tools every host uses that the base image lacks.                     |
+| `scripts/updates.sh`  | Stages OS updates in the background without rebooting.                                         |
 | `bin/h`               | `h`, the homelab management script, installed as `/usr/bin/h`, with its bash completion.       |
 | `hosts.toml`          | The hosts a VM can stand in for, and each host's flavor and VM resources.                      |
 | `kickstart/<host>.ks` | Installs a host, on its hardware or as a VM.                                                   |
@@ -24,6 +25,11 @@ Each image starts from a Fedora base pinned to a major version by the
   settings from `/etc/ansible-pull.conf`, which the `ansible_pull` role writes,
   so the image holds no host-specific paths.
 - Command-line tools every host uses, such as `wget` and `7z`.
+- Staged OS updates. `bootc-fetch-apply-updates.timer` is enabled, with a
+  drop-in that runs `bootc upgrade` without `--apply`: it downloads a newer
+  image and stages it an hour after boot and every 8 hours, and the host
+  boots into it at the next reboot you do. Nothing reboots the host on its
+  own.
   ansible-pull runs on first boot with no network installs, and both update
   with the base image.
 

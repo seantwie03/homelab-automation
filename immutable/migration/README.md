@@ -346,8 +346,13 @@ keep `/var/home`, and the install runbook in `migration/` matches what was done.
   `gh auth token | podman login ghcr.io --username seantwie03 --password-stdin`.
   A new GHCR package is private; make it public once in its settings on
   github.com, so installers pull it without credentials.
-- [ ] OS updates (Q6): updates download and stage in the background, and apply
+- [x] OS updates (Q6): updates download and stage in the background, and apply
   only at the next reboot you do. Nothing reboots the laptop on its own.
+  `images/scripts/updates.sh` enables `bootc-fetch-apply-updates.timer`,
+  which every image ships disabled, with a drop-in that runs
+  `bootc upgrade` without `--apply`. Tested in the x1carbon23 VM: after a
+  newer build was pushed, the service staged it without rebooting, and the
+  next reboot booted it, with the previous build kept for rollback.
 - [x] `ansible_pull`: the unit runs `immutable/x1carbon23.yml` with the
   overlay config, and `h` is baked into the image as `immutable/images/bin/h`,
   so role changes never rebuild the image (D5). The overlay role writes
@@ -369,15 +374,20 @@ keep `/var/home`, and the install runbook in `migration/` matches what was done.
 - [ ] Add the Fedora package of each collection a ported role needs to
   `immutable/images/scripts/ansible.sh`, which starts with only
   `ansible.posix`.
-- [ ] Set the image URL in x1carbon23's `%pre` to
-  `ghcr.io/seantwie03/workstation-kde:stable`. This can happen any time:
-  VM installs override it with `imgman.url`.
+- [x] Set the image URL in x1carbon23's `%pre` to
+  `ghcr.io/seantwie03/workstation-kde:stable`. VM installs override it with
+  `imgman.url`.
 - [ ] On the day of the install, replace the placeholder system disk in
   x1carbon23's `%pre` with the disk's `/dev/disk/by-id/` path, read from the
   live USB with `ls -l /dev/disk/by-id/`. This is the only step that needs the
   laptop before the install itself; until then, the placeholder fails `%pre`'s
   disk check, so a hardware install cannot start by accident.
-- [ ] An install runbook, `migration/x1carbon23-install.md`:
+- [x] Bootstrap rehearsal: in a fresh x1carbon23 VM with no checkout, the
+  `ansible_pull` README's first-run command cloned the repository from
+  GitHub and ran `immutable/x1carbon23.yml` with the overlay configuration,
+  and `h test` then reran it with no changes.
+- [ ] An install runbook, [x1carbon23-install.md](x1carbon23-install.md),
+  drafted from the VM rehearsals; its hardware steps are still unverified:
   - BIOS supervisor password, and Secure Boot on. If the install USB does not
     boot, enable "Allow Microsoft 3rd Party UEFI CA" in the BIOS.
   - Boot the install USB with the kickstart, wired through the docking
