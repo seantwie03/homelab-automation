@@ -731,13 +731,7 @@ and desktop25 run all of them too.
 
 - [ ] `core`: base packages to the image; limits, sysctl, and group membership
   stay.
-- [ ] `ansible_pull`: `ansible-core`, `git`, and collections to the image;
-  units, logrotate, and `h` stay; drop pip upgrades, `dnf-makecache` ordering,
-  and Snapper hooks. Move `h` from `immutable/images/bin/` back into the role,
-  installed as `/usr/local/bin/h` with its completion in
-  `/etc/bash_completion.d/`, then remove `bin/` and its `COPY` lines from the
-  image. `/usr/local/bin` comes before `/usr/bin` on `PATH`, so the role's
-  `h` takes over before the image change lands.
+- [ ] `ansible_pull`: `ansible-core`, `git`, and collections to the image; units, logrotate, and `h` stay; drop pip upgrades, `dnf-makecache` ordering, and Snapper hooks. Move `h` from `immutable/images/bin/` back into the role, installed as `/usr/local/bin/h` with its completion in `/etc/bash_completion.d/`, then remove `bin/` and its `COPY` lines from the image. `/usr/local/bin` comes before `/usr/bin` on `PATH`, so the role's `h` takes over before the image change lands. Template `h`, its completion, and `ansible-pull.service` from the role's variables, as the root role does, and drop `/etc/ansible-pull.conf`; the unit sets `ANSIBLE_CONFIG` itself until the move to the root. Update the role's README and MONITORING, and the `h` entry under "Contents" in `immutable/images/README.md`, which describe the file.
 - [ ] `dnf`: drop; OS updates come from images (Q6).
 - [ ] `rpm_fusion`: drop. Images use no RPM Fusion (Q14): Flatpak apps bring
   their own codecs, and Steam comes from Flathub.
