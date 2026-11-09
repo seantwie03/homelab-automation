@@ -153,27 +153,43 @@ of reporting it absent, which defeats the alternatives fallback."
   :ensure nil
   :preface
   (defun my/tty-clipboard-paste ()
-    "Return the OS clipboard contents as a string or nil"
+    "Return the OS clipboard contents as a string or nil."
     (when-let ((cmd (cond
                      ((eq system-type 'darwin) '("pbpaste"))
                      ((eq system-type 'windows-nt)
-                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboared"))
+                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboard"))
                      ((and (getenv "WAYLAND_DISPLAY") (executable-find "wl-paste"))
                       '("wl-paste" "--no-newline"))
                      ((executable-find "powershell.exe") ; WSL fallback
-                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboared")))))
+                      '("powershell.exe" "-NoProfile" "-Command" "Get-Clipboard")))))
       (with-temp-buffer
         (when (zerop (apply #'call-process (car cmd) nil t nil (cdr cmd)))
           (let ((text (replace-regexp-in-string "\r\n" "\n" (buffer-string))))
-            ;; PowerShell's Get-Clipboard appeands a trailing newline.
+            ;; PowerShell's Get-Clipboard appends a trailing newline.
             (when (string-match-p "powershell\\.exe\\'" (car cmd))
               (setq text (replace-regexp-in-string "\n\\'" "" text)))
             text)))))
+  (defun my/tty-interprogram-paste ()
+    "Return new OS clipboard text for a tty frame, or nil.
+Like `gui-selection-value', ignore clipboard text that matches the
+newest kill, so `current-kill' returns the kill with its text
+properties, such as the handler that makes an Evil `yy' paste linewise.
+Like Neovim, mark other clipboard text that ends in a newline linewise."
+    (let ((text (my/tty-clipboard-paste)))
+      (cond
+       ((or (null text)
+            (and kill-ring
+                 (string= text (substring-no-properties (car kill-ring)))))
+        nil)
+       ((and (string-suffix-p "\n" text)
+             (fboundp 'evil-yank-line-handler))
+        (propertize text 'yank-handler '(evil-yank-line-handler nil t)))
+       (t text))))
   (defun my/interprogram-paste ()
     "Paste the window-system selection in GUI frames, the OS clipboard in tty."
     (if (display-graphic-p)
         (gui-selection-value)
-      (my/tty-clipboard-paste)))
+      (my/tty-interprogram-paste)))
 
   :custom
   (kill-do-not-save-duplicates t)
