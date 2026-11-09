@@ -1,0 +1,140 @@
+# Lenovo ThinkPad T14s Gen 4 (2024)
+
+The Lenovo ThinkPad T14s Gen 4 (Intel) was originally announced in 2023, and this unit (`GM0FZDBC`) shipped from the factory in January 2024. I purchased this unit on the secondary market in November 2026 ([eBay #137465209524](https://www.ebay.com/itm/137465209524) for `$589.00 OBO + $21.90` shipping; see [2026 Laptop Buying Comparison — Round 2](../../2026-laptop-buying-round2.md)) to succeed [x1carbon2018](../x1carbon2018/x1carbon2018.md) as a 32 GB portable Linux workstation after [x1carbon23](../x1carbon23/x1carbon23.md) arrived with a dead battery and was returned.
+
+## Usage
+
+This laptop is used for coding, courseware development, travel, and running multi-VM RHEL `libvirt`/KVM and Podman container labs away from a desktop.
+
+It shares the same 65W USB-C Power Delivery (`20V / 3.25A`) AC adapter used with `x1carbon2018`.
+
+Because this laptop travels outside the home, keep a BIOS supervisor password, Secure Boot, and LUKS full-disk encryption enabled.
+
+## Hardware Information
+
+- **Model Number**: `21F7S0CM00` (Type `21F7`)
+- **Serial Number**: `GM0FZDBC`
+- **GTIN / UPC**: `197528923512`
+- **Factory Ship Date**: `2024-01-12` (Warranty start `2024-02-08`)
+- **Factory OS**: Windows 11 Pro 64-bit (preinstalled with Windows 10 Pro 64-bit downgrade, English)
+- **Machine Name**: `t14s24`
+
+### Specs
+
+- **Processor**: Intel Core i7-1365U vPro (10 cores: 2 Performance + 8 Efficient / 12 threads, up to 5.2 GHz P-core / 3.9 GHz E-core, 12 MB cache; 15W base TDP)
+- **Graphics**: Integrated Intel Iris Xe Graphics (96 EUs)
+- **RAM**: 32 GB LPDDR5x (soldered, dual-channel). The installed memory is rated LPDDR5x-6400 (`32GBLPDDR5-6400` in Lenovo's product spec), but runs at 4800 MT/s due to a 13th-gen Intel platform limitation.
+- **Storage**: 512 GB M.2 2280 PCIe 4.0 x4 OPAL 2.0 NVMe SSD (Lenovo "G4 Performance"; single M.2 2280 slot, supports up to 2 TB). Lenovo's As-Built parts list includes a factory-serialized SK Hynix drive (`5SS1F20644`, barcode `8SSSS1F20344K1CC3B708ZA`) alongside interchangeable Kioxia part `5SS0V26470`.
+- **Display**: 14.0" WUXGA (1920x1200) 16:10 Anti-Glare Non-Touch IPS, 400 nits, 100% sRGB, Low-Power, Eyesafe Certified (AUO panel `5D10V82364`, factory barcode `8SSD10Q67044A4AS39J41DF`, 30-pin eDP cable `5C11H81432`)
+- **Camera**: 5MP RGB + IR Discrete USB camera with physical privacy shutter (`5M21H89587`), Human Presence Detection, and dual-array microphones (`5C21D67581` AVC with factory barcode `8SSC21D67481A1ZJ3A4C50S`; interchangeable Chicony part `5C21D67578`)
+- **Audio**: Realtek ALC3287 codec, stereo speakers (2W x 2, Dolby Audio, `5SB0Z88678`), dual-microphone 360° far-field array
+- **Wireless (WLAN & Bluetooth)**: Intel Wi-Fi 6E AX211 vPro (802.11ax 2x2) + Bluetooth 5.3, integrated on the system board (`5B21L59892`) with WLAN antenna kit `5A30Z88203`
+- **Wireless WAN (Cellular)**: Fibocom L860-GL-16 4G LTE Cat 16 M.2 PCIe modem (`5W10V25828`, factory barcode `8SSW11A40420J1BY3CR07E3`) with WWAN antenna kit `5A30Z88202` and rear Nano-SIM tray (`5M21H89594`)
+- **Input**: 6-row spill-resistant backlit US English ThinkPad keyboard by Chicony (`5M11L59461`), TrackPoint, `61 x 115 mm` glass-like Mylar 3-button clickpad (`5M11G56184` Transimage / Synaptics PCB with factory barcode `8SSM11J31720G1SG3C2P0J3`; interchangeable Chicony part `5M11G56222`), and Match-on-Chip power-button fingerprint reader (`5F30V25938`, factory barcode `8SSF30R65613J3KS392087Y`)
+- **Battery**: 57 Wh (`15.36V`, 4-cell) rechargeable Li-ion internal battery (`5B11M90033` BYD with factory barcode `8SSB11M89834B1SH3AM05F9`; interchangeable LGES part `5B10W51874`); supports Rapid Charge (up to 80% in 1 hour) with a 65W USB-C PD 3.0 adapter (`5A10W86318` Lite-On / `5A10W86317` Delta)
+- **Chassis & Weight**: Deep Black carbon-fiber hybrid top cover (`5CB1L57654`, `C24`) and black aluminum bottom cover (`5CB1L57627`); `317.5 x 226.9 x 16.9 mm` (`12.5 x 8.93 x 0.67 in`), starting at `2.76 lbs` (`1.25 kg`)
+- **Ports**:
+    - 2x Thunderbolt 4 / USB4 40 Gbps (Power Delivery 3.0, DisplayPort 2.0 / 1.4a)
+    - 2x USB-A 3.2 Gen 1 (5 Gbps; 1x Always On)
+    - 1x HDMI 2.1 (up to 4K @ 60 Hz)
+    - 1x 3.5 mm headphone / microphone combo jack
+    - 1x Nano-SIM card slot (rear)
+
+### Warranty & Service
+
+- **Status**: **In Warranty** (`91` days remaining as of `2026-11-08`, active through `2027-02-07`); ship-to location United States of America
+- **Seller Protection**: Purchased with **30-day seller-paid free returns** and a **90-day seller warranty** (`iBankonIT`)
+- **Lenovo End of Service**: `2029-11-26`
+- **CO2 Offset**: Includes `0.5 ton` factory CO2 Offset entitlement (`AL1`, project `CDM7178`, certificate `CDM7178_4403767271-10998-2`)
+
+Warranty history from Lenovo's warranty lookup for `GM0FZDBC`:
+
+| Entitlement           | ID       | Type         | Start        | End          | Status  |
+|:----------------------|:---------|:-------------|:-------------|:-------------|:--------|
+| 3Y Premier Support    | `UKN`    | On Site      | `2024-02-08` | `2027-02-07` | Active  |
+| 3Y On-site, 9X5       | `36Y`    | On Site      | `2024-02-08` | `2027-02-07` | Active  |
+| 1YR Battery (On-site) | `1YOBAT` | On Site      | `2024-02-08` | `2025-02-07` | Expired |
+| CO2 Offset (0.5 ton)  | `AL1`    | Tech Support | `2024-02-08` | `2024-03-07` | Expired |
+
+### Links
+
+- [Lenovo PSREF Spec Sheet (PDF)](https://psref.lenovo.com/syspool/Sys/PDF/ThinkPad/ThinkPad_T14s_Gen_4_Intel/ThinkPad_T14s_Gen_4_Intel_Spec.pdf)
+- [Lenovo Marketing Site](https://www.lenovo.com/us/en/p/laptops/thinkpad/thinkpadt/thinkpad-t14s-gen-4-14-inch-intel/len101t0058)
+- [Support Site (`GM0FZDBC`)](https://pcsupport.lenovo.com/us/en/products/laptops-and-netbooks/thinkpad-t-series-laptops/thinkpad-t14s-gen-4-type-21f6-21f7/21f7/21f7s0cm00/gm0fzdbc)
+- [As-Built Parts List (`GM0FZDBC`)](https://pcsupport.lenovo.com/us/en/products/laptops-and-netbooks/thinkpad-t-series-laptops/thinkpad-t14s-gen-4-type-21f6-21f7/21f7/21f7s0cm00/gm0fzdbc/parts/display/as-built)
+- [Warranty Lookup (`GM0FZDBC`)](https://pcsupport.lenovo.com/us/en/products/laptops-and-netbooks/thinkpad-t-series-laptops/thinkpad-t14s-gen-4-type-21f6-21f7/21f7/21f7s0cm00/gm0fzdbc/warranty)
+- [Lenovo Linux for Personal Systems](https://www.lenovo.com/linux) (Lenovo document `PD031426`)
+
+### Lenovo As-Built Parts List
+
+Retrieved from the Lenovo As-Built parts API for serial `GM0FZDBC` (`21F7S0CM00`) on `2026-11-08`. Where Lenovo lists two parts for the same component, one entry represents the build-option group (`SBB...`) and the other carries the factory-scanned `8S...` 23-character serial barcode recorded when `GM0FZDBC` was assembled:
+
+| Component | FRU | Lenovo Description | Factory / Sub Info |
+|:---|:---|:---|:---|
+| System board | `5B21L59892` | `i71365U,32G,NE,WINyAyDTyABEI` | Sub: `5B21U14183` |
+| LCD panel | `5D10V82364` | 14" WUXGA Non-Touch AG IPS 400nit | `8SSD10Q67044A4AS39J41DF` |
+| eDP cable | `5C11H81432` | `FRU T14SG3 EDP CABLE 30P` | 30-pin non-touch eDP |
+| Camera (AVC) | `5C21D67581` | `Camera,5M,RGB+IR,USB,UF,AVC` | `8SSC21D67481A1ZJ3A4C50S` |
+| Camera (Ccy) | `5C21D67578` | `Camera,5M,RGB+IR,USB,UF,Ccy` | `SBB1K57961` option group |
+| Camera cable | `5C11H81542` | `FRU T14SG4_CAMERA_CABLE_5M` | `SC11L29012` |
+| Shutter assy | `5M21H89587` | `KT4D1_SHUTTER_ASSY` | Webcam privacy shutter |
+| SSD (SK Hynix) | `5SS1F20644` | 512G M.2 2280 PCIe4x4 OPAL SK Hynix | `8SSSS1F20344K1CC3B708ZA` |
+| SSD (Kioxia) | `5SS0V26470` | 512G M.2 2280 PCIe4x4 OPAL Kioxia | `SBB1K57977` option group |
+| SSD bracket | `5B40Z68883` | `FRU JT4C0_SSD_BKT_ASSY` | Pad: `5M20S73086` |
+| WWAN modem | `5W10V25828` | Fibocom L860-GL-16 (`L860R+`) | `8SSW11A40420J1BY3CR07E3` |
+| WWAN antennas | `5A30Z88202` | `F-0G-JV-0172-005-00 WWAN` | Bracket: `5B40Z68851` |
+| WLAN antennas | `5A30Z88203` | `FRU ACCY KITS ANTENNA WLAN` | `SA30Z65643` |
+| SIM tray | `5M21H89594` | `FRU Mech KT4D1 SIM TRAY ASSY` | Rear Nano-SIM tray |
+| Battery (BYD) | `5B11M90033` | 15.36V 57Wh 4-cell LiIon, BYD | `8SSB11M89834B1SH3AM05F9` |
+| Battery (LGES) | `5B10W51874` | 15.36V 57Wh 4-cell LiIon, LGES | `SBB1K57971` option group |
+| Keyboard / C-cov | `5M11L59461` | US English, Black, Backlit, Chicony | `SM11L56444` |
+| Touchpad (TRI) | `5M11G56184` | CS22 Glass-Mylar + Synaptics, TRI | `8SSM11J31720G1SG3C2P0J3` |
+| Touchpad (CHY) | `5M11G56222` | CS22 Glass-Mylar + Synaptics, CHY | `SBB1K58025` option group |
+| Touchpad cable | `5C11C12511` | `FFC12PF P0.5PAD=0.35M/B-CLICKPAD/B` | `SC10Z23788` |
+| Fingerprint | `5F30V25938` | `FRU FPR CS21 3.24 MoC BK RND` | `8SSF30R65613J3KS392087Y` |
+| Power board | `5C51J62750` | `FRU CARDPOP PHX2 power board` | Bracket: `5M11L77179` |
+| USB sub-board | `5C51J62749` | `PCBA USB/B NSF151 KT4D1 USB/B` | Cable: `5C11H81479` |
+| Heatsink (Delta) | `5H41B77380` | `Thermal Module KT4D1,Intel` (Delta) | `8SSH41B38088E1DW3AT010T` |
+| Heatsink (AVC) | `5H41B77379` | `Thermal Module KT4D1,Intel` (AVC) | `SBB1K57941` option group |
+| Speakers | `5SB0Z88678` | `FRU PACK2DB2W 4OHM MAINSPKL+R` | `SSB0Z66397` |
+| A-cover (lid) | `5CB1L57654` | `KT4D1_A_C24_FHD24_2K_ASSY` (CFRP) | `8SSCB1J1853500SX3C902BH` |
+| B-cover (bezel) | `5CB1L57617` | `KT4D1_B_COVER_5M_SUB_ASSY` | Tape: `5M11L64890` |
+| D-cover (base) | `5CB1L57627` | `FRU KT4D1_D_AL_WWAN_BLK_ASSY` | `8SSCB1J184160FOX3C7005Y` |
+| Hinges | `5H50W13811` | `HINGE ACCY KITS HINGE CFRP2.4` | `SH50Z52632` |
+| AC adapter (LTN) | `5A10W86318` | 65W USB-C, 2-pin, Black, Lite-On | `8SSA10R16985L1CZ3C10BND` |
+| AC adapter (DEL) | `5A10W86317` | 65W USB-C, 2-pin, Black, Delta | `SBB1B67042` option group |
+| Power cord | `5L60Z54054` | US 1m 2-pin (`LUX` / `5L61X15042`) | `SL60M92016` |
+| RTC battery | `01AY996` | `FRU RTC Battery CR2016 (DBV)` | Sub: `5B11Q51974` |
+| Misc. internal | `5B40Z68857` | `FRU BRACKET SERVAL 2.0_IO_BKT` | Dummy: `5CB0Z69310` |
+| Kits & mylar | `5S10Z89233` | Screw kit, labels, absorber, rubber | `5M21H89524`, `5R61A19626` |
+| Recovery media | `5R31J21806` | `Win10PROx64 Modular US` | `SBB1F79082` |
+
+## Linux & Firmware Notes
+
+- **Official Linux Certification**: Lenovo's [Linux for Personal Systems](https://www.lenovo.com/linux) page (`PD031426`) lists the ThinkPad T14s Gen 4 (`21F6`, `21F7`) as certified for Ubuntu 22.04, Red Hat Enterprise Linux 9.2, and Fedora 38+. Hardware power profiles (`Fn+L` Power Saver, `Fn+M` Balanced, `Fn+H` Performance) work through `thinkpad_acpi` and `power-profiles-daemon` / `tuned-ppd`.
+- **Mainline Kernel Drivers**: CPU frequency scaling (`intel_pstate`), Iris Xe graphics (`i915` / `xe`), wireless (`iwlwifi` / `btintel`), Sound Open Firmware audio (`sof-audio-pci-intel-tgl`), the 5MP RGB+IR USB webcam (`uvcvideo`, avoiding the Intel MIPI IPU6 camera option), and `s2idle` (S0ix) standby all use mainline kernel drivers, with no out-of-tree kernel modules needed on `bootc`.
+- **WWAN Cellular Modem (`Fibocom L860-GL-16`)**: The factory-installed Intel XMM7560-based PCIe LTE modem (`5W10V25828`) uses the mainline `iosm` kernel driver and `ModemManager` (requiring an FCC unlock procedure in `ModemManager` if cellular data is used). When not using a cellular SIM card, disable Wireless WAN in BIOS (`Security -> I/O Port Access -> Wireless WAN -> Disabled`) so the PCIe modem consumes `0W` in idle/standby and does not generate `ModemManager` / `iosm` log noise.
+- **Userspace Components**: The Match-on-Chip fingerprint reader (`5F30V25938`) uses `fprintd` / `libfprint`. Mesa provides OpenGL (`iris`) and Vulkan (`anv`). `intel_lpmd` is an optional low-power daemon, not a kernel driver.
+- **Hardware Video Decode**: Check which VA-API profiles the stock Fedora driver provides with `vainfo`. Codecs missing from the stock driver require `intel-media-driver` from RPM Fusion (see `Q14` in [immutable/migration/README.md](../../../immutable/migration/README.md#open-questions)).
+- **Firmware Updates (`fwupd` / LVFS)**: System UEFI/BIOS, Embedded Controller (EC), Intel Management Engine, and NVMe SSD firmware updates are delivered through LVFS.
+
+  ```sh
+  fwupdmgr refresh
+  fwupdmgr get-updates
+  fwupdmgr update
+  ```
+
+## Verify on Arrival
+
+Run these checks during the 30-day seller-paid free return window and record the results above:
+
+| Check                             | Command                                      |
+|:----------------------------------|:---------------------------------------------|
+| SSD vendor and model              | `sudo nvme list`                             |
+| Battery capacity vs. 57 Wh design | `upower -i $(upower -e \| grep BAT)`         |
+| Wi-Fi and WWAN PCIe devices       | `lspci -nn \| grep -iE 'net\|wireless\|xmm'` |
+| Webcam is 5MP USB (`uvcvideo`)    | `lsusb \| grep -i camera`                    |
+| Display resolution and EDID panel | `kscreen-doctor -o`                          |
+| Firmware devices on LVFS          | `fwupdmgr get-devices`                       |
+| VA-API codec support              | `vainfo`                                     |
+| Fingerprint enrollment            | `fprintd-enroll`                             |
