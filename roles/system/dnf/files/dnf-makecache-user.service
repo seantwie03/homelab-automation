@@ -1,8 +1,7 @@
 [Unit]
 Description=dnf5 makecache (user)
-After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/bash -c "i=0; until resolvectl query mirrors.fedoraproject.org >/dev/null 2>&1; do i=$((i+1)); [ $i -ge 30 ] && exit 1; sleep 2; done"
+ExecStartPre=/usr/local/bin/wait-dns-online.sh
 ExecStart=/usr/bin/dnf5 makecache --refresh --setopt=optional_metadata_types=all

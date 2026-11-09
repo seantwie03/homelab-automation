@@ -48,7 +48,7 @@ Expected:
 - The last result is successful.
 - Both services check every enabled repository and report `Metadata cache
   created.`
-- The user service completes its DNS pre-check before refreshing metadata.
+- The user service completes its DNS pre-check (`wait-dns-online.sh`) before refreshing metadata. The journal ends the check with `DNS is online (attempt N/30)`; a few `DNS not ready` attempts before it are normal right after boot or wake.
 - `systemctl cat` shows `dnf5 makecache --refresh` for both services.
 
 Oneshot services are normally inactive between runs.
