@@ -313,11 +313,49 @@ Like Neovim, mark other clipboard text that ends in a newline linewise."
     (interactive)
     (my/evil-command-and-recenter #'evil-forward-paragraph))
 
+  ;; Yank highlight, like Neovim's `vim.hl.on_yank'
+  (defvar my--evil-yank-highlight-overlays nil
+    "Overlays that highlight the text of the most recent Evil yank.")
+
+  (defvar my--evil-yank-highlight-timer nil
+    "Timer that clears the Evil yank highlight.")
+
+  (defun my/evil-yank-highlight-clear ()
+    "Remove the Evil yank highlight and cancel its pending clear."
+    (when my--evil-yank-highlight-timer
+      (cancel-timer my--evil-yank-highlight-timer)
+      (setq my--evil-yank-highlight-timer nil))
+    (mapc #'delete-overlay my--evil-yank-highlight-overlays)
+    (setq my--evil-yank-highlight-overlays nil)
+    (remove-hook 'pre-command-hook #'my/evil-yank-highlight-clear))
+
+  (defun my/evil-yank-highlight (beg end &optional type &rest _)
+    "Briefly highlight the text from BEG to END that an Evil yank copied.
+Highlight each row separately when TYPE is `block'.  Clear the highlight
+after 150 ms, like Neovim, or at the next command.  Deletes and changes
+also call `evil-yank', so only highlight when the command is a yank.
+Intended as `:after' advice for `evil-yank'."
+    (when (memq this-command '(evil-yank evil-yank-line))
+      (my/evil-yank-highlight-clear)
+      (let ((add-overlay
+             (lambda (row-beg row-end)
+               (let ((overlay (make-overlay row-beg row-end)))
+                 (overlay-put overlay 'face 'isearch)
+                 (overlay-put overlay 'priority 1000)
+                 (push overlay my--evil-yank-highlight-overlays)))))
+        (if (eq type 'block)
+            (evil-apply-on-block add-overlay beg end nil)
+          (funcall add-overlay beg end)))
+      (setq my--evil-yank-highlight-timer
+            (run-with-timer 0.15 nil #'my/evil-yank-highlight-clear))
+      (add-hook 'pre-command-hook #'my/evil-yank-highlight-clear)))
+
   :init
   (setq evil-want-keybinding nil) ; Required for evil-collection compatibility
   (setq evil-want-Y-yank-to-eol t)
   (setq evil-undo-system 'undo-redo)
   :config
+  (advice-add #'evil-yank :after #'my/evil-yank-highlight)
   (evil-mode 1))
 
 (use-package evil-collection
@@ -1921,11 +1959,17 @@ unsupported because the exported text must be available immediately."
 
 ;; Allow emacsclients to connect. This enables
 ;; - AI inspection using safe wrappers
-;; - em alias on command line to open file in current frame
-;; Started last so a client can never get a frame before the theme (and any
-;; machine-specific overrides above) have finished loading.
+;; - em, emg, and the desktop entry to open frames on the running server
+;; Those launchers start a daemon when no server is running, and a daemon
+;; starts its own server; this `server-start' covers Emacs run without
+;; --daemon. Started last so a client can never get a frame before the theme
+;; (and any machine-specific overrides above) have finished loading.
 (use-package server
   :ensure nil
+  :custom
+  ;; Stop the daemon when its last client frame closes, after offering to
+  ;; save modified buffers.  Only affects daemons.
+  (server-stop-automatically 'delete-frame)
   :config
   (unless (server-running-p)
     (server-start)))

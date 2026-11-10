@@ -458,6 +458,99 @@
         (funcall (car entry)))
       (should (eq command (cdr entry))))))
 
+(defun my--evil-yank-highlight-texts (keys)
+  "Run KEYS in an Evil buffer and return the text under each yank highlight."
+  (let ((kill-ring nil)
+        (kill-ring-yank-pointer nil)
+        (interprogram-cut-function nil)
+        (interprogram-paste-function nil))
+    (with-temp-buffer
+      (insert "alpha beta\ngamma delta\n\nomega\n")
+      (goto-char (point-min))
+      (switch-to-buffer (current-buffer))
+      (evil-local-mode 1)
+      (evil-normal-state)
+      (unwind-protect
+          (progn
+            (execute-kbd-macro (kbd keys))
+            (mapcar (lambda (overlay)
+                      (buffer-substring-no-properties
+                       (overlay-start overlay) (overlay-end overlay)))
+                    (sort (copy-sequence my--evil-yank-highlight-overlays)
+                          (lambda (a b)
+                            (< (overlay-start a) (overlay-start b))))))
+        (my/evil-yank-highlight-clear)))))
+
+(ert-deftest my/evil-yank-highlight-covers-the-yanked-text ()
+  (dolist (case '(("yy" "alpha beta\n")
+                  ("yiw" "alpha")
+                  ("yap" "alpha beta\ngamma delta\n\n")
+                  ("Y" "alpha beta")
+                  ("viwy" "alpha")
+                  ("Vjy" "alpha beta\ngamma delta\n")
+                  ("\" a y y" "alpha beta\n")))
+    (ert-info ((format "keys: %s" (car case)))
+      (should (equal (my--evil-yank-highlight-texts (car case))
+                     (cdr case))))))
+
+(ert-deftest my/evil-yank-highlight-covers-each-row-of-a-block ()
+  (should (equal (my--evil-yank-highlight-texts "C-v j l y")
+                 '("al" "ga"))))
+
+(ert-deftest my/evil-yank-highlight-skips-deletes-and-changes ()
+  (dolist (keys '("dd" "x" "c w x <escape>"))
+    (ert-info ((format "keys: %s" keys))
+      (should-not (my--evil-yank-highlight-texts keys)))))
+
+(ert-deftest my/evil-yank-highlight-clears-after-a-timeout-or-next-command ()
+  (let ((this-command 'evil-yank)
+        (pre-command-hook nil)
+        timer-args
+        cancelled)
+    (cl-letf (((symbol-function 'run-with-timer)
+               (lambda (&rest args)
+                 (setq timer-args args)
+                 'yank-timer))
+              ((symbol-function 'cancel-timer)
+               (lambda (timer)
+                 (push timer cancelled))))
+      (with-temp-buffer
+        (insert "alpha beta")
+        (my/evil-yank-highlight 1 6 'inclusive)
+        (let ((overlay (car my--evil-yank-highlight-overlays)))
+          (should (equal timer-args
+                         '(0.15 nil my/evil-yank-highlight-clear)))
+          (should (memq #'my/evil-yank-highlight-clear pre-command-hook))
+          (should (eq (overlay-get overlay 'face) 'isearch))
+          (my/evil-yank-highlight-clear)
+          (should-not (overlay-buffer overlay))
+          (should-not my--evil-yank-highlight-overlays)
+          (should-not my--evil-yank-highlight-timer)
+          (should-not (memq #'my/evil-yank-highlight-clear pre-command-hook))
+          (should (equal cancelled '(yank-timer))))))))
+
+(ert-deftest my/evil-yank-highlight-replaces-the-previous-highlight ()
+  (let ((this-command 'evil-yank)
+        (pre-command-hook nil))
+    (cl-letf (((symbol-function 'run-with-timer)
+               (lambda (&rest _args) 'yank-timer))
+              ((symbol-function 'cancel-timer) #'ignore))
+      (with-temp-buffer
+        (insert "alpha beta")
+        (my/evil-yank-highlight 1 6 'inclusive)
+        (let ((first (car my--evil-yank-highlight-overlays)))
+          (my/evil-yank-highlight 7 11 'inclusive)
+          (unwind-protect
+              (progn
+                (should-not (overlay-buffer first))
+                (should (equal (mapcar (lambda (overlay)
+                                         (buffer-substring-no-properties
+                                          (overlay-start overlay)
+                                          (overlay-end overlay)))
+                                       my--evil-yank-highlight-overlays)
+                               '("beta"))))
+            (my/evil-yank-highlight-clear)))))))
+
 (ert-deftest my/copy-file-name-copies-the-basename ()
   (with-temp-buffer
     (setq buffer-file-name "/tmp/project/archive.tar.gz")

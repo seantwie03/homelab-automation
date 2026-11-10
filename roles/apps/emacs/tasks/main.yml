@@ -35,3 +35,26 @@
     - init.el
     - scripts
     - tests
+
+- name: emacs desktop entry opens frames on the emacs server
+  when: is_graphical_system
+  block:
+    - name: user applications directory exists
+      ansible.builtin.file:
+        path: /home/{{ user }}/{{ item }}
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0755
+      loop:
+        - .local
+        - .local/share
+        - .local/share/applications
+
+    - name: emacs desktop entry overrides the system entry
+      ansible.builtin.copy:
+        src: emacs.desktop
+        dest: /home/{{ user }}/.local/share/applications/emacs.desktop
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644

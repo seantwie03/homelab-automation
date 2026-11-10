@@ -40,7 +40,9 @@ locf() {
             '
 }
 
-# Open arguments in a Terminal Emacs frame attached to the running server
+# Open arguments in a Terminal Emacs frame attached to the running server,
+# starting the Emacs daemon if no server is running. The daemon stops when its
+# last frame closes (see `server-stop-automatically' in the Emacs init.el).
 em() {
     if [ "$#" -eq 0 ]; then
         emacsclient -t -a ''
@@ -67,31 +69,21 @@ emg() {
             emacsclientw.exe -n -a runemacs -- "${args[@]}"
         fi
     else
-        if [ "$#" -eq 0 ]; then
-            # No file: raise the existing frame, or start Emacs if it is not running
-            emacsclient -e "(select-frame-set-input-focus (selected-frame))" >/dev/null 2>&1 || { setsid emacs >/dev/null 2>&1 & }
+        # Raise an existing graphical frame. A terminal frame from `em' does
+        # not count, so prints nothing when no server or graphical frame exists.
+        local raised
+        raised=$(emacsclient -a false -e '(let ((frame (seq-find (lambda (f) (display-graphic-p f)) (frame-list)))) (when frame (select-frame-set-input-focus frame) t))' 2>/dev/null)
+        if [ "$raised" = t ]; then
+            # Open any arguments in the raised frame.
+            if [ "$#" -gt 0 ]; then
+                emacsclient -n -- "$@" >/dev/null 2>&1
+            fi
         else
-            # Open arguments in Emacs. Prefers existing frame but will spawn a new one, if needed.
-            emacsclient -n -- "$@" >/dev/null 2>&1 || { setsid emacs "$@" >/dev/null 2>&1 & }
+            # Create a graphical frame, starting the Emacs daemon if no server
+            # is running. The daemon stops when its last frame closes.
+            emacsclient -c -n -a '' -- "$@" >/dev/null 2>&1
         fi
     fi
-}
-
-emo() {
-    local emacs_eval
-
-    emacs_eval='(progn
-        (require (quote org-agenda))
-        (setq org-agenda-window-setup (quote current-window))
-        (find-file (expand-file-name "~/u/org/inbox.org"))
-        (delete-other-windows)
-        (let ((inbox-window (selected-window))
-            (agenda-window (split-window-below)))
-            (select-window agenda-window)
-            (org-agenda-list)
-            (select-window inbox-window)))'
-
-    emacs -nw --chdir "$HOME/u/org" --eval "$emacs_eval"
 }
 
 # Move files or directories to the trash instead of deleting them outright.
