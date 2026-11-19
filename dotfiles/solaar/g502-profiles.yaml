@@ -1,0 +1,165 @@
+!OnboardProfiles
+buttons: 11
+count: 3
+gbuttons: 11
+name: G502 Proteus Spectrum Optical Mouse
+profiles:
+  1: !OnboardProfile
+    angle_snap: 255
+    blue: 255
+    buttons:
+    - !Button {behavior: 8, type: 1, value: 1}
+    - !Button {behavior: 8, type: 1, value: 2}
+    - !Button {behavior: 8, type: 1, value: 4}
+    - !Button {behavior: 8, type: 1, value: 8}
+    - !Button {behavior: 8, type: 1, value: 16}
+    - !Button {behavior: 9, data: 255, value: 10}
+    - !Button {behavior: 8, modifiers: 1, type: 2, value: 26}
+    - !Button {behavior: 8, modifiers: 1, type: 2, value: 23}
+    - !Button {behavior: 9, data: 0, value: 5}
+    - !Button {behavior: 8, modifiers: 1, type: 2, value: 43}
+    - !Button {behavior: 8, modifiers: 3, type: 2, value: 43}
+    enabled: 1
+    gbuttons:
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    green: 255
+    lighting:
+    - !LEDEffectSetting {ID: 1, color: 0xffffff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xffffff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xffffff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xffffff, ramp: 0}
+    name: Computing
+    po_timeout: 65535
+    power_mode: 255
+    ps_timeout: 65535
+    red: 255
+    report_rate: 1
+    reserved: !!binary |
+      //////////8=
+    resolution_default_index: 0
+    resolution_shift_index: 0
+    resolutions:
+    - 2500
+    - 0
+    - 0
+    - 0
+    - 0
+    sector: 1
+    write_count: 65535
+  2: !OnboardProfile
+    angle_snap: 255
+    blue: 255
+    buttons:
+    - !Button {behavior: 8, type: 1, value: 1}
+    - !Button {behavior: 8, type: 1, value: 2}
+    - !Button {behavior: 8, type: 1, value: 4}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 48}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 47}
+    - !Button {behavior: 9, data: 255, value: 10}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 51}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 54}
+    - !Button {behavior: 9, data: 0, value: 5}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 49}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 52}
+    enabled: 1
+    gbuttons:
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    green: 255
+    lighting:
+    - !LEDEffectSetting {ID: 1, color: 0x0000ff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0x0000ff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0x0000ff, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0x0000ff, ramp: 0}
+    name: Gaming
+    po_timeout: 65535
+    power_mode: 255
+    ps_timeout: 65535
+    red: 255
+    report_rate: 1
+    reserved: !!binary |
+      //////////8=
+    resolution_default_index: 4
+    resolution_shift_index: 0
+    resolutions:
+    - 800
+    - 1200
+    - 1600
+    - 2000
+    - 2500
+    sector: 2
+    write_count: 65535
+  3: !OnboardProfile
+    angle_snap: 255
+    blue: 255
+    buttons:
+    - !Button {behavior: 8, type: 1, value: 1}
+    - !Button {behavior: 8, type: 1, value: 2}
+    - !Button {behavior: 8, type: 1, value: 4}
+    - !Button {behavior: 8, modifiers: 4, type: 2, value: 0}
+    - !Button {behavior: 8, modifiers: 1, type: 2, value: 0}
+    - !Button {behavior: 9, data: 255, value: 10}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 51}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 54}
+    - !Button {behavior: 9, data: 0, value: 5}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 49}
+    - !Button {behavior: 8, modifiers: 0, type: 2, value: 52}
+    enabled: 1
+    gbuttons:
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    - !Button {behavior: 15, bytes: !!binary "/////w==\n"}
+    green: 255
+    lighting:
+    - !LEDEffectSetting {ID: 1, color: 0xff0000, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xff0000, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xff0000, ramp: 0}
+    - !LEDEffectSetting {ID: 1, color: 0xff0000, ramp: 0}
+    name: WoW
+    po_timeout: 65535
+    power_mode: 255
+    ps_timeout: 65535
+    red: 255
+    report_rate: 1
+    reserved: !!binary |
+      //////////8=
+    resolution_default_index: 0
+    resolution_shift_index: 0
+    resolutions:
+    - 2500
+    - 0
+    - 0
+    - 0
+    - 0
+    sector: 3
+    write_count: 65535
+sectors: 16
+size: 256
+version: 3

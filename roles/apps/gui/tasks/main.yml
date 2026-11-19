@@ -33,9 +33,18 @@
 - name: printer packages are installed
   ansible.builtin.include_tasks: printer.yml
 
+# Piper's libratbag backend cannot write lone-modifier button bindings to
+# Logitech onboard profiles; Solaar replaces it. See README.md.
+- name: piper and ratbagd are absent
+  ansible.builtin.package:
+    name:
+      - piper
+      - libratbag-ratbagd
+    state: absent
+
 - name: mouse configuration software is installed
   ansible.builtin.package:
-    name: piper
+    name: solaar
     state: present
 
 - name: bittorrent client is installed

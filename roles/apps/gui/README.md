@@ -122,3 +122,23 @@ To update it, obtain the version and checksum for
 `tldraw-offline-linux-x86_64.AppImage` from the
 [upstream release](https://github.com/tldraw/tldraw-offline/releases), then
 update both `tldraw_offline_version` and `tldraw_offline_checksum`.
+
+## Mouse Configuration
+
+Logitech mice are configured with Solaar, which replaced Piper. Piper's libratbag backend cannot write a button binding that is only a modifier key, such as a held Alt or Ctrl, to a HID++ 2.0 onboard profile: it puts the modifier's HID usage in the key byte instead of the modifier byte, and the mouse sends nothing. Upstream tracks this in [libratbag#710](https://github.com/libratbag/libratbag/issues/710) and [libratbag#1906](https://github.com/libratbag/libratbag/issues/1906).
+
+The `solaar` package pulls in `solaar-udev`, whose udev rule grants the logged-in user access to Logitech hidraw devices, so no step needs root. Replug the mouse after the first install so the rule applies. The package also installs an XDG autostart entry that starts Solaar in the system tray at login.
+
+The onboard profiles for both G502 mice are kept in `dotfiles/solaar/g502-profiles.yaml`. To apply the file to a mouse, connect only that mouse and run:
+
+```sh
+solaar profiles G502 /opt/homelab-automation/dotfiles/solaar/g502-profiles.yaml
+```
+
+Solaar writes only the sectors that differ, so running it on a mouse that already matches writes nothing. After changing a mouse with the Solaar GUI, save its profiles back to the file, commit them, and apply them to the other mouse:
+
+```sh
+solaar profiles G502 > /opt/homelab-automation/dotfiles/solaar/g502-profiles.yaml
+```
+
+A button bound to only a modifier uses `type: 2` with the modifier bits in `modifiers` (1 Ctrl, 2 Shift, 4 Alt, 8 Meta) and `value: 0`, for example `!Button {behavior: 8, modifiers: 4, type: 2, value: 0}` for a held Left Alt.
