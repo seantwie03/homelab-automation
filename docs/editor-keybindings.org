@@ -131,23 +131,23 @@ contains a =.git= directory or =.project= marker.
 
 ** Code (=SPC c=) mappings
 
-| Key     | Mode   | Emacs Provider | Emacs Function | Nvim Provider  | Nvim Function                                   |
-|---------+--------+----------------+----------------+----------------+-------------------------------------------------|
-| SPC c a | normal | eglot          | eglot-code-actions                    | builtin        | vim.lsp.buf.code_action                         |
-| SPC c d | normal | builtin        | xref-find-definitions                 | builtin        | vim.lsp.buf.definition                          |
-| SPC c D | normal | eglot          | eglot-find-declaration                | builtin        | vim.lsp.buf.declaration                         |
-| SPC c f | normal | eglot          | eglot-format                          | builtin        | vim.lsp.buf.format                              |
-| SPC c f | visual | eglot          | eglot-format                          | builtin        | vim.lsp.buf.format                              |
-| SPC c h | normal | builtin        | eldoc-doc-buffer                      | builtin        | vim.lsp.buf.hover                               |
-| SPC c I | normal | eglot          | eglot-find-implementation             | telescope.nvim | telescope.builtin.lsp_implementations           |
-| SPC c i | normal | eglot-hierarchy | eglot-hierarchy-call-hierarchy       | telescope.nvim | telescope.builtin.lsp_incoming_calls            |
-| SPC c n | normal | eglot          | eglot-rename                          | builtin        | vim.lsp.buf.rename                              |
-| SPC c o | normal | custom         | my/eglot-hierarchy-outgoing-calls     | telescope.nvim | telescope.builtin.lsp_outgoing_calls            |
-| SPC c r | normal | builtin        | xref-find-references                  | telescope.nvim | telescope.builtin.lsp_references                |
-| SPC c s | normal | consult        | consult-imenu                         | telescope.nvim | telescope.builtin.lsp_document_symbols          |
-| SPC c S | normal | builtin        | xref-find-apropos                     | telescope.nvim | telescope.builtin.lsp_dynamic_workspace_symbols |
-| SPC c t | normal | eglot          | eglot-find-typeDefinition             | telescope.nvim | telescope.builtin.lsp_type_definitions          |
-| SPC c x | normal | N/I            | N/I                                   | builtin        | vim.lsp.codelens.run                            |
+| Key     | Mode   | Emacs Provider  | Emacs Function                    | Nvim Provider  | Nvim Function                                   |
+|---------+--------+-----------------+-----------------------------------+----------------+-------------------------------------------------|
+| SPC c a | normal | eglot           | eglot-code-actions                | builtin        | vim.lsp.buf.code_action                         |
+| SPC c d | normal | builtin         | xref-find-definitions             | builtin        | vim.lsp.buf.definition                          |
+| SPC c D | normal | eglot           | eglot-find-declaration            | builtin        | vim.lsp.buf.declaration                         |
+| SPC c f | normal | eglot           | eglot-format                      | builtin        | vim.lsp.buf.format                              |
+| SPC c f | visual | eglot           | eglot-format                      | builtin        | vim.lsp.buf.format                              |
+| SPC c h | normal | builtin         | eldoc-doc-buffer                  | builtin        | vim.lsp.buf.hover                               |
+| SPC c I | normal | eglot           | eglot-find-implementation         | telescope.nvim | telescope.builtin.lsp_implementations           |
+| SPC c i | normal | eglot-hierarchy | eglot-hierarchy-call-hierarchy    | telescope.nvim | telescope.builtin.lsp_incoming_calls            |
+| SPC c n | normal | eglot           | eglot-rename                      | builtin        | vim.lsp.buf.rename                              |
+| SPC c o | normal | custom          | my/eglot-hierarchy-outgoing-calls | telescope.nvim | telescope.builtin.lsp_outgoing_calls            |
+| SPC c r | normal | builtin         | xref-find-references              | telescope.nvim | telescope.builtin.lsp_references                |
+| SPC c s | normal | consult         | consult-imenu                     | telescope.nvim | telescope.builtin.lsp_document_symbols          |
+| SPC c S | normal | builtin         | xref-find-apropos                 | telescope.nvim | telescope.builtin.lsp_dynamic_workspace_symbols |
+| SPC c t | normal | eglot           | eglot-find-typeDefinition         | telescope.nvim | telescope.builtin.lsp_type_definitions          |
+| SPC c x | normal | N/I             | N/I                               | builtin        | vim.lsp.codelens.run                            |
 
 Neovim's LSP meanings for =C-s= and =C-]= are intentionally not mirrored in
 Emacs.  =C-s= remains the shared save binding, and =C-]= retains Evil's tag
@@ -159,20 +159,20 @@ for explicit LSP formatting in either editor.
 | Key     | Mode   | Emacs Provider | Emacs Function                     | Nvim Provider  | Nvim Function                                |
 |---------+--------+----------------+------------------------------------+----------------+----------------------------------------------|
 | SPC f f | normal | builtin        | find-file                          | custom         | locate_with_telescope                        |
-| SPC f r | normal | builtin        | recentf-open                       | telescope.nvim | telescope.builtin.oldfiles                   |
+| SPC f r | normal | consult        | consult-recent-file                | telescope.nvim | telescope.builtin.oldfiles                   |
 | SPC f s | normal | builtin        | write-file                         | builtin        | :saveas                                      |
 | SPC f y | normal | custom         | my/copy-file-name                  | custom         | file_actions.copy_file_name                  |
 | SPC f Y | normal | custom         | my/copy-project-relative-file-path | custom         | file_actions.copy_project_relative_file_path |
 
 ** Git (=SPC g=) mappings
 
-| Key     | Mode   | Emacs Provider | Emacs Function          | Nvim Provider      | Nvim Function                                          |
-|---------+--------+----------------+-------------------------+--------------------+--------------------------------------------------------|
+| Key     | Mode   | Emacs Provider | Emacs Function            | Nvim Provider      | Nvim Function                                          |
+|---------+--------+----------------+---------------------------+--------------------+--------------------------------------------------------|
 | SPC g d | normal | custom         | my/magit-status-fullframe | diffview-plus.nvim | <Cmd>DiffviewOpen<CR>                                  |
-| SPC g D | normal | N/I            | N/I                     | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
-| SPC g g | normal | magit          | magit-status            | N/I                | N/I                                                    |
-| SPC g R | normal | builtin        | vc-revert               | N/I                | N/I                                                    |
-| SPC g u | normal | magit          | magit-diff-unstaged     | N/A                | N/A                                                    |
+| SPC g D | normal | N/I            | N/I                       | diffview-plus.nvim | <Cmd>DiffviewOpen origin/HEAD...HEAD --imply-local<CR> |
+| SPC g g | normal | magit          | magit-status              | N/I                | N/I                                                    |
+| SPC g R | normal | builtin        | vc-revert                 | N/I                | N/I                                                    |
+| SPC g u | normal | magit          | magit-diff-unstaged       | N/A                | N/A                                                    |
 
 ** Help (=SPC h=) mappings
 
@@ -220,13 +220,13 @@ for explicit LSP formatting in either editor.
 
 ** Search (=SPC s=) mappings
 
-| Key     | Mode   | Emacs Provider | Emacs Function                    | Nvim Provider  | Nvim Function                                                    |
-|---------+--------+----------------+-----------------------------------+----------------+------------------------------------------------------------------|
-| SPC s b | normal | custom         | my/search-open-buffers            | custom         | search_actions.search_open_buffers                               |
-| SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                              |
-| SPC s s | normal | custom         | my/search-project-symbol-at-point | telescope.nvim | telescope.builtin.grep_string (cwd=project.current_root)         |
-| SPC s t | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)           |
-| SPC s u | normal | vundo          | vundo                             | undotree       | :UndotreeToggle (N/I)                                            |
+| Key     | Mode   | Emacs Provider | Emacs Function                    | Nvim Provider  | Nvim Function                                            |
+|---------+--------+----------------+-----------------------------------+----------------+----------------------------------------------------------|
+| SPC s b | normal | custom         | my/search-open-buffers            | custom         | search_actions.search_open_buffers                       |
+| SPC s m | normal | builtin        | bookmark-jump                     | N/A            | N/A                                                      |
+| SPC s s | normal | custom         | my/search-project-symbol-at-point | telescope.nvim | telescope.builtin.grep_string (cwd=project.current_root) |
+| SPC s t | normal | consult        | consult-ripgrep                   | telescope.nvim | telescope.builtin.live_grep (cwd=project.current_root)   |
+| SPC s u | normal | vundo          | vundo                             | undotree       | :UndotreeToggle (N/I)                                    |
 
 ** Toggle (=SPC t=) mappings
 
@@ -313,10 +313,10 @@ for explicit LSP formatting in either editor.
 
 *** Markdown links (=\ l=) mappings
 
-| Key   | Mode   | Emacs Provider | Emacs Function               | Nvim Provider | Nvim Function |
-|-------+--------+----------------+------------------------------+---------------+---------------|
-| \ l l | normal | markdown-mode  | markdown-insert-link         | N/I           | N/I           |
-| \ l t | normal | markdown-mode  | markdown-toggle-url-hiding   | N/I           | N/I           |
+| Key   | Mode   | Emacs Provider | Emacs Function             | Nvim Provider | Nvim Function |
+|-------+--------+----------------+----------------------------+---------------+---------------|
+| \ l l | normal | markdown-mode  | markdown-insert-link       | N/I           | N/I           |
+| \ l t | normal | markdown-mode  | markdown-toggle-url-hiding | N/I           | N/I           |
 
 *** Markdown tables (=\ b=) mappings
 

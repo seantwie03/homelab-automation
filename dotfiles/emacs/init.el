@@ -1743,7 +1743,7 @@ unsupported because the exported text must be available immediately."
 (defvar-keymap my/leader-files-map
   :doc "File commands."
   "f" #'find-file
-  "r" #'recentf-open
+  "r" #'consult-recent-file
   "s" #'write-file
   "y" #'my/copy-file-name
   "Y" #'my/copy-project-relative-file-path)
