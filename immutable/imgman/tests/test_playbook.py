@@ -17,7 +17,7 @@ from imgman.playbook import (
 from imgman.process import Result
 from tests.fakes import OK, FakeRunner
 
-X1 = HostName("x1carbon23")
+X1 = HostName("x1carbon18")
 
 
 def recap_line(changed: int, failed: int = 0) -> str:
@@ -36,8 +36,8 @@ def test_parse_recap_takes_the_last_recap() -> None:
 @pytest.mark.parametrize(
     ("subdirectory", "expected"),
     [
-        ("immutable", ("immutable/x1carbon23.yml", "immutable/ansible.cfg")),
-        ("", ("x1carbon23.yml", "ansible.cfg")),
+        ("immutable", ("immutable/x1carbon18.yml", "immutable/ansible.cfg")),
+        ("", ("x1carbon18.yml", "ansible.cfg")),
     ],
 )
 def test_playbook_paths_follow_the_checkout(
@@ -58,9 +58,9 @@ def test_rsync_reaches_the_vm_through_the_ssh_proxy(tmp_path: Path) -> None:
 
 
 def test_playbook_command_uses_the_overlay_configuration() -> None:
-    command = playbook_command("immutable/x1carbon23.yml", "immutable/ansible.cfg")
+    command = playbook_command("immutable/x1carbon18.yml", "immutable/ansible.cfg")
     assert command[:2] == ["env", "ANSIBLE_CONFIG=/opt/homelab-automation/immutable/ansible.cfg"]
-    assert command[-1] == "/opt/homelab-automation/immutable/x1carbon23.yml"
+    assert command[-1] == "/opt/homelab-automation/immutable/x1carbon18.yml"
 
 
 def vm_dir(tmp_path: Path) -> Path:

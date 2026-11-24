@@ -173,10 +173,10 @@ second command on a busy host fails at once and names the command holding it.
 To investigate a failure, keep the VM running and look inside it:
 
 ```sh
-imgman test image x1carbon23
-imgman machine ssh x1carbon23 journalctl -b -p warning --no-pager
-imgman machine gui x1carbon23
-imgman machine rm x1carbon23
+imgman test image x1carbon18
+imgman machine ssh x1carbon18 journalctl -b -p warning --no-pager
+imgman machine gui x1carbon18
+imgman machine rm x1carbon18
 ```
 
 ## Changing imgman

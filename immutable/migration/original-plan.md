@@ -256,7 +256,7 @@ sudo mokutil --import /tmp/ublue-os.der
 
 #### 2. Local Builds (Non-NVIDIA vs. NVIDIA)
 
-* **For Non-NVIDIA machines (`desktop25` today, `x1carbon2018` Intel laptop):**
+* **For Non-NVIDIA machines (`desktop25` today, `x1carbon18` Intel laptop):**
   ```sh
   sudo podman build -t localhost/workstation-kde:latest -f images/Containerfile.kde .
   ```
@@ -356,7 +356,7 @@ Every build produces a non-overwriting release tag and an immutable cryptographi
 * **`workstation-kde:latest` (Floating Canary Tag)**: Tracks the most recent successful build; used for canary testing on `desktop22`.
 
 #### Fleet Promotion Workflow
-To prevent secondary fleet hosts (`desktop25`, `x1carbon2018`) from automatically pulling an untested compose directly from scheduled CI:
+To prevent secondary fleet hosts (`desktop25`, `x1carbon18`) from automatically pulling an untested compose directly from scheduled CI:
 1. **Canary Verification**: `desktop22` consumes `:latest` or the freshly built `${BUILD_DATE}-${COMMIT_SHA}` tag.
 2. **Promotion to Fleet**: Once verified on the canary, secondary machines are updated to the verified release tag (e.g. `sudo bootc switch ghcr.io/.../workstation-kde:2026.09.26-c91da61`), ensuring fleet machines run known-good, verified builds.
 3. **Retention Policy**: GHCR package settings retain the last 30–60 days of tagged releases while pruning older untagged layers.
@@ -369,9 +369,9 @@ By combining separate Containerfiles for each desktop base with the `NVIDIA` bui
 
 | Image Tag | Hardware Target | Description |
 | :--- | :--- | :--- |
-| **`workstation-kde`** | `x1carbon2018`, `desktop25` (today) | Clean KDE Plasma 6 on Intel/AMD Mesa drivers. No NVIDIA bloat. |
+| **`workstation-kde`** | `x1carbon18`, `desktop25` (today) | Clean KDE Plasma 6 on Intel/AMD Mesa drivers. No NVIDIA bloat. |
 | **`workstation-kde-nvidia`** | `desktop22` (today), `desktop25` (after GPU) | KDE Plasma 6 with pre-compiled & signed NVIDIA drivers. |
-| **`workstation-niri`** | `x1carbon2018`, `desktop25` (today) | Clean Niri Wayland compositor on Intel/AMD Mesa drivers. |
+| **`workstation-niri`** | `x1carbon18`, `desktop25` (today) | Clean Niri Wayland compositor on Intel/AMD Mesa drivers. |
 | **`workstation-niri-nvidia`** | `desktop22` (today), `desktop25` (after GPU) | Niri Wayland compositor with pre-compiled & signed NVIDIA drivers. |
 | **`workstation-gnome`** | Any host | Clean GNOME Shell on Intel/AMD Mesa drivers. |
 | **`workstation-gnome-nvidia`** | Any host with NVIDIA | GNOME Shell with pre-compiled & signed NVIDIA drivers. |
@@ -486,7 +486,7 @@ dnf clean all
 To test or switch your entire machine's desktop environment, specify the appropriate image variant for your hardware:
 
 ```sh
-# For Intel / AMD Mesa workstations (desktop25, x1carbon2018):
+# For Intel / AMD Mesa workstations (desktop25, x1carbon18):
 # Switch to Niri (clean minimal compositor):
 sudo bootc switch --apply --transport containers-storage localhost/workstation-niri:latest
 
@@ -1498,7 +1498,7 @@ To ensure this skill operates identically across all AI harnesses, it follows th
 
 ## 7. Multi-Host Agent Synchronization & YOLO Sandboxing (Optional enhancement)
 
-To allow AI agent harnesses (Google Antigravity / AGY, Claude Code, and Codex) to operate in autonomous "YOLO" mode across the fleet (`desktop22`, `desktop25`, `x1carbon2018`), the system establishes a dedicated unprivileged user: **`agent`**.
+To allow AI agent harnesses (Google Antigravity / AGY, Claude Code, and Codex) to operate in autonomous "YOLO" mode across the fleet (`desktop22`, `desktop25`, `x1carbon18`), the system establishes a dedicated unprivileged user: **`agent`**.
 
 This design accomplishes two critical goals:
 1. **Host & Personal Data Security**: Complete isolation of personal credentials (`~/.ssh`, `~/.aws`, 1Password) and host OS integrity without the overhead or latency of running a full VM for editing.

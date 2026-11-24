@@ -1,6 +1,6 @@
 # 2026 Laptop Buying Comparison
 
-This document compares three secondary-market Lenovo ThinkPad candidates evaluated in 2026 to replace the [ThinkPad X1 Carbon 6th Gen (2018)](./x1carbon2018/x1carbon2018.md) (`20KG022US`: Intel Core i7-8550U 4C/8T, 16 GB RAM, 512 GB NVMe SSD).
+This document compares three secondary-market Lenovo ThinkPad candidates evaluated in 2026 to replace the [ThinkPad X1 Carbon 6th Gen (2018)](../devices/x1carbon18/x1carbon18.md) (`20KG022US`: Intel Core i7-8550U 4C/8T, 16 GB RAM, 512 GB NVMe SSD).
 
 ## Goals for the System
 

@@ -28,7 +28,7 @@ Everything else belongs in a runtime role.
 | Image                    | Base                                           | Hosts                |
 |--------------------------|------------------------------------------------|----------------------|
 | `workstation-kde-nvidia` | Kinoite, plus ublue's prebuilt NVIDIA packages | desktop22, desktop25 |
-| `workstation-kde`        | Kinoite                                        | x1carbon23           |
+| `workstation-kde`        | Kinoite                                        | x1carbon18           |
 | `server`                 | fedora-bootc                                   | odroidh3plus         |
 
 Niri and GNOME variants are possible additions (D2). `images/README.md` covers

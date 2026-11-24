@@ -1,5 +1,5 @@
 ---
-- name: Configure x1carbon23 as a laptop
+- name: Configure x1carbon18 as a laptop
   hosts: localhost
   connection: local
   become: true

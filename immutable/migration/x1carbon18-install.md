@@ -1,16 +1,16 @@
-# x1carbon23 install runbook
+# x1carbon18 install runbook
 
-Installs x1carbon23 from `ghcr.io/seantwie03/workstation-kde:stable` with
+Installs x1carbon18 from `ghcr.io/seantwie03/workstation-kde:stable` with
 Secure Boot on and its disk encrypted with LUKS2, unlocked by TPM2 + PIN
 ([D8](../docs/architecture.md#d8-full-disk-encryption)).
 
-**Status:** draft. Every step up to the first boot runs in the x1carbon23 VM
-with `imgman`. Steps marked **(hardware)** have not run yet: the firmware
-settings, the system disk's path, and TPM enrollment.
+**Status:** draft. Every step up to the first boot runs in the x1carbon18 VM with `imgman`. Steps marked **(hardware)** have not run yet: the hardware survey, the backup and restore, the firmware settings, and TPM enrollment.
+
+The install wipes the system disk, including the current Fedora install and its home directory.
 
 ## Before the install day
 
-1. `imgman test image x1carbon23` passes on the build `:stable` points to.
+1. `imgman test image x1carbon18` passes on the build `:stable` points to.
 2. Write the Fedora 44 netinst ISO, verified as described in "Installer ISO"
    in `immutable/imgman/README.md`, to a USB stick. Fedora Media Writer works,
    or, with the stick's device from `lsblk`:
@@ -22,30 +22,34 @@ settings, the system disk's path, and TPM enrollment.
 3. Choose the LUKS passphrase and store it in 1Password. It stays the
    fallback after TPM enrollment, so make it strong.
 
+## Survey the hardware (hardware)
+
+On the current Fedora install, record in `docs/devices/x1carbon18/x1carbon18.md`:
+
+```sh
+ls -l /dev/disk/by-id/ | grep nvme          # the system disk's path
+mokutil --sb-state                          # Secure Boot state
+cat /sys/class/tpm/tpm0/tpm_version_major   # 2: TPM2 + PIN works
+```
+
+For the disk, use the `nvme-<model>_<serial>` entry that points at the whole disk, such as `../../nvme0n1`: not an `-part` entry, and not the `nvme-eui.` alias.
+
+Run Phase 4's audio and laptop checks on this install too, so a check that fails after the install points at the image, not the hardware.
+
+## Back up the home directory (hardware)
+
+Copy `/home/sean` off the laptop, and check that the copy reads back. Leave out what the new install recreates or does not need, such as `~/.cache`, `~/.local/share/containers`, and `~/Downloads`. Do not continue until the backup is verified.
+
 ## Firmware (hardware)
 
 Press `F1` at power-on for the BIOS setup.
 
 1. Set a supervisor password and store it in 1Password.
-2. Turn Secure Boot on. If the install USB does not boot with Secure Boot on,
-   enable "Allow Microsoft 3rd Party UEFI CA": Fedora's shim is signed with
-   that CA, and Secured-core ThinkPads ship with it off.
+2. Turn Secure Boot on. If the install USB does not boot with Secure Boot on, check that the firmware trusts Microsoft's third-party UEFI CA, which signs Fedora's shim; newer ThinkPads have an "Allow Microsoft 3rd Party UEFI CA" setting for it.
 
-## Read the system disk's path (hardware)
+## Set the system disk (hardware)
 
-Boot the USB stick (`F12` for the boot menu), start "Install Fedora", and
-switch to a shell with `Ctrl+Alt+F2`, or boot any Fedora live image:
-
-```sh
-ls -l /dev/disk/by-id/ | grep nvme
-```
-
-Use the `nvme-<model>_<serial>` entry that points at the whole disk, such as
-`../../nvme0n1`: not an `-part` entry, and not the `nvme-eui.` alias. Replace
-`disk/by-id/placeholder` in `immutable/images/kickstart/x1carbon23.ks` with
-`disk/by-id/<that entry>`, run `imgman test image x1carbon23`, and commit and
-push it. Until then, the placeholder fails `%pre`'s disk check, so the install
-stops before touching any disk.
+Only after the backup is verified, replace `disk/by-id/placeholder` in `immutable/images/kickstart/x1carbon18.ks` with `disk/by-id/<the entry from the survey>`, run `imgman test image x1carbon18`, and commit and push it. Until then, the placeholder fails `%pre`'s disk check, so the install stops before touching any disk.
 
 ## Install
 
@@ -55,7 +59,7 @@ stops before touching any disk.
    `e`, and append to the `linux` line:
 
    ```text
-   inst.ks=https://raw.githubusercontent.com/seantwie03/homelab-automation/main/immutable/images/kickstart/x1carbon23.ks
+   inst.ks=https://raw.githubusercontent.com/seantwie03/homelab-automation/main/immutable/images/kickstart/x1carbon18.ks
    ```
 
    Press `Ctrl+X` to boot.
@@ -76,7 +80,13 @@ stops before touching any disk.
        --limit localhost \
        --directory /opt/homelab-automation \
        --url https://github.com/seantwie03/homelab-automation.git \
-       immutable/x1carbon23.yml
+       immutable/x1carbon18.yml
+   ```
+
+4. Restore the home directory from the backup. Copy into the existing directories with `rsync`, without `--delete`, so the kickstart's nested subvolumes stay subvolumes, then relabel. The UID and GID are 1000 on both installs, so ownership carries over:
+
+   ```sh
+   sudo restorecon -R /var/home/sean
    ```
 
 ## TPM2 + PIN (hardware)

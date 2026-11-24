@@ -35,7 +35,7 @@ line per check. It exits 3 if any check fails. With current disks it takes
 about 20 seconds per host; each reinstall adds about 7 minutes, so run it in
 the background and wait for it to finish. Each host's disk needs about 7 GB.
 
-Test one host by naming it, such as `imgman test image x1carbon23`.
+Test one host by naming it, such as `imgman test image x1carbon18`.
 `imgman/README.md` describes every command, the checks, and the exit codes.
 
 ## Investigating failures
@@ -44,9 +44,9 @@ Test one host by naming it, such as `imgman test image x1carbon23`.
 then stop it:
 
 ```sh
-uv run --project immutable/imgman imgman machine ssh x1carbon23 bootc status
-uv run --project immutable/imgman imgman machine ssh x1carbon23 journalctl -b -p warning --no-pager
-uv run --project immutable/imgman imgman machine rm x1carbon23
+uv run --project immutable/imgman imgman machine ssh x1carbon18 bootc status
+uv run --project immutable/imgman imgman machine ssh x1carbon18 journalctl -b -p warning --no-pager
+uv run --project immutable/imgman imgman machine rm x1carbon18
 ```
 
 The VM's serial console is logged to

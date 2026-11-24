@@ -1,4 +1,4 @@
-# Installs x1carbon23, a laptop, on its hardware or as an imgman VM. The system
+# Installs x1carbon18, a laptop, on its hardware or as an imgman VM. The system
 # disk is encrypted with LUKS2; the EFI partition and /boot are not.
 #
 # %pre reads four optional kernel arguments, each on its own:
@@ -15,7 +15,7 @@ text
 lang en_US.UTF-8
 keyboard us
 timezone America/Chicago --utc
-network --bootproto=dhcp --activate --hostname=x1carbon23
+network --bootproto=dhcp --activate --hostname=x1carbon18
 rootpw --lock
 # A bootstrap password, published with this file. Change it at first login.
 user --name=sean --uid=1000 --gid=1000 --groups=wheel --iscrypted --password=$y$j9T$d7zLGmZwspvuPbCe750ya/$NPPNjIoTofZbVBZv4fdXjiW73H1feqMszK7e31vgg5A

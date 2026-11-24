@@ -7,7 +7,7 @@ host with every `imgman` prerequisite installed, from the repository root,
 `/opt/homelab-automation`, unless a step says otherwise.
 
 desktop25 is in `immutable/images/hosts.toml`, so `imgman` defaults to it, but
-it has no playbook. Always name the host, such as `x1carbon23`.
+it has no playbook. Always name the host, such as `x1carbon18`.
 
 ## Read first
 
@@ -63,7 +63,7 @@ Review `immutable/images/Containerfile.kde`, `scripts/*.sh`, `keys/`, and
   imgman image build kde
   ```
 
-- [ ] Check that the image's initramfs carries the TPM2 support x1carbon23's
+- [ ] Check that the image's initramfs carries the TPM2 support x1carbon18's
   TPM2 + PIN unlock needs. Only the hardware can test the unlock itself:
 
   ```sh
@@ -72,17 +72,17 @@ Review `immutable/images/Containerfile.kde`, `scripts/*.sh`, `keys/`, and
           grep -E "libtss2|systemd-tpm2|libcryptsetup-token"'
   ```
 
-## 3. Install x1carbon23's VM disk
+## 3. Install x1carbon18's VM disk
 
-Review `immutable/images/kickstart/x1carbon23.ks` and
+Review `immutable/images/kickstart/x1carbon18.ks` and
 `immutable/imgman/src/imgman/installer.py`.
 
 - [ ] Install the disk, which takes about 7 minutes, and watch the installer's
   console from another terminal:
 
   ```sh
-  imgman machine init x1carbon23
-  tail -f ~/.cache/homelab-images/x1carbon23/install/console.log
+  imgman machine init x1carbon18
+  tail -f ~/.cache/homelab-images/x1carbon18/install/console.log
   ```
 
 ## 4. Test the image
@@ -92,32 +92,32 @@ Review `immutable/imgman/src/imgman/checks.py` and `vm.py`.
 - [ ] Run the checks. All 15 should pass in about 20 seconds:
 
   ```sh
-  imgman test image x1carbon23
+  imgman test image x1carbon18
   ```
 
 - [ ] Look around the VM as root. Without the bootstrap password, set one for
   `sean`; changes last only until the VM stops:
 
   ```sh
-  imgman machine ssh x1carbon23
+  imgman machine ssh x1carbon18
   passwd sean
   ```
 
 - [ ] Log in to the desktop:
 
   ```sh
-  imgman machine gui x1carbon23
+  imgman machine gui x1carbon18
   ```
 
 ## 5. Test the playbook
 
-Review `immutable/x1carbon23.yml`, `immutable/ansible.cfg`, the roles under
+Review `immutable/x1carbon18.yml`, `immutable/ansible.cfg`, the roles under
 `immutable/roles/`, and `immutable/imgman/src/imgman/playbook.py`.
 
 - [ ] Converge twice. The second run must change nothing:
 
   ```sh
-  imgman test playbook x1carbon23
+  imgman test playbook x1carbon18
   ```
 
 - [ ] Check whether starting `ansible-pull.timer` also starts the service. The
@@ -125,7 +125,7 @@ Review `immutable/x1carbon23.yml`, `immutable/ansible.cfg`, the roles under
   at every boot. The VM skips the service, so read the unit instead:
 
   ```sh
-  imgman machine ssh x1carbon23 systemctl show ansible-pull.timer -p Requires
+  imgman machine ssh x1carbon18 systemctl show ansible-pull.timer -p Requires
   ```
 
 ## 6. Rehearse the bootstrap
@@ -138,8 +138,8 @@ working tree.
   "Bootstrap" in `immutable/roles/system/ansible_pull/README.md`:
 
   ```sh
-  imgman machine run x1carbon23
-  imgman machine ssh x1carbon23
+  imgman machine run x1carbon18
+  imgman machine ssh x1carbon18
   ```
 
 - [ ] In the same shell, `h test` reruns the playbook with no changes, and `h`
@@ -155,23 +155,23 @@ of the plan.
   that command as failed; wait about 20 seconds before the next one:
 
   ```sh
-  imgman machine ssh x1carbon23 bootc switch ghcr.io/seantwie03/workstation-kde:stable
-  imgman machine ssh x1carbon23 systemctl reboot
+  imgman machine ssh x1carbon18 bootc switch ghcr.io/seantwie03/workstation-kde:stable
+  imgman machine ssh x1carbon18 systemctl reboot
   ```
 
 - [ ] Check that the VM booted the published image and reaches GHCR without
   credentials:
 
   ```sh
-  imgman machine ssh x1carbon23 bootc status
-  imgman machine ssh x1carbon23 bootc upgrade --check
+  imgman machine ssh x1carbon18 bootc status
+  imgman machine ssh x1carbon18 bootc upgrade --check
   ```
 
 - [ ] Check that updates stage without rebooting:
 
   ```sh
-  imgman machine ssh x1carbon23 systemctl cat bootc-fetch-apply-updates.service
-  imgman machine ssh x1carbon23 systemctl list-timers bootc-fetch-apply-updates.timer
+  imgman machine ssh x1carbon18 systemctl cat bootc-fetch-apply-updates.service
+  imgman machine ssh x1carbon18 systemctl list-timers bootc-fetch-apply-updates.timer
   ```
 
 ## 8. Other hosts and the runbook
@@ -183,7 +183,7 @@ of the plan.
   imgman test image --all
   ```
 
-- [ ] Read [x1carbon23-install.md](x1carbon23-install.md) against Phase 3's
+- [ ] Read [x1carbon18-install.md](x1carbon18-install.md) against Phase 3's
   open items.
 
 ## Prototype: `/opt` as an image directory
@@ -204,7 +204,7 @@ See the [bootc file system docs](https://bootc.dev/bootc/bootc-filesystem.7.html
 and the
 [Fedora discussion of the links](https://discussion.fedoraproject.org/t/are-opt-and-usr-local-symlinks-on-silverblue-because-it-is-an-ostree-image-and-not-bootc/199320).
 
-Do this before x1carbon23's install. Once a host keeps data under `/var/opt`,
+Do this before x1carbon18's install. Once a host keeps data under `/var/opt`,
 switching needs a migration.
 
 - [ ] Replace the `/opt` link with a directory in the image.
@@ -218,14 +218,14 @@ switching needs a migration.
   the runbook.
 - [ ] Change `test image`'s layout checks: `/opt` is a read-only directory, not
   a link.
-- [ ] `imgman test image --all` and `imgman test playbook x1carbon23` pass.
+- [ ] `imgman test image --all` and `imgman test playbook x1carbon18` pass.
 - [ ] Once a role that links dotfiles runs in the VM, check for SELinux
   denials. The checkout's label changes from `usr_t` under `/opt` to `var_t`
   under `/var`, and dotfiles in the home directory link into it. `ausearch`
   prints `<no matches>` and exits 1 when there are none:
 
   ```sh
-  imgman machine ssh x1carbon23 ausearch -m avc -ts boot
+  imgman machine ssh x1carbon18 ausearch -m avc -ts boot
   ```
 
 - [ ] Record the outcome. If the layout holds, add a decision to

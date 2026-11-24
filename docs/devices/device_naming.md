@@ -10,7 +10,7 @@ I've never purchased two of the same device before. If I ever do that I will pro
 
 ## Examples
 
-- X1 Carbon 6th Gen came out in 2018 so the hostname is `x1carbon2018`
+- X1 Carbon 6th Gen came out in 2018 so the hostname is `x1carbon18`
 - I built a custom desktop in 2022 so the hostname is `desktop22`
 
 ## Caveat

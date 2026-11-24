@@ -33,7 +33,7 @@ commands later phases add (`image promote`, `test playbook`, `test upgrade`,
    - `--flavor` boots a different image but runs the host's playbook unchanged, including the desktop roles it lists.
 
 5. **Podman-Style Positional Target (`[HOST]`):**
-   - Images are named by flavor and machines by host, as Podman names images and machines separately. `image build` accepts an optional positional flavor argument (e.g., `kde`, `kde-nvidia`). Every `machine`, `test`, and `system` command accepts an optional positional host argument (e.g., `desktop22`, `x1carbon2018`).
+   - Images are named by flavor and machines by host, as Podman names images and machines separately. `image build` accepts an optional positional flavor argument (e.g., `kde`, `kde-nvidia`). Every `machine`, `test`, and `system` command accepts an optional positional host argument (e.g., `desktop22`, `x1carbon18`).
    - A VM stands in for its host: it boots the host's flavor from a disk installed with the host's Kickstart, its hostname is set to `HOST`, and the host's playbook runs as it does on the host.
    - `images/hosts.toml` maps each host to its flavor. Each host's Kickstart is found by convention at `images/kickstart/<host>.ks`.
    - If `HOST` is omitted, commands default to `hostname --short` when it names a host in `hosts.toml`, and exit with a usage error otherwise. If `FLAVOR` is omitted, `image build` builds the default host's flavor.
@@ -402,7 +402,7 @@ images/
 └── kickstart/
     ├── desktop22.ks      # Includes the secondary /games disk
     ├── desktop25.ks
-    └── x1carbon23.ks     # Encrypts the system disk with LUKS2
+    └── x1carbon18.ks     # Encrypts the system disk with LUKS2
 ```
 
 ```toml
@@ -416,7 +416,7 @@ data_disks = ["10G"]    # stands in for the games SSD
 [desktop25]
 flavor = "kde-nvidia"
 
-[x1carbon23]
+[x1carbon18]
 flavor = "kde"
 ```
 
@@ -512,7 +512,7 @@ EOF
 
 - **Hardware:** booted with `inst.ks=https://...` or from a USB stick, with no `imgman.*` arguments, so `%pre` uses the hardware values written in the file. Typing `imgman.url=...` at the boot prompt installs another tag or digest onto the same disk, still over TLS.
 - **VM:** `machine init` passes all four arguments, and a kickstart that does not encrypt ignores `imgman.luks-passphrase`. `--flavor` changes only `imgman.url`.
-- **Encryption:** a kickstart that encrypts (x1carbon23's) also has `%pre` write its `part` line to `/tmp/target.ks`, as `part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2`, adding `--passphrase=` only when `imgman.luks-passphrase` is given. On the hardware, Anaconda asks for the passphrase, so it never enters the repository. The VM has no TPM; it unlocks from the `cryptsetup.passphrase` credential `machine run` passes. TPM2 enrollment happens on the hardware, after the install (see D8 in `docs/architecture.md`).
+- **Encryption:** a kickstart that encrypts (x1carbon18's) also has `%pre` write its `part` line to `/tmp/target.ks`, as `part btrfs.01 --fstype=btrfs --grow --encrypted --luks-version=luks2`, adding `--passphrase=` only when `imgman.luks-passphrase` is given. On the hardware, Anaconda asks for the passphrase, so it never enters the repository. The VM has no TPM; it unlocks from the `cryptsetup.passphrase` credential `machine run` passes. TPM2 enrollment happens on the hardware, after the install (see D8 in `docs/architecture.md`).
 - The kickstart names the system disk only in `ignoredisk`. `clearpart --all` and `part` lines without `--ondisk` then apply to that one disk, so every other disk, such as desktop22's games SSD, is left alone in both targets.
 - `ksvalidator` cannot see the included commands, so imgman's unit tests validate each kickstart with both targets' commands filled in.
 - The kickstarts use `ostreecontainer`, not Anaconda's newer `bootc` command (Fedora 44), which installs with `bootc install to-filesystem` and can track a different tag than it installs from (`--target-imgref`). In Fedora 44, `bootc` rejects every user-specified mount point, including `/boot/efi`, so it cannot install these UEFI hosts or their `/var` and `/var/home` subvolumes (Red Hat issue RHEL-135114). `ostreecontainer` is not deprecated. Revisit `bootc` once it accepts user-specified mount points.

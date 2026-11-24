@@ -1,7 +1,6 @@
-# Upgrade x1carbon2018 from Fedora 43 to Fedora 44
+# Upgrade x1carbon18 from Fedora 43 to Fedora 44
 
-This procedure upgrades `x1carbon2018` using Fedora's supported DNF5 offline
-system-upgrade workflow.
+This procedure upgrades `x1carbon18` using Fedora's supported DNF5 offline system-upgrade workflow.
 
 Host facts observed on June 13, 2026:
 
@@ -40,7 +39,7 @@ Before upgrading:
 3. Apply the final Fedora 43 configuration and confirm that it succeeds:
 
    ```bash
-   sudo h a test x1carbon2018.yml
+   sudo h a test x1carbon18.yml
    ```
 
 4. Confirm that the DNF5 Automatic schedule and service override are loaded:
@@ -188,7 +187,7 @@ The EFI system partition is not included in either snapshot. Back it up
 separately:
 
 ```bash
-sudo tar -C /boot/efi -czf /PATH/ON/EXTERNAL/BACKUP/x1carbon2018-efi-before-f44.tar.gz .
+sudo tar -C /boot/efi -czf /PATH/ON/EXTERNAL/BACKUP/x1carbon18-efi-before-f44.tar.gz .
 ```
 
 Replace the destination with a path on an external backup device or machine.
@@ -294,19 +293,19 @@ Run the complete host configuration:
 
 ```bash
 cd /opt/homelab-automation
-sudo h a test x1carbon2018.yml
+sudo h a test x1carbon18.yml
 ```
 
 Run it a second time to check idempotency:
 
 ```bash
-sudo h a test x1carbon2018.yml
+sudo h a test x1carbon18.yml
 ```
 
 The second run should complete with `failed=0`. Investigate unexpected changes
 that repeat on every run.
 
-## 9. Verify x1carbon2018
+## 9. Verify x1carbon18
 
 Check the services and timers most likely to expose an upgrade regression:
 
