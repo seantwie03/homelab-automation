@@ -6,6 +6,10 @@ This role configures a recurring job. The job runs `ansible-pull` to clone the p
 
 The Systemd Service name is `ansible-pull`. It is hardcoded in several places.
 
+`ansible-pull.timer` runs the service daily at 03:00. It is persistent, so a run missed while the host was off or asleep starts after the next boot or wake. Starting the timer does not start a run by itself.
+
+While a run is in progress, the service holds a `systemd-inhibit` sleep lock in block mode. Suspend requests from the menu, the suspend key, or an idle timeout are refused, or prompt for an administrator password, until the run finishes. Without the lock, a run frozen by suspend continues on resume before the network is back, and its next download fails. Closing a laptop lid still suspends, because logind's default `LidSwitchIgnoreInhibited=yes` ignores the lock.
+
 ## Role Variables
 
 `ansible_pull_path`: The path to the `ansible-pull` executable. Will be different depending on installation method.

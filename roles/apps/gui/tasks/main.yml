@@ -47,6 +47,20 @@
     name: solaar
     state: present
 
+# The mice keep their onboard profiles without Solaar running. This override
+# hides the package's /etc/xdg/autostart/solaar.desktop entry.
+- name: solaar does not autostart at login
+  ansible.builtin.copy:
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name=Solaar
+      Hidden=true
+    dest: /home/{{ user }}/.config/autostart/solaar.desktop
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
 - name: bittorrent client is installed
   ansible.builtin.package:
     name: qbittorrent

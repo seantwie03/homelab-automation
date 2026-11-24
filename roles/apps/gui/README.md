@@ -127,7 +127,7 @@ update both `tldraw_offline_version` and `tldraw_offline_checksum`.
 
 Logitech mice are configured with Solaar, which replaced Piper. Piper's libratbag backend cannot write a button binding that is only a modifier key, such as a held Alt or Ctrl, to a HID++ 2.0 onboard profile: it puts the modifier's HID usage in the key byte instead of the modifier byte, and the mouse sends nothing. Upstream tracks this in [libratbag#710](https://github.com/libratbag/libratbag/issues/710) and [libratbag#1906](https://github.com/libratbag/libratbag/issues/1906).
 
-The `solaar` package pulls in `solaar-udev`, whose udev rule grants the logged-in user access to Logitech hidraw devices, so no step needs root. Replug the mouse after the first install so the rule applies. The package also installs an XDG autostart entry that starts Solaar in the system tray at login.
+The `solaar` package pulls in `solaar-udev`, whose udev rule grants the logged-in user access to Logitech hidraw devices, so no step needs root. Replug the mouse after the first install so the rule applies. The package also installs an XDG autostart entry that would start Solaar in the system tray at login. The role hides it with a `Hidden=true` override in `~/.config/autostart/solaar.desktop`, because the mice keep their onboard profiles without Solaar running. Open Solaar from the application launcher to change a profile.
 
 The onboard profiles for both G502 mice are kept in `dotfiles/solaar/g502-profiles.yaml`. To apply the file to a mouse, connect only that mouse and run:
 

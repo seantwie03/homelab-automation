@@ -120,9 +120,7 @@ Review `immutable/x1carbon18.yml`, `immutable/ansible.cfg`, the roles under
   imgman test playbook x1carbon18
   ```
 
-- [ ] Check whether starting `ansible-pull.timer` also starts the service. The
-  timer lists `Requires=ansible-pull.service`, which on desktop25 starts a run
-  at every boot. The VM skips the service, so read the unit instead:
+- [ ] Check that starting `ansible-pull.timer` does not start the service. `Requires` must not list `ansible-pull.service`; when it did, desktop25 started a run at every boot. The VM skips the service, so read the unit instead:
 
   ```sh
   imgman machine ssh x1carbon18 systemctl show ansible-pull.timer -p Requires

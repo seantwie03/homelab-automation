@@ -10,8 +10,7 @@ role configures what differs per host:
   host's playbook, and the Ansible configuration it runs with.
   `ansible-pull.service` loads it as its environment, and `h` reads it, so the
   timer and `h test` run the same playbook from the same checkout.
-- `ansible-pull.service` and `ansible-pull.timer`. The timer runs daily at
-  03:00, persistent and with up to 10 minutes of random delay.
+- `ansible-pull.service` and `ansible-pull.timer`. The timer runs daily at 03:00, persistent and with up to 10 minutes of random delay, so a run missed while the host was off or asleep starts after the next boot or wake. Starting the timer does not start a run by itself.
 - The log directory, `/var/log/ansible-pull`, and its rotation.
 - `ansible-pull-notify.sh`, which reports each run's result as a desktop
   notification.
@@ -20,6 +19,8 @@ role configures what differs per host:
 
 The service is condition-skipped in a VM, where `imgman test playbook` runs the
 playbook from a copy of the working tree instead.
+
+While a run is in progress, the service holds a `systemd-inhibit` sleep lock in block mode. Suspend requests from the menu, the suspend key, or an idle timeout are refused, or prompt for an administrator password, until the run finishes. Without the lock, a run frozen by suspend continues on resume before the network is back, and its next download fails. Closing a laptop lid still suspends, because logind's default `LidSwitchIgnoreInhibited=yes` ignores the lock.
 
 ## Role Variables
 

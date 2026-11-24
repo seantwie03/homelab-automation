@@ -31,3 +31,12 @@ Btrfs free-space result. The downloaded RPM is still verified against the
 SHA-256 checksum pinned in `defaults/main.yml`. This is a known problem with
 upstream Zoom's package. Nothing can be done by the user to fix this issue.
 
+Solaar should not start at login:
+
+```sh
+cat ~/.config/autostart/solaar.desktop
+systemctl --user list-unit-files 'app-solaar@*' --no-pager
+```
+
+Expected: the file contains `Hidden=true`, and no `app-solaar@autostart.service` unit is listed. The unit is generated from the package's `/etc/xdg/autostart/solaar.desktop` when the override is missing.
+

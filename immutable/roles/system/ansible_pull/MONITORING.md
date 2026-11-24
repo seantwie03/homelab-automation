@@ -11,18 +11,38 @@ Expected: `ANSIBLE_PULL_PLAYBOOK` names this host's playbook, and
 
 ## Timer
 
-`ansible-pull.timer` runs daily at 03:00 with up to 10 minutes of random delay.
-It is persistent, so a missed run starts after the next boot.
+`ansible-pull.timer` runs daily at 03:00 with up to 10 minutes of random delay. It is persistent, so a missed run starts after the next boot or wake. Starting the timer does not start a run by itself.
 
 ```sh
 systemctl status ansible-pull.timer --no-pager
 systemctl list-timers ansible-pull.timer --all
+systemctl show ansible-pull.timer -p Requires
 ```
 
 Expected:
 
 - The timer is enabled and active.
 - The last and next trigger are consistent with the configured daily schedule.
+- `Requires` does not list `ansible-pull.service`. If it does, every boot starts a run, even when that day's run already succeeded.
+
+## Sleep Lock
+
+The service blocks suspend for the length of a run. During a run, check the lock:
+
+```sh
+systemd-inhibit --list --no-pager
+```
+
+Expected:
+
+- While `ansible-pull.service` is active, the list includes `ansible-pull` with `sleep` under `WHAT` and `block` under `MODE`.
+- When no run is active, `ansible-pull` is absent.
+
+A run that fails on a DNS or download error may have been frozen by suspend, for example by closing a laptop lid, which ignores the lock. Look for a suspend between the run's start and its failure:
+
+```sh
+journalctl -b -u ansible-pull.service -u systemd-suspend.service --no-pager
+```
 
 ## Last Run
 

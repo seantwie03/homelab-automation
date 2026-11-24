@@ -14,7 +14,14 @@ EnvironmentFile=-/run/ansible-pull.env
 ExecStartPre=-/bin/bash -c "echo PRE_NUM=$(snapper create --type pre --print-number --description 'Before ansible-pull' --cleanup-algorithm number) > /run/ansible-pull.env"
 WorkingDirectory={{ playbook_path }}
 Environment="PYTHONUNBUFFERED=True"
-ExecStart=/bin/bash -c "set -o pipefail; {{ ansible_pull_path }} \
+# Block suspend for the whole run. A run frozen by suspend continues on resume
+# before the network is back, and its next download fails.
+ExecStart=/usr/bin/systemd-inhibit \
+    --what=sleep \
+    --mode=block \
+    --who=ansible-pull \
+    "--why=Applying homelab configuration" \
+    /bin/bash -c "set -o pipefail; {{ ansible_pull_path }} \
     --limit localhost \
     --accept-host-key \
     --directory {{ playbook_path }} \

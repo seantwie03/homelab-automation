@@ -12,7 +12,14 @@ User=root
 EnvironmentFile=/etc/ansible-pull.conf
 WorkingDirectory={{ playbook_path }}
 Environment="PYTHONUNBUFFERED=True"
-ExecStart=/bin/bash -c "set -o pipefail; ansible-pull \
+# Block suspend for the whole run. A run frozen by suspend continues on resume
+# before the network is back, and its next download fails.
+ExecStart=/usr/bin/systemd-inhibit \
+    --what=sleep \
+    --mode=block \
+    --who=ansible-pull \
+    "--why=Applying homelab configuration" \
+    /bin/bash -c "set -o pipefail; ansible-pull \
     --limit localhost \
     --accept-host-key \
     --directory \"$ANSIBLE_PULL_DIRECTORY\" \

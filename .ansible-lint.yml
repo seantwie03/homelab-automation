@@ -1,3 +1,7 @@
+exclude_paths:
+  # Solaar profile dump
+  - dotfiles/solaar/g502-profiles.yaml
+
 skip_list:
   - var-naming[no-role-prefix]
   - name[casing]
