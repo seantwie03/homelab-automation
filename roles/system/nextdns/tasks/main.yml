@@ -18,6 +18,20 @@
     mode: 0644
   notify: restart networkmanager
 
+- name: networkmanager per-link dns-over-tls is disabled
+  ansible.builtin.copy:
+    dest: /etc/NetworkManager/conf.d/dns-over-tls.conf
+    content: |
+      # Per-link DNS servers otherwise inherit resolved's global
+      # DNSOverTLS=yes, and most networks' DNS servers refuse DoT. The global
+      # NextDNS servers still use DoT. See the nextdns role README.
+      [connection]
+      connection.dns-over-tls=0
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart networkmanager
+
 - name: /etc/systemd/resolved.conf.d directory exists
   ansible.builtin.file:
     path: /etc/systemd/resolved.conf.d

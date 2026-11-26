@@ -14,7 +14,9 @@ Expected:
 - `/etc/resolv.conf` resolves to `/run/systemd/resolve/stub-resolv.conf`.
 - Global DNS servers and the search domain match the role defaults or host
   overrides.
-- DNS-over-TLS is enabled for the NextDNS servers.
+- DNS-over-TLS is enabled for the NextDNS servers: the `Global` section shows `+DNSOverTLS`.
+- Each network link, such as the wired or Wi-Fi interface, shows `-DNSOverTLS`. A link showing `+DNSOverTLS` means `/etc/NetworkManager/conf.d/dns-over-tls.conf` is missing or NetworkManager has not applied it.
+- `nmcli networking connectivity check` prints `full` on a working network.
 
 ## Resolution
 
