@@ -46,8 +46,7 @@ Runtime roles must not:
 - Create directories directly under `/`. Mount points and shared data go under
   `/srv`.
 
-Scripts that systemd, root, or `sudo` run go in `/usr/local/bin`. A user's
-own tools go in their home directory.
+Scripts that systemd, root, or `sudo` run, and tools that every user shares, go in `/usr/local/bin`. Tools that update themselves, and tools only one user needs, go in that user's home directory.
 
 When a runtime role needs a package, add the package to the image build and
 list it in the role's README as an image requirement.

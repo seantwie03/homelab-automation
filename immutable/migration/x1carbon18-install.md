@@ -10,7 +10,14 @@ The install wipes the system disk, including the current Fedora install and its 
 
 ## Before the install day
 
-1. `imgman test image x1carbon18` passes on the build `:stable` points to.
+1. `:stable` is a build of current `main`, and `imgman test image x1carbon18` and `imgman test playbook x1carbon18` pass on it. Its date-and-commit tag names the commit it was built from, and this prints nothing when the image is current:
+
+   ```sh
+   git diff --stat <commit> main -- immutable/images/Containerfile.kde \
+       immutable/images/scripts immutable/images/keys immutable/images/bin
+   ```
+
+   `test image` alone is not enough: it also passes on an older build that lacks packages the playbook's roles need.
 2. Write the Fedora 44 netinst ISO, verified as described in "Installer ISO"
    in `immutable/imgman/README.md`, to a USB stick. Fedora Media Writer works,
    or, with the stick's device from `lsblk`:
@@ -74,6 +81,12 @@ Press `F1` at power-on for the BIOS setup. The BIOS stays at 1.59, because fwupd
        immutable/x1carbon18.yml
    ```
 
+4. In the Tailscale admin console, remove the old x1carbon18, so the new install gets the name `x1carbon18` instead of `x1carbon18-1`. Then authenticate it:
+
+   ```sh
+   sudo tailscale up
+   ```
+
 ## TPM2 + PIN (hardware)
 
 The LUKS2 container is the system disk's third partition, after the EFI
@@ -116,6 +129,7 @@ mokutil --sb-state                                    # SecureBoot enabled
 bootc status                                          # ghcr.io/seantwie03/workstation-kde:stable
 systemctl is-enabled bootc-fetch-apply-updates.timer  # enabled: updates stage, never reboot
 h                                                     # ansible-pull.service status
+tailscale status                                      # this host listed as x1carbon18
 sudo cryptsetup luksDump "$disk" | grep systemd-tpm2  # the TPM2 token
 ```
 

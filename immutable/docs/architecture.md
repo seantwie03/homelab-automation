@@ -58,13 +58,17 @@ read-only, writable, and linked paths. Proposed for the server image.
 |              |              | install, so image builds leave it empty.                           |
 | `/`          | Image        | Read-only. The image adds no top-level directories.                |
 | `/srv`       | Runtime      | Links to `/var/srv` in every base image. Holds mounted and shared  |
-|              |              | storage: `/srv/source`, `/srv/tier1`, and `/srv/tier2` (NFS mounts |
-|              |              | on clients, local data on odroidh3plus) and `/srv/games` (a local  |
-|              |              | games disk). Runtime roles create these directories.               |
+|              |              | storage: `/srv/tier1` and `/srv/tier2` (NFS mounts on clients,     |
+|              |              | local data on odroidh3plus), `/srv/games` (a local games disk),    |
+|              |              | and `/srv/s` (source code). Runtime roles create these             |
+|              |              | directories.                                                       |
 | `/opt`       | Runtime on   | Kinoite links it to `/var/opt`. fedora-bootc ships it as a         |
 |              | workstations | read-only directory.                                               |
 | Repository   | Runtime      | `/opt/homelab-automation` on workstations. The server's location   |
 | checkout     |              | is open.                                                           |
+| Source code  | Runtime      | Git clones in `/srv/s` on each workstation: a btrfs subvolume that |
+|              |              | `sean` and the coding agent both write, through the `sourceshare`  |
+|              |              | group. Pushed and pulled through GitHub. No source code is on NFS. |
 | `/usr/local` | Runtime      | Links to `/var/usrlocal` in every image. Kinoite ships the link,   |
 |              |              | and the server image adds it in place of fedora-bootc's read-only  |
 |              |              | directory. Holds the scripts runtime roles install for systemd,    |
@@ -214,17 +218,13 @@ generated Machine Owner Key.
 once. Kernel updates wait for matching modules. The open modules support Turing
 and newer GPUs, which covers the RTX 4070 SUPER and the RTX 2070.
 
-### D4. Everyday CLI tools in user space
+### D4. Everyday CLI tools in `/usr/local`
 
 **Status:** proposed.
 
-Runtime Ansible downloads pinned release builds, verifies their checksums,
-installs each version into its own directory under `~/.local/share`, and links
-the active version into `~/bin`. The image carries only what Ansible needs to
-run.
+Runtime Ansible downloads pinned release builds, verifies their checksums, installs each version into its own directory under `/usr/local/lib/<tool>/<version>`, and links the active version into `/usr/local/bin`, which is on every user's `PATH`. Root owns them and only Ansible changes them, so `sean` and the agent users run the same versions. Tools that update themselves, such as Claude Code and Codex, and language runtimes with per-project versions (Q8) install into each user's home instead, because they write to where they are installed. The image carries only what Ansible needs to run.
 
-**Why:** Updating a tool needs no image build or reboot. The same versions run
-on every host, and switching back to an installed version needs no download.
+**Why:** Updating a tool needs no image build or reboot. The same versions run on every host and for every user, switching back to an installed version needs no download, and no user, an agent included, can change the shared tools.
 
 **Alternatives rejected:**
 
@@ -232,6 +232,7 @@ on every host, and switching back to an installed version needs no download.
 - Toolbx or Distrobox: tools run inside a container, adding a step to everyday
   use.
 - Homebrew: a second package manager with its own update sprawl.
+- Installs in each user's home: every user needs its own copy and its own updates.
 
 **Consequences:** This repository maintains versions and checksums by hand.
 

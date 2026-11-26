@@ -47,9 +47,7 @@ The reasons and rejected alternatives are in the
 
 x1carbon18 goes first. It needs no NVIDIA modules, and it is not the daily driver, so desktop22 carries the daily work while it settles in. It runs Secure Boot with Fedora's signed boot chain, so it needs no signing keys of this repository's own. Its current Fedora install answers the hardware questions before the install wipes the disk. Its home directory holds nothing that is not also on the NFS shares or GitHub, so it is not backed up, and the install starts it empty; desktop22's cutover is the first real run of the restore that Phase 10 rehearses.
 
-Agent workspaces (section 7 of the original plan) are a separate project. So is
-a self-hosted forge with CI and a container registry, such as Forgejo or GitLab
-on odroidh3plus; nothing in this plan depends on one.
+Phase 18 replaces section 7 of the original plan, agent workspaces, with a user for a coding agent, without section 7's session mobility (Q19). A self-hosted forge with CI and a container registry, such as Forgejo or GitLab on odroidh3plus, is a separate project; nothing in this plan depends on one.
 
 ## How the overlay works
 
@@ -351,17 +349,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
   `bootc upgrade` without `--apply`. Tested in the x1carbon18 VM: after a
   newer build was pushed, the service staged it without rebooting, and the
   next reboot booted it, with the previous build kept for rollback.
-- [x] `ansible_pull`: the unit runs `immutable/x1carbon18.yml` with the
-  overlay config, and `h` is baked into the image as `immutable/images/bin/h`,
-  so role changes never rebuild the image (D5). The overlay role writes
-  `/etc/ansible-pull.conf`, which the unit loads with `EnvironmentFile=` and
-  `h` reads, so the image holds no host-specific paths. It drops the pip
-  installs, the Snapper hooks, and its `dnf`, `nextdns`, and `podman`
-  dependencies; `nextdns` and `podman` return as Phase 4 ports them. The
-  overlay `core` keeps only the `is_graphical_system` fact; its packages
-  come from the image, with `images/scripts/base.sh` adding the three
-  Kinoite lacks. In Fedora 44, `dnf install wget p7zip` installs
-  `wget2-wget` and `7zip`; name those in `base.sh` with the next image change.
+- [x] `ansible_pull`: the unit runs `immutable/x1carbon18.yml` with the overlay config, and `h` is baked into the image as `immutable/images/bin/h`, so role changes never rebuild the image (D5). The overlay role writes `/etc/ansible-pull.conf`, which the unit loads with `EnvironmentFile=` and `h` reads, so the image holds no host-specific paths. It drops the pip installs, the Snapper hooks, and its `dnf`, `nextdns`, and `podman` dependencies; `nextdns` and `podman` return as Phase 4 ports them. The overlay `core` keeps only the `is_graphical_system` fact; its packages come from the image, with `images/scripts/base.sh` adding the three Kinoite lacks. Fedora 44 packages `wget` and `p7zip` as `wget2-wget` and `7zip`, the names `base.sh` uses.
 - [x] `immutable/x1carbon18.yml`, starting with `ansible_pull`; it gains the
   roles Phase 4 ports.
 - [x] `imgman test playbook`: copy the working tree into the VM, then run the
@@ -380,6 +368,15 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
   `ansible_pull` README's first-run command cloned the repository from
   GitHub and ran `immutable/x1carbon18.yml` with the overlay configuration,
   and `h test` then reran it with no changes.
+- [ ] Republish `:stable` from current `main`. The build it points to, `:20261106-7ad2330`, predates `tailscale` in `base.sh` and `scripts/onepassword.sh`, so the first `ansible-pull` after an install from it fails at `tailscaled.service`. On 2026-11-26, desktop25 built image `b4d828c6a407` from `99105cb`, on Kinoite 44.20261107.0, and `imgman test image x1carbon18` and `imgman test playbook x1carbon18` pass on it. Its push to `:20261126-99105cb` did not complete over a slow uplink: 60 of its 77 layers are new to GHCR, about 3.9 GB compressed. The image exists only in desktop25's local storage, so push from there; on another host, rebuild and retest first, which gives a new image ID and may pull a newer Kinoite base. Rerun the push, which skips layers already uploaded, then push `:stable` by image ID, so a rebuild that moves `localhost/workstation-kde` cannot change what `:stable` receives, and check that both tags report the same digest:
+
+  ```sh
+  podman push b4d828c6a407 ghcr.io/seantwie03/workstation-kde:20261126-99105cb
+  podman push b4d828c6a407 ghcr.io/seantwie03/workstation-kde:stable
+  skopeo inspect --format '{{.Digest}}' docker://ghcr.io/seantwie03/workstation-kde:20261126-99105cb
+  skopeo inspect --format '{{.Digest}}' docker://ghcr.io/seantwie03/workstation-kde:stable
+  ```
+
 - [ ] An install runbook, [x1carbon18-install.md](x1carbon18-install.md),
   drafted from the VM rehearsals; its hardware steps are still unverified:
   - BIOS supervisor password, and Secure Boot on. If the install USB does not
@@ -406,9 +403,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 
 **Done when:** `immutable/x1carbon18.yml` has the roles of the root `x1carbon18.yml`, converges in a VM installed with x1carbon18's kickstart, a second run reports no changes, every role under [x1carbon18](#x1carbon18) is checked off with its README and MONITORING current, the checks below pass on the hardware, and x1carbon18 has been in regular use for a soak period (length to be decided) without falling back.
 
-- [ ] Refactor x1carbon18's roles (see the [role checklist](#role-checklist)),
-  one at a time, testing each with `imgman test playbook` before it reaches
-  the laptop through ansible-pull.
+- [ ] Refactor x1carbon18's roles (see the [role checklist](#role-checklist)), one at a time, testing each with `imgman test playbook` before it reaches the laptop through ansible-pull. A role that needs nothing new from the image can reach `main` at any time. A role that needs new image packages waits until a `:stable` that has them is published, or x1carbon18's next `ansible-pull` fails; batch image changes, because each one is another upload to GHCR.
 - [ ] Capability tests, run as `sean` in the VM after the playbook converges.
   For example: opening a TypeScript file in Neovim attaches `ts_ls`, a login
   shell starts without errors, rootless Podman runs a container, and names
@@ -422,8 +417,7 @@ them, where `check-homelab-host` uses them after every upgrade:
   `ts_ls`, and a login shell starts without errors.
 - [ ] DNS (`nextdns`): resolver active, NextDNS DNS-over-TLS works, short names
   resolve through the search domain.
-- [ ] NFS (`network_storage`): at home, `/srv/source`, `/srv/tier1`, and
-  `/srv/tier2` automount with the intended permissions.
+- [ ] NFS (`network_storage`): at home, `/srv/tier1` and `/srv/tier2` automount with the intended permissions.
 - [ ] VPN (`tailscale`): authenticates and routes.
 - [ ] Audio (image): PipeWire and WirePlumber run; output switching, the microphone, and media keys work.
 - [ ] Zoom (`gui`): launches; audio, microphone, webcam, and screen sharing
@@ -638,8 +632,7 @@ that apply to it.
 orbit, the retro-gaming kiosk, the Tailscale exit node, and `/srv` snapshots
 work; and clients' NFS automounts recover.
 
-- [ ] Move `/source` to `/srv/source` on odroidh3plus and point every client's
-  mount at the new export.
+- [ ] Retire the `/source` export, or move it under `/srv` as an archive. No bootc host mounts it (Q19).
 - [ ] Install with the kickstart, keeping the `/srv` volume, and run
   ansible-pull, following the runbook, including downtime for NFS clients.
 - [ ] Capability tests on the hardware for what the VM could not cover, such
@@ -685,12 +678,28 @@ decision in `docs/architecture.md` first.
 - [ ] `imgman test playbook` runs `site.yml` with the same inventory and limit
   as the unit.
 
-### Phase 18: YOLO Agent Setup
+### Phase 18: Coding agent user
 
-- [ ] Move section 7 of the original plan to
-  `docs/projects/agent-workspaces.md`.
-- [ ] Capability test: as `agent`, editing a source checkout works, and reading
-  `/home/sean` or `/srv/tier1` fails.
+**Depends on:** Phase 3. Nothing depends on it, so it runs alongside Phase 4, on x1carbon18 first.
+
+**Done when:** `immutable/x1carbon18.yml` creates `smn-dev-bot3246` and the shared checkouts, converges in a VM installed with x1carbon18's kickstart, a second run reports no changes, the capability tests below pass in the VM, and the README of the new `coding_agent` role describes the design. It replaces section 7 of the original plan.
+
+A coding agent runs in autonomous mode as its own user, `smn-dev-bot3246`. The threat model is a confused agent, not a malicious one, so the user limits what a mistake can reach: the agent cannot use `sudo`, read or write `sean`'s home, write the NFS shares, or push to GitHub. Its mistakes reach only the checkouts it shares with `sean`, which git and btrbk snapshots recover.
+
+Rejected: a container per project, as in Canonical's Workshop, which also requires Ubuntu's LXD 6.8. Each container needs its own toolchain, login, and access configuration, where a host user gets them from shared installs and file permissions. Also rejected: separate clones for the agent, exchanged through GitHub branches; both users work in the same checkouts. Accepted: hooks and `.git/config` settings, such as `core.fsmonitor`, that the agent writes run as whoever runs git next, root included in `/opt/homelab-automation`.
+
+- [ ] The user `smn-dev-bot3246`, with UID and GID 1500 on every host, fixed as `sean`'s are and clear of the IDs `useradd` hands out from 1000 up. It is in no group that grants more: not `wheel`, `docker`, `libvirt`, or `networkshare`. Its GitHub account is `smn-dev-bot3246` and its Gmail address `smn.dev.bot3246`; its commits use the GitHub account's noreply address. Other agents follow the same pattern, `smn-<purpose>-bot3246`. `bot` in the name discloses that an agent did the work when the account acts on its own; work `sean` reviews and stands behind goes out from his own account. GitHub's terms allow one free machine account per person, as best remembered, so check them before creating a second; GitHub Apps, which act as `<name>[bot]`, are the alternative.
+- [ ] The `sourceshare` group, GID 5568, with `sean` and `smn-dev-bot3246`.
+- [ ] `/srv/s`, the shared checkouts: a btrfs subvolume at `/var/srv/s`, owned by `sean:sourceshare` with mode `2775`, and a default ACL that gives `sourceshare` `rwX`, so new files stay writable by both users whatever their creator's umask. Add it to btrbk's subvolumes when Phase 4 ports `btrfs`; until then, only git protects its work. The image has `btrfs-progs` and `acl` but only the `ansible.posix` collection, so create the subvolume with `btrfs subvolume create` rather than `community.general.btrfs_subvolume`, and set the ACLs with `ansible.posix.acl`.
+- [ ] `/opt/homelab-automation` in group `sourceshare` instead of `wheel`, with setgid directories and the same default ACL. Its owner stays `root`, so root's git runs in `ansible-pull` and `h` pass git's ownership check. The `ansible_pull` role's "wheel group can edit" task already resets the checkout to `root:wheel` and `u=rwX,g=rwX,o=rX` on every run, with `changed_when: false`, so change that task's group, rather than adding a second task that the two roles silently fight over. Its `/etc/gitconfig` block, with the marker `ansible_pull`, already marks the checkout as a `safe.directory`; a `coding_agent` block needs its own marker.
+- [ ] `/etc/gitconfig` marks the shared checkouts as `safe.directory` and sets `core.sharedRepository=group` for them: git refuses to run in a repository another user owns, and it sets some file modes itself. Check whether git matches `/srv/s` or `/var/srv/s` on a bootc host.
+- [ ] A sudoers rule that lets `sean` run commands as `smn-dev-bot3246` without a password, for `sudo -u smn-dev-bot3246 -i`. `sudo` starts no login session, so for rootless Podman or `systemctl --user` the agent needs `machinectl shell smn-dev-bot3246@` instead.
+- [ ] No credentials: no GitHub token or SSH key, so the agent commits and `sean` pushes. It logs in to Claude Code and Codex as itself, once per host.
+- [ ] Tools (D4): as Phase 4 ports `cli`, `ai`, `nodejs`, `python`, `dotnet`, and `rust`, pinned tools go in `/usr/local` for every user, and tools that update themselves, such as Claude Code and Codex, and language runtimes (Q8) install into both users' homes.
+- [ ] Capability tests in the VM:
+  - Each user edits, commits, and deletes files the other created, in a checkout under `/srv/s` and in `/opt/homelab-automation`, and runs git in a checkout the other cloned. Include files that tools such as `pnpm` and `git` created: a tool's own `chmod` rewrites the ACL mask and can drop group write.
+  - After the agent has written to `/opt/homelab-automation`, the playbook still converges as the `ansible_pull` unit runs it.
+  - As `smn-dev-bot3246`, reading `/home/sean` and running `sudo` fail. Once Phase 4 ports `network_storage`, writing `/srv/tier1` fails too.
 
 ## Role checklist
 
@@ -702,31 +711,18 @@ refactoring the role.
 
 The roles of the root `x1carbon18.yml`, including roles pulled in as dependencies. desktop22 and desktop25 run all of them too.
 
-- [ ] `core`: base packages to the image; limits, sysctl, and group membership
-  stay.
+- [ ] `core`: base packages to the image; limits, sysctl, and group membership stay. Checked 2026-11-26: the image has every package the root role installs, and the root role manages no limits, sysctl, or groups, so the overlay `core` may already be complete. Confirm, then check it off.
 - [ ] `ansible_pull`: `ansible-core`, `git`, and collections to the image; units, logrotate, and `h` stay; drop pip upgrades, `dnf-makecache` ordering, and Snapper hooks. Move `h` from `immutable/images/bin/` back into the role, installed as `/usr/local/bin/h` with its completion in `/etc/bash_completion.d/`, then remove `bin/` and its `COPY` lines from the image. `/usr/local/bin` comes before `/usr/bin` on `PATH`, so the role's `h` takes over before the image change lands. Template `h`, its completion, and `ansible-pull.service` from the role's variables, as the root role does, and drop `/etc/ansible-pull.conf`; the unit sets `ANSIBLE_CONFIG` itself until the move to the root. Update the role's README and MONITORING, and the `h` entry under "Contents" in `immutable/images/README.md`, which describe the file.
 - [ ] `dnf`: drop; OS updates come from images (Q6).
 - [ ] `rpm_fusion`: drop. Images use no RPM Fusion (Q14): Flatpak apps bring
   their own codecs, and Steam comes from Flathub.
-- [ ] `btrfs`: `btrbk` to the image; configuration and timers stay. `/` is
-  read-only, so snapshots move under a mount of the btrfs top level in
-  `/var/mnt`. Snapshot the `home` subvolume; nested subvolumes for `~/.cache`
-  and `~/.local/share/containers` keep those directories out of snapshots
-  (the kickstart creates them at install). desktop22 already has both.
-- [ ] `nextdns`: packages to the image; resolver configuration stays.
+- [ ] `btrfs`: `btrbk` to the image; configuration and timers stay. `/` is read-only, so snapshots move under a mount of the btrfs top level in `/var/mnt`. Snapshot the `home` subvolume; nested subvolumes for `~/.cache` and `~/.local/share/containers` keep those directories out of snapshots (the kickstart creates them at install). desktop22 already has both. Neither `btrbk` nor `btrfsmaintenance` is in the image yet.
+- [ ] `nextdns`: packages to the image; resolver configuration stays. The image already ships `systemd-resolved`, and the role writes only under `/etc` and `/usr/local/bin`, so porting it needs no image change. Copy the root role as of 2026-11-26, which added the per-link DNS-over-TLS drop-in.
 - [x] `tailscale`: package to the image; enablement, sysctl, and routes stay.
   Fedora packages it, so the image installs it with `scripts/base.sh`. Its
   state and cache directories under `/var` move to `tmpfiles.d`, which
   `bootc container lint` requires.
-- [ ] `network_storage`: `nfs-utils` to the image; automounts and groups stay.
-  Mount `/source` at `/srv/source`. The role needs separate remote and local
-  paths, because odroidh3plus keeps exporting `/source` until its cutover in
-  Phase 15. `/srv` links to `/var/srv`, so fstab entries name the real mount
-  point, such as `/var/srv/tier1`: on Fedora Atomic, an fstab mount point
-  under the `/mnt` link failed where its `/var/mnt` path worked
-  ([Team Silverblue issue 46](https://pagure.io/teamsilverblue/issue/46)).
-  Everything else, people and scripts included, uses `/srv`. Confirm the
-  mounts in the VM.
+- [ ] `network_storage`: `nfs-utils` to the image; automounts and groups stay. Drop the `/source` mount: source code lives in git clones in `/srv/s` (Q19). `/srv` links to `/var/srv`, so fstab entries name the real mount point, such as `/var/srv/tier1`: on Fedora Atomic, an fstab mount point under the `/mnt` link failed where its `/var/mnt` path worked ([Team Silverblue issue 46](https://pagure.io/teamsilverblue/issue/46)). Everything else, people and scripts included, uses `/srv`. Confirm the mounts in the VM. The image already has `nfs-utils` and `cifs-utils`. On desktop25, `/srv/tier1` and `/srv/tier2` are mode `0775`, readable by every local user, the coding agent included, and the role creates its mount points with `0775`, where section 7 assumed `0770`. Decide while porting, and check the shares' top directories on odroidh3plus too.
 - [ ] `docker`, `podman`: packages to the image; enablement and groups stay.
 - [ ] `libvirt`: packages to the image, including QEMU, OVMF, the SPICE
   support that `imgman` needs, and `python3-libvirt` for
@@ -737,11 +733,9 @@ The roles of the root `x1carbon18.yml`, including roles pulled in as dependencie
   rollbacks, which bootc hosts no longer do, so the kickstarts add no
   subvolume for it.
 - [ ] `flatpak`: remotes and apps stay; they live in `/var`.
-- [ ] `nodejs`, `python`, `dotnet`, `rust`: user space, through each
-  language's own version manager (Q8). The image keeps only `python3`, which
-  Ansible needs.
-- [ ] `cli`: rewrite for user-space installs into `~/bin`; drop package tasks.
-- [ ] `ai`: user-space installs stay; drop global `npm` installs.
+- [ ] `nodejs`, `python`, `dotnet`, `rust`: user space, through each language's own version manager (Q8), for `sean` and the coding agent (Phase 18). The image keeps only `python3`, which Ansible needs.
+- [ ] `cli`: rewrite for pinned installs into `/usr/local`, shared by every user (D4); drop package tasks.
+- [ ] `ai`: user-space installs stay, for `sean` and the coding agent (Phase 18); drop global `npm` installs.
 - [ ] `fonts`: system fonts to the image; user fonts stay.
 - [x] `onepassword`: RPMs and signing key to the image
   (`scripts/onepassword.sh`); the runtime role keeps only the app's autostart.
@@ -766,8 +760,7 @@ The roles desktop22 adds to x1carbon18's.
 - [ ] `wifi`: NetworkManager and firmware to the image. The role only installs
   packages, so it goes away; Kinoite already ships them, which is why
   x1carbon18 needs no `wifi` role.
-- [ ] `ai_health_monitor`: system user to the image; sudoers, logrotate,
-  scripts, and units stay.
+- [ ] `ai_health_monitor`: system user to the image; sudoers, logrotate, scripts, and units stay. Rename the user `smn-health-bot3246`, following Phase 18's naming.
 - [ ] `gaming`: Steam from Flathub (Q14); Wine and udev rules to the image;
   user configuration stays. Mount the games SSD at `/srv/games`, with
   `/var/srv/games` in fstab, as `network_storage` does; no role manages that
@@ -779,8 +772,7 @@ No roles beyond desktop22's.
 
 ### odroidh3plus
 
-- [ ] `nfs`, `smb`: server packages to the image; exports, shares, and services
-  stay. The `/source` export moves to `/srv/source`, onto the `/srv` volume.
+- [ ] `nfs`, `smb`: server packages to the image; exports, shares, and services stay. Phase 15 retires the `/source` export or moves it under `/srv` (Q19).
 - [ ] `karakeep`: the compose project stays; it lives under `/opt/karakeep`
   today (Q1).
 - [ ] `orbit`: to be audited.
@@ -813,10 +805,10 @@ Each of these describes the traditional setup. Write its replacement under
 |     | host tracks and CI moves to a build once it passes its VM tests, plus a      |          |
 |     | date-and-commit tag per build.                                               |          |
 | Q7  | The `cli` role installs your everyday tools with `dnf`, which runtime roles  | Phase 4  |
-|     | cannot do. Which go into the image, and which become pinned user-space       |          |
-|     | downloads (D4)? The recommendation: stable distro tools (`git`, `tree`,      |          |
+|     | cannot do. Which go into the image, and which become pinned downloads in     |          |
+|     | `/usr/local` (D4)? The recommendation: stable distro tools (`git`, `tree`,   |          |
 |     | `bind-utils`, `fzf`, `bat`, `abduco`) into the image; fast-moving tools with |          |
-|     | release builds (Neovim, `gh`, `yazi`, `asciinema`) into user space. The      |          |
+|     | release builds (Neovim, `gh`, `yazi`, `asciinema`) into `/usr/local`. The    |          |
 |     | login shell is bash, which the image already ships.                          |          |
 | Q12 | odroidh3plus cutover: downtime for NFS clients, keeping `/srv` on its own    | Phases 9 |
 |     | volume, and moving its services. fedora-bootc ships `/opt` read-only (Q1):   | and 15   |
@@ -863,8 +855,9 @@ Each of these describes the traditional setup. Write its replacement under
 |     | reboots to apply, is not used as shipped. The server's policy is part of Q12. Recorded in  |
 |     | Phase 3.                                                                                   |
 | Q8  | Language runtimes (`nodejs`, `python`, `dotnet`, `rust`) live in user space, each through  |
-|     | its own version manager, so per-project versions and updates need no image build. The      |
-|     | image keeps only `python3`, which Ansible needs.                                           |
+|     | its own version manager, so per-project versions and updates need no image build. Each     |
+|     | user that needs them, `sean` and the coding agent, gets its own install. The image keeps   |
+|     | only `python3`, which Ansible needs.                                                       |
 | Q10 | Images: the VM harness runs a registry container on `127.0.0.1:5000`, which the VM reaches |
 |     | at `10.0.2.2:5000`, and the test disk tracks a tag there. Checkout: `imgman test playbook` |
 |     | copies the working tree into the VM over SSH. Recorded in `immutable/images/README.md`.    |
@@ -879,3 +872,10 @@ Each of these describes the traditional setup. Write its replacement under
 |     | and no role enables it. desktop22 runs one today, so it loses it at its cutover.           |
 | Q16 | x1carbon18 is not replaced. It stays a workstation and is the first bootc host, on         |
 |     | `workstation-kde` with LUKS2 and TPM2 + PIN. Recorded in the scope table and Phase 3.      |
+| Q19 | Source code lives in git clones, pushed and pulled through GitHub by hand: in `/srv/s` on  |
+|     | bootc workstations, shared by `sean` and the coding agent (Phase 18), and in `~/s` on      |
+|     | traditional hosts until their cutover. No bootc host mounts `/source`. Over Tailscale off  |
+|     | the LAN, NFS was too slow for `pnpm dev`, and a shared checkout never carried agent        |
+|     | sessions between hosts. Context that outlives a session goes in plan files, specs, or      |
+|     | `AGENTS.md`, committed with the code, and sessions stay short, so nothing syncs agent      |
+|     | state. Recorded in the filesystem table, the role checklist, and Phases 15 and 18.         |

@@ -1,10 +1,8 @@
 # imgman
 
-Builds this repository's bootc images and tests them in VMs that stand in for
-the hosts in `images/hosts.toml`. Each VM's disk is installed by Anaconda with
-the host's own kickstart, the same file that installs the host's hardware, so
-the VM has the hardware's disk layout, encryption, and user accounts. imgman
-runs without root.
+> Image Manager. Similar syntax to `podman`. Manages bootc images.
+
+Builds this repository's bootc images and tests them in VMs that stand in for the hosts in `images/hosts.toml`. Each VM's disk is installed by Anaconda with the host's own kickstart, the same file that installs the host's hardware, so the VM has the hardware's disk layout, encryption, and user accounts. imgman runs without root.
 
 ## Installing
 
@@ -14,24 +12,22 @@ From the repository root:
 uv tool install --editable imgman
 ```
 
-This puts `imgman` on `PATH` in `~/.local/bin`. imgman reads the checkout it
-was installed from, so it works only from an editable install, and changes to
-its source take effect without reinstalling.
+This puts `imgman` on `PATH` in `~/.local/bin`. imgman reads the checkout it was installed from, so it works only from an editable install, and changes to its source take effect without reinstalling.
 
 ## Commands
 
 ```text
-imgman image build [FLAVOR] [--all]                 build and lint an image
-imgman machine init [HOST] [--all] [--flavor NAME]  install a host's VM disk with its kickstart
-imgman machine run  [HOST] [--all] [--flavor NAME] [--no-gui]
-                                                    boot a host's VM from a fresh overlay
-imgman machine ssh  [HOST] [COMMAND ...]            run a command as root in the VM, or open a shell
-imgman machine gui  [HOST]                          open the VM's display in remote-viewer
-imgman machine rm   [HOST] [--all]                  stop the VM and remove its overlay
-imgman test image   [HOST] [--all] [--flavor NAME] [--rm] [--no-gui]
-                                                    install if needed, boot fresh, and check the VM
-imgman test playbook [HOST] [--all] [--flavor NAME] [--rm] [--no-gui]
-                                                    run the host's playbook from the working tree, twice
+imgman image build   [FLAVOR] [--all]                  build and lint an image
+imgman machine init  [HOST]   [--all] [--flavor NAME]  install a host's VM disk with its kickstart
+imgman machine run   [HOST]   [--all] [--flavor NAME] [--no-gui]
+                                                       boot a host's VM from a fresh overlay
+imgman machine ssh   [HOST]   [COMMAND ...]            run a command as root in the VM, or open a shell
+imgman machine gui   [HOST]                            open the VM's display in remote-viewer
+imgman machine rm    [HOST]   [--all]                  stop the VM and remove its overlay
+imgman test image    [HOST]   [--all] [--flavor NAME] [--rm] [--no-gui]
+                                                       install if needed, boot fresh, and check the VM
+imgman test playbook [HOST]   [--all] [--flavor NAME] [--rm] [--no-gui]
+                                                       run the host's playbook from the working tree, twice
 ```
 
 - `HOST` defaults to this machine's short hostname when `hosts.toml` lists it.
@@ -110,6 +106,7 @@ Fedora version the Containerfiles set in `FEDORA_MAJOR_VERSION`, verify it,
 and place it in `~/.cache/homelab-images/iso/`. For Fedora 44:
 
 ```sh
+[ -d ~/.cache/homelab-images ] || { mkdir ~/.cache/homelab-images && chattr +C ~/.cache/homelab-images; }
 mkdir -p ~/.cache/homelab-images/iso && cd ~/.cache/homelab-images/iso
 base=https://download.fedoraproject.org/pub/fedora/linux/releases/44/Everything/x86_64/iso
 curl -fLO "$base/Fedora-Everything-44-1.7-x86_64-CHECKSUM"
@@ -123,6 +120,8 @@ rm fedora-44.gpg
 Fedora's release key is already on every Fedora host. `gpgv` needs it
 dearmored into a keyring file; it cannot read a key from a pipe. Keep exactly
 one ISO for each Fedora version: imgman refuses to choose between two.
+
+imgman creates `~/.cache/homelab-images` with `chattr +C`, so the disks in it skip btrfs copy-on-write and compression, but only when the directory does not exist yet. The first line does the same, because placing the ISO would otherwise create the directory without it.
 
 ## How it works
 
