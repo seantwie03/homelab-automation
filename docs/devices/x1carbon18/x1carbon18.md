@@ -14,7 +14,7 @@ Since the X1 Carbon is a laptop, it sometimes gets taken with me when I travel. 
 
 ## Hardware Information
 
-- **Model Number**: 20KG022US
+- **Model Number**: 20KG0022US
 - **Machine Name**: x1carbon18
 
 
@@ -22,7 +22,17 @@ Since the X1 Carbon is a laptop, it sometimes gets taken with me when I travel. 
 
 - **Processor**: Intel i7-8550U
 - **RAM**: 16GB
-- **HDD**: 512GB
+- **HDD**: 512GB NVMe, `/dev/disk/by-id/nvme-LENSE30512GMSP34MEAT3TA_1207865800766`
+- **GPU**: Intel UHD Graphics 620
+- **Wi-Fi**: Intel Wireless 8265
+- **TPM**: TPM 2.0 (Infineon)
+- **Fingerprint reader**: Synaptics `06cb:009a`
+
+### Linux Support
+
+- The fingerprint reader works for the BIOS but not in Linux: Fedora's libfprint has no driver for it.
+- Fedora's own VA-API driver decodes MPEG-2, JPEG, VP8, and VP9 in hardware. H.264, HEVC, and VC-1 need RPM Fusion's `intel-media-driver`.
+- Suspend uses S3 (`deep`) sleep.
 
 ### Links
 
@@ -33,4 +43,6 @@ Since the X1 Carbon is a laptop, it sometimes gets taken with me when I travel. 
 ## BIOS
 
 The BIOS is fingerprint or password protected.
+
+The BIOS is at version 1.59 (N23ET84W). LVFS offers 1.68 and an Intel ME update, but fwupd failed to apply them with Secure Boot off: choosing Linux-Firmware-Updater flashes the screen and returns to the boot menu. Lenovo's bootable BIOS update ISO, from the Drivers and Firmware page, updates the BIOS without fwupd.
 

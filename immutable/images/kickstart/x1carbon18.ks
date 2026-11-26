@@ -8,9 +8,7 @@
 #   imgman.luks-passphrase    the LUKS passphrase, for a throwaway VM only
 # imgman passes all four to install from its test registry onto a VM's disk.
 # Without them, %pre uses this host's published image and system disk, verifies
-# TLS, and leaves the passphrase out, so Anaconda asks for it. The system disk
-# is a placeholder until it is read from the hardware, so a hardware install
-# stops in %pre until then.
+# TLS, and leaves the passphrase out, so Anaconda asks for it.
 text
 lang en_US.UTF-8
 keyboard us
@@ -28,7 +26,7 @@ arg() {
 url=$(arg 'imgman\.url')
 url=${url:-ghcr.io/seantwie03/workstation-kde:stable}
 disk=$(arg 'imgman\.disk')
-disk=${disk:-disk/by-id/placeholder}
+disk=${disk:-disk/by-id/nvme-LENSE30512GMSP34MEAT3TA_1207865800766}
 insecure=$(arg 'imgman\.insecure-registry')
 passphrase=$(arg 'imgman\.luks-passphrase')
 if [ -n "$insecure" ]; then

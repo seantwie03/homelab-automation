@@ -45,7 +45,7 @@ The reasons and rejected alternatives are in the
 
 [d8]: ../docs/architecture.md#d8-full-disk-encryption
 
-x1carbon18 goes first. It needs no NVIDIA modules, and it is not the daily driver, so desktop22 carries the daily work while it settles in. It runs Secure Boot with Fedora's signed boot chain, so it needs no signing keys of this repository's own. Its current Fedora install answers the hardware questions before the install wipes the disk. Its home directory is backed up before the install and restored after it, the first real run of the restore that Phase 10 rehearses for the other hosts.
+x1carbon18 goes first. It needs no NVIDIA modules, and it is not the daily driver, so desktop22 carries the daily work while it settles in. It runs Secure Boot with Fedora's signed boot chain, so it needs no signing keys of this repository's own. Its current Fedora install answers the hardware questions before the install wipes the disk. Its home directory holds nothing that is not also on the NFS shares or GitHub, so it is not backed up, and the install starts it empty; desktop22's cutover is the first real run of the restore that Phase 10 rehearses.
 
 Agent workspaces (section 7 of the original plan) are a separate project. So is
 a self-hosted forge with CI and a container registry, such as Forgejo or GitLab
@@ -321,12 +321,12 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 
 ### Phase 3: x1carbon18 install
 
-**Depends on:** Phase 2, a verified backup of x1carbon18's home directory.
+**Depends on:** Phase 2.
 
-**Done when:** x1carbon18 boots its image from GHCR with Secure Boot on and its disk unlocked by TPM2 + PIN, `immutable/x1carbon18.yml` converges through the ansible-pull timer, the restored `/var/home/sean` is readable with correct ownership and SELinux labels, a `bootc upgrade` to a newer build and a `bootc rollback` keep `/var/home`, and the install runbook in `migration/` matches what was done.
+**Done when:** x1carbon18 boots its image from GHCR with Secure Boot on and its disk unlocked by TPM2 + PIN, `immutable/x1carbon18.yml` converges through the ansible-pull timer, a `bootc upgrade` to a newer build and a `bootc rollback` keep `/var/home`, and the install runbook in `migration/` matches what was done.
 
-- [ ] Survey the hardware from x1carbon18's current Fedora install, before anything wipes it, and record the results in `docs/devices/x1carbon18/x1carbon18.md`: the system disk's `/dev/disk/by-id/` path, from `ls -l /dev/disk/by-id/`; the Secure Boot state, from `mokutil --sb-state`; and the TPM version, from `cat /sys/class/tpm/tpm0/tpm_version_major`, which must print `2` for TPM2 + PIN (D8). Run Phase 4's audio and laptop checks there too, so a check that fails after the install points at the image, not the hardware. Drop any check the hardware cannot pass on either install, such as a fingerprint reader that Fedora's libfprint does not support.
-- [ ] Back up `/home/sean` off the laptop, and check that the backup reads back. After the first boot, restore what is worth keeping into `/var/home/sean` with `rsync`, into the existing directories, so the kickstart's nested subvolumes (`~/.cache`, `~/.local/share/containers`, `~/Downloads`) stay subvolumes. Then run `restorecon -R /var/home/sean`. The UID and GID are 1000 on both installs, so ownership carries over.
+- [x] Survey the hardware from x1carbon18's current Fedora install, recorded in `docs/devices/x1carbon18/x1carbon18.md`. The system disk is `/dev/disk/by-id/nvme-LENSE30512GMSP34MEAT3TA_1207865800766`, Secure Boot was off, and the TPM is version 2, so TPM2 + PIN works (D8). Phase 4's audio and laptop checks were not run on Fedora, where the laptop has worked for years. Two findings change Phase 4's checks: the fingerprint reader, a Synaptics `06cb:009a`, has no libfprint driver, so its check is dropped; and Fedora's VA-API driver decodes MPEG-2, JPEG, VP8, and VP9 but not H.264, HEVC, or VC-1, which on Fedora came from RPM Fusion. fwupd installed the latest dbx, but its BIOS (1.59 to 1.68) and Intel ME updates failed: the firmware updater returns straight to the boot menu. Neither is needed for the install. Retry them on the bootc install, where fwupd starts its updater through shim, or use Lenovo's bootable BIOS ISO; either way, re-enroll the TPM afterwards.
+- [x] No home directory backup: x1carbon18's home directory holds nothing that is not also on the NFS shares or GitHub, so the install starts it empty.
 - [x] Publish by hand: push `localhost/workstation-kde` to the public GHCR
   package `ghcr.io/seantwie03/workstation-kde`, tagged with its date and git
   commit (D5), and move `:stable`, the tag x1carbon18 tracks, to it only after
@@ -375,7 +375,7 @@ passes for desktop22 and desktop25; `vm_test.py`, `vm_test_tests.py`, and
 - [x] Set the image URL in x1carbon18's `%pre` to
   `ghcr.io/seantwie03/workstation-kde:stable`. VM installs override it with
   `imgman.url`.
-- [ ] On the day of the install, after the backup, replace the placeholder system disk in x1carbon18's `%pre` with the `/dev/disk/by-id/` path the survey recorded. Until then, the placeholder fails `%pre`'s disk check, so a hardware install cannot start by accident and wipe a disk that still holds data.
+- [x] Replace the placeholder system disk in x1carbon18's `%pre` with the `/dev/disk/by-id/` path the survey recorded. Booting the installer with x1carbon18's kickstart now wipes that disk.
 - [x] Bootstrap rehearsal: in a fresh x1carbon18 VM with no checkout, the
   `ansible_pull` README's first-run command cloned the repository from
   GitHub and ran `immutable/x1carbon18.yml` with the overlay configuration,
@@ -428,7 +428,7 @@ them, where `check-homelab-host` uses them after every upgrade:
 - [ ] Audio (image): PipeWire and WirePlumber run; output switching, the microphone, and media keys work.
 - [ ] Zoom (`gui`): launches; audio, microphone, webcam, and screen sharing
   work.
-- [ ] Laptop (image): Wi-Fi connects; suspend and resume work; the fingerprint reader enrolls and unlocks, if the survey found it supported; power profiles switch from Plasma's power applet; external displays work over Thunderbolt and HDMI; `vainfo` lists hardware video decoding; `fwupdmgr get-updates` runs.
+- [ ] Laptop (image): Wi-Fi connects; suspend and resume work; power profiles switch from Plasma's power applet; external displays work over Thunderbolt and HDMI; `vainfo` lists hardware decoding of MPEG-2, VP8, and VP9, the codecs Fedora's driver supports; `fwupdmgr get-updates` runs.
 
 ### Phase 5: Runtime roles for desktop22
 
